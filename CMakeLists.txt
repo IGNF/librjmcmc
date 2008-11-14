@@ -78,9 +78,10 @@ IF(UNIX)
 											 ${wxWidgets_LIBRARIES}
 											 ${Boost_LIBRARIES}
 											 ${CGAL_LIBRARIES}
-											 ITKViewer
-											 shapelib
-											 tinyxml )
+#											 ITKViewer
+#											 shapelib
+#											 tinyxml 
+											 )
 ENDIF(UNIX)
 IF(WIN32)
 	ADD_EXECUTABLE( RJMCMC_Rectangles WIN32 ${ALL_SRC} ${SRC_XML} )
@@ -89,6 +90,7 @@ ENDIF(WIN32)
 											 ${wxWidgets_LIBRARIES}
 											 ${Boost_LIBRARIES}
 											 ${CGAL_LIBRARIES}
-											 ITKViewer
-											 shapelib
-											 tinyxml )
+#											 ITKViewer
+#											 shapelib
+#											 tinyxml 
+											)
