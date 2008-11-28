@@ -1,40 +1,53 @@
 #include "BuildingsDetectorParameters.hpp"
 
-void BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
+bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
 {
 	if ((argc-1) % 2 != 0)
-	Usage();
+	{
+		Usage(argv[0]);
+		return false;
+	}
 	for (int i = 1; i<argc; i += 2)
 	{
 		std::string str(argv[i]);
 		if (str == "-img")
-		InputDataFilePath(argv[i+1]);
+			InputDataFilePath(argv[i+1]);
 		else if (str == "-nbi")
-		NbIterations(atoi(argv[i+1]));
+			NbIterations(atoi(argv[i+1]));
 		else if (str == "-nbd")
-		NbIterationsDump(atoi(argv[i+1]));
+			NbIterationsDump(atoi(argv[i+1]));
+		else if (str == "-originx")
+			RunningOriginX(atoi(argv[i+1]));
+		else if (str == "-originy")
+			RunningOriginY(atoi(argv[i+1]));
 		else if (str == "-sizex")
-		InputImageWidth(atoi(argv[i+1]));
+			RunningWidth(atoi(argv[i+1]));
 		else if (str == "-sizey")
-		InputImageHeight(atoi(argv[i+1]));
+			RunningHeight(atoi(argv[i+1]));
 		else if (str == "-temp")
-		InitialTemperature(atof(argv[i+1]));
+			InitialTemperature(atof(argv[i+1]));
 		else if (str == "-coef")
-		DecreaseCoefficient(atof(argv[i+1]));
+			DecreaseCoefficient(atof(argv[i+1]));
 		else if (str == "-Pbirth")
-		ProbaBirth(atof(argv[i+1]));
+			ProbaBirth(atof(argv[i+1]));
 		else if (str == "-Pdeath")
-		ProbaDeath(atof(argv[i+1]));
+			ProbaDeath(atof(argv[i+1]));
 		else
-		Usage();
+		{
+			Usage(argv[0]);
+			return false;
+		}
 	}
 	ComputeProb();
+	return true;
 }
 
-void BuildingsDetectorParametersSingleton::Usage() const
+void BuildingsDetectorParametersSingleton::Usage(const char *nomExe) const
 {
 	std::cout
-			<< "Usage : ./XXXX [-img data.bmp][-nbi 10000000] [-nbd 10000] [-sizex 50] [-sizey 50] [-temp 100] [-coef 0.999999] [-Pbirth 0.1] [-Pdeath 0.1]"
+			<< "Usage : "
+			<< nomExe
+			<< " [-img data.bmp][-nbi 10000000] [-nbd 10000] [-originx 0] [-originy 0] [-sizex 50] [-sizey 50] [-temp 100] [-coef 0.999999] [-Pbirth 0.1] [-Pdeath 0.1]"
 			<< std::endl;
 }
 
@@ -48,11 +61,17 @@ void BuildingsDetectorParametersSingleton::GetAsText(std::vector< std::pair<std:
 	oss << NbIterationsDump();
 	pileText.push_back(make_pair("Nombre d'iterations entre chaque visualisation", oss.str() ) );
 	oss.str("");
-	oss << InputImageWidth();
+	oss << RunningWidth();
 	pileText.push_back(make_pair("Taille en X", oss.str() ) );
 	oss.str("");
-	oss << InputImageHeight();
+	oss << RunningHeight();
 	pileText.push_back(make_pair("Taille en Y", oss.str() ) );
+	oss.str("");
+	oss << RunningOriginX();
+	pileText.push_back(make_pair("Origine en X", oss.str() ) );
+	oss.str("");
+	oss << RunningOriginY();
+	pileText.push_back(make_pair("Origine en Y", oss.str() ) );
 	oss.str("");
 	oss << VarianceGaussianFilter();
 	pileText.push_back(make_pair("Variance filtre gaussien", oss.str() ) );
@@ -114,17 +133,29 @@ void BuildingsDetectorParametersSingleton::SetFromText(const std::vector< std::p
 			iss >> nbi;
 			NbIterationsDump(nbi);
 		}
+		else if (type == std::string("Origine en X"))
+		{
+			unsigned int sizex;
+			iss >> sizex;
+			RunningOriginX(sizex);
+		}
+		else if (type == std::string("Origine en Y"))
+		{
+			unsigned int sizey;
+			iss >> sizey;
+			RunningOriginY(sizey);
+		}
 		else if (type == std::string("Taille en X"))
 		{
 			unsigned int sizex;
 			iss >> sizex;
-			InputImageWidth(sizex);
+			RunningWidth(sizex);
 		}
 		else if (type == std::string("Taille en Y"))
 		{
 			unsigned int sizey;
 			iss >> sizey;
-			InputImageHeight(sizey);
+			RunningHeight(sizey);
 		}
 		else if (type == std::string("Variance filtre gaussien"))
 		{
@@ -211,9 +242,10 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 //	m_inputImageWidth(1695),
 //	m_inputImageHeight(1575),
 	m_inputDataFilePath("./data/Marseille/Crop_MNE_Marseille.tif"),
-//	m_inputDataFilePath("D:\\Codes\\ITKViewer\\other\\rjmcmc_buildings\\data\\Marseille\\UnBloc_MNE_Marseille.tif"),
-	m_inputImageWidth(1000),
-	m_inputImageHeight(1000),
+	m_runningOriginX(0),
+	m_runningOriginY(0),
+	m_runningWidth(1000),
+	m_runningHeight(1000),
 	m_varianceGaussianFilter(2.0),
 	m_rectangleMinimalSize(5.),
 	m_rectangleMaximalRatio(5.),

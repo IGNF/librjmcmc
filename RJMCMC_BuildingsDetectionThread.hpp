@@ -33,10 +33,10 @@ typedef RJMCMC_Detector<RectangleNode, RectanglePointsPriorEnergyPolicy, ImageGr
 void* RJMCMC_BuildingsDetectionThread::Entry()
 {
 	BBox::PointType size , origin;
-	size[0] = BuildingsDetectorParametersSingleton::Instance()->InputImageWidth()-1;
-	size[1] = BuildingsDetectorParametersSingleton::Instance()->InputImageHeight()-1;
-	origin[0] = 0;
-	origin[1] = 0;
+	size[0] = BuildingsDetectorParametersSingleton::Instance()->RunningWidth()-1;
+	size[1] = BuildingsDetectorParametersSingleton::Instance()->RunningHeight()-1;
+	origin[0] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginX();
+	origin[1] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginY();
 	BuildingsDetector buildingsDetector(BBox(size, origin));
 	Sampler< BuildingsDetector > sampler( BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
 

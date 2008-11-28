@@ -28,10 +28,16 @@ public:
 
 	std::string InputDataFilePath() const { return m_inputDataFilePath; }
 	void InputDataFilePath( const std::string &path ) { m_inputDataFilePath = path; }
-	unsigned int InputImageWidth() const { return m_inputImageWidth; }
-	void InputImageWidth( unsigned int width ) { m_inputImageWidth = width; }
-	unsigned int InputImageHeight() const { return m_inputImageHeight; }
-	void InputImageHeight( unsigned int height ) { m_inputImageHeight = height; }
+
+	unsigned int RunningOriginX() const { return m_runningOriginX; }
+	void RunningOriginX(unsigned int x) { m_runningOriginX = x; }
+	unsigned int RunningOriginY() const { return m_runningOriginY; }
+	void RunningOriginY(unsigned int y) { m_runningOriginY = y; }
+	unsigned int RunningWidth() const { return m_runningWidth; }
+	void RunningWidth( unsigned int width ) { m_runningWidth = width; }
+	unsigned int RunningHeight() const { return m_runningHeight; }
+	void RunningHeight( unsigned int height ) { m_runningHeight = height; }
+
 	const std::vector<double> &CumulatedProbabilities() const { return m_probas; }
 	double VarianceGaussianFilter() const { return m_varianceGaussianFilter; }
 	void VarianceGaussianFilter(double variance) { m_varianceGaussianFilter = variance; }
@@ -50,8 +56,8 @@ public:
 	double IndividualEnergy() const { return m_individualEnergy; }
 	void IndividualEnergy(double energy) { m_individualEnergy = energy; }
 
-	void ParseCmdLine(int argc, char **argv);
-	void Usage() const;
+	bool ParseCmdLine(int argc, char **argv);
+	void Usage(const char *nomExe) const;
 	void GetAsText(std::vector< std::pair<std::string, std::string> > &pileText) const;
 	void SetFromText(const std::vector< std::pair<std::string, std::string> > &pileText);
 
@@ -65,8 +71,10 @@ private:
 	double m_probaBirth;
 	double m_probaDeath;
 	std::string m_inputDataFilePath;
-	unsigned int m_inputImageWidth;
-	unsigned int m_inputImageHeight;
+	unsigned int m_runningOriginX;
+	unsigned int m_runningOriginY;
+	unsigned int m_runningWidth;
+	unsigned int m_runningHeight;
 	double m_varianceGaussianFilter;
 	double m_rectangleMinimalSize;
 	double m_rectangleMaximalRatio;

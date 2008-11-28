@@ -10,8 +10,9 @@ public :
 
 int main (int argc, char **argv)
 {
+
 	RJMCMC_BuildingsDetectionThread rien;
-	BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc, argv);
-	rien.Entry();
+	if (BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc, argv))
+		rien.Entry();
 	return 0;
 }
