@@ -1,1 +1,1 @@
-#define	USE_IHM	0
+#define	USE_IHM	1

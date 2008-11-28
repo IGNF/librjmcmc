@@ -60,27 +60,27 @@ ENDIF(WIN32)
 #SET( ITKVIEWERPATH  ../../trunk/ )
 SET( ITKVIEWERPATH "" CACHE PATH "Path to ITKViewer" )
 
-LINK_DIRECTORIES( ${LINK_DIRECTORIES} ${ITKVIEWERPATH}/cots/lib )
-#INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES} ${ITKVIEWERPATH}/src )
-#INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES} ${ITKVIEWERPATH}/cots )
-#INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES} ${ITKVIEWERPATH}/cots/tinyxml_2.5.3 )
+LINK_DIRECTORIES( ${LINK_DIRECTORIES} ${ITKVIEWERPATH}/extern/lib )
+INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES} ${ITKVIEWERPATH}/src )
+INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES} ${ITKVIEWERPATH}/extern )
+#INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES} ${ITKVIEWERPATH}/extern/tinyxml_2.5.3 )
 
 #####################################
 ###                     Fin recherche des packages                         ###
 #####################################
 IF(UNIX)
-	SET(CMAKE_CXX_FLAGS "-O2 -g -fpermissive")
-	SET(CMAKE_EXE_LINKER_FLAGS "-g")
+#	SET(CMAKE_CXX_FLAGS "-O2 -g -fpermissive")
+#	SET(CMAKE_EXE_LINKER_FLAGS "-g")
 #	ADD_DEFINITIONS("-pg")
 	ADD_DEFINITIONS("-Wall")
 	ADD_EXECUTABLE( RJMCMC_Rectangles ${ALL_SRC} ${SRC_XML} )
 	TARGET_LINK_LIBRARIES( RJMCMC_Rectangles ${ITK_LIBRARIES}
-#											 ${wxWidgets_LIBRARIES}
+											 ${wxWidgets_LIBRARIES}
 											 ${Boost_LIBRARIES}
 											 ${CGAL_LIBRARIES}
-#											 ITKViewer
-#											 shapelib
-#											 tinyxml 
+											 ITKViewer
+											 shapelib
+											 tinyxml 
 											 )
 ENDIF(UNIX)
 IF(WIN32)
