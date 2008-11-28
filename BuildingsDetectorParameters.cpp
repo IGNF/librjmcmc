@@ -201,7 +201,8 @@ void BuildingsDetectorParametersSingleton::SetFromText(const std::vector< std::p
 
 BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_initialTemperature(5000.),
-	m_nbIterations(15000000),
+	m_nbIterations(150000),
+//	m_nbIterations(15000000),
 	m_nbIterationsDump(10000),
 	m_decreaseCoefficient(0.999999),
 	m_probaBirth(1. / 10.),
@@ -209,7 +210,7 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 //	m_inputDataFilePath("data/SaintMichel/MNS_StMichel_sans_veget.tif"),
 //	m_inputImageWidth(1695),
 //	m_inputImageHeight(1575),
-	m_inputDataFilePath("/home/dboldo/noyau/ITKViewer/other/rjmcmc_buildings/data/Marseille/Crop_MNE_Marseille.tif"),
+	m_inputDataFilePath("./data/Marseille/Crop_MNE_Marseille.tif"),
 //	m_inputDataFilePath("D:\\Codes\\ITKViewer\\other\\rjmcmc_buildings\\data\\Marseille\\UnBloc_MNE_Marseille.tif"),
 	m_inputImageWidth(1000),
 	m_inputImageHeight(1000),

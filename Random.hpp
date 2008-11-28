@@ -8,7 +8,6 @@
 	#include <unistd.h>
 #endif
 
-//typedef boost::lagged_fibonacci607 RJMCMCRandom;
 typedef boost::mt19937 RJMCMCRandom;
 
 static RJMCMCRandom &GetRandom()

@@ -1,6 +1,3 @@
-#include "use_ihm.h"
-#if USE_IHM
-
 #include "layers/VectorLayer.hpp"
 #include "layers/ImageLayer.hpp"
 #include "gui/PanelManager.h"
@@ -115,6 +112,3 @@ private:
 };
 
 IMPLEMENT_APP(MyApp);
-
-#endif //#if USE_IHM
-

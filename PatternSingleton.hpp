@@ -27,16 +27,15 @@
 * @author OTO
 * @date Sat Sep 08 16:29:00 2007
 */
-
 template <typename T> class PatternSingleton
 {
 protected:
-	/// Constructeur vide
-	PatternSingleton () {}
-	/// Constructeur par recopie
-	PatternSingleton (const PatternSingleton& ) {}
+	/// Constructeur vide 
+	PatternSingleton () {;}
+	/// Constructeur par recopie : non implemente
+	PatternSingleton (const PatternSingleton& ) ;
 	/// Destructeur
-	~PatternSingleton () {}
+	~PatternSingleton () {;}
 
 public:
 	/// Cette methode permet d'obtenir ou de creer l'instance unique de l'objet

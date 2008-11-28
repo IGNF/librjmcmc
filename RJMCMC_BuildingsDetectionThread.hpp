@@ -1,6 +1,8 @@
-#include <iostream>
+#ifndef USE_IHM
+#error DEFINE USE_IHM TO 1 OR 0
+#endif // #ifndef USE_IHM
 
-#include "use_ihm.h"
+#include <iostream>
 
 #ifndef WIN32
 #include <tr1/array>
@@ -11,7 +13,9 @@
 #endif // WIN32
 
 #include "BuildingsDetectorParameters.hpp"
+#if USE_IHM
 #include "RJMCMC_BuildingsDetectionFrame.hpp"
+#endif //#if USE_IHM
 
 //#include "Simple2DNode.hpp"
 #include "RectangleNode.hpp"
@@ -25,15 +29,6 @@
 typedef RJMCMC_Detector<RectangleNode, RectanglePointsPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 
 
-#if !USE_IHM
-
-class RJMCMC_BuildingsDetectionThread
-{
-public :
-	void *Entry();
-};
-
-#endif // #if !USE_IHM
 
 void* RJMCMC_BuildingsDetectionThread::Entry()
 {
@@ -89,7 +84,7 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 					if (modif)
 						sampler.CumulatedProbabilities(BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities());
 			}
-			*/
+*/
 			for (unsigned int i=0; i<4; ++i)
 				nb_accepted[i] = 0;
 			clock_t clock_temp = clock();
@@ -135,7 +130,7 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 	my_out_stream << "Graph Data energy integrity : " << buildingsDetector.CheckGraphDataEnergyIntegrity() << std::endl;
 	my_out_stream << "Graph Prior energy integrity: " << buildingsDetector.CheckGraphPriorEnergyIntegrity() << std::endl;
 	my_out_stream << "Graph Structure integrity : " << buildingsDetector.CheckGraphStructureIntegrity() << std::endl;
-	buildingsDetector.Dump(my_out_stream);
+	buildingsDetector.Dump(my_out_stream, true);
 #if USE_IHM
 	wxMutexGuiEnter();
 	wxLogMessage( wxString( my_out_stream.str().c_str(),*wxConvCurrent ).GetData());
@@ -147,14 +142,3 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 
 	return 00;
 }
-
-#if !USE_IHM
-int main (int argc, char **argv)
-{
-	RJMCMC_BuildingsDetectionThread rien;
-	BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc, argv);
-	rien.Entry();
-	return 0;
-}
-
-#endif  // #if USE_IHM

@@ -1,10 +1,6 @@
 #ifndef RJMCMC_BUILDINGSDETECTIONFRAME_HPP_
 #define RJMCMC_BUILDINGSDETECTIONFRAME_HPP_
 
-#include "use_ihm.h"
-
-#if USE_IHM
-
 #include <wx/wx.h>
 #include <wx/statusbr.h>
 #include <wx/thread.h>
@@ -48,7 +44,5 @@ private:
 	//PanelViewer *m_panel;
 	RJMCMC_BuildingsDetectionFrame *m_frame;
 };
-
-#endif // #if USE_IHM
 
 #endif /* RJMCMC_BUILDINGSDETECTIONFRAME_HPP_ */
