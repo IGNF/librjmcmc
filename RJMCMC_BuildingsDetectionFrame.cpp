@@ -29,7 +29,9 @@ RJMCMC_BuildingsDetectionFrame::RJMCMC_BuildingsDetectionFrame(const wxString& t
 	wxPanel *test = new wxPanel(this,wxID_ANY,wxDefaultPosition,wxSize(350,1024));
 	main_sizer->Add(test_sizer, 0, wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5);
 
+	PanelViewer::Register(this);
 	m_panel = PanelManager::Instance()->createObject("PanelViewer");
+
 	m_panel->GetLayerControl()->Show(true);
 	main_sizer->Add(m_panel, 1, wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5);
 	this->SetStatusBar( m_panel->GetStatusBar() );
