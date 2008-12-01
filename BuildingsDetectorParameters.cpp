@@ -1,56 +1,5 @@
 #include "BuildingsDetectorParameters.hpp"
 
-bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
-{
-	if ((argc-1) % 2 != 0)
-	{
-		Usage(argv[0]);
-		return false;
-	}
-	for (int i = 1; i<argc; i += 2)
-	{
-		std::string str(argv[i]);
-		if (str == "-img")
-			InputDataFilePath(argv[i+1]);
-		else if (str == "-nbi")
-			NbIterations(atoi(argv[i+1]));
-		else if (str == "-nbd")
-			NbIterationsDump(atoi(argv[i+1]));
-		else if (str == "-originx")
-			RunningOriginX(atoi(argv[i+1]));
-		else if (str == "-originy")
-			RunningOriginY(atoi(argv[i+1]));
-		else if (str == "-sizex")
-			RunningWidth(atoi(argv[i+1]));
-		else if (str == "-sizey")
-			RunningHeight(atoi(argv[i+1]));
-		else if (str == "-temp")
-			InitialTemperature(atof(argv[i+1]));
-		else if (str == "-coef")
-			DecreaseCoefficient(atof(argv[i+1]));
-		else if (str == "-Pbirth")
-			ProbaBirth(atof(argv[i+1]));
-		else if (str == "-Pdeath")
-			ProbaDeath(atof(argv[i+1]));
-		else
-		{
-			Usage(argv[0]);
-			return false;
-		}
-	}
-	ComputeProb();
-	return true;
-}
-
-void BuildingsDetectorParametersSingleton::Usage(const char *nomExe) const
-{
-	std::cout
-			<< "Usage : "
-			<< nomExe
-			<< " [-img data.bmp][-nbi 10000000] [-nbd 10000] [-originx 0] [-originy 0] [-sizex 50] [-sizey 50] [-temp 100] [-coef 0.999999] [-Pbirth 0.1] [-Pdeath 0.1]"
-			<< std::endl;
-}
-
 void BuildingsDetectorParametersSingleton::GetAsText(std::vector< std::pair<std::string, std::string> > &pileText) const
 {
 	pileText.push_back(std::make_pair("Nom de l'image de donnees", InputDataFilePath() ) );
@@ -250,7 +199,7 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_rectangleMinimalSize(5.),
 	m_rectangleMaximalRatio(5.),
 	m_ponderationSurfaceIntersection(10.),
-	m_pointsDistancePonderation(10.),
+	m_ponderationPointsDistance(10.),
 	m_pointsDistanceMax(10.),
 	m_individualEnergy(500.)
 			{}

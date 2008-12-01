@@ -39,27 +39,12 @@ protected:
 
 public:
 	/// Cette methode permet d'obtenir ou de creer l'instance unique de l'objet
-	static boost::shared_ptr<T> Instance ()
+	static T * Instance ()
 	{
-		if ( m_singleton == boost::shared_ptr<T>() )
-		{
-			// Double-Checked Locking Pattern !
-			boost::mutex::scoped_lock lock(m_mutex);
-			if ( m_singleton == boost::shared_ptr<T>() )
-				m_singleton = boost::shared_ptr<T> (new T);
-		}
-		return (static_cast< boost::shared_ptr<T> > (m_singleton));
+		static T myT;
+
+		return &myT; 
 	}
-
-private:
-	/// Le pointeur sur l'instance unique de l'objet
-	static boost::shared_ptr<T> m_singleton;
-	/// Un mutex pour le <i>Double-Checked Locking Pattern</i> !
-	static boost::mutex m_mutex;
 };
-
-// Initialisation des variables statiques
-template <typename T> boost::shared_ptr<T> PatternSingleton<T>::m_singleton;
-template <typename T> boost::mutex PatternSingleton<T>::m_mutex;
 
 #endif // __PATTERN_SINGLETON_HPP__

@@ -41,7 +41,7 @@ ENDIF(ITK_FOUND)
 
 
 # Find BOOST
-FIND_PACKAGE( Boost 1.36 COMPONENTS thread filesystem system )
+FIND_PACKAGE( Boost 1.37 COMPONENTS program_options thread filesystem system )
 
 IF(UNIX)
 	INCLUDE( CGAL.cmake )

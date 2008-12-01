@@ -43,8 +43,8 @@ public:
 	void VarianceGaussianFilter(double variance) { m_varianceGaussianFilter = variance; }
 	double IntersectionSurfacePonderation() const { return m_ponderationSurfaceIntersection; }
 	void IntersectionSurfacePonderation(double coef) { m_ponderationSurfaceIntersection = coef; }
-	double PointsDistancePonderation() const { return m_pointsDistancePonderation; }
-	void PointsDistancePonderation(double coef) { m_pointsDistancePonderation = coef; }
+	double PointsDistancePonderation() const { return m_ponderationPointsDistance; }
+	void PointsDistancePonderation(double coef) { m_ponderationPointsDistance = coef; }
 	double PointsDistanceMax() const { return m_pointsDistanceMax; }
 	void PointsDistanceMax(double coef) { m_pointsDistanceMax = coef; }
 
@@ -56,13 +56,9 @@ public:
 	double IndividualEnergy() const { return m_individualEnergy; }
 	void IndividualEnergy(double energy) { m_individualEnergy = energy; }
 
-	bool ParseCmdLine(int argc, char **argv);
-	void Usage(const char *nomExe) const;
 	void GetAsText(std::vector< std::pair<std::string, std::string> > &pileText) const;
 	void SetFromText(const std::vector< std::pair<std::string, std::string> > &pileText);
 
-private:
-	BuildingsDetectorParametersSingleton();
 
 	double m_initialTemperature;
 	unsigned int m_nbIterations;
@@ -79,9 +75,11 @@ private:
 	double m_rectangleMinimalSize;
 	double m_rectangleMaximalRatio;
 	double m_ponderationSurfaceIntersection;
-	double m_pointsDistancePonderation;
+	double m_ponderationPointsDistance;
 	double m_pointsDistanceMax;
 	double m_individualEnergy;
+private:
+	BuildingsDetectorParametersSingleton();
 	// probas cumulees
 	std::vector<double> m_probas;
 

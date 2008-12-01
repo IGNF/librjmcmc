@@ -72,8 +72,8 @@ void RJMCMC_BuildingsDetectionFrame::OnGoButton(wxCommandEvent& event)
 	}
 	BuildingsDetectorParametersSingleton::Instance()->SetFromText(pileText);
 
-	//m_panel->AddLayer(ImageLayer<signed short>::CreateImageLayer(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath()));
-	m_panel->AddLayer(ImageLayer<unsigned short,1>::CreateImageLayer(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath()));
+	m_panel->AddLayer(ImageLayer<signed short,1>::CreateImageLayer(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath()));
+//	m_panel->AddLayer(ImageLayer<unsigned short,1>::CreateImageLayer(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath()));
 
 //	Layer::ptrLayerType layer = VectorLayer::CreateVectorLayer(std::string("Points") , SHPT_POINT);
 //	Layer::ptrLayerType layer = VectorLayer::CreateVectorLayer(std::string("Polylines") , SHPT_ARC);
