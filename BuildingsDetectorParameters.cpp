@@ -2,192 +2,52 @@
 
 void BuildingsDetectorParametersSingleton::GetAsText(std::vector< std::pair<std::string, std::string> > &pileText) const
 {
-	pileText.push_back(std::make_pair("Nom de l'image de donnees", InputDataFilePath() ) );
-	std::ostringstream oss;
-	oss << NbIterations();
-	pileText.push_back(make_pair("Nombre d'iterations", oss.str() ) );
-	oss.str("");
-	oss << NbIterationsDump();
-	pileText.push_back(make_pair("Nombre d'iterations entre chaque visualisation", oss.str() ) );
-	oss.str("");
-	oss << RunningWidth();
-	pileText.push_back(make_pair("Taille en X", oss.str() ) );
-	oss.str("");
-	oss << RunningHeight();
-	pileText.push_back(make_pair("Taille en Y", oss.str() ) );
-	oss.str("");
-	oss << RunningOriginX();
-	pileText.push_back(make_pair("Origine en X", oss.str() ) );
-	oss.str("");
-	oss << RunningOriginY();
-	pileText.push_back(make_pair("Origine en Y", oss.str() ) );
-	oss.str("");
-	oss << VarianceGaussianFilter();
-	pileText.push_back(make_pair("Variance filtre gaussien", oss.str() ) );
-	oss.str("");
-	oss << 	RectangleMinimalSize();
-	pileText.push_back(make_pair("Rectangle : taille minimale", oss.str() ) );
-	oss.str("");
-	oss << RectangleMaximalRatio();
-	pileText.push_back(make_pair("Rectangle : Ratio L/H maximal", oss.str() ) );
-	oss.str("");
-	oss << InitialTemperature();
-	pileText.push_back(make_pair("Temperature initiale", oss.str() ) );
-	oss.str("");
-	oss << DecreaseCoefficient();
-	pileText.push_back(make_pair("Coefficient de descente", oss.str() ) );
-	oss.str("");
-	oss << ProbaBirth();
-	pileText.push_back(make_pair("Probabilite naissance", oss.str() ) );
-	oss.str("");
-	oss << ProbaDeath();
-	pileText.push_back(make_pair("Probabilite mort", oss.str() ) );
-	oss.str("");
-	oss << IntersectionSurfacePonderation();
-	pileText.push_back(make_pair("Ponderation surface intersection", oss.str() ) );
-	oss.str("");
-	oss << PointsDistancePonderation();
-	pileText.push_back(make_pair("Ponderation distance points", oss.str() ) );
-	oss.str("");
-	oss << PointsDistanceMax();
-	pileText.push_back(make_pair("Maximum distance points", oss.str() ) );
-	oss.str("");
-	oss << IndividualEnergy();
-	pileText.push_back(make_pair("Energie d'existence d'un objet", oss.str() ) );
+	const std::vector< boost::shared_ptr< po::option_description > > & options = m_desc.options();
+	for (unsigned int i=0; i<options.size(); ++i)
+	{
+		if ((options[i]->long_name() == "help") || (options[i]->long_name() == "config"))
+			continue;
+		std::string param = options[i]->format_parameter();
+		std::string default_value = param.substr(6, param.size()-6-1);		
+		pileText.push_back(make_pair(options[i]->description(), default_value ) );
+	}
 }
 
 void BuildingsDetectorParametersSingleton::SetFromText(const std::vector< std::pair<std::string, std::string> > &pileText)
 {
-
+	std::vector < std::string > read_options;
+	const std::vector< boost::shared_ptr< po::option_description > > & options = m_desc.options();
 	for (unsigned int i=0; i<pileText.size(); ++i)
 	{
-		std::string type = pileText[i].first;
-		std::istringstream iss;
-		iss.str(pileText[i].second);
-		if (type == std::string("Nom de l'image de donnees"))
+		for (unsigned int j=0; j<options.size(); ++j)
 		{
-			std::string nomData;
-			iss >> nomData;
-			InputDataFilePath(nomData);
+			if (options[j]->description() == pileText[i].first)
+			{
+				read_options.push_back("--" + options[j]->long_name());
+				read_options.push_back(pileText[i].second);
+				break;
+			}
 		}
-		else if (type == std::string("Nombre d'iterations"))
-		{
-			unsigned int nbi;
-			iss >> nbi;
-			NbIterations(nbi);
-		}
-		else if (type == std::string("Nombre d'iterations entre chaque visualisation"))
-		{
-			unsigned int nbi;
-			iss >> nbi;
-			NbIterationsDump(nbi);
-		}
-		else if (type == std::string("Origine en X"))
-		{
-			unsigned int sizex;
-			iss >> sizex;
-			RunningOriginX(sizex);
-		}
-		else if (type == std::string("Origine en Y"))
-		{
-			unsigned int sizey;
-			iss >> sizey;
-			RunningOriginY(sizey);
-		}
-		else if (type == std::string("Taille en X"))
-		{
-			unsigned int sizex;
-			iss >> sizex;
-			RunningWidth(sizex);
-		}
-		else if (type == std::string("Taille en Y"))
-		{
-			unsigned int sizey;
-			iss >> sizey;
-			RunningHeight(sizey);
-		}
-		else if (type == std::string("Variance filtre gaussien"))
-		{
-			double variance;
-			iss >> variance;
-			VarianceGaussianFilter(variance);
-		}
-		else if (type ==std::string("Rectangle : taille minimale"))
-		{
-			double minSize;
-			iss >> minSize;
-			RectangleMinimalSize(minSize);
-		}
-		else if (type ==std::string("Rectangle : Ratio L/H maximal"))
-		{
-			double ratio;
-			iss >> ratio;
-			RectangleMaximalRatio(ratio);
-		}
-		else if (type == std::string("Temperature initiale"))
-		{
-			double tempInitiale;
-			iss >> tempInitiale;
-			InitialTemperature(tempInitiale);
-		}
-		else if (type == std::string("Coefficient de descente"))
-		{
-			double coefDescente;
-			iss >> coefDescente;
-			DecreaseCoefficient(coefDescente);
-
-		}
-		else if (type == std::string("Probabilite naissance"))
-		{
-			double probaBirth;
-			iss >> probaBirth;
-			ProbaBirth(probaBirth);
-		}
-		else if (type == std::string("Probabilite mort"))
-		{
-			double probaDeath;
-			iss >> probaDeath;
-			ProbaDeath(probaDeath);
-		}
-		else if (type == std::string("Ponderation surface intersection"))
-		{
-			double ponderation;
-			iss >> ponderation;
-			IntersectionSurfacePonderation(ponderation);
-		}
-		else if (type == std::string("Ponderation distance points"))
-		{
-			double ponderation;
-			iss >> ponderation;
-			PointsDistancePonderation(ponderation);
-		}
-		else if (type == std::string("Maximum distance points"))
-		{
-			double ponderation;
-			iss >> ponderation;
-			PointsDistanceMax(ponderation);
-		}
-		else if (type == std::string("Energie d'existence d'un objet"))
-		{
-			double energy;
-			iss >> energy;
-			IndividualEnergy(energy);
-		}
-		else
-			std::cout << "Tag " << type << " de valeur " << iss.str() << " non reconnu." << std::endl;
 	}
-	ComputeProb();
+	po::command_line_parser parser(read_options);
+	parser.options(m_desc);
+
+	po::variables_map vm;
+	po::store(parser.run(), vm);
+	po::notify(vm);
+
+	ComputeProb();	
 }
 
 BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
+	m_desc("buildings detector options"),
 	m_initialTemperature(5000.),
-	m_nbIterations(150000),
-//	m_nbIterations(15000000),
+	m_nbIterations(15000000),
 	m_nbIterationsDump(10000),
 	m_decreaseCoefficient(0.999999),
 	m_probaBirth(1. / 10.),
 	m_probaDeath(1. / 10.),
-//	m_inputDataFilePath("data/SaintMichel/MNS_StMichel_sans_veget.tif"),
+//	m_inputDataFilePath("./data/SaintMichel/MNS_StMichel_sans_veget.tif"),
 //	m_inputImageWidth(1695),
 //	m_inputImageHeight(1575),
 	m_inputDataFilePath("./data/Marseille/Crop_MNE_Marseille.tif"),
@@ -202,7 +62,31 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_ponderationPointsDistance(10.),
 	m_pointsDistanceMax(10.),
 	m_individualEnergy(500.)
-			{}
+{
+	m_desc.add_options()
+	("help,h", "Ce message d'aide...")
+	("config,c",	po::value< std::string >(), "Fichier de configuration")	
+	("temp,t", 		po::value< double >		(&(m_initialTemperature))->default_value(m_initialTemperature) , "Temperature initiale")
+	("nbiter,I", 	po::value< unsigned int>(&(m_nbIterations))->default_value(m_nbIterations), "Nombre d'iterations")
+	("nbdump,d",	po::value< unsigned int>(&(m_nbIterationsDump))->default_value(m_nbIterationsDump), "Nombre d'iterations entre chaque affichage")
+	("deccoef,C",	po::value< double >		(&(m_decreaseCoefficient))->default_value(m_decreaseCoefficient), "Coefficient de decroissance")
+	("pbirth,B",	po::value< double >		(&(m_probaBirth))->default_value(m_probaBirth), "Probabilite de naissance")
+	("pdeath,D",	po::value< double >		(&(m_probaDeath))->default_value(m_probaDeath), "Probabilite de mort")
+	("input,i",		po::value< std::string >(&(m_inputDataFilePath))->default_value(m_inputDataFilePath), "Fichier image d'entree")
+	("xorig,x",		po::value< unsigned int>(&(m_runningOriginX))->default_value(m_runningOriginX), "Origine (X) de la zone a traiter")
+	("yorig,y",		po::value< unsigned int>(&(m_runningOriginY))->default_value(m_runningOriginY), "Origine (Y) de la zone a traiter")
+	("width,w",		po::value< unsigned int>(&(m_runningWidth))->default_value(m_runningWidth), "Largeur de la zone a traiter")
+	("height,h",	po::value< unsigned int>(&(m_runningHeight))->default_value(m_runningHeight), "Hauteur de la zone a traiter")
+	("gaussian,g",	po::value< double >		(&(m_varianceGaussianFilter))->default_value(m_varianceGaussianFilter), "Variance du filtre gaussien en entrée")
+	("minsize,m",	po::value< double >		(&(m_rectangleMinimalSize))->default_value(m_rectangleMinimalSize), "Taille minimale d'un rectangle")
+	("maxratio,M",	po::value< double >		(&(m_rectangleMaximalRatio))->default_value(m_rectangleMaximalRatio), "Rapport longueur / largeur maximal d'un rectangle")
+	("surface,s",	po::value< double >		(&(m_ponderationSurfaceIntersection))->default_value(m_ponderationSurfaceIntersection), "Ponderation de la surface d'intersection")	
+	("point,p",		po::value< double >		(&(m_ponderationPointsDistance))->default_value(m_ponderationPointsDistance), "Ponderation de distance des sommets")	
+	("dmax,x",		po::value< double >		(&(m_pointsDistanceMax))->default_value(m_pointsDistanceMax), "Distance maximale d'intercation entre sommets")	
+	("energy,e",	po::value< double >		(&(m_individualEnergy))->default_value(m_individualEnergy), "Energie d'existence d'un objet")	
+	;
+	ComputeProb();
+}
 
 void BuildingsDetectorParametersSingleton::ComputeProb()
 {

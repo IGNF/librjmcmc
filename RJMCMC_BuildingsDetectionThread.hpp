@@ -28,8 +28,6 @@
 //typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 typedef RJMCMC_Detector<RectangleNode, RectanglePointsPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 
-
-
 void* RJMCMC_BuildingsDetectionThread::Entry()
 {
 	BBox::PointType size , origin;
