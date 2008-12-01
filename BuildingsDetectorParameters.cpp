@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include "BuildingsDetectorParameters.hpp"
 
 void BuildingsDetectorParametersSingleton::GetAsText(std::vector< std::pair<std::string, std::string> > &pileText) const
@@ -39,6 +41,37 @@ void BuildingsDetectorParametersSingleton::SetFromText(const std::vector< std::p
 	ComputeProb();	
 }
 
+void BuildingsDetectorParametersSingleton::ReadConfigFile(const char *filename)
+{
+	po::variables_map vm;
+	std::ifstream config_file(filename);
+	po::store(po::parse_config_file(config_file, m_desc), vm);
+	po::notify(vm);
+	ComputeProb();
+}
+
+bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
+{
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc, argv, m_desc), vm);
+	if (vm.count("help")) 
+	{
+		std::cout << m_desc << "\n";
+		return false;
+	}
+
+	if (vm.count("config"))
+	{
+		ReadConfigFile(vm["config"].as<std::string>().c_str());
+	}
+	else
+	{
+		po::notify(vm);
+		ComputeProb();
+	}
+	return true;
+}
+
 BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_desc("buildings detector options"),
 	m_initialTemperature(5000.),
@@ -64,7 +97,7 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_individualEnergy(500.)
 {
 	m_desc.add_options()
-	("help,h", "Ce message d'aide...")
+	("help,h", "Message d'aide...")
 	("config,c",	po::value< std::string >(), "Fichier de configuration")	
 	("temp,t", 		po::value< double >		(&(m_initialTemperature))->default_value(m_initialTemperature) , "Temperature initiale")
 	("nbiter,I", 	po::value< unsigned int>(&(m_nbIterations))->default_value(m_nbIterations), "Nombre d'iterations")

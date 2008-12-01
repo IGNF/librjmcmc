@@ -42,8 +42,8 @@ public:
 
 	void GetAsText(std::vector< std::pair<std::string, std::string> > &pileText) const;
 	void SetFromText(const std::vector< std::pair<std::string, std::string> > &pileText);
-
-	const po::options_description &GetAsProgramOption() const { return m_desc;}
+	bool ParseCmdLine(int argc, char **argv);
+	void ReadConfigFile(const char *filename);
 
 private:
 	po::options_description m_desc;
