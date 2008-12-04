@@ -51,6 +51,12 @@ RJMCMC_BuildingsDetectionFrame::RJMCMC_BuildingsDetectionFrame(bool with_paramet
 	this->SetSizerAndFit(main_sizer);
 	this->SetSize(800,600);
 	main_sizer->Layout();
+	
+	if (!with_parameters)
+	{
+		wxCommandEvent ev;
+		OnGoButton(ev);
+	}
 }
 
 void RJMCMC_BuildingsDetectionFrame::OnGoButton(wxCommandEvent& event)
