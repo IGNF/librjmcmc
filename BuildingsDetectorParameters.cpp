@@ -69,7 +69,6 @@ bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
 		po::notify(vm);
 		ComputeProb();
 	}
-	std::cout << m_individualEnergy << std::endl;
 	return true;
 }
 

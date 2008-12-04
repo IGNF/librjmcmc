@@ -22,12 +22,17 @@ END_EVENT_TABLE();
 
 IMPLEMENTS_ITKVIEWER_METHODS_FOR_EVENTS_TABLE(RJMCMC_BuildingsDetectionFrame,m_panel)
 
-RJMCMC_BuildingsDetectionFrame::RJMCMC_BuildingsDetectionFrame(const wxString& title, const wxPoint& pos,const wxSize& size) : wxFrame( (wxFrame *)NULL, -1 , title , pos , size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL )
+RJMCMC_BuildingsDetectionFrame::RJMCMC_BuildingsDetectionFrame(bool with_parameters, const wxString& title, const wxPoint& pos,const wxSize& size) : wxFrame( (wxFrame *)NULL, -1 , title , pos , size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL )
 {
 	wxInitAllImageHandlers();
 
-	parameters = new ParametersFrame();
-	parameters->Show();
+	if (with_parameters)
+	{
+		parameters = new ParametersFrame();
+		parameters->Show();
+	}
+	else 
+		parameters = 00;
 
 	// Le sizer contenant "tout"
 	wxBoxSizer *main_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -51,18 +56,20 @@ RJMCMC_BuildingsDetectionFrame::RJMCMC_BuildingsDetectionFrame(const wxString& t
 void RJMCMC_BuildingsDetectionFrame::OnGoButton(wxCommandEvent& event)
 {
 	m_buttonGo->Disable();
-	std::vector< std::pair<std::string, std::string> > pileText1;
-	for (unsigned int i=0; i<parameters->m_pileText.size(); ++i)
+	if (parameters != 00)
 	{
-		parameters->m_pileText[i].second->Disable();
-		pileText1.push_back(
-				make_pair(
-						std::string( parameters->m_pileText[i].first->GetLabel().fn_str() ),
-						std::string( parameters->m_pileText[i].second->GetLineText(0).fn_str() )
-						));
+		std::vector< std::pair<std::string, std::string> > pileText1;
+		for (unsigned int i=0; i<parameters->m_pileText.size(); ++i)
+		{
+			parameters->m_pileText[i].second->Disable();
+			pileText1.push_back(
+					make_pair(
+							std::string( parameters->m_pileText[i].first->GetLabel().fn_str() ),
+							std::string( parameters->m_pileText[i].second->GetLineText(0).fn_str() )
+							));
+		}
+		BuildingsDetectorParametersSingleton::Instance()->SetFromText(pileText1);
 	}
-	BuildingsDetectorParametersSingleton::Instance()->SetFromText(pileText1);
-
 	m_panel->AddLayer(ImageLayer<signed short,1>::CreateImageLayer(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath()));
 //	m_panel->AddLayer(ImageLayer<unsigned short,1>::CreateImageLayer(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath()));
 
@@ -96,15 +103,20 @@ public:
 private:
 	bool OnInit()
 	{
-		char **my_argv = new char*[argc];
-		for (int i=0;i<argc;++i)
+		bool with_parameters = true;
+		if (argc > 1)
 		{
-			wxString mystr(argv[i]);
-			my_argv[i] = new char[mystr.size()+1];
-			strcpy(my_argv[i], mystr.To8BitData());
+			char **my_argv = new char*[argc];
+			for (int i=0;i<argc;++i)
+			{
+				wxString mystr(argv[i]);
+				my_argv[i] = new char[mystr.size()+1];
+				strcpy(my_argv[i], mystr.To8BitData());
+			}
+			BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc,my_argv);
+			with_parameters = false;
 		}
-		BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc,my_argv);
-		m_frame = new RJMCMC_BuildingsDetectionFrame( _("RJMCMC Detection") , wxDefaultPosition , wxDefaultSize );
+		m_frame = new RJMCMC_BuildingsDetectionFrame(with_parameters, _("RJMCMC Detection") , wxDefaultPosition , wxDefaultSize );
 		m_frame->Show();
 		return true;
 	}

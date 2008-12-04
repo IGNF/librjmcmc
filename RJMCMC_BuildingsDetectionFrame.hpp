@@ -16,7 +16,7 @@ class ParametersFrame;
 class RJMCMC_BuildingsDetectionFrame : public wxFrame
 {
 public:
-	RJMCMC_BuildingsDetectionFrame(const wxString& title, const wxPoint& pos,const wxSize& size = wxSize(500,500));
+	RJMCMC_BuildingsDetectionFrame(bool with_parameters, const wxString& title, const wxPoint& pos,const wxSize& size = wxSize(500,500));
 	~RJMCMC_BuildingsDetectionFrame() {;}
 
 	void OnGoButton(wxCommandEvent& event);
