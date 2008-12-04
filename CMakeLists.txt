@@ -28,6 +28,7 @@ SET( SRC_IHM	${SRC_DIR}BuildingsDetectorParameters.cpp
 				${SRC_DIR}RectangleNode.cpp
 				${SRC_DIR}Main_RJMCMC_BuildingsDetection_ihm.cpp
 				${SRC_DIR}RJMCMC_BuildingsDetectionFrame.cpp
+				${SRC_DIR}ParametersFrame.cpp
 	)
 
 # Find ITK

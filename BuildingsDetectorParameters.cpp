@@ -10,7 +10,7 @@ void BuildingsDetectorParametersSingleton::GetAsText(std::vector< std::pair<std:
 		if ((options[i]->long_name() == "help") || (options[i]->long_name() == "config"))
 			continue;
 		std::string param = options[i]->format_parameter();
-		std::string default_value = param.substr(6, param.size()-6-1);		
+		std::string default_value = param.substr(6, param.size()-6-1);
 		pileText.push_back(make_pair(options[i]->description(), default_value ) );
 	}
 }
@@ -38,7 +38,7 @@ void BuildingsDetectorParametersSingleton::SetFromText(const std::vector< std::p
 	po::store(parser.run(), vm);
 	po::notify(vm);
 
-	ComputeProb();	
+	ComputeProb();
 }
 
 void BuildingsDetectorParametersSingleton::ReadConfigFile(const char *filename)
@@ -54,7 +54,7 @@ bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
 {
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, m_desc), vm);
-	if (vm.count("help")) 
+	if (vm.count("help"))
 	{
 		std::cout << m_desc << "\n";
 		return false;
@@ -69,6 +69,7 @@ bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
 		po::notify(vm);
 		ComputeProb();
 	}
+	std::cout << m_individualEnergy << std::endl;
 	return true;
 }
 
@@ -98,7 +99,7 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 {
 	m_desc.add_options()
 	("help,h", "Message d'aide...")
-	("config,c",	po::value< std::string >(), "Fichier de configuration")	
+	("config,c",	po::value< std::string >(), "Fichier de configuration")
 	("temp,t", 		po::value< double >		(&(m_initialTemperature))->default_value(m_initialTemperature) , "Temperature initiale")
 	("nbiter,I", 	po::value< unsigned int>(&(m_nbIterations))->default_value(m_nbIterations), "Nombre d'iterations")
 	("nbdump,d",	po::value< unsigned int>(&(m_nbIterationsDump))->default_value(m_nbIterationsDump), "Nombre d'iterations entre chaque affichage")
@@ -113,10 +114,10 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	("gaussian,g",	po::value< double >		(&(m_varianceGaussianFilter))->default_value(m_varianceGaussianFilter), "Variance du filtre gaussien en entrée")
 	("minsize,m",	po::value< double >		(&(m_rectangleMinimalSize))->default_value(m_rectangleMinimalSize), "Taille minimale d'un rectangle")
 	("maxratio,M",	po::value< double >		(&(m_rectangleMaximalRatio))->default_value(m_rectangleMaximalRatio), "Rapport longueur / largeur maximal d'un rectangle")
-	("surface,s",	po::value< double >		(&(m_ponderationSurfaceIntersection))->default_value(m_ponderationSurfaceIntersection), "Ponderation de la surface d'intersection")	
-	("point,p",		po::value< double >		(&(m_ponderationPointsDistance))->default_value(m_ponderationPointsDistance), "Ponderation de distance des sommets")	
-	("dmax,x",		po::value< double >		(&(m_pointsDistanceMax))->default_value(m_pointsDistanceMax), "Distance maximale d'intercation entre sommets")	
-	("energy,e",	po::value< double >		(&(m_individualEnergy))->default_value(m_individualEnergy), "Energie d'existence d'un objet")	
+	("surface,s",	po::value< double >		(&(m_ponderationSurfaceIntersection))->default_value(m_ponderationSurfaceIntersection), "Ponderation de la surface d'intersection")
+	("point,p",		po::value< double >		(&(m_ponderationPointsDistance))->default_value(m_ponderationPointsDistance), "Ponderation de distance des sommets")
+	("dmax,x",		po::value< double >		(&(m_pointsDistanceMax))->default_value(m_pointsDistanceMax), "Distance maximale d'intercation entre sommets")
+	("energy,e",	po::value< double >		(&(m_individualEnergy))->default_value(m_individualEnergy), "Energie d'existence d'un objet")
 	;
 	ComputeProb();
 }

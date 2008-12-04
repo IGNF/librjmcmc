@@ -1,16 +1,17 @@
 #ifndef RJMCMC_BUILDINGSDETECTIONFRAME_HPP_
 #define RJMCMC_BUILDINGSDETECTIONFRAME_HPP_
 
+// TODO : nettoyage des headers
 #include <wx/wx.h>
 #include <wx/statusbr.h>
 #include <wx/thread.h>
 
 #include "gui/PanelViewer.hpp"
 #include "gui/LayerControl.hpp"
-
-#include "BuildingsDetectorParameters.hpp"
+#include "convenient/MacrosITKViewer.hpp"
 
 class RJMCMC_BuildingsDetectionThread;
+class ParametersFrame;
 
 class RJMCMC_BuildingsDetectionFrame : public wxFrame
 {
@@ -23,13 +24,15 @@ public:
 
 	RJMCMC_BuildingsDetectionThread *m_thread;
 
+	ParametersFrame* parameters;
+
+	DECLARE_ITKVIEWER_METHODS_FOR_EVENTS_TABLE();
 	DECLARE_EVENT_TABLE();
 
 
 private:
 	wxButton *m_buttonGo;
 	PanelViewer *m_panel;
-	std::vector< std::pair<wxStaticText*, wxTextCtrl*> > m_pileText;
 };
 
 class RJMCMC_BuildingsDetectionThread : public wxThread
