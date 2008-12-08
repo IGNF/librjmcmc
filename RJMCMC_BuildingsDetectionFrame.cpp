@@ -29,9 +29,10 @@ RJMCMC_BuildingsDetectionFrame::RJMCMC_BuildingsDetectionFrame(bool with_paramet
 	if (with_parameters)
 	{
 		parameters = new ParametersFrame();
+		parameters->SetModal(false);
 		parameters->Show();
 	}
-	else 
+	else
 		parameters = 00;
 
 	// Le sizer contenant "tout"
@@ -51,7 +52,7 @@ RJMCMC_BuildingsDetectionFrame::RJMCMC_BuildingsDetectionFrame(bool with_paramet
 	this->SetSizerAndFit(main_sizer);
 	this->SetSize(800,600);
 	main_sizer->Layout();
-	
+
 	if (!with_parameters)
 	{
 		wxCommandEvent ev;
@@ -81,7 +82,7 @@ void RJMCMC_BuildingsDetectionFrame::OnGoButton(wxCommandEvent& event)
 
 //	Layer::ptrLayerType layer = VectorLayer::CreateVectorLayer(std::string("Points") , SHPT_POINT);
 //	Layer::ptrLayerType layer = VectorLayer::CreateVectorLayer(std::string("Polylines") , SHPT_ARC);
-	Layer::ptrLayerType layer = VectorLayer::CreateVectorLayer(std::string("Buildings") , SHPT_POLYGON);
+	Layer::ptrLayerType layer = VectorLayer::CreateVectorLayer(std::string("Buildings") , SHPT_POLYGON );
 	m_panel->AddLayer(layer);
 
 	wxLog *logger=new wxLogWindow(this, _("LOG"));

@@ -47,16 +47,43 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 	unsigned int nb_ite = BuildingsDetectorParametersSingleton::Instance()->NbIterations();
 	unsigned int nb_dump = BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump();
 
+#if USE_IHM
+	m_layer->PolygonsRingsColour(wxColour(255,255,0));
+	m_layer->PolygonsInsideStyle( wxTRANSPARENT );
+	m_layer->PolygonsRingsWidth(3);
+	m_layer->TextsVisibility(false);
+#endif // USE_IHM
+
+	// Formattage du log sous forme de tableau, ca facilite la creation de graphiques ...
+	std::ostringstream my_out_stream;
+	my_out_stream << "Iteration\t";
+	my_out_stream << "# Objects\t";
+	my_out_stream << "% Birth\t";
+	my_out_stream << "% Death\t";
+	my_out_stream << "% Modif\t";
+	my_out_stream << "Time per iteration (ms)\t";
+	my_out_stream << "Temperature\t";
+	my_out_stream << "E_data\t";
+	my_out_stream << "E_priori\t";
+	my_out_stream << "E_total\t";
+#if USE_IHM
+	wxMutexGuiEnter();
+	wxLogMessage( wxString( my_out_stream.str().c_str(),*wxConvCurrent ).GetData());
+	wxMutexGuiLeave();
+#else
+	std::cout << my_out_stream.str() << std::endl;
+#endif // USE_IHM
+
 	for (unsigned int i=0; i<=nb_ite; ++i)
 	{
 		if (i % nb_dump == 0)
 		{
-			std::ostringstream my_out_stream;
-			my_out_stream << "Iteration : " << i << "\n";
-			my_out_stream << "Rates (%) proposition \t acceptation : \n";
-			my_out_stream << "Birth : " << BuildingsDetectorParametersSingleton::Instance()->ProbaBirth()*100 << "\t" << 100.* nb_accepted[0] / double(BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump()) << "\n";
-			my_out_stream << "Death : " << BuildingsDetectorParametersSingleton::Instance()->ProbaDeath()*100 << "\t" << 100.* nb_accepted[1] / double(BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump()) << "\n";
-			my_out_stream << "Modif : " << BuildingsDetectorParametersSingleton::Instance()->ProbaModification()*100 << "\t" << 100.* nb_accepted[2] / double(BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump()) << "\n";
+			my_out_stream.str("");
+			my_out_stream << i;
+			my_out_stream << "\t" << buildingsDetector.GetNbVertices();
+			my_out_stream << "\t" << 100.* nb_accepted[0] / double(BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump());
+			my_out_stream << "\t" << 100.* nb_accepted[1] / double(BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump());
+			my_out_stream << "\t" << 100.* nb_accepted[2] / double(BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump());
 /*
 			unsigned int sum_accepted = 0;
 			for (unsigned int i=0;i<3;++i)
@@ -86,11 +113,14 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 			for (unsigned int i=0; i<4; ++i)
 				nb_accepted[i] = 0;
 			clock_t clock_temp = clock();
-			my_out_stream << "Time per iteration (ms) :  "<< double(clock_temp - clock_local)*1000./ (1.*CLOCKS_PER_SEC*BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump()) << "\n";
+			my_out_stream << "\t" << double(clock_temp - clock_local)*1000./ (1.*CLOCKS_PER_SEC*BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump());
 			clock_local = clock_temp;
 
-			my_out_stream << "Temperature : " << sampler.Temperature() << "\n";
-			buildingsDetector.Dump(my_out_stream);
+			my_out_stream << "\t" << sampler.Temperature();
+			//buildingsDetector.Dump(my_out_stream);
+			my_out_stream << "\t" << buildingsDetector.DataEnergy();
+			my_out_stream << "\t" << buildingsDetector.PriorEnergy();
+			my_out_stream << "\t" << buildingsDetector.DataEnergy() + buildingsDetector.PriorEnergy();
 
 #if USE_IHM
 			wxMutexGuiEnter();
@@ -122,7 +152,7 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 		nb_accepted[prop]++;
 	}
 	clock_t clock_fin = clock();
-	std::ostringstream my_out_stream;
+	my_out_stream.str("");
 	my_out_stream << "Iterations finished" << std::endl;
 	my_out_stream << "Total elapsed time (s) :  " << double(clock_fin - clock_debut) / CLOCKS_PER_SEC << std::endl;
 	my_out_stream << "Graph Data energy integrity : " << buildingsDetector.CheckGraphDataEnergyIntegrity() << std::endl;

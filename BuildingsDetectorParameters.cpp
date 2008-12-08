@@ -84,6 +84,7 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 //	m_inputImageWidth(1695),
 //	m_inputImageHeight(1575),
 	m_inputDataFilePath("./data/Marseille/Crop_MNE_Marseille.tif"),
+//	m_inputDataFilePath("/home/olivier/work/data/MNESaintMande.tif"),
 	m_runningOriginX(0),
 	m_runningOriginY(0),
 	m_runningWidth(1000),

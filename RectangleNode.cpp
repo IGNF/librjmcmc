@@ -117,9 +117,9 @@ double RectanglePriorEnergyPolicy::ComputePriorEnergy(const RectangleNode &n1,
 	 */
 }
 
-RectanglePointsPriorEnergyPolicy::RectanglePointsPriorEnergyPolicy() : 
-	m_coefSurface(BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()), 
-	m_coefDistance(BuildingsDetectorParametersSingleton::Instance()->PointsDistancePonderation()), 
+RectanglePointsPriorEnergyPolicy::RectanglePointsPriorEnergyPolicy() :
+	m_coefSurface(BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()),
+	m_coefDistance(BuildingsDetectorParametersSingleton::Instance()->PointsDistancePonderation()),
 	m_distMax(BuildingsDetectorParametersSingleton::Instance()->PointsDistanceMax())
 {
 	m_distMax2 = m_distMax * m_distMax;
