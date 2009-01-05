@@ -18,7 +18,7 @@
 class ParametersFrame: public wxDialog
 {
 public:
-	ParametersFrame(wxWindow *parent = (wxWindow *) NULL, wxWindowID id = wxID_ANY, const wxString& title = _("MPP parameters"), long style = wxDEFAULT_FRAME_STYLE, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+	ParametersFrame(wxWindow *parent = (wxWindow *) NULL, wxWindowID id = wxID_ANY, const wxString& title = _("MPP parameters"), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 	virtual ~ParametersFrame();
 
 	std::vector< std::pair<wxStaticText*, wxTextCtrl*> > m_pileText;

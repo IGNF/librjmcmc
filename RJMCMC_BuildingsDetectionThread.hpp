@@ -46,6 +46,7 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 
 	unsigned int nb_ite = BuildingsDetectorParametersSingleton::Instance()->NbIterations();
 	unsigned int nb_dump = BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump();
+	unsigned int nb_save = BuildingsDetectorParametersSingleton::Instance()->NbIterationsSave();
 
 #if USE_IHM
 	m_layer->PolygonsRingsColour(wxColour(255,255,0));
@@ -57,11 +58,11 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 	// Formattage du log sous forme de tableau, ca facilite la creation de graphiques ...
 	std::ostringstream my_out_stream;
 	my_out_stream << "Iteration\t";
-	my_out_stream << "# Objects\t";
-	my_out_stream << "% Birth\t";
-	my_out_stream << "% Death\t";
-	my_out_stream << "% Modif\t";
-	my_out_stream << "Time per iteration (ms)\t";
+	my_out_stream << "#Objects\t";
+	my_out_stream << "%Birth\t";
+	my_out_stream << "%Death\t";
+	my_out_stream << "%Modif\t";
+	my_out_stream << "TimePerIteration(ms)\t";
 	my_out_stream << "Temperature\t";
 	my_out_stream << "E_data\t";
 	my_out_stream << "E_priori\t";
@@ -76,6 +77,17 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 
 	for (unsigned int i=0; i<=nb_ite; ++i)
 	{
+		if ( nb_save != 0 )
+			if ( i % nb_save == 0 )
+			{
+#if USE_IHM
+				std::ostringstream name;
+				name.width(8);
+				name.fill('0');
+				name << i;
+				m_layer->Save( name.str() );
+#endif // USE_IHM
+			}
 		if (i % nb_dump == 0)
 		{
 			my_out_stream.str("");

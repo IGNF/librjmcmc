@@ -35,11 +35,24 @@ void RectangleNode::RandomModify(const BBox &box)
 			diechoix(GetRandom(), boost::uniform_smallint<>(0, 2));
 	int choix = diechoix();
 
-	boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > die(
-			GetRandom(), boost::uniform_real<>(-10, 10));
-	Point_2 pts[] =
-	{ Rect().point(0), Rect().point(1), Rect().point(2) };
-	pts[choix] = Point_2(pts[choix].x() + die(), pts[choix].y() + die());;
+	// On suffgle les points afin de pouvoir varier dans toutes les dimensions (venir voir Olivier si pas compris ...)
+	boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> >
+			doshuffle(GetRandom(), boost::uniform_smallint<>(0, 1));
+
+	bool shuffle = false;
+	if ( doshuffle() )
+		shuffle = true;
+
+	boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > die(GetRandom(), boost::uniform_real<>(-10, 10));
+	std::vector<Point_2> pts;
+	pts.push_back( Rect().point(0) );
+	pts.push_back( Rect().point(1) );
+	pts.push_back( Rect().point(2) );
+
+	pts[choix] = Point_2(pts[choix].x() + die(), pts[choix].y() + die());
+
+	if ( shuffle )
+		std::random_shuffle( pts.begin() , pts.end() );
 	m_rect = CRectangle_2(pts[0], pts[1], pts[2]);
 
 	if (!IsValid(box))

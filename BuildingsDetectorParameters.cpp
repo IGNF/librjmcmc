@@ -1,5 +1,8 @@
 #include <fstream>
 
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+
 #include "BuildingsDetectorParameters.hpp"
 
 void BuildingsDetectorParametersSingleton::GetAsText(std::vector< std::pair<std::string, std::string> > &pileText) const
@@ -7,7 +10,7 @@ void BuildingsDetectorParametersSingleton::GetAsText(std::vector< std::pair<std:
 	const std::vector< boost::shared_ptr< po::option_description > > & options = m_desc.options();
 	for (unsigned int i=0; i<options.size(); ++i)
 	{
-		if ((options[i]->long_name() == "help") || (options[i]->long_name() == "config"))
+		if ((options[i]->long_name() == "help") || (options[i]->long_name() == "config") || (options[i]->long_name() == "configxml"))
 			continue;
 		std::string param = options[i]->format_parameter();
 		std::string default_value = param.substr(6, param.size()-6-1);
@@ -50,6 +53,19 @@ void BuildingsDetectorParametersSingleton::ReadConfigFile(const char *filename)
 	ComputeProb();
 }
 
+void BuildingsDetectorParametersSingleton::ReadXMLConfigFile(const char *filename)
+{
+	// open the archive
+    std::ifstream file(filename);
+    assert(file.good());
+    boost::archive::xml_iarchive archive(file);
+
+    // restore the schedule from the archive
+    archive >> BOOST_SERIALIZATION_NVP(*this);
+    //serialize(archive,0);
+	ComputeProb();
+}
+
 bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
 {
 	po::variables_map vm;
@@ -64,6 +80,10 @@ bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
 	{
 		ReadConfigFile(vm["config"].as<std::string>().c_str());
 	}
+	else if (vm.count("configxml"))
+	{
+		ReadXMLConfigFile(vm["configxml"].as<std::string>().c_str());
+	}
 	else
 	{
 		po::notify(vm);
@@ -74,35 +94,39 @@ bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
 
 BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_desc("buildings detector options"),
-	m_initialTemperature(5000.),
-	m_nbIterations(15000000),
-	m_nbIterationsDump(10000),
-	m_decreaseCoefficient(0.999999),
+	m_initialTemperature(500.),
+	m_nbIterations(5000000),
+	m_nbIterationsDump(25000),
+	m_nbIterationsSave(100000),
+	m_decreaseCoefficient(0.99999),
 	m_probaBirth(1. / 10.),
 	m_probaDeath(1. / 10.),
 //	m_inputDataFilePath("./data/SaintMichel/MNS_StMichel_sans_veget.tif"),
 //	m_inputImageWidth(1695),
 //	m_inputImageHeight(1575),
-	m_inputDataFilePath("./data/Marseille/Crop_MNE_Marseille.tif"),
+//	m_inputDataFilePath("./data/Marseille/Crop_MNE_Marseille.tif"),
 //	m_inputDataFilePath("/home/olivier/work/data/MNESaintMande.tif"),
+	m_inputDataFilePath("./data/ZTerrain_c3.tif"),
 	m_runningOriginX(0),
 	m_runningOriginY(0),
 	m_runningWidth(1000),
 	m_runningHeight(1000),
-	m_varianceGaussianFilter(2.0),
+	m_varianceGaussianFilter(5.0),
 	m_rectangleMinimalSize(5.),
 	m_rectangleMaximalRatio(5.),
-	m_ponderationSurfaceIntersection(10.),
-	m_ponderationPointsDistance(10.),
+	m_ponderationSurfaceIntersection(1.),
+	m_ponderationPointsDistance(0.),
 	m_pointsDistanceMax(10.),
-	m_individualEnergy(500.)
+	m_individualEnergy(400.)
 {
 	m_desc.add_options()
 	("help,h", "Message d'aide...")
 	("config,c",	po::value< std::string >(), "Fichier de configuration")
+	("configxml,X",	po::value< std::string >(), "Fichier de configuration XML (boost::serialization)")
 	("temp,t", 		po::value< double >		(&(m_initialTemperature))->default_value(m_initialTemperature) , "Temperature initiale")
 	("nbiter,I", 	po::value< unsigned int>(&(m_nbIterations))->default_value(m_nbIterations), "Nombre d'iterations")
 	("nbdump,d",	po::value< unsigned int>(&(m_nbIterationsDump))->default_value(m_nbIterationsDump), "Nombre d'iterations entre chaque affichage")
+	("nbsave,S",	po::value< unsigned int>(&(m_nbIterationsSave))->default_value(m_nbIterationsSave), "Nombre d'iterations entre chaque sauvegarde")
 	("deccoef,C",	po::value< double >		(&(m_decreaseCoefficient))->default_value(m_decreaseCoefficient), "Coefficient de decroissance")
 	("pbirth,B",	po::value< double >		(&(m_probaBirth))->default_value(m_probaBirth), "Probabilite de naissance")
 	("pdeath,D",	po::value< double >		(&(m_probaDeath))->default_value(m_probaDeath), "Probabilite de mort")

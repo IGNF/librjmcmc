@@ -8,16 +8,25 @@
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
+// boost::serialization
+#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/list.hpp>
+#include <boost/serialization/version.hpp>
+
 #include "PatternSingleton.hpp"
 
 class BuildingsDetectorParametersSingleton : public PatternSingleton<BuildingsDetectorParametersSingleton>
 {
 	friend class PatternSingleton<BuildingsDetectorParametersSingleton>;
+	friend class boost::serialization::access;
+
 
 public:
 	double InitialTemperature()  const { return m_initialTemperature; }
 	unsigned int NbIterations()  const { return m_nbIterations; }
 	unsigned int NbIterationsDump() const { return m_nbIterationsDump; }
+	unsigned int NbIterationsSave() const { return m_nbIterationsSave; }
 	double DecreaseCoefficient() const { return m_decreaseCoefficient; }
 	double ProbaBirth() const { return m_probaBirth; }
 	double ProbaDeath() const { return m_probaDeath; }
@@ -44,12 +53,14 @@ public:
 	void SetFromText(const std::vector< std::pair<std::string, std::string> > &pileText);
 	bool ParseCmdLine(int argc, char **argv);
 	void ReadConfigFile(const char *filename);
+	void ReadXMLConfigFile(const char *filename);
 
 private:
 	po::options_description m_desc;
 	double m_initialTemperature;
 	unsigned int m_nbIterations;
 	unsigned int m_nbIterationsDump;
+	unsigned int m_nbIterationsSave;
 	double m_decreaseCoefficient;
 	double m_probaBirth;
 	double m_probaDeath;
@@ -65,6 +76,30 @@ private:
 	double m_ponderationPointsDistance;
 	double m_pointsDistanceMax;
 	double m_individualEnergy;
+	template<class Archive>
+	void serialize(Archive & ar , const unsigned int &version)
+	{
+		ar & BOOST_SERIALIZATION_NVP(m_initialTemperature)
+		& BOOST_SERIALIZATION_NVP(m_nbIterations)
+		& BOOST_SERIALIZATION_NVP(m_nbIterationsDump)
+		& BOOST_SERIALIZATION_NVP(m_nbIterationsSave)
+		& BOOST_SERIALIZATION_NVP(m_decreaseCoefficient)
+		& BOOST_SERIALIZATION_NVP(m_probaBirth)
+		& BOOST_SERIALIZATION_NVP(m_probaDeath)
+		& BOOST_SERIALIZATION_NVP(m_inputDataFilePath)
+		& BOOST_SERIALIZATION_NVP(m_runningOriginX)
+		& BOOST_SERIALIZATION_NVP(m_runningOriginY)
+		& BOOST_SERIALIZATION_NVP(m_runningWidth)
+		& BOOST_SERIALIZATION_NVP(m_runningHeight)
+		& BOOST_SERIALIZATION_NVP(m_varianceGaussianFilter)
+		& BOOST_SERIALIZATION_NVP(m_ponderationSurfaceIntersection)
+		& BOOST_SERIALIZATION_NVP(m_ponderationPointsDistance)
+		& BOOST_SERIALIZATION_NVP(m_pointsDistanceMax)
+		& BOOST_SERIALIZATION_NVP(m_rectangleMinimalSize)
+		& BOOST_SERIALIZATION_NVP(m_rectangleMaximalRatio)
+		& BOOST_SERIALIZATION_NVP(m_individualEnergy)
+		;
+	}
 
 	BuildingsDetectorParametersSingleton();
 	BuildingsDetectorParametersSingleton(const BuildingsDetectorParametersSingleton &);
