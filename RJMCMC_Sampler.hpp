@@ -19,7 +19,7 @@ public:
 
 	eProposition Type() const { return m_type; }
 	const typename DetectorType::InternalNodeType &Node() const { return m_node; }
-	typename DetectorType::GraphType::vertex_iterator Vertex() { return m_vertex; }
+	const typename DetectorType::GraphType::vertex_iterator &Vertex() { return m_vertex; }
 	void Vertex( typename DetectorType::GraphType::vertex_iterator vertex ) { m_vertex = vertex; }
 
 	void SetBirth(const typename DetectorType::InternalNodeType &node)
@@ -99,12 +99,15 @@ private :
 	{
 		double delta = modif.Node().Weight();
 		typename DetectorType::vertex_iterator it_v = vertices(detector.GetGraph()).first, fin_v = vertices(detector.GetGraph()).second;
+		// optim
+		const typename DetectorType::GraphType::vertex_iterator &modifiedVertex = modif.Vertex();
+		const typename DetectorType::InternalNodeType &modifiedNode = modif.Node();
 		for (; it_v != fin_v; ++it_v)
 		{
 			/// Si on est en modification, il ne faut pas prendre en compte l'interaction avec la version non modifee
-			if (it_v == modif.Vertex())
+			if (it_v == modifiedVertex)
 				continue;
-			delta += detector.ComputePriorEnergy( detector.GetGraph()[ *it_v ] , modif.Node() );
+			delta += detector.ComputePriorEnergy( detector.GetGraph()[ *it_v ] , modifiedNode );
 		}
 		return delta;
 	}
@@ -185,13 +188,15 @@ private :
 			case eBIRTH :
 			{
 				delta = delta_birth(detector, modif);
-				R = 1.- detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
+				//R = 1.- detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
+				R = double( detector.GetBox().Volume() ) / ((double)detector.GetNbVertices()+1.);
 				break;
 			}
 			case eDEATH :
 			{
 				delta = delta_death(detector, modif);
-				R = detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
+				//R = detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
+				R = ((double)detector.GetNbVertices()+1.) / double( detector.GetBox().Volume() );
 				break;
 			}
 			case eMODIFY :
@@ -199,7 +204,8 @@ private :
 				delta = delta_death(detector, modif);
 				delta+= delta_birth(detector, modif);
 				// Ici : delta = 0 => acceptation = 50 %
-				R = .5;
+				//R = .5;
+				R = 1.;
 				break;
 			}
 			default :
@@ -209,6 +215,9 @@ private :
 		// Cas non stochastique : on accepte les descentes
 		if (m_temp == 0)
 			return (delta <= 0);
+
+//		std::cout << "R = " << R << std::endl;
+//		std::cout << "D = " << delta << std::endl;
 
 		R *= exp ( - delta / m_temp );
 		m_temp *= m_q;

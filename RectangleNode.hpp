@@ -21,6 +21,7 @@ public :
 	void Weight( double w ) { m_weight = w; }
 
 	const CRectangle_2 &Rect() const { return m_rect; }
+	typedef CRectangle_2::Point_2 Point_2;
 
 private :
 

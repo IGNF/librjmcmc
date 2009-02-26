@@ -53,7 +53,7 @@ public:
 	void SetFromText(const std::vector< std::pair<std::string, std::string> > &pileText);
 	bool ParseCmdLine(int argc, char **argv);
 	void ReadConfigFile(const char *filename);
-	void ReadXMLConfigFile(const char *filename);
+//	void ReadXMLConfigFile(const char *filename);
 
 private:
 	po::options_description m_desc;
@@ -76,30 +76,30 @@ private:
 	double m_ponderationPointsDistance;
 	double m_pointsDistanceMax;
 	double m_individualEnergy;
-	template<class Archive>
-	void serialize(Archive & ar , const unsigned int &version)
-	{
-		ar & BOOST_SERIALIZATION_NVP(m_initialTemperature)
-		& BOOST_SERIALIZATION_NVP(m_nbIterations)
-		& BOOST_SERIALIZATION_NVP(m_nbIterationsDump)
-		& BOOST_SERIALIZATION_NVP(m_nbIterationsSave)
-		& BOOST_SERIALIZATION_NVP(m_decreaseCoefficient)
-		& BOOST_SERIALIZATION_NVP(m_probaBirth)
-		& BOOST_SERIALIZATION_NVP(m_probaDeath)
-		& BOOST_SERIALIZATION_NVP(m_inputDataFilePath)
-		& BOOST_SERIALIZATION_NVP(m_runningOriginX)
-		& BOOST_SERIALIZATION_NVP(m_runningOriginY)
-		& BOOST_SERIALIZATION_NVP(m_runningWidth)
-		& BOOST_SERIALIZATION_NVP(m_runningHeight)
-		& BOOST_SERIALIZATION_NVP(m_varianceGaussianFilter)
-		& BOOST_SERIALIZATION_NVP(m_ponderationSurfaceIntersection)
-		& BOOST_SERIALIZATION_NVP(m_ponderationPointsDistance)
-		& BOOST_SERIALIZATION_NVP(m_pointsDistanceMax)
-		& BOOST_SERIALIZATION_NVP(m_rectangleMinimalSize)
-		& BOOST_SERIALIZATION_NVP(m_rectangleMaximalRatio)
-		& BOOST_SERIALIZATION_NVP(m_individualEnergy)
-		;
-	}
+//	template<class Archive>
+//	void serialize(Archive & ar , const unsigned int &version)
+//	{
+//		ar & BOOST_SERIALIZATION_NVP(m_initialTemperature)
+//		& BOOST_SERIALIZATION_NVP(m_nbIterations)
+//		& BOOST_SERIALIZATION_NVP(m_nbIterationsDump)
+//		& BOOST_SERIALIZATION_NVP(m_nbIterationsSave)
+//		& BOOST_SERIALIZATION_NVP(m_decreaseCoefficient)
+//		& BOOST_SERIALIZATION_NVP(m_probaBirth)
+//		& BOOST_SERIALIZATION_NVP(m_probaDeath)
+//		& BOOST_SERIALIZATION_NVP(m_inputDataFilePath)
+//		& BOOST_SERIALIZATION_NVP(m_runningOriginX)
+//		& BOOST_SERIALIZATION_NVP(m_runningOriginY)
+//		& BOOST_SERIALIZATION_NVP(m_runningWidth)
+//		& BOOST_SERIALIZATION_NVP(m_runningHeight)
+//		& BOOST_SERIALIZATION_NVP(m_varianceGaussianFilter)
+//		& BOOST_SERIALIZATION_NVP(m_ponderationSurfaceIntersection)
+//		& BOOST_SERIALIZATION_NVP(m_ponderationPointsDistance)
+//		& BOOST_SERIALIZATION_NVP(m_pointsDistanceMax)
+//		& BOOST_SERIALIZATION_NVP(m_rectangleMinimalSize)
+//		& BOOST_SERIALIZATION_NVP(m_rectangleMaximalRatio)
+//		& BOOST_SERIALIZATION_NVP(m_individualEnergy)
+//		;
+//	}
 
 	BuildingsDetectorParametersSingleton();
 	BuildingsDetectorParametersSingleton(const BuildingsDetectorParametersSingleton &);

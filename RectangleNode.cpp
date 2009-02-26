@@ -155,8 +155,10 @@ bool RectanglePointsPriorEnergyPolicy::AreNeighbor(const RectangleNode &n1, cons
 double RectanglePointsPriorEnergyPolicy::ComputePriorEnergy(const RectangleNode &n1, const RectangleNode &n2)
 {
 	double inter = std::abs(CGAL::to_double(n1.Rect().intersection_area(n2.Rect())));
-	if (inter > 0)
+	if (inter > 0 )
 		return m_coefSurface * inter;
+	if ( std::abs(m_coefDistance) < 1E-6 )
+		return 0.;
 	double distmin2 = GetDistMax2();
 	unsigned int imin = 5, jmin = 5;
 	for (unsigned int i=0; i<4;++i)
@@ -269,11 +271,13 @@ double ImageGradientEnergyPolicy::ComputeDataEnergy(const RectangleNode &n) cons
 	return m_policy->ComputeDataEnergy(n);
 }
 
-const double M_PI = 4.0 * atan(1.0);
+#ifdef WIN32
+	const double M_PI = 4.0 * atan(1.0);
+#endif // WIN32
 
 template<typename Kernel1D>
 void initKernelGaussian1D(Kernel1D& kernel, double sigma)
-{ 
+{
 	// Gaussian smoothing
 	typedef typename Kernel1D::value_type vt;
 	const vt z = 1.0 / (std::sqrt(2 * M_PI) * sigma);
@@ -291,7 +295,7 @@ void initKernelGaussian1D(Kernel1D& kernel, double sigma)
 
 template<typename Kernel1D>
 void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
-{ 
+{
 	// Gaussian derivative smoothing
 	typedef typename Kernel1D::value_type vt;
 	const vt z = 1.0 / (std::sqrt(2 * M_PI) * sigma);
@@ -318,8 +322,8 @@ void GILPolicyImage::LoadFile(const std::string &str)
 	initKernelGaussian1D(ksmooth,sigmaD);
 	initKernelGaussianDeriv1D(kderiv,sigmaD);
 
-    gray8_image_t img;
-    tiff_read_image("Im1.tif",img);
+    gray16_image_t img;
+    tiff_read_image(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath(),img);
 	m_imageWidth = img.dimensions().x;
 	m_imageHeight = img.dimensions().y;
 	m_gradients_x.recreate(img.dimensions());
@@ -355,17 +359,14 @@ Point_2 GILPolicyImage::OffsetToPos(int off) const
 double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn,
 		const Point_2 &gridOut) const
 {
-	float gradient_sum[2];
-	gradient_sum[0] = 0.;
-	gradient_sum[1] = 0.;
-
-	double res = 0.;
+	float gradient_sum[2] = {0.,0.};
 
 	Segment_2 s(gridIn, gridOut);
-	for (CGAL::Segment_2_iterator<Segment_2> it(s); !it.end(); ++it)
+	CGAL::Segment_2_iterator<Segment_2> it(s);
+	for (; !it.end(); ++it)
 	{
 		// Calcul de la direction du gradient ...
-		float length = it.length();
+		const float &length = it.length();
 		gradient_sum[0] += length * m_gradients_x._view(it.x(), it.y());
 		gradient_sum[1] += length * m_gradients_y._view(it.x(), it.y());
 	}
@@ -373,6 +374,5 @@ double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn,
 	Vector_2 arete(gridIn, gridOut);
 	Vector_2 normale = arete.perpendicular(CGAL::POSITIVE);
 	Vector_2 sum(gradient_sum[0], gradient_sum[1]);
-	res = CGAL::to_double(normale * sum);
-	return res;
+	return CGAL::to_double(normale * sum);
 }

@@ -32,13 +32,20 @@ SET( SRC_IHM	${SRC_DIR}BuildingsDetectorParameters.cpp
 	)
 
 # Find BOOST
-FIND_PACKAGE( Boost 1.38 COMPONENTS program_options thread filesystem system gil)
+FIND_PACKAGE( Boost 1.37 COMPONENTS program_options thread filesystem system )
+
+IF(UNIX)
+	INCLUDE( CGAL.cmake )
+	INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES} ${CGAL_INCLUDE_DIRECTORIES} )
+	LINK_DIRECTORIES( ${LINK_DIRECTORIES} /usr/local/CGAL/lib )
+ENDIF(UNIX)
 
 FIND_PACKAGE( CGAL COMPONENTS Core )
 IF( CGAL_FOUND )
 	include( ${CGAL_USE_FILE} )
 ENDIF()
 
+# Pour CGAL 3.4
 IF(WIN32)
 #	SET( CGAL_ROOT_DIR "C:/Program Files/CGAL-3.3.1" )
 #	INCLUDE_DIRECTORIES( ${CGAL_ROOT_DIR}/include/CGAL/config/msvc )
@@ -57,6 +64,7 @@ ADD_EXECUTABLE( RJMCMC_Rectangles_noihm ${SRC_NO_IHM} )
 TARGET_LINK_LIBRARIES( RJMCMC_Rectangles_noihm	
 										 		${Boost_LIBRARIES}
 										 		${CGAL_LIBRARIES}
+													tiff
 										)
 
 #####################################
@@ -74,9 +82,9 @@ ENDIF(wxWidgets_FOUND)
 
 SET( ITKVIEWERPATH "" CACHE PATH "Path to ITKViewer" )
 
-INCLUDE_DIRECTORIES( ${ITKVIEWERPATH} )
-INCLUDE_DIRECTORIES( ${ITKVIEWERPATH}/../extern )
-LINK_DIRECTORIES( ${ITKVIEWERPATH}/../extern/lib )
+INCLUDE_DIRECTORIES( ${ITKVIEWERPATH}/src )
+INCLUDE_DIRECTORIES( ${ITKVIEWERPATH}/extern )
+LINK_DIRECTORIES( ${ITKVIEWERPATH}/lib )
 
 IF(UNIX)
 	ADD_DEFINITIONS("-Wall")
@@ -88,7 +96,8 @@ IF(UNIX)
 													${CGAL_LIBRARIES}
 													ITKViewer
 													shapelib
-													tinyxml 
+													tinyxml
+													tiff 
 											 )
 ENDIF(UNIX)
 IF(WIN32)
@@ -102,5 +111,6 @@ TARGET_LINK_LIBRARIES( RJMCMC_Rectangles_ihm
 										 ${wxWidgets_LIBRARIES}
 										 ITKViewer
 										 shapelib
-										 tinyxml 
+										 tinyxml
+										 tiff
 										)

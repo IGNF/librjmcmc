@@ -27,8 +27,8 @@
 #include <CGAL/Iso_rectangle_2.h>
 
 #include <CGAL/Polygon_2.h>
-//#include <CGAL/Polygon_with_holes_2.h>
-//#include <CGAL/Boolean_set_operations_2.h>
+#include <CGAL/Polygon_with_holes_2.h>
+#include <CGAL/Boolean_set_operations_2.h>
 
 #include <boost/array.hpp>
 
@@ -157,6 +157,8 @@ template <class FT> inline FT triangle_area(FT n2, FT m2, FT tx, FT ty, FT rx, F
 template <class R_>
 class Rectangle_2
 {
+public:
+  typedef  R_   R;
   typedef typename R_::RT                    RT;
   typedef typename R_::FT                    FT;
   typedef typename R_::Point_2               Point_2;
@@ -170,9 +172,6 @@ class Rectangle_2
   Point_2 c;
   Vector_2 n;
   FT r;
-
-public:
-  typedef  R_   R;
 
 /* Constructors */
   Rectangle_2() : c(0.,0.), n(0.,0.), r(0.) {}

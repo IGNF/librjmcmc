@@ -60,6 +60,11 @@ RJMCMC_BuildingsDetectionFrame::RJMCMC_BuildingsDetectionFrame(bool with_paramet
 	}
 }
 
+RJMCMC_BuildingsDetectionFrame::~RJMCMC_BuildingsDetectionFrame()
+{
+	parameters->Destroy();
+}
+
 void RJMCMC_BuildingsDetectionFrame::OnGoButton(wxCommandEvent& event)
 {
 	m_buttonGo->Disable();
@@ -77,7 +82,7 @@ void RJMCMC_BuildingsDetectionFrame::OnGoButton(wxCommandEvent& event)
 		}
 		BuildingsDetectorParametersSingleton::Instance()->SetFromText(pileText1);
 	}
-	m_panel->AddLayer(ImageLayer<signed short,1>::CreateImageLayer(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath()));
+	//m_panel->AddLayer( ImageLayer::CreateImageLayer(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath()) );
 //	m_panel->AddLayer(ImageLayer<unsigned short,1>::CreateImageLayer(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath()));
 
 //	Layer::ptrLayerType layer = VectorLayer::CreateVectorLayer(std::string("Points") , SHPT_POINT);

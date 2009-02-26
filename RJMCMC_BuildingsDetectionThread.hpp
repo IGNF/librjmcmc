@@ -35,8 +35,9 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 	size[1] = BuildingsDetectorParametersSingleton::Instance()->RunningHeight()-1;
 	origin[0] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginX();
 	origin[1] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginY();
-	BuildingsDetector buildingsDetector(BBox(size, origin));
 	Sampler< BuildingsDetector > sampler( BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
+
+	BuildingsDetector buildingsDetector(BBox(size, origin));
 
 	unsigned int nb_accepted[4];
 	for (unsigned int i=0; i<4; ++i)
@@ -46,9 +47,9 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 
 	unsigned int nb_ite = BuildingsDetectorParametersSingleton::Instance()->NbIterations();
 	unsigned int nb_dump = BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump();
+#if USE_IHM
 	unsigned int nb_save = BuildingsDetectorParametersSingleton::Instance()->NbIterationsSave();
 
-#if USE_IHM
 	m_layer->PolygonsRingsColour(wxColour(255,255,0));
 	m_layer->PolygonsInsideStyle( wxTRANSPARENT );
 	m_layer->PolygonsRingsWidth(3);
@@ -77,17 +78,16 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 
 	for (unsigned int i=0; i<=nb_ite; ++i)
 	{
-		if ( nb_save != 0 )
-			if ( i % nb_save == 0 )
-			{
 #if USE_IHM
-				std::ostringstream name;
-				name.width(8);
-				name.fill('0');
-				name << i;
-				m_layer->Save( name.str() );
+		if ( i % nb_save == 0 && nb_save != 0 )
+		{
+			std::ostringstream oss;
+			oss.width(8);
+			oss.fill('0');
+			oss << i;
+			m_layer->Save(oss.str() + ".shp");
+		}
 #endif // USE_IHM
-			}
 		if (i % nb_dump == 0)
 		{
 			my_out_stream.str("");

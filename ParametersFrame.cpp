@@ -15,8 +15,8 @@ ParametersFrame::ParametersFrame(wxWindow *parent, wxWindowID id, const wxString
 {
 	wxBoxSizer *test_sizer= new wxBoxSizer( wxVERTICAL );
 	wxBoxSizer* inner_sizer = new wxBoxSizer(wxVERTICAL);
-	
-	wxScrolledWindow* wnd = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxT("scroll")); 
+
+	wxScrolledWindow* wnd = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxT("scroll"));
 	wnd->SetScrollbars(20,20,50,50);
 
 	std::vector< std::pair<std::string, std::string> > pileText2;
@@ -30,16 +30,16 @@ ParametersFrame::ParametersFrame(wxWindow *parent, wxWindowID id, const wxString
 		inner_sizer->Add(sizerH,0,wxEXPAND);
 		sizerH->Layout();
 	}
-	
+
 	wnd->SetSizer(inner_sizer);
     wnd->SetAutoLayout(true);
     wnd->Layout();
-    
-    test_sizer->Add(wnd, 1, wxEXPAND | wxALL, 5); 
+
+    test_sizer->Add(wnd, 1, wxEXPAND | wxALL, 5);
     SetSizer(test_sizer);
     //SetAutoLayout(true);
     //Layout();
-    
+
 	//SetSizerAndFit(test_sizer);
 	//test_sizer->Layout();
 }
