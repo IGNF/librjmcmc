@@ -1,5 +1,6 @@
-#include "RectangleNode.hpp"
+#include "stdafx.h"
 
+#include "RectangleNode.hpp"
 #include "BuildingsDetectorParameters.hpp"
 
 bool RectangleNode::IsValid(const BBox &box) /*const*/
@@ -90,7 +91,6 @@ std::ostream & operator<<(std::ostream &o, const RectangleNode &node)
 
 RectanglePriorEnergyPolicy::RectanglePriorEnergyPolicy() : m_coefSurface(BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation())
 {}
-
 
 bool RectanglePriorEnergyPolicy::AreNeighbor(const RectangleNode &n1,
 		const RectangleNode &n2)
@@ -209,21 +209,35 @@ double SurfaceRectangleDataEnergyPolicy::ComputeDataEnergy(const RectangleNode &
 	return -::log(1. + std::abs(CGAL::to_double(n.Rect().area())));
 }
 
-#include <itkImage.h>
-#include <itkImageFileReader.h>
-#include <itkDiscreteGaussianImageFilter.h>
-#include <itkGradientImageFilter.h>
-#include <itkImageRegionIterator.h>
-#include <itkImageFileWriter.h>
-#include <itkLineConstIterator.h>
+typedef pixel<float,gray_layout_t>				gray32F_pixel_t;
+typedef gray32F_pixel_t*						gray32F_pixel_ptr_t;
+typedef image_type<float,gray_layout_t>::type	gray32F_image_t;
+typedef gray32F_image_t::view_t				gray32F_view_t;
+/*
+namespace boost { namespace gil {
 
-class itkPolicyImage
+namespace detail {
+template <>
+struct tiff_read_support_private<float,gray_t> {
+    BOOST_STATIC_CONSTANT(bool,is_supported=true);
+    BOOST_STATIC_CONSTANT(int,bit_depth=32);
+    BOOST_STATIC_CONSTANT(int,color_type=PHOTOMETRIC_MINISBLACK);
+};
+template <>
+struct tiff_write_support_private<float,gray_t> {
+    BOOST_STATIC_CONSTANT(bool,is_supported=true);
+    BOOST_STATIC_CONSTANT(int,bit_depth=32);
+    BOOST_STATIC_CONSTANT(int,color_type=PHOTOMETRIC_MINISBLACK);
+};
+
+};
+};};
+*/
+
+class GILPolicyImage
 {
 public:
 
-	typedef signed short PixelType;
-	typedef itk::CovariantVector<float,2> CovariantPixelType;
-	typedef itk::Image<CovariantPixelType> CovariantImageType;
 	double ComputeSegmentDataEnergy(const Point_2 &gridIn,const Point_2 &gridOut) const;
 
 	void LoadFile(const std::string &str);
@@ -232,7 +246,7 @@ public:
 	int PosToOffset(const Point_2 &pt) const;
 	Point_2 OffsetToPos(int off) const;
 
-	CovariantImageType::Pointer m_gradients;
+	gray32F_image_t m_gradients_x, m_gradients_y;
 	unsigned int m_imageWidth;
 	unsigned int m_imageHeight;
 
@@ -240,7 +254,7 @@ public:
 };
 
 ImageGradientEnergyPolicy::ImageGradientEnergyPolicy() :
-	m_policy( boost::shared_ptr<itkPolicyImage>(new itkPolicyImage) )
+	m_policy( boost::shared_ptr<GILPolicyImage>(new GILPolicyImage) )
 {
 	m_policy->LoadFile(BuildingsDetectorParametersSingleton::Instance()-> InputDataFilePath());
 	m_policy->m_defaultEnergy = BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy();
@@ -255,68 +269,68 @@ double ImageGradientEnergyPolicy::ComputeDataEnergy(const RectangleNode &n) cons
 	return m_policy->ComputeDataEnergy(n);
 }
 
-void itkPolicyImage::LoadFile(const std::string &str)
-{
-	typedef itk::Image<PixelType,2> InputImageType;
-	typedef itk::ImageFileReader<InputImageType> ImageReaderType;
-	ImageReaderType::Pointer reader = ImageReaderType::New();
-	reader->SetFileName(str);
+const double M_PI = 4.0 * atan(1.0);
 
-	typedef itk::DiscreteGaussianImageFilter<InputImageType,InputImageType>
-			GaussianFilterType;
-	GaussianFilterType::Pointer gaussianFilter = GaussianFilterType::New();
-	gaussianFilter->SetInput(reader->GetOutput());
-	gaussianFilter->SetVariance(BuildingsDetectorParametersSingleton::Instance()->VarianceGaussianFilter());
-
-	typedef itk::GradientImageFilter<InputImageType/*,float,float*/>
-			GradientFilterType;
-	GradientFilterType::Pointer gradientFilter = GradientFilterType::New();
-	gradientFilter->SetInput(gaussianFilter->GetOutput());
-
-	try
+template<typename Kernel1D>
+void initKernelGaussian1D(Kernel1D& kernel, double sigma)
+{ 
+	// Gaussian smoothing
+	typedef typename Kernel1D::value_type vt;
+	const vt z = 1.0 / (std::sqrt(2 * M_PI) * sigma);
+	const vt sigmasquared = sigma * sigma;
+	vt x = -1.0 * kernel.center();
+	vt sum =0.;
+	for(typename Kernel1D::iterator i = kernel.begin();i!=kernel.end(); ++i, ++x)
 	{
-		gradientFilter->Update();
-		m_gradients = gradientFilter->GetOutput();
-
-		m_imageWidth = m_gradients->GetLargestPossibleRegion().GetSize()[0];
-		m_imageHeight = m_gradients->GetLargestPossibleRegion().GetSize()[1];
-/*
-		typedef itk::Image<itk::Vector<float,3>,2> ImageOut;
-		typedef itk::ImageFileWriter<ImageOut> WriterType;
-
-		ImageOut::Pointer monimage = ImageOut::New();
-		ImageOut::RegionType region = m_gradients->GetLargestPossibleRegion();
-		monimage->SetRegions(region);
-		monimage->Allocate();
-
-		typedef itk::ImageRegionIterator<ImageOut> iterator;
-		iterator it_out(monimage, monimage->GetLargestPossibleRegion());
-		it_out.GoToBegin();
-
-		typedef itk::ImageRegionIterator<CovariantImageType> InIterator;
-		InIterator it_in(m_gradients, m_gradients->GetLargestPossibleRegion());
-		it_in.GoToBegin();
-
-		for (; !it_out.IsAtEnd(); ++it_in, ++it_out)
-		{
-			it_out.Value()[0] = it_in.Value()[0];
-			it_out.Value()[1] = it_in.Value()[1];
-			it_out.Value()[2] = 0;
-		}
-
-		WriterType::Pointer w = WriterType::New();
-		w->SetInput(monimage);
-		w->SetFileName("Gradients.tif");
-		w->Update();
-*/
+		*i = z * (std::exp(-0.5 * (x * x / sigmasquared)));
+		sum += *i;
 	}
-	catch (const itk::ExceptionObject &e)
-	{
-		std::cout << e.what() << std::endl;
-	}
+	for (typename Kernel1D::iterator i = kernel.begin(); i!=kernel.end(); ++i)
+		*i /= sum;
 }
 
-double itkPolicyImage::ComputeDataEnergy(const RectangleNode &n) const
+template<typename Kernel1D>
+void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
+{ 
+	// Gaussian derivative smoothing
+	typedef typename Kernel1D::value_type vt;
+	const vt z = 1.0 / (std::sqrt(2 * M_PI) * sigma);
+	const vt sigmasquared = sigma * sigma;
+	vt x = -1.0 * kernel.center();
+	typename Kernel1D::iterator i;
+	vt sum = 0.;
+	for (i = kernel.begin(); i!=kernel.end(); ++i, ++x)
+	{
+		*i = (x / sigmasquared) * z * (std::exp(-0.5 * (x * x / sigmasquared)));
+		sum += *i * x;
+	}
+	for (i=kernel.begin(); i!=kernel.end(); ++i)
+		*i /= sum;
+}
+
+void GILPolicyImage::LoadFile(const std::string &str)
+{
+	double sigmaD = 1.;
+	unsigned int half_size = 3*sigmaD;
+	const size_t kws = 2 * half_size+1;
+	kernel_1d<float> ksmooth(kws,kws/2);
+	kernel_1d<float> kderiv(kws,kws/2);
+	initKernelGaussian1D(ksmooth,sigmaD);
+	initKernelGaussianDeriv1D(kderiv,sigmaD);
+
+    gray8_image_t img;
+    tiff_read_image("Im1.tif",img);
+	m_imageWidth = img.dimensions().x;
+	m_imageHeight = img.dimensions().y;
+	m_gradients_x.recreate(img.dimensions());
+	m_gradients_y.recreate(img.dimensions());
+    convolve_cols<gray32F_pixel_t>(const_view(img),ksmooth,view(m_gradients_x), convolve_option_extend_constant);
+    convolve_rows<gray32F_pixel_t>(const_view(m_gradients_x),kderiv,view(m_gradients_x), convolve_option_extend_constant);
+	convolve_rows<gray32F_pixel_t>(const_view(img),ksmooth,view(m_gradients_y), convolve_option_extend_constant);
+    convolve_cols<gray32F_pixel_t>(const_view(m_gradients_y),kderiv,view(m_gradients_y), convolve_option_extend_constant);
+}
+
+double GILPolicyImage::ComputeDataEnergy(const RectangleNode &n) const
 {
 	double res = m_defaultEnergy;
 	for (unsigned int i = 0; i < 4; ++i)
@@ -328,144 +342,32 @@ double itkPolicyImage::ComputeDataEnergy(const RectangleNode &n) const
 	return res;
 }
 
-int itkPolicyImage::PosToOffset(const Point_2 &pt) const
+int GILPolicyImage::PosToOffset(const Point_2 &pt) const
 {
 	return m_imageWidth * std::floor(pt.y()) + std::floor(pt.x());
 }
 
-Point_2 itkPolicyImage::OffsetToPos(int off) const
+Point_2 GILPolicyImage::OffsetToPos(int off) const
 {
 	return Point_2(off % m_imageWidth, off / m_imageWidth);
 }
 
-double itkPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn,
+double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn,
 		const Point_2 &gridOut) const
 {
-	/*
-	 int Pos = PosToOffset(gridIn);
-	 int Out = PosToOffset(gridOut);
-
-	 const Point_2 next[] = {OffsetToPos(Pos),OffsetToPos(Pos+m_imageWidth+1)};
-
-	 // Set up 2D DDA for ray
-	 float NextCrossingT[2], DeltaT[2];
-	 int Step[2];
-	 Vector_2 arete(gridIn,gridOut);
-	 float length = ::sqrt(arete.squared_length());
-	 for (int axis = 0; axis < 2; ++axis)
-	 {
-	 int dir = (arete[axis] >= 0);
-	 float invrayd = 1.0f / arete[axis];
-	 NextCrossingT[axis] = (next[dir][axis] - gridIn[axis])*invrayd;
-	 if(NextCrossingT[axis]>1.f) NextCrossingT[axis]=1.f;
-	 Step [axis] = 2*dir-1;
-	 DeltaT[axis] = Step[axis] * invrayd;
-	 }
-	 Step[1] *= m_imageWidth;
-	 int stepAxis = NextCrossingT[1] < NextCrossingT[0];
-	 float t = 0; // cell entering time
-
-	 // Calcul de la normale normalisee a l'arete
-	 Vector_2 normale_normalisee = arete.perpendicular( CGAL::POSITIVE ) / length;
-
-	 //double maxcos=0;
-	 double res = 0.;
-	 // Walk grid
-	 for (;;)
-	 {
-	 // test current cell (Pos)
-	 Point_2 cur_pos = OffsetToPos(Pos);
-
-	 // Calcul de la direction du gradient ...
-	 CovariantImageType::IndexType index;
-	 index[0] = cur_pos.x();
-	 index[1] = cur_pos.y();
-	 //std::cout << "index = " << index << std::endl;
-
-
-	 CovariantPixelType pixel = m_gradients->GetPixel( index );
-	 Vector_2 gradient((double) pixel[0],(double) pixel[1]);
-	 res += (NextCrossingT[stepAxis]-t) * normale_normalisee * gradient;
-	 //std::cout << index << "\t" << cur_pos << "\t" << pixel << "\t" << gradient * gradient << std::endl;
-	 //if(maxcos<index[1])	maxcos=index[1];
-
-	 //res += m_img->GetRed( cur_pos.x(), cur_pos.y() );
-	 //std::cout << "res = " << res << std::endl;
-
-
-	 // Advance to next cell
-	 t = NextCrossingT[stepAxis];
-	 if (Pos==Out)
-	 return res*length;
-	 Pos += Step[stepAxis];
-	 NextCrossingT[stepAxis] += DeltaT[stepAxis];
-	 stepAxis = NextCrossingT[1] < NextCrossingT[0];
-	 if(NextCrossingT[stepAxis]>1.f) NextCrossingT[stepAxis]=1.f;
-	 }
-	 return res*length;
-	 */
-	//float gradient_sum[]={0, 0};
 	float gradient_sum[2];
 	gradient_sum[0] = 0.;
 	gradient_sum[1] = 0.;
 
 	double res = 0.;
-/*
-	CovariantImageType::IndexType index_b, index_e;
-	index_b[0]=gridIn.x();
-	index_b[1]=gridIn.y();
-	index_e[0]=gridOut.x();
-	index_e[1]=gridOut.y();
-	itk::LineConstIterator<CovariantImageType> iit(m_gradients, index_b, index_e);
-	for (;!iit.IsAtEnd(); ++iit)
-	{
-		gradient_sum[0] += iit.Get()[0];
-		gradient_sum[1] += iit.Get()[1];
-	}
-*/
-	/*
-	Segment_2 s(gridIn, gridOut);
-	itk::ImageRegionConstIterator< CovariantImageType > iit(m_gradients, m_gradients->GetLargestPossibleRegion());
-	CGAL::Segment_2_iterator<Segment_2> it(s);
-	{
-		CovariantImageType::IndexType index;
-		index[0]=it.x();
-		index[1]=it.y();
-		iit.SetIndex(index);
-	}
-
-	for (; !it.end(); ++it)
-	{
-		if (it.axis() == 0)
-			if (it.step() >0)
-				++iit;
-			else
-				--iit;
-		else
-		{
-			CovariantImageType::IndexType index;
-			index[0]=it.x();
-			index[1]=it.y();
-			iit.SetIndex(index);
-		}
-		// Calcul de la direction du gradient ...
-		float length = it.length();
-		gradient_sum[0] += length * iit.Value()[0];
-		gradient_sum[1] += length * iit.Value()[1];
-	}
-	*/
 
 	Segment_2 s(gridIn, gridOut);
 	for (CGAL::Segment_2_iterator<Segment_2> it(s); !it.end(); ++it)
 	{
-		CovariantImageType::IndexType index;
-		index[0] = it.x();
-		index[1] = it.y();
 		// Calcul de la direction du gradient ...
-		const CovariantPixelType &pixel = m_gradients->GetPixel(index);
 		float length = it.length();
-		gradient_sum[0] += length * pixel[0];
-		gradient_sum[1] += length * pixel[1];
+		gradient_sum[0] += length * m_gradients_x._view(it.x(), it.y());
+		gradient_sum[1] += length * m_gradients_y._view(it.x(), it.y());
 	}
 
 	Vector_2 arete(gridIn, gridOut);

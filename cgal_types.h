@@ -17,12 +17,19 @@
 //
 // Author(s)     : Radu Ursu
 
+#ifdef WIN32
+#define CGAL_CFG_NO_NEXTAFTER
+#undef min
+#undef max
+#endif //#ifdef WIN32
+
+
 #include <CGAL/basic.h>
 #include <CGAL/Simple_cartesian.h>
 //#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Polygon_2.h>
-#include <CGAL/point_generators_2.h>
+//#include <CGAL/point_generators_2.h>
 
 #include "Rectangle_2.h"
 
@@ -38,5 +45,5 @@ typedef K::Iso_rectangle_2                       Iso_rectangle_2;
 typedef K::Aff_transformation_2                  Aff_transformation_2;
 typedef std::vector<Point_2>                     Container;
 typedef CGAL::Polygon_2<K, Container>            CPolygon_2;
-typedef CGAL::Random_points_in_square_2<Point_2> Point_generator;
+//typedef CGAL::Random_points_in_square_2<Point_2> Point_generator;
 typedef CGAL::Rectangle_2<K>                     CRectangle_2;

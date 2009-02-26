@@ -64,7 +64,7 @@ public :
 	double ComputeDataEnergy(const RectangleNode &n) const;
 };
 
-class itkPolicyImage;
+class GILPolicyImage;
 class ImageGradientEnergyPolicy
 {
 public :
@@ -74,7 +74,7 @@ public :
 	double ComputeDataEnergy(const RectangleNode &n) const;
 
 private:
-	boost::shared_ptr<itkPolicyImage> m_policy;
+	boost::shared_ptr<GILPolicyImage> m_policy;
 };
 
 #endif /*RECTANGLENODE_HPP_*/

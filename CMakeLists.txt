@@ -31,24 +31,8 @@ SET( SRC_IHM	${SRC_DIR}BuildingsDetectorParameters.cpp
 				${SRC_DIR}ParametersFrame.cpp
 	)
 
-# Find ITK
-FIND_PACKAGE(ITK REQUIRED)
-IF(ITK_FOUND)
-    INCLUDE(${ITK_USE_FILE})
-ELSE(ITK_FOUND)
-   # For convenience. When we cannot continue, inform the user
-   MESSAGE(FATAL_ERROR "ITK not found ! Please set ITK path ...")
-ENDIF(ITK_FOUND)
-
-
 # Find BOOST
-FIND_PACKAGE( Boost 1.37 COMPONENTS program_options thread filesystem system serialization )
-
-#IF(UNIX)
-#	INCLUDE( CGAL.cmake )
-#	INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES} ${CGAL_INCLUDE_DIRECTORIES} )
-#	LINK_DIRECTORIES( ${LINK_DIRECTORIES} /usr/local/CGAL/lib )
-#ENDIF(UNIX)
+FIND_PACKAGE( Boost 1.38 COMPONENTS program_options thread filesystem system gil)
 
 FIND_PACKAGE( CGAL COMPONENTS Core )
 IF( CGAL_FOUND )
@@ -56,10 +40,10 @@ IF( CGAL_FOUND )
 ENDIF()
 
 IF(WIN32)
-	SET( CGAL_ROOT_DIR "C:/Program Files/CGAL-3.3.1" )
-	INCLUDE_DIRECTORIES( ${CGAL_ROOT_DIR}/include/CGAL/config/msvc )
-	INCLUDE_DIRECTORIES( ${CGAL_ROOT_DIR}/include )
-	LINK_DIRECTORIES( ${CGAL_ROOT_DIR}/lib )
+#	SET( CGAL_ROOT_DIR "C:/Program Files/CGAL-3.3.1" )
+#	INCLUDE_DIRECTORIES( ${CGAL_ROOT_DIR}/include/CGAL/config/msvc )
+#	INCLUDE_DIRECTORIES( ${CGAL_ROOT_DIR}/include )
+#	LINK_DIRECTORIES( ${CGAL_ROOT_DIR}/lib )
 ENDIF(WIN32)
 
 #####################################
@@ -70,7 +54,7 @@ ENDIF(WIN32)
 ###                     Executable sans IHM                        ###
 #####################################
 ADD_EXECUTABLE( RJMCMC_Rectangles_noihm ${SRC_NO_IHM} )
-TARGET_LINK_LIBRARIES( RJMCMC_Rectangles_noihm	${ITK_LIBRARIES}
+TARGET_LINK_LIBRARIES( RJMCMC_Rectangles_noihm	
 										 		${Boost_LIBRARIES}
 										 		${CGAL_LIBRARIES}
 										)
@@ -98,7 +82,7 @@ IF(UNIX)
 	ADD_DEFINITIONS("-Wall")
 	ADD_EXECUTABLE( RJMCMC_Rectangles_ihm ${SRC_IHM}  )
 
-	TARGET_LINK_LIBRARIES( RJMCMC_Rectangles_ihm	${ITK_LIBRARIES}
+	TARGET_LINK_LIBRARIES( RJMCMC_Rectangles_ihm
 													${wxWidgets_LIBRARIES}
 													${Boost_LIBRARIES}
 													${CGAL_LIBRARIES}
@@ -112,7 +96,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 
-TARGET_LINK_LIBRARIES( RJMCMC_Rectangles_ihm ${ITK_LIBRARIES}
+TARGET_LINK_LIBRARIES( RJMCMC_Rectangles_ihm
 										 ${Boost_LIBRARIES}
 										 ${CGAL_LIBRARIES}
 										 ${wxWidgets_LIBRARIES}

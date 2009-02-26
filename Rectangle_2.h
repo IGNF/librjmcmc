@@ -27,8 +27,8 @@
 #include <CGAL/Iso_rectangle_2.h>
 
 #include <CGAL/Polygon_2.h>
-#include <CGAL/Polygon_with_holes_2.h>
-#include <CGAL/Boolean_set_operations_2.h>
+//#include <CGAL/Polygon_with_holes_2.h>
+//#include <CGAL/Boolean_set_operations_2.h>
 
 #include <boost/array.hpp>
 
