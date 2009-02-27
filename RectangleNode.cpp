@@ -372,7 +372,7 @@ double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn,
 	}
 
 	Vector_2 arete(gridIn, gridOut);
-	Vector_2 normale = arete.perpendicular(CGAL::POSITIVE);
+	Vector_2 normale = arete.perpendicular(CGAL::NEGATIVE);
 	Vector_2 sum(gradient_sum[0], gradient_sum[1]);
 	return CGAL::to_double(normale * sum);
 }
