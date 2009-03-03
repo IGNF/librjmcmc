@@ -211,31 +211,6 @@ double SurfaceRectangleDataEnergyPolicy::ComputeDataEnergy(const RectangleNode &
 	return -::log(1. + std::abs(CGAL::to_double(n.Rect().area())));
 }
 
-typedef pixel<float,gray_layout_t>				gray32F_pixel_t;
-typedef gray32F_pixel_t*						gray32F_pixel_ptr_t;
-typedef image_type<float,gray_layout_t>::type	gray32F_image_t;
-typedef gray32F_image_t::view_t				gray32F_view_t;
-/*
-namespace boost { namespace gil {
-
-namespace detail {
-template <>
-struct tiff_read_support_private<float,gray_t> {
-    BOOST_STATIC_CONSTANT(bool,is_supported=true);
-    BOOST_STATIC_CONSTANT(int,bit_depth=32);
-    BOOST_STATIC_CONSTANT(int,color_type=PHOTOMETRIC_MINISBLACK);
-};
-template <>
-struct tiff_write_support_private<float,gray_t> {
-    BOOST_STATIC_CONSTANT(bool,is_supported=true);
-    BOOST_STATIC_CONSTANT(int,bit_depth=32);
-    BOOST_STATIC_CONSTANT(int,color_type=PHOTOMETRIC_MINISBLACK);
-};
-
-};
-};};
-*/
-
 class GILPolicyImage
 {
 public:
@@ -248,7 +223,7 @@ public:
 	int PosToOffset(const Point_2 &pt) const;
 	Point_2 OffsetToPos(int off) const;
 
-	gray32F_image_t m_gradients_x, m_gradients_y;
+	dev2n32F_image_t m_gradients;
 	unsigned int m_imageWidth;
 	unsigned int m_imageHeight;
 
@@ -305,7 +280,7 @@ void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 	vt sum = 0.;
 	for (i = kernel.begin(); i!=kernel.end(); ++i, ++x)
 	{
-		*i = (x / sigmasquared) * z * (std::exp(-0.5 * (x * x / sigmasquared)));
+		*i = - (x / sigmasquared) * z * (std::exp(-0.5 * (x * x / sigmasquared)));
 		sum += *i * x;
 	}
 	for (i=kernel.begin(); i!=kernel.end(); ++i)
@@ -324,14 +299,17 @@ void GILPolicyImage::LoadFile(const std::string &str)
 
     gray16_image_t img;
     tiff_read_image(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath(),img);
+
+	m_gradients.recreate(img.dimensions());
 	m_imageWidth = img.dimensions().x;
 	m_imageHeight = img.dimensions().y;
-	m_gradients_x.recreate(img.dimensions());
-	m_gradients_y.recreate(img.dimensions());
-    convolve_cols<gray32F_pixel_t>(const_view(img),ksmooth,view(m_gradients_x), convolve_option_extend_constant);
-    convolve_rows<gray32F_pixel_t>(const_view(m_gradients_x),kderiv,view(m_gradients_x), convolve_option_extend_constant);
-	convolve_rows<gray32F_pixel_t>(const_view(img),ksmooth,view(m_gradients_y), convolve_option_extend_constant);
-    convolve_cols<gray32F_pixel_t>(const_view(m_gradients_y),kderiv,view(m_gradients_y), convolve_option_extend_constant);
+
+
+	convolve_cols<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<0>(m_gradients._view), convolve_option_extend_constant);
+	convolve_rows<gray32F_pixel_t>(kth_channel_view<0>(m_gradients),kderiv,kth_channel_view<0>(m_gradients), convolve_option_extend_constant);
+
+	convolve_rows<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<1>(m_gradients), convolve_option_extend_constant);
+    convolve_cols<gray32F_pixel_t>(kth_channel_view<1>(m_gradients),kderiv,kth_channel_view<1>(m_gradients), convolve_option_extend_constant);
 }
 
 double GILPolicyImage::ComputeDataEnergy(const RectangleNode &n) const
@@ -366,13 +344,14 @@ double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn,
 	for (; !it.end(); ++it)
 	{
 		// Calcul de la direction du gradient ...
-		const float &length = it.length();
-		gradient_sum[0] += length * m_gradients_x._view(it.x(), it.y());
-		gradient_sum[1] += length * m_gradients_y._view(it.x(), it.y());
+		const float length = it.length();
+		const dev2n32F_pixel_t grad = m_gradients._view(it.x(), it.y());
+		gradient_sum[0] += length * at_c<0>(grad);
+		gradient_sum[1] += length * at_c<1>(grad);
 	}
 
 	Vector_2 arete(gridIn, gridOut);
-	Vector_2 normale = arete.perpendicular(CGAL::NEGATIVE);
+	Vector_2 normale = arete.perpendicular(CGAL::POSITIVE);
 	Vector_2 sum(gradient_sum[0], gradient_sum[1]);
 	return CGAL::to_double(normale * sum);
 }
