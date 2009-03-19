@@ -951,19 +951,19 @@ public:
 	for (int i = 0; i < 2; ++i) {
 		p[i] = (int) std::floor(to_double(s.source()[i]+f));
 		q[i] = (int) std::floor(to_double(s.target()[i]+f));
-		if(p[i]==q[i]) { NextCrossingT[i]=2; Step[i]=0; DeltaT[i]=0; continue; }
+		if(p[i]==q[i]) { NextCrossingT[i]=2; m_Step[i]=0; DeltaT[i]=0; continue; }
 		int dir = (q[i]>p[i]);
 		FT invlength =  1.0f / (s.target()[i]-s.source()[i]);
 		NextCrossingT[i] = (p[i]+dir -(s.source()[i]+f))*invlength;
-		Step  [i] = 2*dir-1;
-		DeltaT[i] = Step[i] * invlength;
+		m_Step  [i] = 2*dir-1;
+		DeltaT[i] = m_Step[i] * invlength;
 	}
         m_axis = NextCrossingT[1] < NextCrossingT[0];
         if(p[m_axis]==q[m_axis]) NextCrossingT[m_axis]=1;
   }
   Segment_2_iterator operator++( int ) { Segment_2_iterator tmp(*this); operator++(); return tmp; }
   inline int axis() const { return m_axis; } // 0->x, 1->y
-  inline int step() const { return Step[m_axis]; } // + or - 1
+  inline int step() const { return m_Step[m_axis]; } // + or - 1
   Segment_2_iterator& operator++()
   {
     t = NextCrossingT[m_axis];
@@ -980,9 +980,9 @@ public:
   inline FT prev  () const { return t; }
   inline FT next  () const { return NextCrossingT[m_axis]; }
   inline FT length() const { return NextCrossingT[m_axis]-t; }
-
+  inline int Step(int axis) { return m_Step[axis]; }
 private :
-  int p[2], q[2], Step[2], m_axis;
+  int p[2], q[2], m_Step[2], m_axis;
   FT NextCrossingT[2], DeltaT[2], t;
 };
 

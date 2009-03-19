@@ -366,13 +366,18 @@ double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn,
 
 	Segment_2 s(gridIn, gridOut);
 	CGAL::Segment_2_iterator<Segment_2> it(s);
+	dev2n32F_view_t::xy_locator loc_grad = m_gradients._view.xy_at(gridIn.x(), gridIn.y());
+	point2<std::ptrdiff_t> movement[2] = { point2<std::ptrdiff_t>(it.Step(0),0), point2<std::ptrdiff_t>(0,it.Step(1)) };
 	for (; !it.end(); ++it)
 	{
-		// Calcul de la direction du gradient ...
 		const float length = it.length();
-		const dev2n32F_pixel_t grad = m_gradients._view(it.x(), it.y());
+		const dev2n32F_pixel_t grad = *loc_grad;
 		gradient_sum[0] += length * at_c<0>(grad);
 		gradient_sum[1] += length * at_c<1>(grad);
+		loc_grad += movement[it.axis()];
+//		std::cout << "new : " << at_c<0>(grad) << "\t" << at_c<1>(grad) << std::endl;
+//		const dev2n32F_pixel_t old_grad = m_gradients._view(it.x(), it.y());
+//		std::cout << "old : " << at_c<0>(old_grad) << "\t" << at_c<1>(old_grad) << std::endl;
 	}
 
 	Vector_2 arete(gridIn, gridOut);
