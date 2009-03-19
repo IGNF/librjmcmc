@@ -3,6 +3,8 @@
 #include "RectangleNode.hpp"
 #include "BuildingsDetectorParameters.hpp"
 
+#include "/home/olivier/work/dev/lib/MATISlibs/ITKViewer/branches/gil/extern/gil/extension/matis/deriche.hpp"
+
 bool RectangleNode::IsValid(const BBox &box) /*const*/
 {
 	for (unsigned int i=0; i<4; ++i)
@@ -306,10 +308,33 @@ void GILPolicyImage::LoadFile(const std::string &str)
 
 
 	convolve_cols<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<0>(m_gradients._view), convolve_option_extend_constant);
-	convolve_rows<gray32F_pixel_t>(kth_channel_view<0>(m_gradients),kderiv,kth_channel_view<0>(m_gradients), convolve_option_extend_constant);
+	convolve_rows<gray32F_pixel_t>(kth_channel_view<0>(m_gradients._view),kderiv,kth_channel_view<0>(m_gradients._view), convolve_option_extend_constant);
 
-	convolve_rows<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<1>(m_gradients), convolve_option_extend_constant);
-    convolve_cols<gray32F_pixel_t>(kth_channel_view<1>(m_gradients),kderiv,kth_channel_view<1>(m_gradients), convolve_option_extend_constant);
+	convolve_rows<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<1>(m_gradients._view), convolve_option_extend_constant);
+    convolve_cols<gray32F_pixel_t>(kth_channel_view<1>(m_gradients._view),kderiv,kth_channel_view<1>(m_gradients._view), convolve_option_extend_constant);
+
+    gray32F_image_t module(img.dimensions());
+    gray8_image_t filtered_module(img.dimensions());
+    ModuleGradient( kth_channel_view<0>(m_gradients._view), kth_channel_view<1>(m_gradients._view), view(module));
+    NonMaximaLocauxGradient (
+							  kth_channel_view<0>(m_gradients._view) ,
+							  kth_channel_view<1>(m_gradients._view) ,
+							  view(module) ,
+							  view(filtered_module) ,
+							  5.);
+
+	gray8_view_t::iterator it_filtered = view(filtered_module).begin();
+	dev2n32F_view_t::iterator it_gradients = m_gradients._view.begin();
+
+	for( ; it_filtered!=view(filtered_module).begin() ; ++it_filtered , ++it_gradients )
+	{
+		if ( *it_filtered==0 )
+		{
+			dev2n32F_pixel_t &grad = m_gradients._view(it_gradients.x_pos(), it_gradients.y_pos());
+			at_c<0>(grad) = 0.;
+			at_c<1>(grad) = 0.;
+		}
+	}
 }
 
 double GILPolicyImage::ComputeDataEnergy(const RectangleNode &n) const
@@ -351,7 +376,8 @@ double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn,
 	}
 
 	Vector_2 arete(gridIn, gridOut);
-	Vector_2 normale = arete.perpendicular(CGAL::POSITIVE);
+	// TODO : NEGATIVE or POSITIVE ???
+	Vector_2 normale = arete.perpendicular(CGAL::NEGATIVE);
 	Vector_2 sum(gradient_sum[0], gradient_sum[1]);
 	return CGAL::to_double(normale * sum);
 }

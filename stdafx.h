@@ -3,6 +3,7 @@
 #include <boost/gil/extension/io/tiff_dynamic_io.hpp>
 #include <boost/gil/extension/numeric/kernel.hpp>
 #include <boost/gil/extension/numeric/convolve.hpp>
+#include <boost/gil/image_view_factory.hpp>
 
 /*
 namespace boost { namespace gil {

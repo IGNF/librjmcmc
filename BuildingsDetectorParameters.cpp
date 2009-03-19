@@ -109,15 +109,15 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_inputDataFilePath("./data/ZTerrain_c3.tif"),
 	m_runningOriginX(0),
 	m_runningOriginY(0),
-	m_runningWidth(500),
-	m_runningHeight(500),
-	m_varianceGaussianFilter(5.0),
+	m_runningWidth(653),
+	m_runningHeight(663),
+	m_varianceGaussianFilter(2.0),
 	m_rectangleMinimalSize(5.),
 	m_rectangleMaximalRatio(5.),
 	m_ponderationSurfaceIntersection(1.),
 	m_ponderationPointsDistance(0.),
-	m_pointsDistanceMax(10.),
-	m_individualEnergy(400.)
+	m_pointsDistanceMax(0.),
+	m_individualEnergy(250.)
 {
 	m_desc.add_options()
 	("help,h", "Message d'aide...")

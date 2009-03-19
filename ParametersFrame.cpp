@@ -24,7 +24,8 @@ ParametersFrame::ParametersFrame(wxWindow *parent, wxWindowID id, const wxString
 	for (unsigned int i=0; i<pileText2.size(); ++i)
 	{
 		wxBoxSizer *sizerH = new wxBoxSizer( wxHORIZONTAL );
-		m_pileText.push_back(std::make_pair(new wxStaticText(this, -1, wxString(pileText2[i].first.c_str(),*wxConvCurrent)),new wxTextCtrl(this, -1, wxString(pileText2[i].second.c_str(),*wxConvCurrent))));
+		m_pileText.push_back(std::make_pair(new wxStaticText(wnd, -1, wxString(pileText2[i].first.c_str(),*wxConvCurrent)),
+											new wxTextCtrl(wnd, -1, wxString(pileText2[i].second.c_str(),*wxConvCurrent))));
 		sizerH->Add(m_pileText.back().first, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
 		sizerH->Add(m_pileText.back().second, 1, wxALL, 5);
 		inner_sizer->Add(sizerH,0,wxEXPAND);
@@ -37,8 +38,10 @@ ParametersFrame::ParametersFrame(wxWindow *parent, wxWindowID id, const wxString
 
     test_sizer->Add(wnd, 1, wxEXPAND | wxALL, 5);
     SetSizer(test_sizer);
-    //SetAutoLayout(true);
-    //Layout();
+
+//	SetSizer(inner_sizer);
+//    SetAutoLayout(true);
+//    Layout();
 
 	//SetSizerAndFit(test_sizer);
 	//test_sizer->Layout();
