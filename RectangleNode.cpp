@@ -3,7 +3,7 @@
 #include "RectangleNode.hpp"
 #include "BuildingsDetectorParameters.hpp"
 
-#include "/home/olivier/work/dev/lib/MATISlibs/ITKViewer/branches/gil/extern/gil/extension/matis/deriche.hpp"
+#include <boost/gil/extension/matis/deriche.hpp>
 
 bool RectangleNode::IsValid(const BBox &box) /*const*/
 {

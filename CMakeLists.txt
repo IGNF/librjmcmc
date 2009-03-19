@@ -5,7 +5,8 @@ PROJECT( RJMCMC_Rectangles )
 
 IF(UNIX)
 ############## Spécial ECLIPSE pour parse correct des headers
-INCLUDE_DIRECTORIES(/usr/local/include)
+INCLUDE_DIRECTORIES(/usr/local/include/boost-1_37)
+LINK_DIRECTORIES(/usr/local/lib)
 #SET(gcc_version 4.2.4)
 #INCLUDE_DIRECTORIES(	/usr/lib/gcc/i486-linux-gnu/${gcc_version}/include
 #						/usr/include/c++ /usr/include/c++/${gcc_version}
@@ -32,7 +33,7 @@ SET( SRC_IHM	${SRC_DIR}BuildingsDetectorParameters.cpp
 	)
 
 # Find BOOST
-FIND_PACKAGE( Boost 1.37 COMPONENTS program_options thread filesystem system )
+FIND_PACKAGE( Boost 1.37 COMPONENTS thread program_options system )
 
 IF(UNIX)
 	INCLUDE( CGAL.cmake )
