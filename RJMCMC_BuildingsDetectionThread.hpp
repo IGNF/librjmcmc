@@ -79,7 +79,7 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 	for (unsigned int i=0; i<=nb_ite; ++i)
 	{
 #if USE_IHM
-		if ( i % nb_save == 0 && nb_save != 0 )
+		if ( (i+1) % nb_save == 0 && nb_save != 0 )
 		{
 			std::ostringstream oss;
 			oss.width(8);

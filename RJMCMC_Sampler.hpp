@@ -86,47 +86,6 @@ public :
 		return eNONE;
 	}
 
-private :
-	typename DetectorType::GraphType::vertex_iterator ChooseRandomVertex(const typename DetectorType::GraphType &graph)
-	{
-		boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > die(GetRandom(), boost::uniform_smallint<>(0,num_vertices(graph)-1));
-		typename DetectorType::GraphType::vertex_iterator it = vertices(graph).first;
-		std::advance(it, die());
-		return it;
-	}
-
-	double delta_birth(DetectorType &detector, Modification<DetectorType> &modif)
-	{
-		double delta = modif.Node().Weight();
-		typename DetectorType::vertex_iterator it_v = vertices(detector.GetGraph()).first, fin_v = vertices(detector.GetGraph()).second;
-		// optim
-		const typename DetectorType::GraphType::vertex_iterator &modifiedVertex = modif.Vertex();
-		const typename DetectorType::InternalNodeType &modifiedNode = modif.Node();
-		for (; it_v != fin_v; ++it_v)
-		{
-			/// Si on est en modification, il ne faut pas prendre en compte l'interaction avec la version non modifee
-			if (it_v == modifiedVertex)
-				continue;
-			delta += detector.ComputePriorEnergy( detector.GetGraph()[ *it_v ] , modifiedNode );
-		}
-		return delta;
-	}
-
-	double delta_death(DetectorType &detector, Modification<DetectorType> &modif)
-	{
-		double delta = -detector.GetGraph()[ *modif.Vertex()].Weight();
-		if ( modif.Vertex() != vertices(  detector.GetGraph() ).second && detector.GetNbVertices() > 1 )
-		{
-			std::pair< typename DetectorType::out_edge_iterator, typename DetectorType::out_edge_iterator > pair_edges ;
-			pair_edges = out_edges( *(modif.Vertex()) ,  detector.GetGraph());
-			for(;pair_edges.first!=pair_edges.second; ++pair_edges.first)
-			{
-				delta -= detector.GetGraph()[ *(pair_edges.first) ].Weight();
-			}
-		}
-		return delta;
-	}
-
 	void ProposeModification(DetectorType &detector, Modification<DetectorType> &modif)
 	{
 		int choix = eBIRTH;
@@ -244,6 +203,48 @@ private :
 				throw;
 		}
 	}
+
+private :
+	typename DetectorType::GraphType::vertex_iterator ChooseRandomVertex(const typename DetectorType::GraphType &graph)
+	{
+		boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > die(GetRandom(), boost::uniform_smallint<>(0,num_vertices(graph)-1));
+		typename DetectorType::GraphType::vertex_iterator it = vertices(graph).first;
+		std::advance(it, die());
+		return it;
+	}
+
+	double delta_birth(DetectorType &detector, Modification<DetectorType> &modif)
+	{
+		double delta = modif.Node().Weight();
+		typename DetectorType::vertex_iterator it_v = vertices(detector.GetGraph()).first, fin_v = vertices(detector.GetGraph()).second;
+		// optim
+		const typename DetectorType::GraphType::vertex_iterator &modifiedVertex = modif.Vertex();
+		const typename DetectorType::InternalNodeType &modifiedNode = modif.Node();
+		for (; it_v != fin_v; ++it_v)
+		{
+			/// Si on est en modification, il ne faut pas prendre en compte l'interaction avec la version non modifee
+			if (it_v == modifiedVertex)
+				continue;
+			delta += detector.ComputePriorEnergy( detector.GetGraph()[ *it_v ] , modifiedNode );
+		}
+		return delta;
+	}
+
+	double delta_death(DetectorType &detector, Modification<DetectorType> &modif)
+	{
+		double delta = -detector.GetGraph()[ *modif.Vertex()].Weight();
+		if ( modif.Vertex() != vertices(  detector.GetGraph() ).second && detector.GetNbVertices() > 1 )
+		{
+			std::pair< typename DetectorType::out_edge_iterator, typename DetectorType::out_edge_iterator > pair_edges ;
+			pair_edges = out_edges( *(modif.Vertex()) ,  detector.GetGraph());
+			for(;pair_edges.first!=pair_edges.second; ++pair_edges.first)
+			{
+				delta -= detector.GetGraph()[ *(pair_edges.first) ].Weight();
+			}
+		}
+		return delta;
+	}
+
 
 };
 
