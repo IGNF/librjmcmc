@@ -359,6 +359,7 @@ Point_2 GILPolicyImage::OffsetToPos(int off) const
 	return Point_2(off % m_imageWidth, off / m_imageWidth);
 }
 
+//TODO: improve --> 40%
 double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn,
 		const Point_2 &gridOut) const
 {

@@ -595,6 +595,7 @@ public:
   }
 
 /* Intersection area */
+  //TODO: improve --> 33%
   inline FT intersection_area(const Rectangle_2 &b) const { return intersection_area_four_triangles_and_an_isorectangle(b); }
 
   FT intersection_area_two_slabs(const Rectangle_2 &b) const {
