@@ -43,14 +43,13 @@ public:
 
 //	void AddNewNeighboor( typename DetectorType::GraphType::vertex_iterator vi ) { m_newNeighboors.push_back( vi ); }
 //	void AddImpactedEdge( const typename DetectorType::GraphType::edge_descriptor &ed ){ m_impactedEdges.push_back( ed ); }
+	std::vector<typename DetectorType::neighboor_and_weight> m_newNeighboors;
 
 private:
 	eProposition m_type;
 	typename DetectorType::InternalNodeType m_node;
 	typename DetectorType::GraphType::vertex_iterator m_vertex;
 
-//	std::vector< typename DetectorType::GraphType::edge_descriptor > m_impactedEdges;
-//	std::vector< typename DetectorType::GraphType::vertex_iterator > m_newNeighboors;
 };
 
 template < class DetectorType>
@@ -148,14 +147,14 @@ public :
 			{
 				delta = delta_birth(detector, modif);
 				//R = 1.- detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
-				R = double( detector.GetBox().Volume() ) / ((double)detector.GetNbVertices()+1.);
+				R = double( detector.GetBox().Volume() ) / ((double)detector.GetNbVertices()*BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize()+1.);
 				break;
 			}
 			case eDEATH :
 			{
 				delta = delta_death(detector, modif);
 				//R = detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
-				R = ((double)detector.GetNbVertices()+1.) / double( detector.GetBox().Volume() );
+				R = ((double)detector.GetNbVertices()*BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize()+1.) / double( detector.GetBox().Volume() );
 				break;
 			}
 			case eMODIFY :
@@ -175,13 +174,11 @@ public :
 		if (m_temp == 0)
 			return (delta <= 0);
 
-//		std::cout << "R = " << R << std::endl;
-//		std::cout << "D = " << delta << std::endl;
-
-		R *= exp ( - delta / m_temp );
 		m_temp *= m_q;
-
-		boost::variate_generator<RJMCMCRandom&, boost::bernoulli_distribution<> > die(GetRandom(), boost::bernoulli_distribution<>(std::min( 1. , R )));
+		R *= exp ( - delta / m_temp );
+		if (R >= 1.)
+			return true;
+		boost::variate_generator<RJMCMCRandom&, boost::bernoulli_distribution<> > die(GetRandom(), boost::bernoulli_distribution<>(R));
 		return die();
 	}
 
@@ -197,7 +194,7 @@ public :
 				break;
 			case eMODIFY :
 				detector.RemoveVertex( modif.Vertex() );
-				detector.AddNode( modif.Node() );
+				detector.AddNode( modif.Node(), modif.m_newNeighboors);
 				break;
 			default :
 				throw;
@@ -225,7 +222,14 @@ private :
 			/// Si on est en modification, il ne faut pas prendre en compte l'interaction avec la version non modifee
 			if (it_v == modifiedVertex)
 				continue;
-			delta += detector.ComputePriorEnergy( detector.GetGraph()[ *it_v ] , modifiedNode );
+			if ( detector.AreNeighbor(modif.Node(), detector.GetGraph()[*it_v]) )
+			{
+				typename DetectorType::neighboor_and_weight p;
+				p.m_neighboor = it_v;
+				p.m_weight = detector.ComputePriorEnergy( detector.GetGraph()[ *it_v ] , modifiedNode );
+				delta += p.m_weight;
+				modif.m_newNeighboors.push_back(p);
+			}
 		}
 		return delta;
 	}

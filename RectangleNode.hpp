@@ -37,8 +37,16 @@ class RectanglePriorEnergyPolicy
 {
 public :
 	RectanglePriorEnergyPolicy();
-	bool AreNeighbor(const RectangleNode &n1, const RectangleNode &n2);
-	double ComputePriorEnergy(const RectangleNode &n1, const RectangleNode &n2);
+
+	inline bool AreNeighbor(const RectangleNode &n1, const RectangleNode &n2)
+	{
+		return n1.Rect().do_intersect(n2.Rect());
+	}
+	
+	inline double ComputePriorEnergy(const RectangleNode &n1, const RectangleNode &n2)
+	{
+		return m_coefSurface * std::abs(CGAL::to_double(n1.Rect().intersection_area(n2.Rect())));
+	}
 
 private :
 	double m_coefSurface;

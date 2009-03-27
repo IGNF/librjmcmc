@@ -13,13 +13,13 @@ template <class NodeType>
 class DefaultPriorEnergyPolicy
 {
 public :
-	DefaultPriorEnergyPolicy(double sigma = 10., double factor = 100) : m_sigma(sigma), m_factor(factor)
+	inline DefaultPriorEnergyPolicy(double sigma = 10., double factor = 100) : m_sigma(sigma), m_factor(factor)
 	{
 		m_double_sigma_square = 2. * sigma * sigma;
 		m_seuil_distance2 = 3. * m_sigma * m_sigma;
 	}
 
-	bool AreNeighbor(const NodeType &n1, const NodeType &n2)
+	inline bool AreNeighbor(const NodeType &n1, const NodeType &n2)
 	{
 		double dx = n1.X() - n2.X();
 		double dy = n1.Y() - n2.Y();
@@ -27,7 +27,7 @@ public :
 		return (d2 < m_seuil_distance2);
 	}
 
-	double ComputePriorEnergy(const NodeType &n1, const NodeType &n2)
+	inline double ComputePriorEnergy(const NodeType &n1, const NodeType &n2)
 	{
 		double dx = n1.X() - n2.X();
 		double dy = n1.Y() - n2.Y();
@@ -48,9 +48,9 @@ template <class NodeType>
 class DefaultDataEnergyPolicy
 {
 public :
-	DefaultDataEnergyPolicy(double val = -10.):m_val(val) {}
+	inline DefaultDataEnergyPolicy(double val = -10.):m_val(val) {}
 
-	double ComputeDataEnergy(const NodeType &n) { return m_val;}
+	inline double ComputeDataEnergy(const NodeType &n) { return m_val;}
 
 private :
 	double m_val;
@@ -62,10 +62,10 @@ class RJMCMC_Detector : public PriorEnergyPolicy, public DataEnergyPolicy
 	class RJMCMC_DetectorEdge
 	{
 	public:
-		RJMCMC_DetectorEdge(double w = 0.) : m_weight(w) {;}
+		inline RJMCMC_DetectorEdge(double w = 0.) : m_weight(w) {;}
 
-		const double Weight() const { return m_weight; }
-		void Weight( double w ) { m_weight = w; }
+		inline const double Weight() const { return m_weight; }
+		inline void Weight( double w ) { m_weight = w; }
 
 	protected:
 	private:
@@ -73,11 +73,17 @@ class RJMCMC_Detector : public PriorEnergyPolicy, public DataEnergyPolicy
 	};
 
 public :
-	typedef boost::adjacency_list<boost::listS, boost::listS,boost::undirectedS,NodeType,RJMCMC_DetectorEdge> GraphType;
+	typedef boost::adjacency_list<boost::vecS, boost::listS, boost::undirectedS,NodeType,RJMCMC_DetectorEdge> GraphType;
 	typedef NodeType InternalNodeType;
 	typedef typename GraphType::vertex_iterator vertex_iterator;
 	typedef typename GraphType::edge_iterator edge_iterator;
 	typedef typename GraphType::out_edge_iterator out_edge_iterator;
+
+	struct neighboor_and_weight
+	{
+		typename GraphType::vertex_iterator m_neighboor;
+		double m_weight;
+	};
 
 private :
 	typedef std::pair< typename GraphType::edge_descriptor , bool > edge_descriptor_bool;
@@ -85,10 +91,10 @@ private :
 
 public:
 
-	RJMCMC_Detector(const MultiDimensionnalBBox<DIMENSION> &box) : m_box(box), m_priorEnergy(0.), m_dataEnergy(0.) {}
-	~RJMCMC_Detector() {}
+	inline RJMCMC_Detector(const MultiDimensionnalBBox<DIMENSION> &box) : m_box(box), m_priorEnergy(0.), m_dataEnergy(0.) {}
+	inline ~RJMCMC_Detector() {}
 
-	vertex_descriptor AddNode (const NodeType &node)
+	inline vertex_descriptor AddNode (const NodeType &node)
 	{
 		m_dataEnergy += node.Weight();
 		vertex_descriptor n = add_vertex(node, m_graph);
@@ -108,16 +114,37 @@ public:
 		return n;
 	}
 
-	void RemoveVertex( vertex_iterator vi )
+	inline vertex_descriptor AddNode (const NodeType &node, const std::vector<neighboor_and_weight> &newNeighboors)
+	{
+		m_dataEnergy += node.Weight();
+		vertex_descriptor n = add_vertex(node, m_graph);
+		
+		typename std::vector<neighboor_and_weight>::const_iterator it = newNeighboors.begin(), fin = newNeighboors.end();
+		for (; it != fin; ++it)
+		{
+			edge_descriptor_bool new_edge = add_edge(n, *(it->m_neighboor) ,m_graph);
+			// On calcule l'énergie d'attache aux donnees et on l'affecte a la nouvelle arete
+			if ( new_edge.second )
+			{
+				m_graph[ new_edge.first ].Weight( it->m_weight);
+				m_priorEnergy += it->m_weight;
+			}
+			else
+				std::cerr << "AddNode : impossible de creer une edge !!!" << std::endl;
+		}
+		return n;
+	}
+
+	inline void RemoveVertex( vertex_iterator vi )
 	{
 		// Suppression des prior terms sur toutes les aretes adjacentes
 		std::pair< typename GraphType::out_edge_iterator , typename GraphType::out_edge_iterator > pair_edges = out_edges( *vi , m_graph );
-		for(;pair_edges.first!=pair_edges.second;++pair_edges.first)
+		for(;pair_edges.first != pair_edges.second;++pair_edges.first)
 		{
 			m_priorEnergy -= m_graph[ *(pair_edges.first) ].Weight();
 		}
 		m_dataEnergy -= m_graph[*vi].Weight();
-		clear_vertex( *vi , m_graph);
+		clear_vertex( *vi, m_graph);
 		remove_vertex( *vi , m_graph);
 	}
 
@@ -209,15 +236,15 @@ public:
 
 	/** Accesseurs
 	*/
-	const double PriorEnergy() const { return m_priorEnergy; }
-	void PriorEnergy( double pe ) { m_priorEnergy = pe; }
-	const double DataEnergy() const { return m_dataEnergy; }
-	void DataEnergy( double de ) { m_dataEnergy = de; }
+	inline const double PriorEnergy() const { return m_priorEnergy; }
+	inline void PriorEnergy( double pe ) { m_priorEnergy = pe; }
+	inline const double DataEnergy() const { return m_dataEnergy; }
+	inline void DataEnergy( double de ) { m_dataEnergy = de; }
 
-	const MultiDimensionnalBBox<DIMENSION> & GetBox() const { return m_box; }
-	const GraphType & GetGraph() const {return m_graph;}
-	const int GetNbVertices() const { return num_vertices(m_graph); }
-	const int GetNbEdges() const { return num_edges(m_graph); }
+	inline const MultiDimensionnalBBox<DIMENSION> & GetBox() const { return m_box; }
+	inline const GraphType & GetGraph() const {return m_graph;}
+	inline const int GetNbVertices() const { return num_vertices(m_graph); }
+	inline const int GetNbEdges() const { return num_edges(m_graph); }
 
 private:
 	GraphType m_graph;

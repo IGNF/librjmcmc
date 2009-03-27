@@ -94,44 +94,6 @@ std::ostream & operator<<(std::ostream &o, const RectangleNode &node)
 RectanglePriorEnergyPolicy::RectanglePriorEnergyPolicy() : m_coefSurface(BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation())
 {}
 
-bool RectanglePriorEnergyPolicy::AreNeighbor(const RectangleNode &n1,
-		const RectangleNode &n2)
-{
-	return n1.Rect().do_intersect(n2.Rect());
-}
-
-double RectanglePriorEnergyPolicy::ComputePriorEnergy(const RectangleNode &n1,
-		const RectangleNode &n2)
-{
-	double inter = std::abs(CGAL::to_double(n1.Rect().intersection_area(n2.Rect())));
-	return m_coefSurface * inter;
-	/*if ( !n1.Rect().do_intersect(n2.Rect()) )
-	 {
-	 // return 0.;
-	 double cos2 = std::abs(CGAL::to_double(n1.Rect().squared_cos(n2.Rect())));
-	 return -5.*cos2*cos2*cos2;
-	 }*/
-	/*
-	 double surf1 = CGAL::to_double(CGAL::abs(n1.Rect().area()));;
-	 double surf2 = CGAL::to_double(CGAL::abs(n2.Rect().area()));;
-	 double combined = std::abs(CGAL::to_double( n1.Rect().combination_area(n2.Rect()) / std::min(surf1, surf2)));
-	 return - 100. * exp(-combined );
-	 */
-	//exp( - combined / 1. );
-	/*
-	 double dx = n1.X() - n2.X();
-	 double dy = n1.Y() - n2.Y();
-	 double d2 = dx * dx + dy * dy ;
-	 if(d2==0)
-	 return 10000; // valeur bidon
-	 double d = ::sqrt(d2);
-	 double x = d-m_mean;
-	 if ( d > (m_mean + m_sigma))
-	 return 0.;
-	 return (x-m_sigma)*(x+m_sigma)/(d2*d);
-	 */
-}
-
 RectanglePointsPriorEnergyPolicy::RectanglePointsPriorEnergyPolicy() :
 	m_coefSurface(BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()),
 	m_coefDistance(BuildingsDetectorParametersSingleton::Instance()->PointsDistancePonderation()),
@@ -139,7 +101,6 @@ RectanglePointsPriorEnergyPolicy::RectanglePointsPriorEnergyPolicy() :
 {
 	m_distMax2 = m_distMax * m_distMax;
 }
-
 
 bool RectanglePointsPriorEnergyPolicy::AreNeighbor(const RectangleNode &n1, const RectangleNode &n2)
 {
