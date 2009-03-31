@@ -9,17 +9,17 @@
 namespace po = boost::program_options;
 
 // boost::serialization
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/list.hpp>
-#include <boost/serialization/version.hpp>
+//#include <boost/serialization/nvp.hpp>
+//#include <boost/serialization/utility.hpp>
+//#include <boost/serialization/list.hpp>
+//#include <boost/serialization/version.hpp>
 
 #include "PatternSingleton.hpp"
 
 class BuildingsDetectorParametersSingleton : public PatternSingleton<BuildingsDetectorParametersSingleton>
 {
 	friend class PatternSingleton<BuildingsDetectorParametersSingleton>;
-	friend class boost::serialization::access;
+//	friend class boost::serialization::access;
 
 
 public:

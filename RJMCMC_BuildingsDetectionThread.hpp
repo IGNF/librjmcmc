@@ -26,7 +26,7 @@
 //typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, SurfaceRectangleDataEnergyPolicy >	BuildingsDetector;
 //typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, ImageRectangleDataEnergyPolicy >	BuildingsDetector;
 //typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
-typedef RJMCMC_Detector<RectangleNode, RectanglePointsPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
+typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 
 void* RJMCMC_BuildingsDetectionThread::Entry()
 {

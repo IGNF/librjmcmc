@@ -38,54 +38,6 @@ Nb edge : 35
 typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 unsigned int current_iter=0;
 
-/*
-const unsigned int nb_threads = 0;
-boost::mutex global_configuration_mutex;
-boost::barrier global_barrier(std::max<unsigned int>(nb_threads, 1));
-bool global_locked = false;
-
-void run_thread(BuildingsDetector &buildingsDetector, Sampler< BuildingsDetector > &sampler)
-{
-	while (current_iter < BuildingsDetectorParametersSingleton::Instance()->NbIterations())
-	{
-		Modification< BuildingsDetector  > modif;
-		sampler.ProposeModification(buildingsDetector, modif);
-		bool should_accept = sampler.AcceptModification(buildingsDetector, modif);
-		bool will_accept = false;
-		if ((should_accept) && (!global_locked))
-		{
-			will_accept = global_configuration_mutex.try_lock();	
-			if (will_accept)
-				global_locked = true;
-		}
-		
-		if (global_locked)
-		{
-			global_barrier.wait();
-			if ( will_accept )
-			{
-				sampler.ApplyModification(buildingsDetector, modif);
-				global_configuration_mutex.unlock();
-				global_locked = false;
-			}
-			else if (should_accept)
-				--current_iter;
-			global_barrier.wait();
-		}
-		++current_iter;
-	}
-}
-*/
-void run_nothread(BuildingsDetector &buildingsDetector, Sampler< BuildingsDetector > &sampler)
-{
-	while (current_iter < BuildingsDetectorParametersSingleton::Instance()->NbIterations())
-	{
-		sampler.Itere(buildingsDetector);
-		++current_iter;
-	}
-}
-
-
 int main (int argc, char **argv)
 {
 	if (!BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc, argv))
@@ -112,37 +64,13 @@ int main (int argc, char **argv)
 	std::cout << my_out_stream.str() << std::endl;
 
 	clock_t clock_debut = clock();
-	//clock_t clock_local = clock_debut;
-	// if (nb_threads > 0)
-	// {
-		// std::vector<boost::thread *> all_threads;
-		// for (unsigned int i=0;i<nb_threads; ++i)
-			// all_threads.push_back( new boost::thread(run_thread, boost::ref(buildingsDetector), boost::ref(sampler)) );
-		//unsigned int local_iter = 0;
-		//while (current_iter < BuildingsDetectorParametersSingleton::Instance()->NbIterations())
-		//{
-			//sleep(1);
-			//my_out_stream.str("");
-			//my_out_stream << current_iter;
-			//my_out_stream << "\t" << buildingsDetector.GetNbVertices();
-			//my_out_stream << "\t" << sampler.Temperature();
-			//my_out_stream << "\t" << buildingsDetector.DataEnergy();
-			//my_out_stream << "\t" << buildingsDetector.PriorEnergy();
-			//my_out_stream << "\t" << buildingsDetector.DataEnergy() + buildingsDetector.PriorEnergy();
-			//clock_t clock_temp = clock();
-			//unsigned int delta_iter = current_iter - local_iter;
-			//my_out_stream << "\t" << double(clock_temp - clock_local)*1000./ (1.*CLOCKS_PER_SEC*delta_iter);
-			//local_iter = current_iter;
-			//clock_local = clock_temp;
-
-			//std::cout << my_out_stream.str() << std::endl;
-		//}
-	// }
-	// else
-		run_nothread(buildingsDetector, sampler);
-
-
+	while (current_iter < BuildingsDetectorParametersSingleton::Instance()->NbIterations())
+	{
+		sampler.Itere(buildingsDetector);
+		++current_iter;
+	}
 	clock_t clock_fin = clock();
+
 	my_out_stream.str("");
 	my_out_stream << "Iterations finished" << std::endl;
 	my_out_stream << "Total elapsed time (s) :  " << double(clock_fin - clock_debut) / CLOCKS_PER_SEC << std::endl;

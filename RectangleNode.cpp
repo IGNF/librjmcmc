@@ -38,7 +38,7 @@ void RectangleNode::RandomModify(const BBox &box)
 			diechoix(GetRandom(), boost::uniform_smallint<>(0, 2));
 	int choix = diechoix();
 
-	// On suffgle les points afin de pouvoir varier dans toutes les dimensions (venir voir Olivier si pas compris ...)
+	// On suffle les points afin de pouvoir varier dans toutes les dimensions (venir voir Olivier si pas compris ...)
 	boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> >
 			doshuffle(GetRandom(), boost::uniform_smallint<>(0, 1));
 
@@ -329,7 +329,8 @@ double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn,
 	Segment_2 s(gridIn, gridOut);
 	CGAL::Segment_2_iterator<Segment_2> it(s);
 	dev2n32F_view_t::xy_locator loc_grad = m_gradients._view.xy_at(gridIn.x(), gridIn.y());
-	point2<std::ptrdiff_t> movement[2] = { point2<std::ptrdiff_t>(it.Step(0),0), point2<std::ptrdiff_t>(0,it.Step(1)) };
+	dev2n32F_view_t::xy_locator::cached_location_t movement[2] = {loc_grad.cache_location(it.Step(0),0), loc_grad.cache_location(0,it.Step(1)) };
+//	point2<std::ptrdiff_t> movement[2] = { point2<std::ptrdiff_t>(it.Step(0),0), point2<std::ptrdiff_t>(0,it.Step(1)) };
 	for (; !it.end(); ++it)
 	{
 		const float length = it.length();

@@ -61,7 +61,7 @@ class Sampler
 
 public :
 
-	Sampler(double tempInitiale, double coef_descente, std::vector<double> probas): m_temp(tempInitiale), m_q(coef_descente), m_probas(probas)
+	Sampler(double tempInitiale, double coef_descente, const std::vector<double> &probas): m_temp(tempInitiale), m_q(coef_descente), m_probas(probas)
 	{}
 
 	double Temperature() const { return m_temp; }

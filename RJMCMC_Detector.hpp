@@ -110,6 +110,8 @@ public:
 						m_graph[ new_edge.first ].Weight( ComputePriorEnergy( node , m_graph[*it] ) );
 						m_priorEnergy += m_graph[ new_edge.first ].Weight();
 					}
+					else
+						std::cerr << "AddNode() : impossible de creer une edge !!!" << std::endl;
 				}
 		return n;
 	}
@@ -130,7 +132,7 @@ public:
 				m_priorEnergy += it->m_weight;
 			}
 			else
-				std::cerr << "AddNode : impossible de creer une edge !!!" << std::endl;
+				std::cerr << "AddNode(,) : impossible de creer une edge !!!" << std::endl;
 		}
 		return n;
 	}
