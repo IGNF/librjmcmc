@@ -17,6 +17,8 @@
 #include "RJMCMC_BuildingsDetectionFrame.hpp"
 #endif //#if USE_IHM
 
+#include "ImageGradientEnergyPolicy.hpp"
+
 //#include "Simple2DNode.hpp"
 #include "RectangleNode.hpp"
 
@@ -144,13 +146,13 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 				std::vector<double> vectx, vecty;
 				for (unsigned int i=0; i<5;++i)
 				{
-					vectx.push_back(CGAL::to_double(n.Rect()[i].x()));
-					vecty.push_back(CGAL::to_double(n.Rect()[i].y()));
+					vectx.push_back(CGAL::to_double(n.Geometry()[i].x()));
+					vecty.push_back(CGAL::to_double(n.Geometry()[i].y()));
 				}
 				m_layer->AddPolygon(vectx, vecty );
 				std::ostringstream oss;
 				oss << n.Weight();
-				m_layer->AddText( CGAL::to_double(n.Rect().center().x()) , CGAL::to_double(n.Rect().center().y()) , oss.str() , wxColour(255,0,0) );
+				m_layer->AddText( CGAL::to_double(n.Geometry().center().x()) , CGAL::to_double(n.Geometry().center().y()) , oss.str() , wxColour(255,0,0) );
 			}
 			m_frame->Refresh();
 			wxLogMessage( wxString( my_out_stream.str().c_str(),*wxConvCurrent ).GetData());

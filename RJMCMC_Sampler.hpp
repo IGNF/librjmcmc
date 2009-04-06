@@ -149,7 +149,7 @@ public :
 				//R = 1.- detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
 				double surface = BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize();
 				surface *= surface*detector.GetNbVertices();
-				R = 1. - surface / detector.GetBox().Volume();
+				R = detector.GetBox().Volume() / (surface+1) ;
 				break;
 			}
 			case eDEATH :
@@ -166,8 +166,8 @@ public :
 				delta = delta_death(detector, modif);
 				delta+= delta_birth(detector, modif);
 				// Ici : delta = 0 => acceptation = 50 %
-				//R = .5;
-				R = 1.;
+				R = .5;
+				//R = 1.;
 				break;
 			}
 			default :

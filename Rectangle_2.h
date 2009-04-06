@@ -495,8 +495,9 @@ public:
 
 /* Intersection */
   inline Object intersection(const Rectangle_2 &b) const { return intersection_two_slabs(b); }
-
-  Object intersection_unoptimized(const Rectangle_2 &b) const {
+/*
+  Object intersection_unoptimized(const Rectangle_2 &b) const 
+  {
     if(is_degenerate() || b.is_degenerate()) return Object();
     typedef std::vector<Point_2>               Container;
     typedef Polygon_2<R_, Container> Polygon_2;
@@ -507,7 +508,7 @@ public:
     CGAL::intersection(polya,polyb,std::back_inserter(res));
     return (res.empty())?Object():make_object(res.back().outer_boundary().container());
   }
-
+*/
   Object intersection_two_slabs(const Rectangle_2 &b) const {
     if(is_degenerate() || b.is_degenerate()) return Object();
 	std::vector<Vector_2> v;

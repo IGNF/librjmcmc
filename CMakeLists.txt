@@ -22,11 +22,15 @@ AUX_SOURCE_DIRECTORY(${SRC_DIR} ALL_SRC )
 
 SET( SRC_NO_IHM ${SRC_DIR}BuildingsDetectorParameters.cpp
 				${SRC_DIR}RectangleNode.cpp
+				${SRC_DIR}CircleNode.cpp
+				${SRC_DIR}GILEnergyPolicy.cpp
 				${SRC_DIR}Main_RJMCMC_BuildingsDetection_noihm.cpp
 	)
 	
 SET( SRC_IHM	${SRC_DIR}BuildingsDetectorParameters.cpp
 				${SRC_DIR}RectangleNode.cpp
+				${SRC_DIR}CircleNode.cpp
+				${SRC_DIR}GILEnergyPolicy.cpp
 				${SRC_DIR}Main_RJMCMC_BuildingsDetection_ihm.cpp
 				${SRC_DIR}RJMCMC_BuildingsDetectionFrame.cpp
 				${SRC_DIR}ParametersFrame.cpp

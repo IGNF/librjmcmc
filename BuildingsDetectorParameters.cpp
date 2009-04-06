@@ -91,11 +91,11 @@ bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
 
 BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_desc("buildings detector options"),
-	m_initialTemperature(5000.),
-	m_nbIterations(15000000),
+	m_initialTemperature(350.),
+	m_nbIterations(5000000),
 	m_nbIterationsDump(10000),
 	m_nbIterationsSave(1000000),
-	m_decreaseCoefficient(0.999999),
+	m_decreaseCoefficient(0.9999995),
 	m_probaBirth(1. / 10.),
 	m_probaDeath(1. / 10.),
 //	m_inputDataFilePath("./data/SaintMichel/MNS_StMichel_sans_veget.tif"),
@@ -103,19 +103,19 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 //	m_inputImageHeight(1575),
 //	m_inputDataFilePath("./data/Marseille/Crop_MNE_Marseille.tif"),
 //	m_inputDataFilePath("/home/olivier/work/data/MNESaintMande.tif"),
-	m_inputDataFilePath("ZTerrain_c3.tif"),
+	m_inputDataFilePath("./data/ZTerrain_c3.tif"),
 	m_runningOriginX(0),
 	m_runningOriginY(0),
 	m_runningWidth(653),
 	m_runningHeight(663),
 	m_varianceGaussianFilter(2.0),
 	m_rectangleMinimalSize(5.),
-	m_rectangleMaximalSize(500.),
+	m_rectangleMaximalSize(200.),
 	m_rectangleMaximalRatio(5.),
 	m_ponderationSurfaceIntersection(1.),
 	m_ponderationPointsDistance(0.),
 	m_pointsDistanceMax(0.),
-	m_individualEnergy(250.)
+	m_individualEnergy(150.)
 {
 	m_desc.add_options()
 	("help,h", "Message d'aide...")
