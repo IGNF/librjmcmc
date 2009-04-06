@@ -183,9 +183,9 @@ public:
 		for (; it_v != fin_v; ++it_v)
 		{
 			/// VARIANT
-//			computedEnergy += ComputeDataEnergy( m_graph[*it_v] );
-			ComputeDataEnergyVisitor v(*this);
-			computedEnergy += boost::apply_visitor( v,  m_graph[*it_v]); 
+			computedEnergy += ComputeDataEnergy( m_graph[*it_v] );
+//			ComputeDataEnergyVisitor v(*this);
+//			computedEnergy += boost::apply_visitor( v,  m_graph[*it_v]); 
 		}
 		return computedEnergy-m_dataEnergy;
 	}
@@ -196,11 +196,11 @@ public:
 		double computedEnergy = 0.;
 		std::pair< edge_iterator, edge_iterator > it_edges = edges(m_graph);
 		//VARIANT
-//		for(edge_iterator it = it_edges.first; it != it_edges.second;++it)
-//			computedEnergy += ComputePriorEnergy( m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)] );
-		ComputePriorEnergyVisitor v(10.);
 		for(edge_iterator it = it_edges.first; it != it_edges.second;++it)
-			computedEnergy += boost::apply_visitor( v,  m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)] );
+			computedEnergy += ComputePriorEnergy( m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)] );
+//		ComputePriorEnergyVisitor v(10.);
+//		for(edge_iterator it = it_edges.first; it != it_edges.second;++it)
+//			computedEnergy += boost::apply_visitor( v,  m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)] );
 		return computedEnergy-m_priorEnergy;
 	}
 
