@@ -4,8 +4,6 @@
 #include "BBox.hpp"
 #include "cgal_types.h"
 
-#include <boost/shared_ptr.hpp>
-
 class RectangleNode
 {
 public :

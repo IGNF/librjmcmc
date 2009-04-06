@@ -16,6 +16,8 @@
 //
 //
 // Author(s)     : Radu Ursu
+#ifndef CGAL_TYPES_H
+#define CGAL_TYPES_H
 
 #ifdef WIN32
 #define CGAL_CFG_NO_NEXTAFTER
@@ -32,6 +34,7 @@
 //#include <CGAL/point_generators_2.h>
 
 #include "Rectangle_2.h"
+#include "Cercle_2.h"
 
 typedef CGAL::Simple_cartesian<float>              K;
 //typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
@@ -47,3 +50,11 @@ typedef std::vector<Point_2>                     Container;
 typedef CGAL::Polygon_2<K, Container>            CPolygon_2;
 //typedef CGAL::Random_points_in_square_2<Point_2> Point_generator;
 typedef CGAL::Rectangle_2<K>                     CRectangle_2;
+typedef CGAL::Cercle_2<K>                        Cercle_2;
+
+#ifdef WIN32 
+#ifndef M_PI
+	const double M_PI = 4.0 * atan(1.0);
+#endif // #ifndef M_PI
+#endif // WIN32
+#endif //#ifndef CGAL_TYPES_H
