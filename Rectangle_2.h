@@ -27,8 +27,8 @@
 #include <CGAL/Iso_rectangle_2.h>
 
 #include <CGAL/Polygon_2.h>
-#include <CGAL/Polygon_with_holes_2.h>
-#include <CGAL/Boolean_set_operations_2.h>
+//#include <CGAL/Polygon_with_holes_2.h>
+//#include <CGAL/Boolean_set_operations_2.h>
 
 #include <boost/array.hpp>
 
@@ -948,20 +948,23 @@ public:
   // rasterize the segment s on a pixel grid [i-f,i+1-f]x[j-f,j+1-f]
   // pixels centers are (i+0.5-f, j+0.5-f)
   Segment_2_iterator () : t(1) {}
-  Segment_2_iterator (const Segment_2& s, FT f=0) : t(0) {
-	for (int i = 0; i < 2; ++i) {
-		p[i] = (int) std::floor(to_double(s.source()[i]+f));
-		q[i] = (int) std::floor(to_double(s.target()[i]+f));
-		if(p[i]==q[i]) { NextCrossingT[i]=2; m_Step[i]=0; DeltaT[i]=0; continue; }
-		int dir = (q[i]>p[i]);
-		FT invlength =  1.0f / (s.target()[i]-s.source()[i]);
-		NextCrossingT[i] = (p[i]+dir -(s.source()[i]+f))*invlength;
-		m_Step  [i] = 2*dir-1;
-		DeltaT[i] = m_Step[i] * invlength;
-	}
-        m_axis = NextCrossingT[1] < NextCrossingT[0];
-        if(p[m_axis]==q[m_axis]) NextCrossingT[m_axis]=1;
+  Segment_2_iterator (const Segment_2& s, FT f=0) : t(0) 
+  {
+	  for (unsigned int i = 0; i < 2; ++i) 
+	  {
+		  p[i] = (int) std::floor(to_double(s.source()[i]+f));
+		  q[i] = (int) std::floor(to_double(s.target()[i]+f));
+		  if(p[i]==q[i]) { NextCrossingT[i]=2; m_Step[i]=0; DeltaT[i]=0; continue; }
+		  int dir = (q[i]>p[i]);
+		  FT invlength =  1.0f / (s.target()[i]-s.source()[i]);
+		  NextCrossingT[i] = (p[i]+dir -(s.source()[i]+f))*invlength;
+		  m_Step  [i] = 2*dir-1;
+		  DeltaT[i] = m_Step[i] * invlength;
+	  }
+	  m_axis = NextCrossingT[1] < NextCrossingT[0];
+	  if(p[m_axis]==q[m_axis]) NextCrossingT[m_axis]=1;
   }
+
   Segment_2_iterator operator++( int ) { Segment_2_iterator tmp(*this); operator++(); return tmp; }
   inline int axis() const { return m_axis; } // 0->x, 1->y
   inline int step() const { return m_Step[m_axis]; } // + or - 1

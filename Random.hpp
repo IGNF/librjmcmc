@@ -4,8 +4,8 @@
 #include <boost/random.hpp>
 
 #ifndef WIN32
-	#include <sys/time.h>
-	#include <unistd.h>
+#include <sys/time.h>
+#include <unistd.h>
 #endif
 
 typedef boost::mt19937 RJMCMCRandom;

@@ -1,11 +1,8 @@
-#ifndef __RJMCMC_BUILDINGS_DETECTOR_HPP__
-#define __RJMCMC_BUILDINGS_DETECTOR_HPP__
+#ifndef RJMCMC_BUILDINGS_DETECTOR_HPP
+#define RJMCMC_BUILDINGS_DETECTOR_HPP
 
 #include <cmath>
-
-// Headers BOOST
 #include <boost/graph/adjacency_list.hpp>
-// Headers BOOST
 
 #include "BBox.hpp"
 
@@ -13,7 +10,7 @@ template <class NodeType>
 class DefaultPriorEnergyPolicy
 {
 public :
-	inline DefaultPriorEnergyPolicy(double sigma = 10., double factor = 100) : m_sigma(sigma), m_factor(factor)
+	inline DefaultPriorEnergyPolicy(double sigma = 10.) : m_sigma(sigma)
 	{
 		m_double_sigma_square = 2. * sigma * sigma;
 		m_seuil_distance2 = 3. * m_sigma * m_sigma;
@@ -21,10 +18,9 @@ public :
 
 	inline bool AreNeighbor(const NodeType &n1, const NodeType &n2)
 	{
-		double dx = n1.X() - n2.X();
-		double dy = n1.Y() - n2.Y();
-		double d2 = dx * dx + dy * dy;
-		return (d2 < m_seuil_distance2);
+		double dx = n1.x() - n2.x();
+		double dy = n1.y() - n2.y();
+		return (dx * dx + dy * dy < m_seuil_distance2);
 	}
 
 	inline double ComputePriorEnergy(const NodeType &n1, const NodeType &n2)
@@ -38,8 +34,6 @@ public :
 
 private :
 	double m_sigma;
-
-	double m_factor;
 	double m_double_sigma_square;
 	double m_seuil_distance2;
 };
@@ -49,9 +43,7 @@ class DefaultDataEnergyPolicy
 {
 public :
 	inline DefaultDataEnergyPolicy(double val = -10.):m_val(val) {}
-
 	inline double ComputeDataEnergy(const NodeType &n) { return m_val;}
-
 private :
 	double m_val;
 };
@@ -104,28 +96,40 @@ public:
 				if ( AreNeighbor(node, m_graph[*it]) )
 				{
 					edge_descriptor_bool new_edge = add_edge(n, *it ,m_graph);
-					// On calcule l'énergie d'attache aux donnees et on l'affecte a la nouvelle arete
+					// On calcule l'énergie d'intercation et on l'affecte a la nouvelle arete
 					if ( new_edge.second )
 					{
-						m_graph[ new_edge.first ].Weight( ComputePriorEnergy( node , m_graph[*it] ) );
-						m_priorEnergy += m_graph[ new_edge.first ].Weight();
+						double prior = ComputePriorEnergy( node , m_graph[*it] );
+						m_graph[ new_edge.first ].Weight( prior );
+						m_priorEnergy += prior;
 					}
 					else
-						std::cerr << "AddNode() : impossible de creer une edge !!!" << std::endl;
+						std::cerr << "AddNode : impossible de creer une edge !!!" << std::endl;
 				}
 		return n;
 	}
 
-	inline vertex_descriptor AddNode (const NodeType &node, const std::vector<neighboor_and_weight> &newNeighboors)
+	inline void ChangeVertex (vertex_iterator vi, const NodeType &node, const std::vector<neighboor_and_weight> &newNeighboors)
 	{
+		m_dataEnergy -= m_graph[*vi].Weight();
+		m_graph[*vi] = node;
 		m_dataEnergy += node.Weight();
-		vertex_descriptor n = add_vertex(node, m_graph);
-		
+
+		// Soustraction des prior terms sur toutes les aretes adjacentes
+		std::pair< typename GraphType::out_edge_iterator , typename GraphType::out_edge_iterator > pair_edges = out_edges( *vi , m_graph );
+		for(;pair_edges.first != pair_edges.second;++pair_edges.first)
+		{
+			m_priorEnergy -= m_graph[ *(pair_edges.first) ].Weight();
+		}
+		// Suppression des aretes adjacentes
+		clear_vertex( *vi, m_graph);
+
+		// creation des nouvelles aretes
 		typename std::vector<neighboor_and_weight>::const_iterator it = newNeighboors.begin(), fin = newNeighboors.end();
 		for (; it != fin; ++it)
 		{
-			edge_descriptor_bool new_edge = add_edge(n, *(it->m_neighboor) ,m_graph);
-			// On calcule l'énergie d'attache aux donnees et on l'affecte a la nouvelle arete
+			edge_descriptor_bool new_edge = add_edge(*vi, *(it->m_neighboor) ,m_graph);
+			// On affecte l'énergie d'attache aux donnees a la nouvelle arete
 			if ( new_edge.second )
 			{
 				m_graph[ new_edge.first ].Weight( it->m_weight);
@@ -134,7 +138,6 @@ public:
 			else
 				std::cerr << "AddNode(,) : impossible de creer une edge !!!" << std::endl;
 		}
-		return n;
 	}
 
 	inline void RemoveVertex( vertex_iterator vi )
@@ -178,7 +181,12 @@ public:
 		double computedEnergy = 0.;
 		vertex_iterator it_v = vertices(m_graph).first, fin_v = vertices(m_graph).second;
 		for (; it_v != fin_v; ++it_v)
-			computedEnergy += ComputeDataEnergy( m_graph[*it_v] );
+		{
+			/// VARIANT
+//			computedEnergy += ComputeDataEnergy( m_graph[*it_v] );
+			ComputeDataEnergyVisitor v(*this);
+			computedEnergy += boost::apply_visitor( v,  m_graph[*it_v]); 
+		}
 		return computedEnergy-m_dataEnergy;
 	}
 
@@ -187,8 +195,12 @@ public:
 		// On parcourt toutes les aretes et on verifie que la somme des energies vaut l'energie courante
 		double computedEnergy = 0.;
 		std::pair< edge_iterator, edge_iterator > it_edges = edges(m_graph);
+		//VARIANT
+//		for(edge_iterator it = it_edges.first; it != it_edges.second;++it)
+//			computedEnergy += ComputePriorEnergy( m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)] );
+		ComputePriorEnergyVisitor v(10.);
 		for(edge_iterator it = it_edges.first; it != it_edges.second;++it)
-			computedEnergy += ComputePriorEnergy( m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)] );
+			computedEnergy += boost::apply_visitor( v,  m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)] );
 		return computedEnergy-m_priorEnergy;
 	}
 
@@ -203,7 +215,9 @@ public:
 			vertex_iterator it_2 = it_1; ++it_2;
 			for (; it_2 != fin; ++it_2)
 			{
+				// VARIANT
 				bool computed = AreNeighbor(m_graph[*it_1], m_graph[*it_2]);
+//				bool computed = boost::apply_visitor( NeighboorVisitor() , m_graph[*it_1], m_graph[*it_2]);
 				bool stored = edge(*it_1, *it_2, m_graph).second;
 				if (computed != stored)
 					nb_err++;
@@ -255,4 +269,4 @@ private:
 	double m_dataEnergy;
 };
 
-#endif // __RJMCMC_BUILDINGS_DETECTOR_HPP__
+#endif // RJMCMC_BUILDINGS_DETECTOR_HPP

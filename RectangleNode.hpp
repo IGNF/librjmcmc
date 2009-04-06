@@ -1,8 +1,6 @@
 #ifndef RECTANGLENODE_HPP_
 #define RECTANGLENODE_HPP_
 
-#include "Random.hpp"
-
 #include "BBox.hpp"
 #include "cgal_types.h"
 
@@ -12,22 +10,20 @@ class RectangleNode
 {
 public :
 	RectangleNode() : m_weight(0) {;}
-	RectangleNode(const RectangleNode &rec) : m_rect(rec.m_rect), m_weight(rec.m_weight) {}
+	RectangleNode(const RectangleNode &rec) : m_geometry(rec.m_geometry), m_weight(rec.m_weight) {}
 
-	void RandomModify(const BBox &box);
 	void RandomInit(const BBox &box);
+	void RandomModify(const BBox &box);
 
 	const double Weight() const { return m_weight; }
 	void Weight( double w ) { m_weight = w; }
 
-	const CRectangle_2 &Rect() const { return m_rect; }
-	typedef CRectangle_2::Point_2 Point_2;
+	const CRectangle_2 &Geometry() const { return m_geometry; }
 
 private :
+	bool IsValid(const BBox &box) const;
 
-	bool IsValid(const BBox &box) /*const*/;
-
-	CRectangle_2 m_rect;
+	CRectangle_2 m_geometry;
 	double m_weight;
 };
 
@@ -40,12 +36,12 @@ public :
 
 	inline bool AreNeighbor(const RectangleNode &n1, const RectangleNode &n2)
 	{
-		return n1.Rect().do_intersect(n2.Rect());
+		return n1.Geometry().do_intersect(n2.Geometry());
 	}
 	
 	inline double ComputePriorEnergy(const RectangleNode &n1, const RectangleNode &n2)
 	{
-		return m_coefSurface * std::abs(CGAL::to_double(n1.Rect().intersection_area(n2.Rect())));
+		return m_coefSurface * std::abs(CGAL::to_double(n1.Geometry().intersection_area(n2.Geometry())));
 	}
 
 private :
@@ -71,19 +67,6 @@ class SurfaceRectangleDataEnergyPolicy
 {
 public :
 	double ComputeDataEnergy(const RectangleNode &n) const;
-};
-
-class GILPolicyImage;
-class ImageGradientEnergyPolicy
-{
-public :
-
-	ImageGradientEnergyPolicy();
-	~ImageGradientEnergyPolicy();
-	double ComputeDataEnergy(const RectangleNode &n) const;
-
-private:
-	boost::shared_ptr<GILPolicyImage> m_policy;
 };
 
 #endif /*RECTANGLENODE_HPP_*/

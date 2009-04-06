@@ -33,7 +33,7 @@
 
 #include "Rectangle_2.h"
 
-typedef CGAL::Simple_cartesian<double>              K;
+typedef CGAL::Simple_cartesian<float>              K;
 //typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 //typedef CGAL::Exact_predicates_exact_constructions_kernel K;
 

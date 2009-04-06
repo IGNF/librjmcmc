@@ -1,5 +1,5 @@
-#ifndef __RJMCMC_SAMPLETR_HPP__
-#define __RJMCMC_SAMPLETR_HPP__
+#ifndef RJMCMC_SAMPLER_HPP
+#define RJMCMC_SAMPLER_HPP
 
 #include "Random.hpp"
 
@@ -147,14 +147,18 @@ public :
 			{
 				delta = delta_birth(detector, modif);
 				//R = 1.- detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
-				R = double( detector.GetBox().Volume() ) / ((double)detector.GetNbVertices()*BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize()+1.);
+				double surface = BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize();
+				surface *= surface*detector.GetNbVertices();
+				R = 1. - surface / detector.GetBox().Volume();
 				break;
 			}
 			case eDEATH :
 			{
 				delta = delta_death(detector, modif);
 				//R = detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
-				R = ((double)detector.GetNbVertices()*BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize()+1.) / double( detector.GetBox().Volume() );
+				double surface = BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize();
+				surface *= surface*detector.GetNbVertices();
+				R = surface / detector.GetBox().Volume();
 				break;
 			}
 			case eMODIFY :
@@ -193,8 +197,7 @@ public :
 				detector.RemoveVertex( modif.Vertex() );
 				break;
 			case eMODIFY :
-				detector.RemoveVertex( modif.Vertex() );
-				detector.AddNode( modif.Node(), modif.m_newNeighboors);
+				detector.ChangeVertex( modif.Vertex(), modif.Node(), modif.m_newNeighboors);
 				break;
 			default :
 				throw;
@@ -252,4 +255,4 @@ private :
 
 };
 
-#endif // __RJMCMC_SAMPLETR_HPP__
+#endif // RJMCMC_SAMPLER_HPP

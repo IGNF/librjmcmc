@@ -1,45 +1,22 @@
 #include <iostream>
 #include <string>
+#include <strstream>
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/barrier.hpp>
+#include "ImageGradientEnergyPolicy.hpp"
 
 #include "BuildingsDetectorParameters.hpp"
 #include "RectangleNode.hpp"
+#include "CircleNode.hpp"
 #include "RJMCMC_Detector.hpp"
 #include "RJMCMC_Sampler.hpp"
 
-/* Temps totaux pour buildings.cfg
- * lisS, lisS
- Total elapsed time (s) :  82.83
-5000000	70	28.7297	-96630.6	2723.32	-93907.2
-Graph Data energy integrity : 1.64437e-09
-Graph Prior energy integrity: -9.64064e-10
-Graph Structure integrity : 0
-Energy : -93907.2
-(Prior : 2723.32	Data : -96630.6)
-Nb node : 70
-Nb edge : 31
-
-* vecS, lisS
-Total elapsed time (s) :  81.64
-5000000	74	28.7297	-99035.9	4648.26	-94387.7
-Graph Data energy integrity : 1.60071e-10
-Graph Prior energy integrity: 6.89397e-10
-Graph Structure integrity : 0
-Energy : -94387.7
-(Prior : 4648.26	Data : -99035.9)
-Nb node : 74
-Nb edge : 35
-
- */ 
+#include "cgal_types.h"
 
 typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
-unsigned int current_iter=0;
+//typedef RJMCMC_Detector<CircleNode, CirclePriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 
 int main (int argc, char **argv)
-{
+{	
 	if (!BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc, argv))
 		return -1;
 	
@@ -48,33 +25,46 @@ int main (int argc, char **argv)
 	size[1] = BuildingsDetectorParametersSingleton::Instance()->RunningHeight()-1;
 	origin[0] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginX();
 	origin[1] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginY();
-	Sampler< BuildingsDetector > sampler( BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
-
 	BuildingsDetector buildingsDetector(BBox(size, origin));
+	Sampler< BuildingsDetector > sampler( BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
+	std::cout << BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() << std::endl;
 
 	// Formattage du log sous forme de tableau, ca facilite la creation de graphiques ...
 	std::ostringstream my_out_stream;
-	my_out_stream << "Iteration\t";
-	my_out_stream << "#Objects\t";
-	my_out_stream << "TimePerIteration(ms)\t";
-	my_out_stream << "Temperature\t";
+	my_out_stream << "\tIte\t";
+	my_out_stream << "NbObjects\t";
+	my_out_stream << "Time(s)\t";
+	my_out_stream << "Temp\t";
 	my_out_stream << "E_data\t";
 	my_out_stream << "E_priori\t";
 	my_out_stream << "E_total\t";
 	std::cout << my_out_stream.str() << std::endl;
 
-	clock_t clock_debut = clock();
-	while (current_iter < BuildingsDetectorParametersSingleton::Instance()->NbIterations())
+	clock_t clock_debut = clock(), clock_local = clock();
+	for (unsigned int current_iter=0; current_iter <= BuildingsDetectorParametersSingleton::Instance()->NbIterations(); ++current_iter)
 	{
+		if (current_iter % BuildingsDetectorParametersSingleton::Instance()->NbIterationsDump() == 0)
+		{
+			my_out_stream.str("");
+			my_out_stream << "\t" << current_iter;
+			my_out_stream << "\t" << buildingsDetector.GetNbVertices();
+			my_out_stream << "\t" << double(clock()- clock_local) / CLOCKS_PER_SEC;
+			my_out_stream << "\t" << sampler.Temperature();
+			my_out_stream << "\t" << buildingsDetector.DataEnergy();
+			my_out_stream << "\t" << buildingsDetector.PriorEnergy();
+			my_out_stream << "\t" << buildingsDetector.DataEnergy() + buildingsDetector.PriorEnergy() << std::endl;
+			std::cout << my_out_stream.str();
+			clock_local = clock();
+		}
 		sampler.Itere(buildingsDetector);
-		++current_iter;
 	}
 	clock_t clock_fin = clock();
 
 	my_out_stream.str("");
 	my_out_stream << "Iterations finished" << std::endl;
-	my_out_stream << "Total elapsed time (s) :  " << double(clock_fin - clock_debut) / CLOCKS_PER_SEC << std::endl;
-	my_out_stream << current_iter;
+	double elapsed = double(clock_fin - clock_debut) / CLOCKS_PER_SEC;
+	my_out_stream << "Total elapsed time (s) :  " << elapsed << std::endl;
+	my_out_stream << "Mean time per iteration (ms) :  " << elapsed * 1000 / BuildingsDetectorParametersSingleton::Instance()->NbIterations() << std::endl;
 	my_out_stream << "\t" << buildingsDetector.GetNbVertices();
 	my_out_stream << "\t" << sampler.Temperature();
 	my_out_stream << "\t" << buildingsDetector.DataEnergy();
@@ -83,9 +73,13 @@ int main (int argc, char **argv)
 	my_out_stream << "Graph Data energy integrity : " << buildingsDetector.CheckGraphDataEnergyIntegrity() << std::endl;
 	my_out_stream << "Graph Prior energy integrity: " << buildingsDetector.CheckGraphPriorEnergyIntegrity() << std::endl;
 	my_out_stream << "Graph Structure integrity : " << buildingsDetector.CheckGraphStructureIntegrity() << std::endl;
-	buildingsDetector.Dump(my_out_stream, true);
-
+	buildingsDetector.Dump(my_out_stream);
 	std::cout << my_out_stream.str();
+	//buildingsDetector.InitExport();
+	//BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
+	//for (; it_v != fin_v; ++it_v)
+	//	buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v]);
+	//buildingsDetector.EndExport("final_out.tif");
 
 	return 0;
 }

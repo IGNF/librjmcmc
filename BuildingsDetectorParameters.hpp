@@ -23,31 +23,33 @@ class BuildingsDetectorParametersSingleton : public PatternSingleton<BuildingsDe
 
 
 public:
-	double InitialTemperature()  const { return m_initialTemperature; }
-	unsigned int NbIterations()  const { return m_nbIterations; }
-	unsigned int NbIterationsDump() const { return m_nbIterationsDump; }
-	unsigned int NbIterationsSave() const { return m_nbIterationsSave; }
-	double DecreaseCoefficient() const { return m_decreaseCoefficient; }
-	double ProbaBirth() const { return m_probaBirth; }
-	double ProbaDeath() const { return m_probaDeath; }
-	double ProbaModification() const { return 1-m_probaDeath-m_probaBirth; }
+	inline double InitialTemperature()  const { return m_initialTemperature; }
+	inline unsigned int NbIterations()  const { return m_nbIterations; }
+	inline double DecreaseCoefficient() const { return m_decreaseCoefficient; }
+	inline double ProbaBirth() const { return m_probaBirth; }
+	inline double ProbaDeath() const { return m_probaDeath; }
+	inline double ProbaModification() const { return 1-m_probaDeath-m_probaBirth; }
+	inline const std::vector<double> &CumulatedProbabilities() const { return m_probas; }
 
-	std::string InputDataFilePath() const { return m_inputDataFilePath; }
+	inline const std::string &InputDataFilePath() const { return m_inputDataFilePath; }
 
-	unsigned int RunningOriginX() const { return m_runningOriginX; }
-	unsigned int RunningOriginY() const { return m_runningOriginY; }
-	unsigned int RunningWidth() const { return m_runningWidth; }
-	unsigned int RunningHeight() const { return m_runningHeight; }
+	inline unsigned int RunningOriginX() const { return m_runningOriginX; }
+	inline unsigned int RunningOriginY() const { return m_runningOriginY; }
+	inline unsigned int RunningWidth() const { return m_runningWidth; }
+	inline unsigned int RunningHeight() const { return m_runningHeight; }
 
-	const std::vector<double> &CumulatedProbabilities() const { return m_probas; }
-	double VarianceGaussianFilter() const { return m_varianceGaussianFilter; }
-	double IntersectionSurfacePonderation() const { return m_ponderationSurfaceIntersection; }
-	double PointsDistancePonderation() const { return m_ponderationPointsDistance; }
-	double PointsDistanceMax() const { return m_pointsDistanceMax; }
+	inline double VarianceGaussianFilter() const { return m_varianceGaussianFilter; }
+	inline double IntersectionSurfacePonderation() const { return m_ponderationSurfaceIntersection; }
+	inline double PointsDistancePonderation() const { return m_ponderationPointsDistance; }
+	inline double PointsDistanceMax() const { return m_pointsDistanceMax; }
 
-	double RectangleMinimalSize() const { return m_rectangleMinimalSize; }
-	double RectangleMaximalRatio() const { return m_rectangleMaximalRatio; }
-	double IndividualEnergy() const { return m_individualEnergy; }
+	inline double RectangleMinimalSize() const { return m_rectangleMinimalSize; }
+	inline double RectangleMaximalSize() const { return m_rectangleMaximalSize; }
+	inline double RectangleMaximalRatio() const { return m_rectangleMaximalRatio; }
+	inline double IndividualEnergy() const { return m_individualEnergy; }
+
+	inline unsigned int NbIterationsDump() const { return m_nbIterationsDump; }
+	inline unsigned int NbIterationsSave() const { return m_nbIterationsSave; }
 
 	void GetAsText(std::vector< std::pair<std::string, std::string> > &pileText) const;
 	void SetFromText(const std::vector< std::pair<std::string, std::string> > &pileText);
@@ -71,6 +73,7 @@ private:
 	unsigned int m_runningHeight;
 	double m_varianceGaussianFilter;
 	double m_rectangleMinimalSize;
+	double m_rectangleMaximalSize;
 	double m_rectangleMaximalRatio;
 	double m_ponderationSurfaceIntersection;
 	double m_ponderationPointsDistance;

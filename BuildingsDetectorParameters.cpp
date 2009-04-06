@@ -1,8 +1,5 @@
 #include <fstream>
 
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
-
 #include "BuildingsDetectorParameters.hpp"
 
 void BuildingsDetectorParametersSingleton::GetAsText(std::vector< std::pair<std::string, std::string> > &pileText) const
@@ -106,13 +103,14 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 //	m_inputImageHeight(1575),
 //	m_inputDataFilePath("./data/Marseille/Crop_MNE_Marseille.tif"),
 //	m_inputDataFilePath("/home/olivier/work/data/MNESaintMande.tif"),
-	m_inputDataFilePath("./data/ZTerrain_c3.tif"),
+	m_inputDataFilePath("ZTerrain_c3.tif"),
 	m_runningOriginX(0),
 	m_runningOriginY(0),
 	m_runningWidth(653),
 	m_runningHeight(663),
 	m_varianceGaussianFilter(2.0),
 	m_rectangleMinimalSize(5.),
+	m_rectangleMaximalSize(500.),
 	m_rectangleMaximalRatio(5.),
 	m_ponderationSurfaceIntersection(1.),
 	m_ponderationPointsDistance(0.),
@@ -136,8 +134,9 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	("width,w",		po::value< unsigned int>(&(m_runningWidth))->default_value(m_runningWidth), "Largeur de la zone a traiter")
 	("height,h",	po::value< unsigned int>(&(m_runningHeight))->default_value(m_runningHeight), "Hauteur de la zone a traiter")
 	("gaussian,g",	po::value< double >		(&(m_varianceGaussianFilter))->default_value(m_varianceGaussianFilter), "Variance du filtre gaussien en entrée")
-	("minsize,m",	po::value< double >		(&(m_rectangleMinimalSize))->default_value(m_rectangleMinimalSize), "Taille minimale d'un rectangle")
-	("maxratio,M",	po::value< double >		(&(m_rectangleMaximalRatio))->default_value(m_rectangleMaximalRatio), "Rapport longueur / largeur maximal d'un rectangle")
+	("minsize,m",	po::value< double >		(&(m_rectangleMinimalSize))->default_value(m_rectangleMinimalSize), "Taille minimale du cote d'un rectangle")
+	("maxsize,M",	po::value< double >		(&(m_rectangleMaximalSize))->default_value(m_rectangleMaximalSize), "Taille maximale du cote d'un rectangle")
+	("maxratio,R",	po::value< double >		(&(m_rectangleMaximalRatio))->default_value(m_rectangleMaximalRatio), "Rapport longueur / largeur maximal d'un rectangle")
 	("surface,s",	po::value< double >		(&(m_ponderationSurfaceIntersection))->default_value(m_ponderationSurfaceIntersection), "Ponderation de la surface d'intersection")
 	("point,p",		po::value< double >		(&(m_ponderationPointsDistance))->default_value(m_ponderationPointsDistance), "Ponderation de distance des sommets")
 	("dmax,x",		po::value< double >		(&(m_pointsDistanceMax))->default_value(m_pointsDistanceMax), "Distance maximale d'intercation entre sommets")
