@@ -41,8 +41,6 @@ public:
 		m_node = node;
 	}
 
-//	void AddNewNeighboor( typename DetectorType::GraphType::vertex_iterator vi ) { m_newNeighboors.push_back( vi ); }
-//	void AddImpactedEdge( const typename DetectorType::GraphType::edge_descriptor &ed ){ m_impactedEdges.push_back( ed ); }
 	std::vector<typename DetectorType::neighboor_and_weight> m_newNeighboors;
 
 private:
@@ -147,7 +145,7 @@ public :
 			{
 				delta = delta_birth(detector, modif);
 				//R = 1.- detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
-				double surface = BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize();
+				double surface = BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
 				surface *= surface*detector.GetNbVertices();
 				R = detector.GetBox().Volume() / (surface+1) ;
 				break;
@@ -156,7 +154,7 @@ public :
 			{
 				delta = delta_death(detector, modif);
 				//R = detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
-				double surface = BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize();
+				double surface = BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
 				surface *= surface*detector.GetNbVertices();
 				R = surface / detector.GetBox().Volume();
 				break;
@@ -229,7 +227,7 @@ private :
 			{
 				typename DetectorType::neighboor_and_weight p;
 				p.m_neighboor = it_v;
-				p.m_weight = detector.ComputePriorEnergy( detector.GetGraph()[ *it_v ] , modifiedNode );
+				p.m_weight = detector.ComputePriorEnergy( detector.GetGraph()[ *it_v ], modifiedNode );
 				delta += p.m_weight;
 				modif.m_newNeighboors.push_back(p);
 			}

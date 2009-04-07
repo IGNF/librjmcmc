@@ -1,19 +1,21 @@
 #include <iostream>
-#include <string>
 #include <strstream>
 
 #include "ImageGradientEnergyPolicy.hpp"
 
 #include "BuildingsDetectorParameters.hpp"
-#include "RectangleNode.hpp"
-#include "CircleNode.hpp"
+#include "GeometricNode.hpp"
 #include "RJMCMC_Detector.hpp"
 #include "RJMCMC_Sampler.hpp"
 
-#include "cgal_types.h"
+//typedef GeometricNode<Rectangle_2> MyNode;
+typedef GeometricNode<Cercle_2> MyNode;
+typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 
-typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
-//typedef RJMCMC_Detector<CircleNode, CirclePriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
+//#include <boost/variant.hpp>
+
+//typedef GeometricNode< boost::variant<Rectangle_2,Cercle_2> > MyNode;
+
 
 int main (int argc, char **argv)
 {	
@@ -75,11 +77,11 @@ int main (int argc, char **argv)
 	my_out_stream << "Graph Structure integrity : " << buildingsDetector.CheckGraphStructureIntegrity() << std::endl;
 	buildingsDetector.Dump(my_out_stream);
 	std::cout << my_out_stream.str();
-	//buildingsDetector.InitExport();
-	//BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
-	//for (; it_v != fin_v; ++it_v)
-	//	buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v]);
-	//buildingsDetector.EndExport("final_out.tif");
+	buildingsDetector.InitExport();
+	BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
+	for (; it_v != fin_v; ++it_v)
+		buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());
+	buildingsDetector.EndExport("final_out.tif");
 
 	return 0;
 }

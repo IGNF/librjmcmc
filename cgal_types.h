@@ -31,7 +31,6 @@
 //#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Polygon_2.h>
-//#include <CGAL/point_generators_2.h>
 
 #include "Rectangle_2.h"
 #include "Cercle_2.h"
@@ -48,9 +47,24 @@ typedef K::Iso_rectangle_2                       Iso_rectangle_2;
 typedef K::Aff_transformation_2                  Aff_transformation_2;
 typedef std::vector<Point_2>                     Container;
 typedef CGAL::Polygon_2<K, Container>            CPolygon_2;
-//typedef CGAL::Random_points_in_square_2<Point_2> Point_generator;
-typedef CGAL::Rectangle_2<K>                     CRectangle_2;
+typedef CGAL::Rectangle_2<K>                     Rectangle_2;
 typedef CGAL::Cercle_2<K>                        Cercle_2;
+
+/*
+inline std::ostream &
+operator<<(std::ostream &os, const Cercle_2 &c)
+{
+  switch(os.iword(IO::mode)) 
+  {
+  case IO::ASCII :
+    return os << c.center() << ' ' << c.radius() ;
+  case IO::BINARY :
+    return os << c.center() << c.radius();
+  default:
+    return os << "Cercle_2(" << c.center() << ", " << c.radius() << ")";
+  }
+}
+*/
 
 #ifdef WIN32 
 #ifndef M_PI

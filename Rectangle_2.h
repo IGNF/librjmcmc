@@ -910,7 +910,7 @@ template <class K> inline Object intersection(const Rectangle_2<K> &r1, const Re
 template <class K> inline typename K::FT intersection_area(const Rectangle_2<K> &r1, const Rectangle_2<K> &r2) {
   return r1.intersection_area(r2);
 }
-
+/*
 template < class R >
 std::ostream &
 operator<<(std::ostream &os, const Rectangle_2<R> &r)
@@ -924,7 +924,7 @@ operator<<(std::ostream &os, const Rectangle_2<R> &r)
     return os << "Rectangle_2(" << r.center() << ", " << r.normal() << ", " << r.ratio() << ")";
   }
 }
-
+*/
 template < class R >
 std::istream &
 operator>>(std::istream &is, Rectangle_2<R> &b)

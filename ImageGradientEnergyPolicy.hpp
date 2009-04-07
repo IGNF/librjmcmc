@@ -1,10 +1,9 @@
 #include <boost/shared_ptr.hpp>
-#include <boost/variant.hpp>
+
+#include "cgal_types.h"
+#include "GeometricNode.hpp"
 
 class GILPolicyImage;
-class RectangleNode;
-class CircleNode;
-
 
 class ImageGradientEnergyPolicy
 {
@@ -12,11 +11,18 @@ public :
 
 	ImageGradientEnergyPolicy();
 	~ImageGradientEnergyPolicy();
-	double ComputeDataEnergy(const RectangleNode &n) const;
-	double ComputeDataEnergy(const CircleNode &n) const;
+
+	double ComputeDataEnergy(const Rectangle_2 &n) const;
+	double ComputeDataEnergy(const Cercle_2 &n) const;
+
+	template<class NodeGeometry>
+	inline double ComputeDataEnergy(const GeometricNode<NodeGeometry> &n) const
+	{
+		return ComputeDataEnergy(n.Geometry());
+	}
 
 	void InitExport() const;
-	void ExportNode(const CircleNode &n) const;
+	void ExportNode(const Cercle_2 &n) const;
 	void EndExport(const char *filename) const;
 
 private:

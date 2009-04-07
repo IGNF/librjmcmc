@@ -163,9 +163,9 @@ public:
 
 		if (exportNode)
 		{
-			vertex_iterator it_v = vertices(m_graph).first, fin_v = vertices(m_graph).second;
-			for (; it_v != fin_v; ++it_v)
-				o << *it_v <<"\t" << m_graph[*it_v] << std::endl;
+//			vertex_iterator it_v = vertices(m_graph).first, fin_v = vertices(m_graph).second;
+//			for (; it_v != fin_v; ++it_v)
+//				o << *it_v <<"\t" << m_graph[*it_v].Geometry() << std::endl;
 		}
 		if (exportEdge)
 		{

@@ -43,8 +43,8 @@ public:
 	inline double PointsDistancePonderation() const { return m_ponderationPointsDistance; }
 	inline double PointsDistanceMax() const { return m_pointsDistanceMax; }
 
-	inline double RectangleMinimalSize() const { return m_rectangleMinimalSize; }
-	inline double RectangleMaximalSize() const { return m_rectangleMaximalSize; }
+	inline double MinimalSize() const { return m_minimalSize; }
+	inline double MaximalSize() const { return m_maximalSize; }
 	inline double RectangleMaximalRatio() const { return m_rectangleMaximalRatio; }
 	inline double IndividualEnergy() const { return m_individualEnergy; }
 
@@ -72,8 +72,8 @@ private:
 	unsigned int m_runningWidth;
 	unsigned int m_runningHeight;
 	double m_varianceGaussianFilter;
-	double m_rectangleMinimalSize;
-	double m_rectangleMaximalSize;
+	double m_minimalSize;
+	double m_maximalSize;
 	double m_rectangleMaximalRatio;
 	double m_ponderationSurfaceIntersection;
 	double m_ponderationPointsDistance;

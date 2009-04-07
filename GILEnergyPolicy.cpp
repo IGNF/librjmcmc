@@ -1,9 +1,17 @@
-#include "ImageGradientEnergyPolicy.hpp"
+#include <boost/gil/gil_all.hpp>
+#include <boost/gil/extension/matis/float_images.hpp>
+#include <boost/gil/extension/io/tiff_dynamic_io.hpp>
+#include <boost/gil/extension/numeric/kernel.hpp>
+#include <boost/gil/extension/numeric/convolve.hpp>
 
-#include "GILEnergyPolicy.hpp"
 #include <boost/gil/extension/matis/deriche.hpp>
 
 #include "BuildingsDetectorParameters.hpp"
+
+#include "GILEnergyPolicy.hpp"
+
+#include "ImageGradientEnergyPolicy.hpp"
+
 
 ImageGradientEnergyPolicy::ImageGradientEnergyPolicy() :
 	m_policy( boost::shared_ptr<GILPolicyImage>(new GILPolicyImage) )
@@ -16,12 +24,12 @@ ImageGradientEnergyPolicy::~ImageGradientEnergyPolicy()
 {
 }
 
-double ImageGradientEnergyPolicy::ComputeDataEnergy(const RectangleNode &n) const
+double ImageGradientEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
 {
 	return m_policy->ComputeDataEnergy(n);
 }
 
-double ImageGradientEnergyPolicy::ComputeDataEnergy(const CircleNode &n) const
+double ImageGradientEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
 {
 	return m_policy->ComputeDataEnergy(n);
 }
@@ -111,12 +119,12 @@ void GILPolicyImage::LoadFile(const std::string &str)
 	}
 }
 
-double GILPolicyImage::ComputeDataEnergy(const RectangleNode &n) const
+double GILPolicyImage::ComputeDataEnergy(const Rectangle_2 &n) const
 {
 	double res = m_defaultEnergy;
 	for (unsigned int i = 0; i < 4; ++i)
 	{
-		double delta = -ComputeSegmentDataEnergy(n.Geometry().point(i),n.Geometry().point(i + 1));
+		double delta = -ComputeSegmentDataEnergy(n.point(i),n.point(i + 1));
 		if ( delta <= 0. )
 			res += delta;
 	}
@@ -200,13 +208,13 @@ void GILPolicyImage::Add8CirclePoints(int xCenter, int yCenter, int dx, int dy, 
 // http://escience.anu.edu.au/lecture/cg/Circle/
 // Corrige par :
 // http://www.cplusplus.happycodings.com/Computer_Graphics/code16.html
-double GILPolicyImage::ComputeDataEnergy(const CircleNode &n) const
+double GILPolicyImage::ComputeDataEnergy(const Cercle_2 &n) const
 {
 	double res = m_defaultEnergy;
 	int x = 0;
-	int y = n.Geometry().radius();
-	int p = 3 - 2*n.Geometry().radius();
-	int xCenter = n.Geometry().center().x(), yCenter = n.Geometry().center().y();
+	int y = n.radius();
+	int p = 3 - 2*n.radius();
+	int xCenter = n.center().x(), yCenter = n.center().y();
     Add8CirclePoints(xCenter, yCenter, x, y, res);
     while (x < y) 
 	{
@@ -222,7 +230,7 @@ double GILPolicyImage::ComputeDataEnergy(const CircleNode &n) const
         x++;
         Add8CirclePoints(xCenter, yCenter, x, y, res);
     } 
-	return res / n.Geometry().radius();
+	return res / n.radius();
 }
 
 gray8_image_t img;
@@ -250,12 +258,12 @@ void GILPolicyImage::Export8Points(int xCenter, int yCenter, int dx, int dy) con
 	img._view(xCenter + dy, yCenter - dx) = 255;
 }
 
-void GILPolicyImage::ExportNode(const CircleNode &n) const
+void GILPolicyImage::ExportNode(const Cercle_2 &n) const
 {
 	int x = 0;
-	int y = n.Geometry().radius();
-	int p = 3 - 2*n.Geometry().radius();
-	int xCenter = n.Geometry().center().x(), yCenter = n.Geometry().center().y();
+	int y = n.radius();
+	int p = 3 - 2*n.radius();
+	int xCenter = n.center().x(), yCenter = n.center().y();
     Export8Points(xCenter, yCenter, x, y);
     while (x < y) 
 	{
@@ -274,5 +282,5 @@ void GILPolicyImage::ExportNode(const CircleNode &n) const
 }
 
 void ImageGradientEnergyPolicy::InitExport() const { m_policy->InitExport(); }
-void ImageGradientEnergyPolicy::ExportNode(const CircleNode &n) const {m_policy->ExportNode(n); }
+void ImageGradientEnergyPolicy::ExportNode(const Cercle_2 &n) const {m_policy->ExportNode(n); }
 void ImageGradientEnergyPolicy::EndExport(const char *filename) const { m_policy->EndExport(filename); }

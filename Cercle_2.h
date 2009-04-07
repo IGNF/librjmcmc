@@ -4,17 +4,18 @@
 #include <CGAL/basic.h>
 
 CGAL_BEGIN_NAMESPACE
+
 template <class R_>
 class Cercle_2
 {
 public:
-	typedef  R_   R;
+	typedef  R_                                R;
 	typedef typename R_::RT                    RT;
 	typedef typename R_::FT                    FT;
 	typedef typename R_::Point_2               Point_2;
 	typedef typename R_::Vector_2              Vector_2;
 	typedef typename R_::Line_2                Line_2;
-	typedef Cercle_2                    Self;
+	typedef Cercle_2                           Self;
 
 	Cercle_2() {}
 	Cercle_2(const Point_2 &center, double radius) : m_center(center), m_radius(radius), m_squared_radius(radius*radius)
@@ -51,12 +52,13 @@ public:
 		area -= 0.5 * ::sqrt((-d+r+R)*(d+r-R)*(d-r+R)*(d+r+R));
 		return area;
 	}
+
 private :
 	Point_2 m_center;
 	FT m_radius, m_squared_radius;
 };
 
+
 CGAL_END_NAMESPACE
 
 #endif //#ifndef CGAL_CERCLE_2_H
-

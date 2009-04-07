@@ -109,8 +109,8 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_runningWidth(653),
 	m_runningHeight(663),
 	m_varianceGaussianFilter(2.0),
-	m_rectangleMinimalSize(5.),
-	m_rectangleMaximalSize(200.),
+	m_minimalSize(5.),
+	m_maximalSize(200.),
 	m_rectangleMaximalRatio(5.),
 	m_ponderationSurfaceIntersection(1.),
 	m_ponderationPointsDistance(0.),
@@ -134,8 +134,8 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	("width,w",		po::value< unsigned int>(&(m_runningWidth))->default_value(m_runningWidth), "Largeur de la zone a traiter")
 	("height,h",	po::value< unsigned int>(&(m_runningHeight))->default_value(m_runningHeight), "Hauteur de la zone a traiter")
 	("gaussian,g",	po::value< double >		(&(m_varianceGaussianFilter))->default_value(m_varianceGaussianFilter), "Variance du filtre gaussien en entrée")
-	("minsize,m",	po::value< double >		(&(m_rectangleMinimalSize))->default_value(m_rectangleMinimalSize), "Taille minimale du cote d'un rectangle")
-	("maxsize,M",	po::value< double >		(&(m_rectangleMaximalSize))->default_value(m_rectangleMaximalSize), "Taille maximale du cote d'un rectangle")
+	("minsize,m",	po::value< double >		(&(m_minimalSize))->default_value(m_minimalSize), "Taille minimale d'un objet")
+	("maxsize,M",	po::value< double >		(&(m_maximalSize))->default_value(m_maximalSize), "Taille maximale d'un objet")
 	("maxratio,R",	po::value< double >		(&(m_rectangleMaximalRatio))->default_value(m_rectangleMaximalRatio), "Rapport longueur / largeur maximal d'un rectangle")
 	("surface,s",	po::value< double >		(&(m_ponderationSurfaceIntersection))->default_value(m_ponderationSurfaceIntersection), "Ponderation de la surface d'intersection")
 	("point,p",		po::value< double >		(&(m_ponderationPointsDistance))->default_value(m_ponderationPointsDistance), "Ponderation de distance des sommets")

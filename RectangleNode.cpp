@@ -44,7 +44,7 @@ void RectangleNode::RandomInit(const BBox &box)
 	while (p == q)
 		q = Point_2(p.x() + dievec(), p.y() + dievec());
 
-	m_geometry = CRectangle_2(p, q, r);
+	m_geometry = Rectangle_2(p, q, r);
 
 	// On le met dans le "bon" sens ...
 	if ( m_geometry.orientation() == CGAL::CLOCKWISE )
@@ -76,7 +76,7 @@ void RectangleNode::RandomModify(const BBox &box)
 	if ( shuffle )
 		std::random_shuffle( pts.begin() , pts.end() );
 
-	m_geometry = CRectangle_2(pts[0], pts[1], pts[2]);
+	m_geometry = Rectangle_2(pts[0], pts[1], pts[2]);
 
 	// On le met dans le "bon" sens ...
 	if ( m_geometry.orientation() == CGAL::CLOCKWISE )
