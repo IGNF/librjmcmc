@@ -184,7 +184,7 @@ class SurfaceDataEnergyPolicy
 {
 public :
 	template<class NodeGeometry>
-	double ComputeDataEnergy(const GeometricNode<NodeGeometry> & n1) const
+	double ComputeDataEnergy(const GeometricNode<NodeGeometry> & n) const
 	{
 			return -::log(1. + std::abs(CGAL::to_double(n.Geometry().area())));
 	}

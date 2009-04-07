@@ -19,16 +19,14 @@
 
 #include "ImageGradientEnergyPolicy.hpp"
 
-//#include "Simple2DNode.hpp"
-#include "RectangleNode.hpp"
+#include "GeometricNode.hpp"
 
 #include "RJMCMC_Detector.hpp"
 #include "RJMCMC_Sampler.hpp"
 
-//typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, SurfaceRectangleDataEnergyPolicy >	BuildingsDetector;
-//typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, ImageRectangleDataEnergyPolicy >	BuildingsDetector;
-//typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
-typedef RJMCMC_Detector<RectangleNode, RectanglePriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
+typedef GeometricNode<Rectangle_2> MyNode;
+//typedef GeometricNode<Cercle_2> MyNode;
+typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 
 void* RJMCMC_BuildingsDetectionThread::Entry()
 {
@@ -142,7 +140,7 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 			BuildingsDetector::vertex_iterator it = vertices( buildingsDetector.GetGraph() ).first, fin = vertices( buildingsDetector.GetGraph() ).second;
 			for (; it != fin; ++it)
 			{
-				RectangleNode n = buildingsDetector.GetGraph()[*it];
+				MyNode n = buildingsDetector.GetGraph()[*it];
 				std::vector<double> vectx, vecty;
 				for (unsigned int i=0; i<5;++i)
 				{
