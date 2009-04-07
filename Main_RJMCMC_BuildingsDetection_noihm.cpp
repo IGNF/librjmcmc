@@ -8,8 +8,8 @@
 #include "RJMCMC_Detector.hpp"
 #include "RJMCMC_Sampler.hpp"
 
-//typedef GeometricNode<Rectangle_2> MyNode;
-typedef GeometricNode<Cercle_2> MyNode;
+typedef GeometricNode<Rectangle_2> MyNode;
+//typedef GeometricNode<Cercle_2> MyNode;
 typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 
 //#include <boost/variant.hpp>
@@ -78,10 +78,10 @@ int main (int argc, char **argv)
 	buildingsDetector.Dump(my_out_stream);
 	std::cout << my_out_stream.str();
 	buildingsDetector.InitExport();
-	BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
-	for (; it_v != fin_v; ++it_v)
-		buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());
-	buildingsDetector.EndExport("final_out.tif");
+//	BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
+//	for (; it_v != fin_v; ++it_v)
+//		buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());
+//	buildingsDetector.EndExport("final_out.tif");
 
 	return 0;
 }
