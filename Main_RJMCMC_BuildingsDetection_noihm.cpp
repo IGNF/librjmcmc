@@ -5,14 +5,21 @@
 
 #include "BuildingsDetectorParameters.hpp"
 #include "GeometricNode.hpp"
+#include "VariantNode.hpp"
 #include "RJMCMC_Detector.hpp"
 #include "RJMCMC_Sampler.hpp"
 
-typedef GeometricNode<Rectangle_2> MyNode;
-//typedef GeometricNode<Cercle_2> MyNode;
-typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 
-//#include <boost/variant.hpp>
+#include <boost/variant.hpp>
+
+typedef boost::variant<Rectangle_2, Cercle_2> VariantType;
+
+typedef RJMCMC_Detector<VariantNode< VariantType >, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
+
+//typedef GeometricNode<Rectangle_2> MyNode;
+//typedef GeometricNode<Cercle_2> MyNode;
+//typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
+
 
 //typedef GeometricNode< boost::variant<Rectangle_2,Cercle_2> > MyNode;
 
@@ -57,6 +64,11 @@ int main (int argc, char **argv)
 			my_out_stream << "\t" << buildingsDetector.DataEnergy() + buildingsDetector.PriorEnergy() << std::endl;
 			std::cout << my_out_stream.str();
 			clock_local = clock();
+//			buildingsDetector.InitExport();
+//			BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
+//			for (; it_v != fin_v; ++it_v)
+//				buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());
+//			buildingsDetector.EndExport("final_out.tif");
 		}
 		sampler.Itere(buildingsDetector);
 	}
@@ -77,7 +89,7 @@ int main (int argc, char **argv)
 	my_out_stream << "Graph Structure integrity : " << buildingsDetector.CheckGraphStructureIntegrity() << std::endl;
 	buildingsDetector.Dump(my_out_stream);
 	std::cout << my_out_stream.str();
-	buildingsDetector.InitExport();
+//	buildingsDetector.InitExport();
 //	BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
 //	for (; it_v != fin_v; ++it_v)
 //		buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());
