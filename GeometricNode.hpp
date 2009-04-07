@@ -190,4 +190,15 @@ public :
 	}
 };
 
+class ImageExporter
+{
+public :
+	void InitExport() const;
+	void ExportNode(const Cercle_2 &n) const;
+	void ExportNode(const Rectangle_2 &n) const;
+	void ExportNode(const Segment_2 &n) const;
+	void Export8Points(int xCenter, int yCenter, int dx, int dy) const;
+	void EndExport(const char *filename) const;
+};
+
 #endif //#ifndef GEOMETRIC_NODE_HPP

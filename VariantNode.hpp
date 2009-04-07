@@ -116,16 +116,44 @@ public:
 
 };
 
+
+class VariantImageExporter : public ImageExporter, public boost::static_visitor<>
+{
+public :
+	void operator()(const Rectangle_2 &r) const
+    {
+		ExportNode(r);
+	}
+
+	void operator()(const Cercle_2 &c) const
+    {
+		ExportNode(c);
+	}
+};
+
 template<class NodeGeometry>
 class VariantGradientDataEnergy
 {
 	ComputeDataEnergyVisitor m_dataVisitor;
+	VariantImageExporter m_exporter;
 
 public :
 	double ComputeDataEnergy(VariantNode<NodeGeometry> const  &n) const
     {
 		return 	boost::apply_visitor(m_dataVisitor, n.Geometry());
     }
+
+	void InitExport() const { m_exporter.InitExport(); }
+
+	void ExportNode(const NodeGeometry &n) const
+	{
+		boost::apply_visitor(m_exporter, n);
+	}
+
+	void EndExport(const char *filename) const  
+	{
+		m_exporter.EndExport(filename);
+	}
 };
 
 class NeighboorVisitor : public boost::static_visitor<bool>
@@ -148,7 +176,7 @@ public:
     bool operator()( const Cercle_2 &n1, const Rectangle_2 &n2 ) const
     {
 		Point_2 center = n2.center();
-		double r = ::sqrt(std::max(n2.squared_length(0), n2.squared_length(1)));
+		double r = ::sqrt(std::min(n2.squared_length(0), n2.squared_length(1)));
 		Cercle_2 c(center, r);
         return c.do_intersect(n1);
     }
@@ -166,7 +194,7 @@ public:
 
 	double operator()( const Rectangle_2 &n1, const Cercle_2 &n2 ) const
     {
-        return m_coefSurface * n1.area() * n2.area(); 
+		return m_coefSurface * std::min(n1.area(), n2.area()); 
     }
 
 	double operator()( const Cercle_2 &n1, const Cercle_2 &n2 ) const
@@ -178,6 +206,7 @@ public:
     {
         return (*this)(n2, n1); 
     }
+
 	double m_coefSurface;
 };
 

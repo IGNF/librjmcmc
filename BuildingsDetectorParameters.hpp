@@ -40,8 +40,6 @@ public:
 
 	inline double VarianceGaussianFilter() const { return m_varianceGaussianFilter; }
 	inline double IntersectionSurfacePonderation() const { return m_ponderationSurfaceIntersection; }
-	inline double PointsDistancePonderation() const { return m_ponderationPointsDistance; }
-	inline double PointsDistanceMax() const { return m_pointsDistanceMax; }
 
 	inline double MinimalSize() const { return m_minimalSize; }
 	inline double MaximalSize() const { return m_maximalSize; }
@@ -76,8 +74,6 @@ private:
 	double m_maximalSize;
 	double m_rectangleMaximalRatio;
 	double m_ponderationSurfaceIntersection;
-	double m_ponderationPointsDistance;
-	double m_pointsDistanceMax;
 	double m_individualEnergy;
 //	template<class Archive>
 //	void serialize(Archive & ar , const unsigned int &version)

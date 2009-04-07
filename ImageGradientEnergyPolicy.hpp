@@ -21,10 +21,6 @@ public :
 		return ComputeDataEnergy(n.Geometry());
 	}
 
-	void InitExport() const;
-	void ExportNode(const Cercle_2 &n) const;
-	void EndExport(const char *filename) const;
-
 private:
 	boost::shared_ptr<GILPolicyImage> m_policy;
 };

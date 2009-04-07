@@ -26,9 +26,4 @@ public:
 	unsigned int m_imageHeight;
 
 	double m_defaultEnergy;
-
-	void InitExport() const;
-	void Export8Points(int xCenter, int yCenter, int dx, int dy) const;
-	void ExportNode(const Cercle_2 &n) const;
-	void EndExport(const char *filename) const;
 };

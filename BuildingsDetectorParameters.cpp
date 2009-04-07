@@ -113,8 +113,6 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_maximalSize(200.),
 	m_rectangleMaximalRatio(5.),
 	m_ponderationSurfaceIntersection(1.),
-	m_ponderationPointsDistance(0.),
-	m_pointsDistanceMax(0.),
 	m_individualEnergy(150.)
 {
 	m_desc.add_options()
@@ -138,8 +136,6 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	("maxsize,M",	po::value< double >		(&(m_maximalSize))->default_value(m_maximalSize), "Taille maximale d'un objet")
 	("maxratio,R",	po::value< double >		(&(m_rectangleMaximalRatio))->default_value(m_rectangleMaximalRatio), "Rapport longueur / largeur maximal d'un rectangle")
 	("surface,s",	po::value< double >		(&(m_ponderationSurfaceIntersection))->default_value(m_ponderationSurfaceIntersection), "Ponderation de la surface d'intersection")
-	("point,p",		po::value< double >		(&(m_ponderationPointsDistance))->default_value(m_ponderationPointsDistance), "Ponderation de distance des sommets")
-	("dmax,x",		po::value< double >		(&(m_pointsDistanceMax))->default_value(m_pointsDistanceMax), "Distance maximale d'intercation entre sommets")
 	("energy,e",	po::value< double >		(&(m_individualEnergy))->default_value(m_individualEnergy), "Energie d'existence d'un objet")
 	;
 	ComputeProb();

@@ -235,18 +235,18 @@ double GILPolicyImage::ComputeDataEnergy(const Cercle_2 &n) const
 
 gray8_image_t img;
 
-void GILPolicyImage::InitExport() const
+void ImageExporter::InitExport() const
 {
-	img.recreate(m_gradients.dimensions());
+	img.recreate(700, 700);
 	fill_pixels(img._view, 0);
 }
 
-void GILPolicyImage::EndExport(const char *filename) const
+void ImageExporter::EndExport(const char *filename) const
 {
 	tiff_write_view(filename, img._view);
 }
 
-void GILPolicyImage::Export8Points(int xCenter, int yCenter, int dx, int dy) const
+void ImageExporter::Export8Points(int xCenter, int yCenter, int dx, int dy) const
 {
 	img._view(xCenter + dx, yCenter + dy) = 255;
 	img._view(xCenter - dx, yCenter + dy) = 255;
@@ -258,7 +258,7 @@ void GILPolicyImage::Export8Points(int xCenter, int yCenter, int dx, int dy) con
 	img._view(xCenter + dy, yCenter - dx) = 255;
 }
 
-void GILPolicyImage::ExportNode(const Cercle_2 &n) const
+void ImageExporter::ExportNode(const Cercle_2 &n) const
 {
 	int x = 0;
 	int y = n.radius();
@@ -281,6 +281,19 @@ void GILPolicyImage::ExportNode(const Cercle_2 &n) const
     } 
 }
 
-void ImageGradientEnergyPolicy::InitExport() const { m_policy->InitExport(); }
-void ImageGradientEnergyPolicy::ExportNode(const Cercle_2 &n) const {m_policy->ExportNode(n); }
-void ImageGradientEnergyPolicy::EndExport(const char *filename) const { m_policy->EndExport(filename); }
+void ImageExporter::ExportNode(const Segment_2 &s) const
+{
+	CGAL::Segment_2_iterator<Segment_2> it(s);
+	for (; !it.end(); ++it)
+	{
+		img._view(it.x(), it.y()) = 255;
+	}
+}
+
+void ImageExporter::ExportNode(const Rectangle_2 &n) const
+{
+	for (unsigned int i = 0; i < 4; ++i)
+	{
+		ExportNode(Segment_2(n.point(i),n.point(i + 1)));
+	}
+}
