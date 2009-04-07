@@ -8,7 +8,6 @@
 #include "RJMCMC_Detector.hpp"
 #include "RJMCMC_Sampler.hpp"
 
-
 //#include "VariantNode.hpp"
 //typedef boost::variant<Rectangle_2, Cercle_2> VariantType;
 //typedef RJMCMC_Detector<VariantNode< VariantType >, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
