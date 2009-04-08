@@ -235,10 +235,15 @@ double GILPolicyImage::ComputeDataEnergy(const Cercle_2 &n) const
 
 gray8_image_t img;
 
-void ImageExporter::InitExport() const
+void ImageExporter::InitExport(const char *filename) const
 {
-	img.recreate(700, 700);
-	fill_pixels(img._view, 0);
+	if (std::string(filename).empty())
+	{
+		img.recreate(700, 700);
+		fill_pixels(img._view, 0);
+	}
+	else
+		tiff_read_image(filename, img);
 }
 
 void ImageExporter::EndExport(const char *filename) const
@@ -297,3 +302,10 @@ void ImageExporter::ExportNode(const Rectangle_2 &n) const
 		ExportNode(Segment_2(n.point(i),n.point(i + 1)));
 	}
 }
+
+ImageExporter exporter;
+
+void ImageGradientEnergyPolicy::InitExport(const char *filename) const { exporter.InitExport(filename); }
+void ImageGradientEnergyPolicy::ExportNode(const Cercle_2 &c) const {exporter.ExportNode(c); }
+void ImageGradientEnergyPolicy::ExportNode(const Rectangle_2 &r) const {exporter.ExportNode(r); }
+void ImageGradientEnergyPolicy::EndExport(const char *filename) const {exporter.EndExport(filename);}

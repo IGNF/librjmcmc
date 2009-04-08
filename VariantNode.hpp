@@ -145,7 +145,7 @@ public :
 		return 	boost::apply_visitor(m_dataVisitor, n.Geometry());
     }
 
-	void InitExport() const { m_exporter.InitExport(); }
+	void InitExport(const char *filename) const { m_exporter.InitExport(filename); }
 
 	void ExportNode(const NodeGeometry &n) const
 	{

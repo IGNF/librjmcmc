@@ -56,7 +56,7 @@ int main (int argc, char **argv)
 			my_out_stream << "\t" << buildingsDetector.DataEnergy() + buildingsDetector.PriorEnergy() << std::endl;
 			std::cout << my_out_stream.str();
 			clock_local = clock();
-			buildingsDetector.InitExport();
+			buildingsDetector.InitExport("./data/ZTerrain_c3_8bits.tif");
 			BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
 			for (; it_v != fin_v; ++it_v)
 				buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());

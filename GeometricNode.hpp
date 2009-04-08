@@ -37,10 +37,6 @@ inline void RandomModify(const BBox &box, Rectangle_2 &r)
 		std::random_shuffle( pts.begin() , pts.end() );
 
 	r = Rectangle_2(pts[0], pts[1], pts[2]);
-
-	// On le met dans le "bon" sens ...
-	if ( r.orientation() == CGAL::CLOCKWISE )
-		r.reverse_orientation ();
 }
 
 inline void RandomInit(const BBox &box, Cercle_2 &c)
@@ -75,10 +71,6 @@ inline void RandomInit(const BBox &box, Rectangle_2 &rect)
 		q = Point_2(p.x() + dievec(), p.y() + dievec());
 
 	rect = Rectangle_2(p, q, r);
-
-	// On le met dans le "bon" sens ...
-	if ( rect.orientation() == CGAL::CLOCKWISE )
-		rect.reverse_orientation ();
 }
 
 inline bool IsValid(const BBox &box, const Rectangle_2 &r)
@@ -193,7 +185,7 @@ public :
 class ImageExporter
 {
 public :
-	void InitExport() const;
+	void InitExport(const char *filename) const;
 	void ExportNode(const Cercle_2 &n) const;
 	void ExportNode(const Rectangle_2 &n) const;
 	void ExportNode(const Segment_2 &n) const;

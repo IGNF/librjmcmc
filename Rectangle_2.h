@@ -143,10 +143,10 @@ template <class FT> inline FT triangle_area(FT n2, FT m2, FT tx, FT ty, FT rx, F
 	if(ry<-m2) { rx = rx+(ry+m2)*(rx-tx)/(ty-ry); ry=-m2; } // crop bottom
 	if(ty<ry) return 0;  // no intersection, underneath
 	if(ty<=m2) {
-		if(rx<=n2) return (ty-ry)*(rx-tx)/2; // all inside
-		return (1+(rx-n2)/(rx-tx))*(ty-ry)*(n2-tx)/2; // cut right
+		if(rx<=n2) return (ty-ry)*(rx-tx)*0.5; // all inside
+		return (1+(rx-n2)/(rx-tx))*(ty-ry)*(n2-tx)*0.5; // cut right
 	}
-	if(rx<=n2) return (1+(ty-m2)/(ty-ry))*(rx-tx)*(m2-ry)/2; // cut top
+	if(rx<=n2) return (1+(ty-m2)/(ty-ry))*(rx-tx)*(m2-ry)*0.5; // cut top
 	FT mx = tx+(m2-ty)*(rx-tx)/(ry-ty);
 	if(mx>=n2) return (n2-tx)*(m2-ry);  // rectangle
 	FT ny = ty+(tx-n2)*(ry-ty)/(tx-rx);
@@ -180,20 +180,25 @@ public:
   Rectangle_2() : c(0.,0.), n(0.,0.), r(0.) {}
 
   Rectangle_2(const Point_2 &p, const Vector_2 &v, const FT &f)
-    : c(p), n(v), r(f), n2(n*n), inv_n2(1./n2), rn2 (r*n2) {}
+    : c(p), n(v), r(abs(f)), n2(n*n), inv_n2(1./n2), rn2 (r*n2) {}
 
   Rectangle_2(const Point_2 &p0, const Point_2 &p1, const Point_2 &p2) : n(0.5*(p1-p0)) 
   {
-      FT n2 = n.squared_length();
-      if(is_zero(n2)) {  // degeneracy p0=p1
+      n2 = n.squared_length();
+      inv_n2 = 1/n2;
+      if(is_zero(n2)) 
+      {  // degeneracy p0=p1
         r = 0;
         c = midpoint(p0,p2);
         n = p2-c;
-      } else {  // non-degenerate edge [p0,p1]
+      } 
+      else 
+      {  // non-degenerate edge [p0,p1]
         Vector_2 m(-n.y(),n.x());
-	r = 0.5*((p2-p1)*m)/n2;
-	c = midpoint(p0,p1)+r*m;
+		r = abs(0.5*((p2-p1)*m)*inv_n2);
+		c = midpoint(p0,p1)+r*m;
       }
+      rn2 = r*n2;
     }
 
 /* Equality */
@@ -212,11 +217,8 @@ public:
 /* Modifiers */
   inline void center(const Point_2& p ) { c=p; }
   inline void normal(const Vector_2& v) { n=v; }
-  inline void ratio (FT f             ) { r=f; }
-
-  inline void reverse_orientation () { r = -r; }
-  inline Self opposite () { return Rectangle_2(c,n,-r); }
-
+  inline void ratio (FT f             ) { r=abs(f); }
+/*
   Rectangle_2 transform(const Aff_transformation_2 &t) const
   {
    // correct result for reflections, translations, rotations,
@@ -226,6 +228,7 @@ public:
    // but anisotropic scalings could be allowed if its eigen vectors
    // are aligned with the direction of the rectangle.
   }
+  */
 /* Convenience Modifiers */
   inline void translate(const Vector_2& v ) { c=c+v; }
   inline void rotate   (const Vector_2& v ) { n=Vector_2(v*n,v.x()*n.y()-v.y()*n.x()); }
@@ -282,9 +285,6 @@ public:
     return Rectangle_2(c+((f-ar)/2)*am,an,((f+ar)/2));
   }
 
-
-
-
 /* Predicates */
   inline bool is_simple() const { return true; }
   inline bool is_convex() const { return true; }
@@ -293,12 +293,15 @@ public:
 
   inline Oriented_side oriented_side(const Point_2& q) const { return Oriented_side(orientation()*bounded_side(q)); }
 
-  Bounded_side  bounded_side(const Point_2& q) const {
+  Bounded_side  bounded_side(const Point_2& q) const 
+  {
    Vector_2 v(q-c);
-   FT n2  = n.squared_length(); n2 *= n2;
+   FT n2  = n.squared_length(); 
+   n2 *= n2;
    FT dot = n*v;
    Sign s0 = sign(dot*dot-n2);
-   if(s0==POSITIVE) return ON_UNBOUNDED_SIDE; // outside slab line1-line3
+   if(s0==POSITIVE) 
+   	return ON_UNBOUNDED_SIDE; // outside slab line1-line3
    FT det = n.x()*v.y()-n.y()*v.x(); //=determinant(n,v);
    Sign s1 = sign(det*det-r*r*n2);
    if(s1==POSITIVE) return ON_UNBOUNDED_SIDE; // outside slab line0-line2
@@ -320,7 +323,7 @@ public:
 /* Rectangle predicates */
   inline bool is_iso_rectangle() const { return (CGAL_NTS is_zero(n.x()*n.y())); }
   inline bool is_square() const { return (r*r==RT(1)); }
-  inline bool is_degenerate() const { return CGAL_NTS is_zero(r*n.squared_length()); }
+  inline bool is_degenerate() const { return CGAL_NTS is_zero(r*n2); }
 
 /* Access methods */
   Bbox_2 bbox() const {
@@ -328,19 +331,22 @@ public:
     std::pair<double,double> cy = to_interval(c.y());
     double nx = to_interval(abs(n.x())).second;
     double ny = to_interval(abs(n.y())).second;
-    double rs = to_interval(abs(r)).second;
+    double rs = to_interval(r).second;
     double dx = nx+rs*ny;
     double dy = ny+rs*nx;
     return Bbox_2(cx.first-dx,cy.first-dy,cx.second+dx,cy.second+dy);
   }
 
-  inline FT area() const { return r*4*n.squared_length(); }
+  inline FT area() const { return 4*rn2; }
   // optimized version of edge(i).squared_length();
-  inline FT squared_length(int i) const { FT l2=4*n.squared_length(); return (i%2)?(r*r*l2):l2; }
+  inline FT squared_length(int i) const { FT l2=4*n2; return (i%2)?(r*r*l2):l2; }
 
   inline Point_2  center() const { return c; }
   inline Vector_2 normal() const { return n; }
   inline FT       ratio () const { return r; }
+  inline FT normal_squared_length() const { return n2; }
+  inline FT not_normal_squared_length() const { return rn2; }
+  inline FT inv_normal_squared_length() const { return inv_n2; }
 
   inline int left_vertex   () const { return (r*n.y()>0)?((n.x()>0)?3:2):((n.x()>0)?0:1); }
   inline int right_vertex  () const { return (r*n.y()>0)?((n.x()>0)?1:0):((n.x()>0)?2:3); }
@@ -351,7 +357,8 @@ public:
   Point_2 point(int i) const
   {
     Vector_2 m(-r*n.y(),r*n.x());
-    switch (i%4) {
+    switch (i%4) 
+    {
     case  0: return c-n-m;
     case  1: return c+n-m;
     case  2: return c+n+m;
@@ -402,7 +409,7 @@ public:
   {
   // optimization: line(i)==edge(i).supporting_line();
     Vector_2 rn(r*n);
-    FT dot(rn*n);
+    FT dot = rn2;
     switch (i%4) {
     case  0: return Line_2(- n.y(),  n.x(), c.x()* n.y()-c.y()* n.x()+dot);
     case  2: return Line_2(  n.y(),- n.x(),-c.x()* n.y()+c.y()* n.x()+dot);
@@ -440,41 +447,41 @@ public:
 
 /* Angle between 2 rectangle orientations */
 
-  FT squared_cos(const Rectangle_2 &b) const {
+  FT squared_cos(const Rectangle_2 &b) const 
+  {
     FT det = abs(n.x()*b.n.y()-n.y()*b.n.x());
     FT dot = abs(n*b.n);
     FT cos = max(det,dot);
-    return  cos*cos/(n.squared_length()*b.n.squared_length());
+    return  cos*cos*inv_normal_squared_length()*b.inv_normal_squared_length();
   }
 
 
 /* Intersection test */
 
-  bool do_intersect(const Rectangle_2 &b) const {
+  bool do_intersect(const Rectangle_2 &b) const 
+  {
     // optimized version of :
     // return intersection_area(b)>0;
     FT det = abs(n.x()*b.n.y()-n.y()*b.n.x());
     FT dot = abs(n*b.n);
     Vector_2 v(c,b.c);
 
-    FT n2  = n.squared_length();
-    FT br(abs(b.r));
+    FT br = b.r;
     FT ax0 = n*v;
     FT dax = dot+br*det+n2;
     if(ax0*ax0>=dax*dax) return false;
 
-    FT ar(abs(r));
     FT ay0 = n.x()*v.y()-n.y()*v.x();
-    FT day = det+br*dot+ar*n2;
+    FT day = det+br*dot+r*n2;
     if(ay0*ay0>=day*day) return false;
 
     FT bn2 = b.n.squared_length();
     FT bx0 = b.n*v;
-    FT dbx = dot+ar*det+bn2;
+    FT dbx = dot+r*det+bn2;
     if(bx0*bx0>=dbx*dbx) return false;
 
     FT by0 = v.x()*b.n.y()-v.y()*b.n.x();
-    FT dby = det+ar*dot+br*bn2;
+    FT dby = det+r*dot+br*bn2;
     if(by0*by0>=dby*dby) return false;
 
     return true;
@@ -502,8 +509,6 @@ public:
 	std::vector<Vector_2> v;
 	std::vector<Line_2> l;
 	for(unsigned int i=0; i<4; ++i)	{ v.push_back(b[i]-ORIGIN); l.push_back(b.line(i)); }
-	FT n2 = n.squared_length();
-	FT rn2 = r*r*n2;
 	Vector_2 vc(c-ORIGIN);
 	Vector_2 trn(-r*n.y(),r*n.x());
 	FT ctrn = vc*trn;
@@ -676,18 +681,20 @@ public:
   }
 
 
-  FT intersection_area_four_triangles_and_an_isorectangle(const Rectangle_2 &b) const {
+  FT intersection_area_four_triangles_and_an_isorectangle(const Rectangle_2 &b) const 
+  {
     if(is_degenerate() || b.is_degenerate()) return 0;
-    	Vector_2 v(c,b.c);
-    	Vector_2 m(-n.y(),n.x());
-    	FT n2  = n.squared_length();
-    	FT m2  = abs(r)*n2;
-	FT br(abs(b.r));
-    	FT cx = n*v;
-    	FT cy = m*v;
-    	FT nx = n*b.n;
-    	FT ny = m*b.n;
-	switch(sign(nx)) {
+   	Vector_2 v(c,b.c);
+   	Vector_2 m(-n.y(),n.x());
+  
+   	FT m2 = rn2;
+	FT br = b.r;
+    FT cx = n*v;
+    FT cy = m*v;
+    FT nx = n*b.n;
+    FT ny = m*b.n;
+	switch(sign(nx)) 
+	{
 	case ZERO : { // m and b.n are collinear
 		ny = abs(ny);
 		FT mx = br*ny;
@@ -696,7 +703,7 @@ public:
 		FT by = cy-ny;
 		FT ty = cy+ny;
         	if(rx<=-n2 || n2<=lx || ty<=-m2 || m2<=by) return 0;
-		return (min(n2,rx)-max(-n2,lx))*(min(m2,ty)-max(-m2,by))/n2;
+		return (min(n2,rx)-max(-n2,lx))*(min(m2,ty)-max(-m2,by))*inv_n2;
 		}
 	case NEGATIVE : // b.n =rotate180(b.n)
 		{ nx = -nx; ny = -ny; }
@@ -711,7 +718,7 @@ public:
 		FT by = cy-my;
 		FT ty = cy+my;
         	if(rx<=-n2 || n2<=lx || ty<=-m2 || m2<=by) return 0;
-		return (min(n2,rx)-max(-n2,lx))*(min(m2,ty)-max(-m2,by))/n2;
+		return (min(n2,rx)-max(-n2,lx))*(min(m2,ty)-max(-m2,by))*inv_n2;
 		}
 	case NEGATIVE : // b.n =rotate90(b.n)
 		nx = -nx; std::swap(nx,mx);
@@ -732,139 +739,14 @@ public:
 		FT s  = 1;
 		if(lx>rx) { std::swap(lx,rx); s=-s; }
 		if(by>ty) { std::swap(by,ty); s=-s; }
-		if(by>=m2 || ty<=-m2 || lx>=n2 || rx<=-n2) return area/n2;
-		return (area + s*(min(n2,rx)-max(-n2,lx))*(min(m2,ty)-max(-m2,by)))/n2;
+		if(by>=m2 || ty<=-m2 || lx>=n2 || rx<=-n2) return area*inv_n2;
+		return (area + s*(min(n2,rx)-max(-n2,lx))*(min(m2,ty)-max(-m2,by)))*inv_n2;
 	}
 	}
 
 }
 
-/* IGN/Matis specific */
-  std::vector<Point_2> combination(const Rectangle_2 &b) const {
-    if(  is_degenerate()) return b.container();
-    if(b.is_degenerate()) return   container();
 
-    // TODO : optimize
-    Line_2 l0[] = {  line(0),  line(1),  line(2),  line(3)};
-    Line_2 l1[] = {b.line(0),b.line(1),b.line(2),b.line(3)};
-    Point_2 p[12];
-    std::vector<Point_2> res;
-    RT invalid_area2(-1.);
-    FT area2(invalid_area2);
-
-    for(int i=0; i<2; ++i) {
-      for(int j=0; j<2; ++j) {
-        if(!CGAL::intersection(l0[i  ],l1[j  ]).assign(p[0]) ||
-           !CGAL::intersection(l0[i+2],l1[j  ]).assign(p[3]) ||
-           !CGAL::intersection(l0[i+2],l1[j+2]).assign(p[6]) ||
-           !CGAL::intersection(l0[i  ],l1[j+2]).assign(p[9]) ) continue;
-
-        collinear_orient(p[9],p[0],  point(i  ),  point(i+1), p[ 8], p[ 1]);
-        collinear_orient(p[3],p[6],  point(i+2),  point(i+3), p[ 2], p[ 7]);
-        collinear_orient(p[0],p[3],b.point(j  ),b.point(j+1), p[11], p[ 4]);
-        collinear_orient(p[6],p[9],b.point(j+2),b.point(j+3), p[ 5], p[10]);
-
-        branch(p[9],p[0],p[ 1],p[ 2],p[3],p[6]);
-        branch(p[0],p[3],p[ 4],p[ 5],p[6],p[9]);
-        branch(p[3],p[6],p[ 7],p[ 8],p[9],p[0]);
-        branch(p[6],p[9],p[10],p[11],p[0],p[3]);
-
-        FT area_tmp;
-        area_2(p,p+12,area_tmp);
-        FT area_tmp2 = area_tmp*area_tmp;
-        if(area2==invalid_area2 || area_tmp2 < area2) { area2 = area_tmp2; res = std::vector<Point_2>(p,p+12); }
-      }
-    }
-    return res;
-  }
-
-
-  FT combination_area(const Rectangle_2 &b) const {
-    if(  is_degenerate()) return abs(b.area());
-    if(b.is_degenerate()) return abs(  area());
-
-    FT det = n.x()*b.n.y()-n.y()*b.n.x();
-    FT dot = n*b.n;
-    FT ar(abs(r)), br(abs(b.r));
-    Vector_2 v(c,b.c);
-    if(is_zero(det)) {
-    	if(dot>0) return iso_combination_area_aux(v,dot,n,ar,b.n,br);
-	return iso_combination_area_aux(v,-dot,n,ar,-b.n,br);
-    }
-
-    if(is_zero(dot)) {
-	Vector_2 tn(-n.y(),n.x());
-    	if(det>0) return iso_combination_area_aux(v,det,tn,ar,b.n,br);
-	return iso_combination_area_aux(v,-det,-tn,ar,b.n,br);
-    }
-    return abs(CGAL::area(combination(b)));
-/*
-
-    RT invalid_area(-1.);
-    FT area_min(invalid_area);
-
-    Vector_2 an(  n);
-    Vector_2 bn(b.n);
-    if(dot<0) { dot=-dot; bn=-b.n; }
-    if(det<0) { det=-det; std::swap(an,bn); std::swap(ar,br); v=-v; }
-
-    FT an2 = an*an;
-    FT bn2 = bn*bn;
-    FT den = 4*an2*bn2;
-    FT den_det = den/det;
-    FT den_dot = den/dot;
-// tarn,tbrn; -tbrn,an; bn,tarn; an,bn;
-    FT parallelogram_area[] = {ar*br*den_det, br*den_dot, ar*den_dot, den_det };
-
-
-
-    for(int i=0; i<1; ++i) {
-      for(int j=0; j<1; ++j) {
-        if(!CGAL::intersection(l0[i  ],l1[j  ]).assign(p[0]) ||
-           !CGAL::intersection(l0[i+2],l1[j  ]).assign(p[3]) ||
-           !CGAL::intersection(l0[i+2],l1[j+2]).assign(p[6]) ||
-           !CGAL::intersection(l0[i  ],l1[j+2]).assign(p[9]) ) continue;
-
-        FT area = parallelogram_area[i+2*j];
-
-        collinear_orient(p[9],p[0],  point(i  ),  point(i+1), p[ 8], p[ 1]);
-        collinear_orient(p[3],p[6],  point(i+2),  point(i+3), p[ 2], p[ 7]);
-        collinear_orient(p[0],p[3],b.point(j  ),b.point(j+1), p[11], p[ 4]);
-        collinear_orient(p[6],p[9],b.point(j+2),b.point(j+3), p[ 5], p[10]);
-
-//        branch_area(l1[j  ],l1[ j+1   ],l1[j+2],l0[i  ],area);
-        branch_area(l1[j  ],l1[ j+1   ],l1[j+2],l0[i+2],area);
-//        branch_area(l1[j+2],l1[(j+3)%4],l1[j  ],l0[i  ],area);
-        branch_area(l1[j+2],l1[(j+3)%4],l1[j  ],l0[i+2],area);
-
-        branch_area(l0[i  ],l0[ i+1   ],l0[i+2],l1[j  ],area);
-//        branch_area(l0[i  ],l0[ i+1   ],l0[i+2],l1[j+2],area);
-        branch_area(l0[i+2],l0[(i+3)%4],l0[i  ],l1[j  ],area);
-//        branch_area(l0[i+2],l0[(i+3)%4],l0[i  ],l1[j+2],area);
-
-        branch(p[9],p[0],p[ 1],p[ 2],p[3],p[6]);
-        branch(p[0],p[3],p[ 4],p[ 5],p[6],p[9]);
-        branch(p[3],p[6],p[ 7],p[ 8],p[9],p[0]);
-        branch(p[6],p[9],p[10],p[11],p[0],p[3]);
-
-        FT area_tmp;
-        area_2(p,p+12,area_tmp);
-        FT area_tmp = abs(area_tmp);
-        if(area_min==invalid_area2 || area_tmp < area_min) { area_min=area_tmp; }
-      }
-    }
-    return area_min;
-*/
-  }
-
-  FT energy(const Rectangle_2 &b, FT f=1, FT g=1) const {
-    if(f==0) return g*intersection_area(b);
-    FT comb  = combination_area (b);
-    FT inter = intersection_area(b);
-    FT a0    = abs(area());
-    FT a1    = abs(b.area());
-    return f*(comb-a0-a1+inter)+g*inter;
-  }
 };
 
 
@@ -1034,14 +916,15 @@ private :
   FT xl[2], xr[2], dxl[2], dxr[2];
 };
 
- template<class K> typename K::FT squared_distance(const Rectangle_2<K> &r, const typename K::Point_2& q) {
-    typedef typename K::Vector_2 Vector_2;
-    typedef typename K::FT FT;
-   Vector_2 v(q-r.center());
-   FT n2  = r.normal().squared_length();
-   FT x = max<FT>(0.,abs(r.normal()*v)-n2);
-   FT y = max<FT>(0.,abs((r.normal().x()*v.y()-r.normal().y()*v.x()))-abs(r.ratio())*n2);
-   return (x*x+y*y)/n2;
+ template<class K> typename K::FT squared_distance(const Rectangle_2<K> &r, const typename K::Point_2& q) 
+ {
+	typedef typename K::Vector_2 Vector_2;
+	typedef typename K::FT FT;
+	Vector_2 v(q-r.center());
+	FT n2  = r.normal_squared_length();
+	FT x = max<FT>(0.,abs(r.normal()*v)-n2);
+	FT y = max<FT>(0.,abs((r.normal().x()*v.y()-r.normal().y()*v.x()))-r.ratio()*n2);
+	return (x*x+y*y)*r.inv_normal_squared_length();
   }
 
   template<class K> inline typename K::FT squared_distance(const typename K::Point_2& q, const Rectangle_2<K> &r) {
