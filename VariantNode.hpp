@@ -175,19 +175,9 @@ public:
         return n1.do_intersect(n2); 
     }
 
-// TODO : Faire le calcul exact : metode B. Vallet
     bool operator()( const Cercle_2 &n1, const Rectangle_2 &n2 ) const
     {
-		Vector_2 CO = n2.center() - n1.center();
-		Vector_2 n = n2.normal();
-		double norm_n = ::sqrt(n.squared_length());
-		if (std::abs(CO*n) > norm_n * (norm_n + n1.radius()) )
-			return false;
-		Vector_2 orthog_n = n.perpendicular(CGAL::POSITIVE) * n2.ratio();
-		norm_n *= n2.ratio();
-		if ( std::abs(CO*orthog_n) > norm_n * (norm_n + n1.radius()) )
-			return false;
-		return true;
+		return (squared_distance(n2, n1.center()) < n1.squared_radius());
     }
 };
 

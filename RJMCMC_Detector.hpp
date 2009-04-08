@@ -182,10 +182,7 @@ public:
 		vertex_iterator it_v = vertices(m_graph).first, fin_v = vertices(m_graph).second;
 		for (; it_v != fin_v; ++it_v)
 		{
-			/// VARIANT
 			computedEnergy += ComputeDataEnergy( m_graph[*it_v] );
-//			ComputeDataEnergyVisitor v(*this);
-//			computedEnergy += boost::apply_visitor( v,  m_graph[*it_v]); 
 		}
 		return computedEnergy-m_dataEnergy;
 	}
@@ -195,12 +192,8 @@ public:
 		// On parcourt toutes les aretes et on verifie que la somme des energies vaut l'energie courante
 		double computedEnergy = 0.;
 		std::pair< edge_iterator, edge_iterator > it_edges = edges(m_graph);
-		//VARIANT
 		for(edge_iterator it = it_edges.first; it != it_edges.second;++it)
 			computedEnergy += ComputePriorEnergy( m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)] );
-//		ComputePriorEnergyVisitor v(10.);
-//		for(edge_iterator it = it_edges.first; it != it_edges.second;++it)
-//			computedEnergy += boost::apply_visitor( v,  m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)] );
 		return computedEnergy-m_priorEnergy;
 	}
 
@@ -215,9 +208,7 @@ public:
 			vertex_iterator it_2 = it_1; ++it_2;
 			for (; it_2 != fin; ++it_2)
 			{
-				// VARIANT
 				bool computed = AreNeighbor(m_graph[*it_1], m_graph[*it_2]);
-//				bool computed = boost::apply_visitor( NeighboorVisitor() , m_graph[*it_1], m_graph[*it_2]);
 				bool stored = edge(*it_1, *it_2, m_graph).second;
 				if (computed != stored)
 					nb_err++;

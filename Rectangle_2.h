@@ -172,14 +172,18 @@ public:
   Point_2 c;
   Vector_2 n;
   FT r;
+  FT n2;
+  FT inv_n2;
+  FT rn2;
 
 /* Constructors */
   Rectangle_2() : c(0.,0.), n(0.,0.), r(0.) {}
 
   Rectangle_2(const Point_2 &p, const Vector_2 &v, const FT &f)
-    : c(p), n(v), r(f) {}
+    : c(p), n(v), r(f), n2(n*n), inv_n2(1./n2), rn2 (r*n2) {}
 
-  Rectangle_2(const Point_2 &p0, const Point_2 &p1, const Point_2 &p2) : n(0.5*(p1-p0)) {
+  Rectangle_2(const Point_2 &p0, const Point_2 &p1, const Point_2 &p2) : n(0.5*(p1-p0)) 
+  {
       FT n2 = n.squared_length();
       if(is_zero(n2)) {  // degeneracy p0=p1
         r = 0;
@@ -189,22 +193,6 @@ public:
         Vector_2 m(-n.y(),n.x());
 	r = 0.5*((p2-p1)*m)/n2;
 	c = midpoint(p0,p1)+r*m;
-      }
-    }
-
-  Rectangle_2(const Iso_rectangle_2 &i)
-    : c(midpoint(i.min(),i.max())), n(0.,0.), r(0.) {
-      Vector_2 v(i.max()-i.min());
-      if       (!(CGAL_NTS is_zero(v.x()))) { n=Vector_2(0.5*v.x(),0.); r=v.y()/v.x();
-      } else if(!(CGAL_NTS is_zero(v.y()))) { n=Vector_2(0.,0.5*v.y()); r=v.x()/v.y();
-      }
-    }
-
-  Rectangle_2(const Point_2 &pmin, const Point_2 &pmax)
-    : c(midpoint(pmin,pmax)), n(0.,0.), r(0.) {
-      Vector_2 v(pmax-pmin);
-      if       (!(CGAL_NTS is_zero(v.x()))) { n=Vector_2(0.5*v.x(),0.); r=v.y()/v.x();
-      } else if(!(CGAL_NTS is_zero(v.y()))) { n=Vector_2(0.,0.5*v.y()); r=v.x()/v.y();
       }
     }
 
@@ -1045,6 +1033,66 @@ private :
   int x_, y_, rx, ly, ry, ty;
   FT xl[2], xr[2], dxl[2], dxr[2];
 };
+
+ template<class K> typename K::FT squared_distance(const Rectangle_2<K> &r, const typename K::Point_2& q) {
+    typedef typename K::Vector_2 Vector_2;
+    typedef typename K::FT FT;
+   Vector_2 v(q-r.center());
+   FT n2  = r.normal().squared_length();
+   FT x = max<FT>(0.,abs(r.normal()*v)-n2);
+   FT y = max<FT>(0.,abs((r.normal().x()*v.y()-r.normal().y()*v.x()))-abs(r.ratio())*n2);
+   return (x*x+y*y)/n2;
+  }
+
+  template<class K> inline typename K::FT squared_distance(const typename K::Point_2& q, const Rectangle_2<K> &r) {
+   return squared_distance(r,q);
+  }
+
+
+   /* equivalent, but at least twice as fast as
+   return
+        min(min(
+                min(squared_distance(b.point(0)),squared_distance(b.point(1))),
+                min(squared_distance(b.point(2)),squared_distance(b.point(3)))
+        ),min(
+                min(b.squared_distance(point(0)),b.squared_distance(point(1))),
+                min(b.squared_distance(point(2)),b.squared_distance(point(3)))
+        ));
+   */
+  template<class K> typename K::FT squared_distance(const Rectangle_2<K> &a, const Rectangle_2<K>& b) {
+    typedef typename K::Vector_2 Vector_2;
+    typedef typename K::FT FT;
+   Vector_2 v(a.center(),b.center());
+   const Vector_2& an(a.normal());
+   const Vector_2& bn(b.normal());
+   FT dot = an*bn;
+   FT det = bn.x()*an.y()-bn.y()*an.x();
+   FT an2 = an.squared_length();
+   FT bn2 = bn.squared_length();
+   FT ar(abs(a.ratio())), arn2(ar*an2), ax(an*v), ay(an.x()*v.y()-an.y()*v.x());
+   FT br(abs(b.ratio())), brn2(br*bn2), bx(bn*v), by(bn.x()*v.y()-bn.y()*v.x());
+   FT ardot (ar*dot), ardet (ar*det), brdot (br*dot), brdet (br*det);
+   FT ax0(dot+brdet), ax1(dot-brdet), bx0(dot-ardet), bx1(dot+ardet);
+   FT ay0(det-brdot), ay1(det+brdot), by0(det+ardot), by1(det-ardot);
+
+   FT x[] = {
+        max(0.,abs(ax-ax0)-an2), max(0.,abs(ax+ax0)-an2),
+        max(0.,abs(ax-ax1)-an2), max(0.,abs(ax+ax1)-an2),
+        max(0.,abs(bx-bx0)-bn2), max(0.,abs(bx+bx0)-bn2),
+        max(0.,abs(bx-bx1)-bn2), max(0.,abs(bx+bx1)-bn2)
+   };
+   FT y[] = {
+        max(0.,abs(ay+ay0)-arn2), max(0.,abs(ay-ay0)-arn2),
+        max(0.,abs(ay+ay1)-arn2), max(0.,abs(ay-ay1)-arn2),
+        max(0.,abs(by-by0)-brn2), max(0.,abs(by+by0)-brn2),
+        max(0.,abs(by-by1)-brn2), max(0.,abs(by+by1)-brn2)
+   };
+   FT d2[8];
+   for (int i=0;i<8;++i) d2[i]=x[i]*x[i]+y[i]*y[i];
+   return
+        min(    min(min(d2[0],d2[1]),min(d2[2],d2[3]))/an2,
+                min(min(d2[4],d2[5]),min(d2[6],d2[7]))/bn2);
+ }
 
 /*
 template<class Rect2> class Rectangle_2_square_iterator {

@@ -8,13 +8,13 @@
 #include "RJMCMC_Detector.hpp"
 #include "RJMCMC_Sampler.hpp"
 
-//#include "VariantNode.hpp"
-//typedef boost::variant<Rectangle_2, Cercle_2> VariantType;
-//typedef RJMCMC_Detector<VariantNode< VariantType >, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
+#include "VariantNode.hpp"
+typedef boost::variant<Rectangle_2, Cercle_2> VariantType;
+typedef RJMCMC_Detector<VariantNode< VariantType >, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
 
-typedef GeometricNode<Rectangle_2> MyNode;
+//typedef GeometricNode<Rectangle_2> MyNode;
 //typedef GeometricNode<Cercle_2> MyNode;
-typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
+//typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 
 int main (int argc, char **argv)
 {	
@@ -56,13 +56,13 @@ int main (int argc, char **argv)
 			my_out_stream << "\t" << buildingsDetector.DataEnergy() + buildingsDetector.PriorEnergy() << std::endl;
 			std::cout << my_out_stream.str();
 			clock_local = clock();
-			//buildingsDetector.InitExport();
-			//BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
-			//for (; it_v != fin_v; ++it_v)
-			//	buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());
-			//std::ostringstream oss;
-			//oss << "out_" << current_iter << ".tif";
-			//buildingsDetector.EndExport(oss.str().c_str());
+			buildingsDetector.InitExport();
+			BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
+			for (; it_v != fin_v; ++it_v)
+				buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());
+			std::ostringstream oss;
+			oss << "out_" << current_iter << ".tif";
+			buildingsDetector.EndExport(oss.str().c_str());
 		}
 		sampler.Itere(buildingsDetector);
 	}
