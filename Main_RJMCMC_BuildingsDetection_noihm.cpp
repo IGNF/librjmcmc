@@ -8,13 +8,13 @@
 #include "RJMCMC_Detector.hpp"
 #include "RJMCMC_Sampler.hpp"
 
-#include "VariantNode.hpp"
-typedef boost::variant<Rectangle_2, Cercle_2> VariantType;
-typedef RJMCMC_Detector<VariantNode< VariantType >, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
+//#include "VariantNode.hpp"
+//typedef boost::variant<Rectangle_2, Cercle_2> VariantType;
+//typedef RJMCMC_Detector<VariantNode< VariantType >, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
 
 //typedef GeometricNode<Rectangle_2> MyNode;
-//typedef GeometricNode<Cercle_2> MyNode;
-//typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
+typedef GeometricNode<Cercle_2> MyNode;
+typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
 
 int main (int argc, char **argv)
 {	

@@ -19,7 +19,7 @@ public:
 	double ComputeSegmentDataEnergy(const Point_2 &gridIn,const Point_2 &gridOut) const;
 
 	double ComputeDataEnergy(const Cercle_2 &n) const;
-	void Add8CirclePoints(int xCenter, int yCenter, int dx, int dy, double & res) const;
+	void Add8CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const;
 
 	dev2n32F_image_t m_gradients;
 	unsigned int m_imageWidth;

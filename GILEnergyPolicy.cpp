@@ -159,7 +159,7 @@ double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Poi
 	return CGAL::to_double(normale * sum);
 }
 
-void GILPolicyImage::Add8CirclePoints(int xCenter, int yCenter, int dx, int dy, double & res) const
+void GILPolicyImage::Add8CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const
 {
 	Vector_2 vgrad, vnorm;
 	dev2n32F_pixel_t grad;
@@ -211,10 +211,10 @@ void GILPolicyImage::Add8CirclePoints(int xCenter, int yCenter, int dx, int dy, 
 double GILPolicyImage::ComputeDataEnergy(const Cercle_2 &n) const
 {
 	double res = m_defaultEnergy;
-	int x = 0;
-	int y = n.radius();
-	int p = 3 - 2*n.radius();
-	int xCenter = n.center().x(), yCenter = n.center().y();
+	float x = 0;
+	float y = n.radius();
+	float p = 3 - 2*n.radius();
+	float xCenter = n.center().x(), yCenter = n.center().y();
     Add8CirclePoints(xCenter, yCenter, x, y, res);
     while (x < y) 
 	{
