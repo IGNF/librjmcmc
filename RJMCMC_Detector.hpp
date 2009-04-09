@@ -1,54 +1,29 @@
 #ifndef RJMCMC_BUILDINGS_DETECTOR_HPP
 #define RJMCMC_BUILDINGS_DETECTOR_HPP
 
+#include <cassert>
 #include <cmath>
 #include <boost/graph/adjacency_list.hpp>
 
 #include "BBox.hpp"
 
-template <class NodeType>
-class DefaultPriorEnergyPolicy
+/** Concepts a verifier
+class PriorEnergyPolicy
 {
 public :
-	inline DefaultPriorEnergyPolicy(double sigma = 10.) : m_sigma(sigma)
-	{
-		m_double_sigma_square = 2. * sigma * sigma;
-		m_seuil_distance2 = 3. * m_sigma * m_sigma;
-	}
-
-	inline bool AreNeighbor(const NodeType &n1, const NodeType &n2)
-	{
-		double dx = n1.x() - n2.x();
-		double dy = n1.y() - n2.y();
-		return (dx * dx + dy * dy < m_seuil_distance2);
-	}
-
-	inline double ComputePriorEnergy(const NodeType &n1, const NodeType &n2)
-	{
-		double dx = n1.X() - n2.X();
-		double dy = n1.Y() - n2.Y();
-		double d2 = dx * dx + dy * dy ;
-
-		return exp(-d2 / m_double_sigma_square );
-	}
-
-private :
-	double m_sigma;
-	double m_double_sigma_square;
-	double m_seuil_distance2;
+* valeur de retour : enregie d'interaction entre les deux noeuds
+	inline double ComputePriorEnergy(const NodeType &n1, const NodeType &n2);
 };
 
-template <class NodeType>
-class DefaultDataEnergyPolicy
+class DataEnergyPolicy
 {
 public :
-	inline DefaultDataEnergyPolicy(double val = -10.):m_val(val) {}
-	inline double ComputeDataEnergy(const NodeType &n) { return m_val;}
-private :
-	double m_val;
+* valeur de retour : attache aux donnees du noeud
+	inline double ComputeDataEnergy(const NodeType &n);
 };
+*/
 
-template <class NodeType, class PriorEnergyPolicy = DefaultPriorEnergyPolicy<NodeType>, class DataEnergyPolicy = DefaultDataEnergyPolicy<NodeType>, unsigned int DIMENSION = 2 >
+template <class NodeType, class PriorEnergyPolicy, class DataEnergyPolicy, unsigned int DIMENSION = 2 >
 class RJMCMC_Detector : public PriorEnergyPolicy, public DataEnergyPolicy
 {
 	class RJMCMC_DetectorEdge
@@ -71,11 +46,7 @@ public :
 	typedef typename GraphType::edge_iterator edge_iterator;
 	typedef typename GraphType::out_edge_iterator out_edge_iterator;
 
-	struct neighboor_and_weight
-	{
-		typename GraphType::vertex_iterator m_neighboor;
-		double m_weight;
-	};
+	typedef std::pair<typename GraphType::vertex_iterator, double> neighboor_and_weight;
 
 private :
 	typedef std::pair< typename GraphType::edge_descriptor , bool > edge_descriptor_bool;
@@ -93,19 +64,16 @@ public:
 		vertex_iterator it = vertices(m_graph).first, fin = vertices(m_graph).second;
 		for (; it != fin; ++it)
 			if (*it != n)
-				if ( AreNeighbor(node, m_graph[*it]) )
+			{
+				double prior = ComputePriorEnergy( node , m_graph[*it]);
+				if ( prior != 0 )
 				{
 					edge_descriptor_bool new_edge = add_edge(n, *it ,m_graph);
-					// On calcule l'énergie d'intercation et on l'affecte a la nouvelle arete
-					if ( new_edge.second )
-					{
-						double prior = ComputePriorEnergy( node , m_graph[*it] );
-						m_graph[ new_edge.first ].Weight( prior );
-						m_priorEnergy += prior;
-					}
-					else
-						std::cerr << "AddNode : impossible de creer une edge !!!" << std::endl;
+					assert(new_edge.second && "AddNode : impossible de creer une edge !!!");
+					m_graph[ new_edge.first ].Weight( prior );
+					m_priorEnergy += prior;
 				}
+			}
 		return n;
 	}
 
@@ -128,15 +96,11 @@ public:
 		typename std::vector<neighboor_and_weight>::const_iterator it = newNeighboors.begin(), fin = newNeighboors.end();
 		for (; it != fin; ++it)
 		{
-			edge_descriptor_bool new_edge = add_edge(*vi, *(it->m_neighboor) ,m_graph);
+			edge_descriptor_bool new_edge = add_edge(*vi, *(it->first) ,m_graph);
 			// On affecte l'énergie d'attache aux donnees a la nouvelle arete
-			if ( new_edge.second )
-			{
-				m_graph[ new_edge.first ].Weight( it->m_weight);
-				m_priorEnergy += it->m_weight;
-			}
-			else
-				std::cerr << "AddNode(,) : impossible de creer une edge !!!" << std::endl;
+			assert(new_edge.second && "AddNode : impossible de creer une edge !!!");
+			m_graph[ new_edge.first ].Weight( it->second);
+			m_priorEnergy += it->second;
 		}
 	}
 
@@ -193,7 +157,7 @@ public:
 		double computedEnergy = 0.;
 		std::pair< edge_iterator, edge_iterator > it_edges = edges(m_graph);
 		for(edge_iterator it = it_edges.first; it != it_edges.second;++it)
-			computedEnergy += ComputePriorEnergy( m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)] );
+			computedEnergy += ComputePriorEnergy( m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)]);
 		return computedEnergy-m_priorEnergy;
 	}
 
@@ -208,7 +172,7 @@ public:
 			vertex_iterator it_2 = it_1; ++it_2;
 			for (; it_2 != fin; ++it_2)
 			{
-				bool computed = AreNeighbor(m_graph[*it_1], m_graph[*it_2]);
+				bool computed = (ComputePriorEnergy(m_graph[*it_1], m_graph[*it_2]) != 0);
 				bool stored = edge(*it_1, *it_2, m_graph).second;
 				if (computed != stored)
 					nb_err++;

@@ -65,10 +65,10 @@ public :
 		NodeGeometry old = m_geometry;
 		boost::apply_visitor(ModifyVisitor(box), m_geometry);
 
-		if (!IsValid(box))
+		while (!IsValid(box))
 		{
 			m_geometry = old;
-			RandomModify(box);
+			boost::apply_visitor(ModifyVisitor(box), m_geometry);
 		}
 	}
 
@@ -101,24 +101,6 @@ private :
 	double m_weight;
 };
 
-class ComputeDataEnergyVisitor : public boost::static_visitor<double>, public ImageGradientEnergyPolicy
-{
-public:
-	ComputeDataEnergyVisitor() {}
-
-	double operator()(const Rectangle_2 &r) const
-    {
-		return ImageGradientEnergyPolicy::ComputeDataEnergy(r);
-    }
-
-    double operator()(const Cercle_2 &c) const
-    {
-		return ImageGradientEnergyPolicy::ComputeDataEnergy(c);
-    }
-
-};
-
-
 class VariantImageExporter : public ImageExporter, public boost::static_visitor<>
 {
 public :
@@ -134,16 +116,26 @@ public :
 };
 
 template<class NodeGeometry>
-class VariantGradientDataEnergy
+class VariantGradientDataEnergy : public ImageGradientEnergyPolicy, public boost::static_visitor<double>
 {
-	ComputeDataEnergyVisitor m_dataVisitor;
 	VariantImageExporter m_exporter;
 
 public :
-	double ComputeDataEnergy(VariantNode<NodeGeometry> const  &n) const
+	inline double ComputeDataEnergy(VariantNode<NodeGeometry> const  &n) const
     {
-		return 	boost::apply_visitor(m_dataVisitor, n.Geometry());
+		return 	boost::apply_visitor(*this, n.Geometry());
     }
+
+	inline double operator()(const Rectangle_2 &r) const
+    {
+		return ImageGradientEnergyPolicy::ComputeDataEnergy(r);
+    }
+
+    inline double operator()(const Cercle_2 &c) const
+    {
+		return ImageGradientEnergyPolicy::ComputeDataEnergy(c);
+    }
+
 
 	void InitExport(const char *filename) const { m_exporter.InitExport(filename); }
 
@@ -158,68 +150,41 @@ public :
 	}
 };
 
-class NeighboorVisitor : public boost::static_visitor<bool>
+
+template<class VariantNodeGeometry>
+class VariantIntersectionPriorEnergy : public boost::static_visitor<double>
 {
-public:
-
-    bool operator()( const Rectangle_2 &n1, const Rectangle_2 &n2 ) const
-    {
-        return n1.do_intersect(n2); 
-    }
-    bool operator()( const Rectangle_2 &n1, const Cercle_2 &n2 ) const
-    {
-        return (*this)(n2, n1); 
-    }
-    bool operator()( const Cercle_2 &n1, const Cercle_2 &n2 ) const
-    {
-        return n1.do_intersect(n2); 
-    }
-
-    bool operator()( const Cercle_2 &n1, const Rectangle_2 &n2 ) const
-    {
-		return (squared_distance(n2, n1.center()) < n1.squared_radius());
-    }
-};
-
-class ComputePriorEnergyVisitor : public boost::static_visitor<double>
-{
-public:
-	ComputePriorEnergyVisitor() : m_coefSurface(BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()) {}
-
-    double operator()( const Rectangle_2 &n1, const Rectangle_2 &n2 ) const
-    {
-		return m_coefSurface * n1.intersection_area(n2);
-    }
-
-	double operator()( const Rectangle_2 &n1, const Cercle_2 &n2 ) const
-    {
-		return m_coefSurface * std::min(n1.area(), n2.area()); 
-    }
-
-	double operator()( const Cercle_2 &n1, const Cercle_2 &n2 ) const
-    {
-        return m_coefSurface * n1.intersection_area(n2);
-    }
-
-    double operator()( const Cercle_2 &n1, const Rectangle_2 &n2 ) const
-    {
-        return (*this)(n2, n1); 
-    }
-
 	double m_coefSurface;
-};
-
-template<class NodeGeometry>
-class VariantIntersectionPriorEnergy
-{
 public :
-	bool AreNeighbor(VariantNode<NodeGeometry> const  &n1, VariantNode<NodeGeometry> const  &n2) const
+	inline VariantIntersectionPriorEnergy() : m_coefSurface(BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()) {}
+
+	inline double ComputePriorEnergy(VariantNode<VariantNodeGeometry> const  &n1, VariantNode<VariantNodeGeometry> const  &n2) const
 	{
-		return 	boost::apply_visitor(NeighboorVisitor(), n1.Geometry(), n2.Geometry());
+		return 	boost::apply_visitor(*this, n1.Geometry(), n2.Geometry());
 	}
 
-	double ComputePriorEnergy(VariantNode<NodeGeometry> const  &n1, VariantNode<NodeGeometry> const  &n2) const
-	{
-		return 	boost::apply_visitor(ComputePriorEnergyVisitor(), n1.Geometry(), n2.Geometry());
-	}
+	template<class NodeGeometry>
+    inline double operator()( const NodeGeometry &n1, const NodeGeometry &n2 ) const
+    {
+        if (n1.do_intersect(n2))
+        { 
+			return m_coefSurface * n1.intersection_area(n2);
+		}
+		return 0.;
+    }
+
+	inline double operator()( const Cercle_2 &n1, const Rectangle_2 &n2  ) const
+    {
+		if (squared_distance(n2, n1.center()) < n1.squared_radius())
+		{
+			return m_coefSurface * std::min(n1.area(), n2.area()); 
+		}
+		return 0.;
+    }
+
+
+    inline double operator()(const Rectangle_2 &n1, const Cercle_2 &n2) const
+    {
+        return (*this)(n2, n1); 
+    }
 };

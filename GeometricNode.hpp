@@ -9,10 +9,7 @@
 inline void RandomModify(const BBox &box, Cercle_2 &c)
 {
 	boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > die(GetRandom(), boost::uniform_real<>(-10, 10));
-	Point_2 center = Point_2(c.center().x() + die(), c.center().y() + die());
-	double r = c.radius() + die();
-
-	c = Cercle_2(center, r);
+	c = Cercle_2(Point_2(c.center().x() + die(), c.center().y() + die()), c.radius() + die());
 }
 
 inline void RandomModify(const BBox &box, Rectangle_2 &r)
@@ -26,6 +23,7 @@ inline void RandomModify(const BBox &box, Rectangle_2 &r)
 	boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> >
 			diechoix(GetRandom(), boost::uniform_smallint<>(0, 2));
 	int choix = diechoix();
+
 	boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > die(GetRandom(), boost::uniform_real<>(-10, 10));
 	pts[choix] = Point_2(pts[choix].x() + die(), pts[choix].y() + die());
 
@@ -51,7 +49,7 @@ inline void RandomInit(const BBox &box, Cercle_2 &c)
 	boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > dieradius( GetRandom(), 
 			boost::uniform_real<>(BuildingsDetectorParametersSingleton::Instance()->MinimalSize(), BuildingsDetectorParametersSingleton::Instance()->MaximalSize()));
 
-	c = Cercle_2(p, dieradius());
+	c = Cercle_2(p, dieradius()*0.5);
 }
 
 inline void RandomInit(const BBox &box, Rectangle_2 &rect)
@@ -83,14 +81,22 @@ inline bool IsValid(const BBox &box, const Rectangle_2 &r)
 	Point_2 c = r.center();
 	if ((c.x()-dx < box.Min()[0]) || (c.y()-dy < box.Min()[1]) || (c.x()+dx > box.Max()[0]) || (c.y()+dy > box.Max()[1]))
 		return false;
+/*
+	float length0 = 4*r.normal_squared_length();
+	float length1 = r.ratio()*r.ratio()*length0;
+	if (length0 > length1)
+		std::swap(length0, length1);
 
 	float minSize = (float)BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
 	minSize *= minSize;
-	float length0 = 4*r.normal().squared_length();
-	float length1 = r.ratio()*r.ratio()*length0;
-	if ( length0 < minSize || length1 < minSize)
+	if ( length0 < minSize)
 		return false;
 
+	float maxSize = (float)BuildingsDetectorParametersSingleton::Instance()->MaximalSize();
+	maxSize *= maxSize;
+	if (length1 > maxSize)
+		return false;
+*/
 	if ((r.ratio() > BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalRatio()) ||
 		(1./r.ratio() > BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalRatio()))
 		return false;
@@ -104,7 +110,10 @@ inline bool IsValid(const BBox &box, const Cercle_2 &ce)
 	double r = ce.radius();
 
 	float minSize = (float)BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
-	if ( r < minSize)
+	if ( 2*r < minSize)
+		return false;
+	float maxSize = (float)BuildingsDetectorParametersSingleton::Instance()->MaximalSize();
+	if ( 2*r > maxSize)
 		return false;
 
 	if ((c.x()-r < box.Min()[0]) || (c.y()-r < box.Min()[1]) || (c.x()+r > box.Max()[0]) || (c.y()+r > box.Max()[1]))
@@ -153,23 +162,19 @@ private :
 
 class IntersectionPriorEnergyPolicy
 {
+	double m_coefSurface;
 public :
 	inline IntersectionPriorEnergyPolicy(): m_coefSurface(BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()) {;}
 
 	template<class NodeGeometry>
-	inline bool AreNeighbor(const GeometricNode<NodeGeometry> & n1, const GeometricNode<NodeGeometry> & n2) const
-	{
-		return n1.Geometry().do_intersect(n2.Geometry());
-	}
-
-	template<class NodeGeometry>
 	inline double ComputePriorEnergy(const GeometricNode<NodeGeometry> & n1, const GeometricNode<NodeGeometry> & n2) const
 	{
-		return m_coefSurface * n1.Geometry().intersection_area(n2.Geometry());
+		if (n1.Geometry().do_intersect(n2.Geometry()))
+		{
+			return m_coefSurface * n1.Geometry().intersection_area(n2.Geometry());
+		}
+		return 0.;
 	}
-
-private :
-	double m_coefSurface;
 };
 
 class SurfaceDataEnergyPolicy

@@ -223,13 +223,11 @@ private :
 			/// Si on est en modification, il ne faut pas prendre en compte l'interaction avec la version non modifee
 			if (it_v == modifiedVertex)
 				continue;
-			if ( detector.AreNeighbor(modif.Node(), detector.GetGraph()[*it_v]) )
+			double weight = detector.ComputePriorEnergy( detector.GetGraph()[ *it_v ], modifiedNode);
+			if ( weight != 0 )
 			{
-				typename DetectorType::neighboor_and_weight p;
-				p.m_neighboor = it_v;
-				p.m_weight = detector.ComputePriorEnergy( detector.GetGraph()[ *it_v ], modifiedNode );
-				delta += p.m_weight;
-				modif.m_newNeighboors.push_back(p);
+				modif.m_newNeighboors.push_back(typename DetectorType::neighboor_and_weight(it_v, weight));
+				delta += weight;
 			}
 		}
 		return delta;
