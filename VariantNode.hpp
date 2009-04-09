@@ -101,27 +101,38 @@ private :
 	double m_weight;
 };
 
+template<class VariantNodeGeometry>
 class VariantImageExporter : public ImageExporter, public boost::static_visitor<>
 {
 public :
+	void InitExport(const char *filename) const { ImageExporter::InitExport(filename); }
+
+	void ExportNode(const VariantNodeGeometry &n) const
+	{
+		boost::apply_visitor(*this, n);
+	}
+
+	void EndExport(const char *filename) const  
+	{
+		ImageExporter::EndExport(filename);
+	}
+	
 	void operator()(const Rectangle_2 &r) const
     {
-		ExportNode(r);
+		ImageExporter::ExportNode(r);
 	}
 
 	void operator()(const Cercle_2 &c) const
     {
-		ExportNode(c);
+		ImageExporter::ExportNode(c);
 	}
 };
 
-template<class NodeGeometry>
+template<class VariantNodeGeometry>
 class VariantGradientDataEnergy : public ImageGradientEnergyPolicy, public boost::static_visitor<double>
 {
-	VariantImageExporter m_exporter;
-
 public :
-	inline double ComputeDataEnergy(VariantNode<NodeGeometry> const  &n) const
+	inline double ComputeDataEnergy(VariantNode<VariantNodeGeometry> const  &n) const
     {
 		return 	boost::apply_visitor(*this, n.Geometry());
     }
@@ -135,19 +146,6 @@ public :
     {
 		return ImageGradientEnergyPolicy::ComputeDataEnergy(c);
     }
-
-
-	void InitExport(const char *filename) const { m_exporter.InitExport(filename); }
-
-	void ExportNode(const NodeGeometry &n) const
-	{
-		boost::apply_visitor(m_exporter, n);
-	}
-
-	void EndExport(const char *filename) const  
-	{
-		m_exporter.EndExport(filename);
-	}
 };
 
 

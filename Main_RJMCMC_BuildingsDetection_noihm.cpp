@@ -8,13 +8,15 @@
 #include "RJMCMC_Detector.hpp"
 #include "RJMCMC_Sampler.hpp"
 
-//#include "VariantNode.hpp"
-//typedef boost::variant<Rectangle_2, Cercle_2> VariantType;
-//typedef RJMCMC_Detector<VariantNode< VariantType >, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
+#include "VariantNode.hpp"
+typedef boost::variant<Rectangle_2, Cercle_2> VariantType;
+typedef RJMCMC_Detector<VariantNode< VariantType >, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
+typedef VariantImageExporter<VariantType> ImageExporterType;
 
 //typedef GeometricNode<Rectangle_2> MyNode;
-typedef GeometricNode<Cercle_2> MyNode;
-typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
+//typedef GeometricNode<Cercle_2> MyNode;
+//typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
+//typedef ImageExporter ImageExporterType;
 
 int main (int argc, char **argv)
 {	
@@ -33,11 +35,11 @@ int main (int argc, char **argv)
 	// Formattage du log sous forme de tableau, ca facilite la creation de graphiques ...
 	std::ostringstream my_out_stream;
 	my_out_stream << "\tIte\t";
-	my_out_stream << "NbObjects\t";
+	my_out_stream << "NbObj\t";
 	my_out_stream << "Time(s)\t";
 	my_out_stream << "Temp\t";
 	my_out_stream << "E_data\t";
-	my_out_stream << "E_priori\t";
+	my_out_stream << "E_prior\t";
 	my_out_stream << "E_total\t";
 	std::cout << my_out_stream.str() << std::endl;
 
@@ -56,13 +58,14 @@ int main (int argc, char **argv)
 			my_out_stream << "\t" << buildingsDetector.DataEnergy() + buildingsDetector.PriorEnergy() << std::endl;
 			std::cout << my_out_stream.str();
 			clock_local = clock();
-			buildingsDetector.InitExport("./data/ZTerrain_c3_8bits.tif");
+			ImageExporterType exporter;
+			exporter.InitExport("./data/ZTerrain_c3_8bits.tif");
 			BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
 			for (; it_v != fin_v; ++it_v)
-				buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());
+				exporter.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());
 			std::ostringstream oss;
 			oss << "out_" << current_iter << ".tif";
-			buildingsDetector.EndExport(oss.str().c_str());
+			exporter.EndExport(oss.str().c_str());
 		}
 		sampler.Itere(buildingsDetector);
 	}
