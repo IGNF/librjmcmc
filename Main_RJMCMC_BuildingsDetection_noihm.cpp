@@ -1,7 +1,7 @@
 #include <iostream>
 #include <strstream>
 
-#include "ImageGradientEnergyPolicy.hpp"
+#include "GILEnergyPolicy.hpp"
 
 #include "BuildingsDetectorParameters.hpp"
 #include "GeometricNode.hpp"
@@ -15,7 +15,7 @@ typedef VariantImageExporter<VariantType> ImageExporterType;
 
 //typedef GeometricNode<Rectangle_2> MyNode;
 //typedef GeometricNode<Cercle_2> MyNode;
-//typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
+//typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, GILEnergyPolicy >	BuildingsDetector;
 //typedef ImageExporter ImageExporterType;
 
 int main (int argc, char **argv)

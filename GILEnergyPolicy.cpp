@@ -5,34 +5,22 @@
 #include <boost/gil/extension/numeric/convolve.hpp>
 
 #include <boost/gil/extension/matis/deriche.hpp>
+#include <boost/gil/extension/matis/float_images.hpp>
+
+using namespace boost::gil;
+
+typedef pixel<float,devicen_layout_t<2> >		dev2n32F_pixel_t;
+typedef dev2n32F_pixel_t*						dev2n32F_pixel_ptr_t;
+typedef image_type<float,devicen_layout_t<2> >::type	dev2n32F_image_t;
+typedef dev2n32F_image_t::view_t				dev2n32F_view_t;
 
 #include "BuildingsDetectorParameters.hpp"
 
 #include "GILEnergyPolicy.hpp"
 
-#include "ImageGradientEnergyPolicy.hpp"
-
-
-ImageGradientEnergyPolicy::ImageGradientEnergyPolicy() :
-	m_policy( boost::shared_ptr<GILPolicyImage>(new GILPolicyImage) )
+struct GILEnergyPolicy::gradients_image_t: public dev2n32F_image_t
 {
-	m_policy->LoadFile(BuildingsDetectorParametersSingleton::Instance()-> InputDataFilePath());
-	m_policy->m_defaultEnergy = BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy();
-}
-
-ImageGradientEnergyPolicy::~ImageGradientEnergyPolicy()
-{
-}
-
-double ImageGradientEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
-{
-	return m_policy->ComputeDataEnergy(n);
-}
-
-double ImageGradientEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
-{
-	return m_policy->ComputeDataEnergy(n);
-}
+};
 
 template<typename Kernel1D>
 void initKernelGaussian1D(Kernel1D& kernel, double sigma)
@@ -71,7 +59,10 @@ void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 		*i /= sum;
 }
 
-void GILPolicyImage::LoadFile(const std::string &str)
+GILEnergyPolicy::GILEnergyPolicy() : m_gradients(new gradients_image_t)
+{}
+
+void GILEnergyPolicy::LoadFile(const std::string &str)
 {
 	double sigmaD = 1.;
 	unsigned int half_size = 3*sigmaD;
@@ -84,42 +75,40 @@ void GILPolicyImage::LoadFile(const std::string &str)
     gray16_image_t img;
     tiff_read_image(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath(),img);
 
-	m_gradients.recreate(img.dimensions());
-	m_imageWidth = img.dimensions().x;
-	m_imageHeight = img.dimensions().y;
+	m_gradients->recreate(img.dimensions());
 
 
-	convolve_cols<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<0>(m_gradients._view), convolve_option_extend_constant);
-	convolve_rows<gray32F_pixel_t>(kth_channel_view<0>(m_gradients._view),kderiv,kth_channel_view<0>(m_gradients._view), convolve_option_extend_constant);
+	convolve_cols<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<0>(m_gradients->_view), convolve_option_extend_constant);
+	convolve_rows<gray32F_pixel_t>(kth_channel_view<0>(m_gradients->_view),kderiv,kth_channel_view<0>(m_gradients->_view), convolve_option_extend_constant);
 
-	convolve_rows<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<1>(m_gradients._view), convolve_option_extend_constant);
-    convolve_cols<gray32F_pixel_t>(kth_channel_view<1>(m_gradients._view),kderiv,kth_channel_view<1>(m_gradients._view), convolve_option_extend_constant);
+	convolve_rows<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<1>(m_gradients->_view), convolve_option_extend_constant);
+    convolve_cols<gray32F_pixel_t>(kth_channel_view<1>(m_gradients->_view),kderiv,kth_channel_view<1>(m_gradients->_view), convolve_option_extend_constant);
 
     gray32F_image_t module(img.dimensions());
     gray8_image_t filtered_module(img.dimensions());
-    ModuleGradient( kth_channel_view<0>(m_gradients._view), kth_channel_view<1>(m_gradients._view), view(module));
+    ModuleGradient( kth_channel_view<0>(m_gradients->_view), kth_channel_view<1>(m_gradients->_view), view(module));
     NonMaximaLocauxGradient (
-							  kth_channel_view<0>(m_gradients._view) ,
-							  kth_channel_view<1>(m_gradients._view) ,
+							  kth_channel_view<0>(m_gradients->_view) ,
+							  kth_channel_view<1>(m_gradients->_view) ,
 							  view(module) ,
 							  view(filtered_module) ,
 							  5.);
 
 	gray8_view_t::iterator it_filtered = view(filtered_module).begin();
-	dev2n32F_view_t::iterator it_gradients = m_gradients._view.begin();
+	dev2n32F_view_t::iterator it_gradients = m_gradients->_view.begin();
 
 	for( ; it_filtered!=view(filtered_module).begin() ; ++it_filtered , ++it_gradients )
 	{
 		if ( *it_filtered==0 )
 		{
-			dev2n32F_pixel_t &grad = m_gradients._view(it_gradients.x_pos(), it_gradients.y_pos());
+			dev2n32F_pixel_t &grad = m_gradients->_view(it_gradients.x_pos(), it_gradients.y_pos());
 			at_c<0>(grad) = 0.;
 			at_c<1>(grad) = 0.;
 		}
 	}
 }
 
-double GILPolicyImage::ComputeDataEnergy(const Rectangle_2 &n) const
+double GILEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
 {
 	double res = m_defaultEnergy;
 	for (unsigned int i = 0; i < 4; ++i)
@@ -132,13 +121,13 @@ double GILPolicyImage::ComputeDataEnergy(const Rectangle_2 &n) const
 }
 
 //TODO: improve --> 40%
-double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Point_2 &gridOut) const
+double GILEnergyPolicy::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Point_2 &gridOut) const
 {
 	float gradient_sum[2] = {0.,0.};
 
 	Segment_2 s(gridIn, gridOut);
 	CGAL::Segment_2_iterator<Segment_2> it(s);
-	dev2n32F_view_t::xy_locator loc_grad = m_gradients._view.xy_at(gridIn.x(), gridIn.y());
+	dev2n32F_view_t::xy_locator loc_grad = m_gradients->_view.xy_at(gridIn.x(), gridIn.y());
 	point2<std::ptrdiff_t> movement[2] = { point2<std::ptrdiff_t>(it.Step(0),0), point2<std::ptrdiff_t>(0,it.Step(1)) };
 	for (; !it.end(); ++it)
 	{
@@ -148,7 +137,7 @@ double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Poi
 		gradient_sum[1] += length * at_c<1>(grad);
 		loc_grad += movement[it.axis()];
 //		std::cout << "new : " << at_c<0>(grad) << "\t" << at_c<1>(grad) << std::endl;
-//		const dev2n32F_pixel_t old_grad = m_gradients._view(it.x(), it.y());
+//		const dev2n32F_pixel_t old_grad = m_gradients->_view(it.x(), it.y());
 //		std::cout << "old : " << at_c<0>(old_grad) << "\t" << at_c<1>(old_grad) << std::endl;
 	}
 
@@ -159,46 +148,46 @@ double GILPolicyImage::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Poi
 	return CGAL::to_double(normale * sum);
 }
 
-void GILPolicyImage::Add8CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const
+void GILEnergyPolicy::Add8CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const
 {
 	Vector_2 vgrad, vnorm;
 	dev2n32F_pixel_t grad;
-	grad = m_gradients._view(xCenter + dx, yCenter + dy);
+	grad = m_gradients->_view(xCenter + dx, yCenter + dy);
 	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
 	vnorm = Vector_2( dx, dy);
 	res -= vgrad*vnorm;
 
-	grad = m_gradients._view(xCenter - dx, yCenter + dy);
+	grad = m_gradients->_view(xCenter - dx, yCenter + dy);
 	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
 	vnorm = Vector_2(-dx, dy);
 	res -= vgrad*vnorm;
 
-	grad = m_gradients._view(xCenter - dx, yCenter - dy);
+	grad = m_gradients->_view(xCenter - dx, yCenter - dy);
 	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
 	vnorm = Vector_2(-dx,-dy);
 	res -= vgrad*vnorm;
 
-	grad = m_gradients._view(xCenter + dx, yCenter - dy);
+	grad = m_gradients->_view(xCenter + dx, yCenter - dy);
 	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
 	vnorm = Vector_2( dx,-dy);
 	res -= vgrad*vnorm;
 
-	grad = m_gradients._view(xCenter + dy, yCenter + dx);
+	grad = m_gradients->_view(xCenter + dy, yCenter + dx);
 	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
 	vnorm = Vector_2( dy, dx);
 	res -= vgrad*vnorm;
 
-	grad = m_gradients._view(xCenter - dy, yCenter + dx);
+	grad = m_gradients->_view(xCenter - dy, yCenter + dx);
 	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
 	vnorm = Vector_2(-dy, dx);
 	res -= vgrad*vnorm;
 
-	grad = m_gradients._view(xCenter - dy, yCenter - dx);
+	grad = m_gradients->_view(xCenter - dy, yCenter - dx);
 	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
 	vnorm = Vector_2(-dy,-dx);
 	res -= vgrad*vnorm;
 
-	grad = m_gradients._view(xCenter + dy, yCenter - dx);
+	grad = m_gradients->_view(xCenter + dy, yCenter - dx);
 	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
 	vnorm = Vector_2( dy,-dx);
 	res -= vgrad*vnorm;
@@ -208,7 +197,7 @@ void GILPolicyImage::Add8CirclePoints(float xCenter, float yCenter, float dx, fl
 // http://escience.anu.edu.au/lecture/cg/Circle/
 // Corrige par :
 // http://www.cplusplus.happycodings.com/Computer_Graphics/code16.html
-double GILPolicyImage::ComputeDataEnergy(const Cercle_2 &n) const
+double GILEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
 {
 	double res = m_defaultEnergy;
 	float x = 0;
@@ -233,34 +222,39 @@ double GILPolicyImage::ComputeDataEnergy(const Cercle_2 &n) const
 	return res / n.radius();
 }
 
-gray8_image_t img;
+struct ImageExporter::export_image_t : public gray8_image_t
+{
+};
+
+ImageExporter::ImageExporter() : m_img(new export_image_t)
+{}
 
 void ImageExporter::InitExport(const char *filename) const
 {
 	if (std::string(filename).empty())
 	{
-		img.recreate(700, 700);
-		fill_pixels(img._view, 0);
+		m_img->recreate(700, 700);
+		fill_pixels(m_img->_view, 0);
 	}
 	else
-		tiff_read_image(filename, img);
+		tiff_read_image(filename, *m_img);
 }
 
 void ImageExporter::EndExport(const char *filename) const
 {
-	tiff_write_view(filename, img._view);
+	tiff_write_view(filename, m_img->_view);
 }
 
 void ImageExporter::Export8Points(int xCenter, int yCenter, int dx, int dy) const
 {
-	img._view(xCenter + dx, yCenter + dy) = 255;
-	img._view(xCenter - dx, yCenter + dy) = 255;
-	img._view(xCenter - dx, yCenter - dy) = 255;
-	img._view(xCenter + dx, yCenter - dy) = 255;
-	img._view(xCenter + dy, yCenter + dx) = 255;
-	img._view(xCenter - dy, yCenter + dx) = 255;
-	img._view(xCenter - dy, yCenter - dx) = 255;
-	img._view(xCenter + dy, yCenter - dx) = 255;
+	m_img->_view(xCenter + dx, yCenter + dy) = 255;
+	m_img->_view(xCenter - dx, yCenter + dy) = 255;
+	m_img->_view(xCenter - dx, yCenter - dy) = 255;
+	m_img->_view(xCenter + dx, yCenter - dy) = 255;
+	m_img->_view(xCenter + dy, yCenter + dx) = 255;
+	m_img->_view(xCenter - dy, yCenter + dx) = 255;
+	m_img->_view(xCenter - dy, yCenter - dx) = 255;
+	m_img->_view(xCenter + dy, yCenter - dx) = 255;
 }
 
 void ImageExporter::ExportNode(const Cercle_2 &n) const
@@ -291,7 +285,7 @@ void ImageExporter::ExportNode(const Segment_2 &s) const
 	CGAL::Segment_2_iterator<Segment_2> it(s);
 	for (; !it.end(); ++it)
 	{
-		img._view(it.x(), it.y()) = 255;
+		m_img->_view(it.x(), it.y()) = 255;
 	}
 }
 
@@ -304,8 +298,3 @@ void ImageExporter::ExportNode(const Rectangle_2 &n) const
 }
 
 ImageExporter exporter;
-
-void ImageGradientEnergyPolicy::InitExport(const char *filename) const { exporter.InitExport(filename); }
-void ImageGradientEnergyPolicy::ExportNode(const Cercle_2 &c) const {exporter.ExportNode(c); }
-void ImageGradientEnergyPolicy::ExportNode(const Rectangle_2 &r) const {exporter.ExportNode(r); }
-void ImageGradientEnergyPolicy::EndExport(const char *filename) const {exporter.EndExport(filename);}

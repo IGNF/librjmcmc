@@ -1,18 +1,16 @@
-#include <boost/gil/image.hpp>
-#include <boost/gil/extension/matis/float_images.hpp>
+#ifndef GILENERGYPOLICY_HPP
+#define GILENERGYPOLICY_HPP
 
-using namespace boost::gil;
-
-typedef pixel<float,devicen_layout_t<2> >		dev2n32F_pixel_t;
-typedef dev2n32F_pixel_t*						dev2n32F_pixel_ptr_t;
-typedef image_type<float,devicen_layout_t<2> >::type	dev2n32F_image_t;
-typedef dev2n32F_image_t::view_t				dev2n32F_view_t;
+#include <boost/shared_ptr.hpp>
 
 #include "cgal_types.h"
+#include "GeometricNode.hpp"
 
-class GILPolicyImage
+class GILEnergyPolicy
 {
 public:
+	GILEnergyPolicy();
+
 	void LoadFile(const std::string &str);
 
 	double ComputeDataEnergy(const Rectangle_2 &n) const;
@@ -21,9 +19,35 @@ public:
 	double ComputeDataEnergy(const Cercle_2 &n) const;
 	void Add8CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const;
 
-	dev2n32F_image_t m_gradients;
-	unsigned int m_imageWidth;
-	unsigned int m_imageHeight;
+	template<class NodeGeometry>
+	inline double ComputeDataEnergy(const GeometricNode<NodeGeometry> &n) const
+	{
+		return ComputeDataEnergy(n.Geometry());
+	}
 
+private :
 	double m_defaultEnergy;
+
+	struct gradients_image_t;
+	boost::shared_ptr<gradients_image_t> m_gradients;
 };
+
+
+class ImageExporter
+{
+public :
+	ImageExporter();
+
+	void InitExport(const char *filename) const;
+	void EndExport(const char *filename) const;
+	void Export8Points(int xCenter, int yCenter, int dx, int dy) const;
+	void ExportNode(const Cercle_2 &n) const;
+	void ExportNode(const Segment_2 &s) const;
+	void ExportNode(const Rectangle_2 &n) const;
+
+private :
+	struct export_image_t;
+	boost::shared_ptr<export_image_t> m_img;
+};
+
+#endif //#ifndef GILENERGYPOLICY_HPP

@@ -1,52 +1,58 @@
 #include "GeometricNode.hpp"
 #include <boost/variant.hpp>
 
-class InitVisitor : public boost::static_visitor<>
+class InitVisitor
 {
 	const BBox & m_bbox;
 public:
+	typedef void result_type;
+
 	InitVisitor(const BBox &bbox) : m_bbox(bbox){}
 
-	void operator()( Rectangle_2 & n) const
+	result_type operator()( Rectangle_2 & n) const
 	{
 		::RandomInit(m_bbox, n);
 	}
 
-    void operator()( Cercle_2 & n) const
+    result_type operator()( Cercle_2 & n) const
 	{
 		::RandomInit(m_bbox, n);
 	}
 };
 
-class ModifyVisitor : public boost::static_visitor<>
+class ModifyVisitor
 {
 	const BBox & m_bbox;
 public:
+	typedef void result_type;
+
 	ModifyVisitor(const BBox &bbox) : m_bbox(bbox){}
 
-	void operator()( Rectangle_2 & n) const
+	result_type operator()( Rectangle_2 & n) const
 	{
 		::RandomModify(m_bbox, n);
 	}
 
-    void operator()( Cercle_2 & n) const
+    result_type operator()( Cercle_2 & n) const
 	{
 		::RandomModify(m_bbox, n);
 	}
 };
 
-class IsValidVisitor : public boost::static_visitor<bool>
+class IsValidVisitor
 {
 	const BBox & m_bbox;
 public:
+	typedef bool result_type;
+
 	IsValidVisitor(const BBox &bbox) : m_bbox(bbox){}
 
-	bool operator()(const Rectangle_2 & n) const
+	result_type operator()(const Rectangle_2 & n) const
 	{
 		return ::IsValid(m_bbox, n);
 	}
 
-    bool operator()(const Cercle_2 & n) const
+    result_type operator()(const Cercle_2 & n) const
 	{
 		return ::IsValid(m_bbox, n);
 	}
@@ -102,67 +108,66 @@ private :
 };
 
 template<class VariantNodeGeometry>
-class VariantImageExporter : public ImageExporter, public boost::static_visitor<>
+class VariantImageExporter : public ImageExporter
 {
 public :
-	void InitExport(const char *filename) const { ImageExporter::InitExport(filename); }
+	typedef void result_type;
 
 	void ExportNode(const VariantNodeGeometry &n) const
 	{
 		boost::apply_visitor(*this, n);
 	}
-
-	void EndExport(const char *filename) const  
-	{
-		ImageExporter::EndExport(filename);
-	}
 	
-	void operator()(const Rectangle_2 &r) const
+	result_type operator()(const Rectangle_2 &r) const
     {
 		ImageExporter::ExportNode(r);
 	}
 
-	void operator()(const Cercle_2 &c) const
+	result_type operator()(const Cercle_2 &c) const
     {
 		ImageExporter::ExportNode(c);
 	}
 };
 
 template<class VariantNodeGeometry>
-class VariantGradientDataEnergy : public ImageGradientEnergyPolicy, public boost::static_visitor<double>
+class VariantGradientDataEnergy : public GILEnergyPolicy
 {
 public :
+	typedef double result_type;
+
 	inline double ComputeDataEnergy(VariantNode<VariantNodeGeometry> const  &n) const
     {
 		return 	boost::apply_visitor(*this, n.Geometry());
     }
 
-	inline double operator()(const Rectangle_2 &r) const
+	inline result_type operator()(const Rectangle_2 &r) const
     {
-		return ImageGradientEnergyPolicy::ComputeDataEnergy(r);
+		return GILEnergyPolicy::ComputeDataEnergy(r);
     }
 
-    inline double operator()(const Cercle_2 &c) const
+    inline result_type operator()(const Cercle_2 &c) const
     {
-		return ImageGradientEnergyPolicy::ComputeDataEnergy(c);
+		return GILEnergyPolicy::ComputeDataEnergy(c);
     }
 };
 
 
 template<class VariantNodeGeometry>
-class VariantIntersectionPriorEnergy : public boost::static_visitor<double>
+class VariantIntersectionPriorEnergy
 {
 	double m_coefSurface;
 public :
+	typedef double result_type;
+
 	inline VariantIntersectionPriorEnergy() : m_coefSurface(BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()) {}
 
-	inline double ComputePriorEnergy(VariantNode<VariantNodeGeometry> const  &n1, VariantNode<VariantNodeGeometry> const  &n2) const
+	inline result_type ComputePriorEnergy(VariantNode<VariantNodeGeometry> const  &n1, VariantNode<VariantNodeGeometry> const  &n2) const
 	{
 		return 	boost::apply_visitor(*this, n1.Geometry(), n2.Geometry());
 	}
 
 	template<class NodeGeometry>
-    inline double operator()( const NodeGeometry &n1, const NodeGeometry &n2 ) const
+    inline result_type operator()( const NodeGeometry &n1, const NodeGeometry &n2 ) const
     {
         if (n1.do_intersect(n2))
         { 
@@ -171,7 +176,7 @@ public :
 		return 0.;
     }
 
-	inline double operator()( const Cercle_2 &n1, const Rectangle_2 &n2  ) const
+	inline result_type operator()( const Cercle_2 &n1, const Rectangle_2 &n2  ) const
     {
 		if (squared_distance(n2, n1.center()) < n1.squared_radius())
 		{
@@ -181,7 +186,7 @@ public :
     }
 
 
-    inline double operator()(const Rectangle_2 &n1, const Cercle_2 &n2) const
+    inline result_type operator()(const Rectangle_2 &n1, const Cercle_2 &n2) const
     {
         return (*this)(n2, n1); 
     }
