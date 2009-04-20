@@ -17,7 +17,7 @@
 #include "RJMCMC_BuildingsDetectionFrame.hpp"
 #endif //#if USE_IHM
 
-#include "ImageGradientEnergyPolicy.hpp"
+#include "GILEnergyPolicy.hpp"
 
 #include "GeometricNode.hpp"
 
@@ -26,7 +26,7 @@
 
 typedef GeometricNode<Rectangle_2> MyNode;
 //typedef GeometricNode<Cercle_2> MyNode;
-typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, ImageGradientEnergyPolicy >	BuildingsDetector;
+typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, GILEnergyPolicy >	BuildingsDetector;
 
 void* RJMCMC_BuildingsDetectionThread::Entry()
 {
