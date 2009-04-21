@@ -106,17 +106,15 @@ inline bool IsValid(const BBox &box, const Rectangle_2 &r)
 
 inline bool IsValid(const BBox &box, const Cercle_2 &ce)
 {
-	Point_2 c = ce.center();
-	double r = ce.radius();
-
 	float minSize = (float)BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
-	if ( 2*r < minSize)
+	if ( 2*ce.radius() < minSize)
 		return false;
 	float maxSize = (float)BuildingsDetectorParametersSingleton::Instance()->MaximalSize();
-	if ( 2*r > maxSize)
+	if ( 2*ce.radius() > maxSize)
 		return false;
 
-	if ((c.x()-r < box.Min()[0]) || (c.y()-r < box.Min()[1]) || (c.x()+r > box.Max()[0]) || (c.y()+r > box.Max()[1]))
+	Point_2 c = ce.center();
+	if ((c.x()-ce.radius() < box.Min()[0]) || (c.y()-ce.radius() < box.Min()[1]) || (c.x()+ce.radius() > box.Max()[0]) || (c.y()+ce.radius() > box.Max()[1]))
 		return false;
 
 	return true;
