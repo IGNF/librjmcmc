@@ -44,12 +44,21 @@ public:
 		FT r = radius(), r2 = squared_radius(), R = C.radius(), R2 = C.squared_radius();
 		if (d < std::abs(r-R))
 		{
-			FT rmin = std::min(r,R);
-			return M_PI * rmin * rmin;
+			return M_PI * std::min(r2,R2);
 		}
-		FT area = r2*acos((d2+r2-R2)/(2*d*r));
-		area += R2* acos((d2+R2-r2)/(2*d*R));
-		area -= 0.5 * ::sqrt((-d+r+R)*(d+r-R)*(d-r+R)*(d+r+R));
+		FT area = r2*acos((d2+r2-R2)/(2.*d*r)) + R2* acos((d2+R2-r2)/(2.*d*R)) - 0.5 * ::sqrt((-d+r+R)*(d+r-R)*(d-r+R)*(d+r+R));
+		/*
+		if (area < 0)
+		{
+			std::cout << "area : " << area << std::endl;
+			std::cout << center() << "\t" << radius() << std::endl;
+			std::cout << C.center() << "\t" << C.radius() << std::endl;
+			std::cout << d << "\t" << r+R  <<"\t" << d-(r+R) << std::endl;
+			FT tdysq = R2 + r2 + 2 * R*r; 
+			std::cout << d2 << "\t" << tdysq << "\t" << d2 - tdysq << std::endl;
+			return -area;
+		}
+		*/
 		return area;
 	}
 

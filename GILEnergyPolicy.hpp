@@ -11,7 +11,7 @@ class GILEnergyPolicy
 public:
 	GILEnergyPolicy();
 
-	void LoadFile(const std::string &str);
+	void Init(const std::string &str, double defaultEnergy);
 
 	double ComputeDataEnergy(const Rectangle_2 &n) const;
 	double ComputeSegmentDataEnergy(const Point_2 &gridIn,const Point_2 &gridOut) const;

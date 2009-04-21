@@ -14,8 +14,6 @@ typedef dev2n32F_pixel_t*						dev2n32F_pixel_ptr_t;
 typedef image_type<float,devicen_layout_t<2> >::type	dev2n32F_image_t;
 typedef dev2n32F_image_t::view_t				dev2n32F_view_t;
 
-#include "BuildingsDetectorParameters.hpp"
-
 #include "GILEnergyPolicy.hpp"
 
 struct GILEnergyPolicy::gradients_image_t: public dev2n32F_image_t
@@ -59,11 +57,12 @@ void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 		*i /= sum;
 }
 
-GILEnergyPolicy::GILEnergyPolicy() : m_gradients(new gradients_image_t)
+GILEnergyPolicy::GILEnergyPolicy() : m_defaultEnergy(0.), m_gradients(new gradients_image_t)
 {}
 
-void GILEnergyPolicy::LoadFile(const std::string &str)
+void GILEnergyPolicy::Init(const std::string &str, double defaultEnergy)
 {
+	m_defaultEnergy = defaultEnergy;
 	double sigmaD = 1.;
 	unsigned int half_size = 3*sigmaD;
 	const size_t kws = 2 * half_size+1;
@@ -73,8 +72,7 @@ void GILEnergyPolicy::LoadFile(const std::string &str)
 	initKernelGaussianDeriv1D(kderiv,sigmaD);
 
     gray16_image_t img;
-    tiff_read_image(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath(),img);
-
+    tiff_read_image(str ,img);
 	m_gradients->recreate(img.dimensions());
 
 
@@ -83,7 +81,7 @@ void GILEnergyPolicy::LoadFile(const std::string &str)
 
 	convolve_rows<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<1>(m_gradients->_view), convolve_option_extend_constant);
     convolve_cols<gray32F_pixel_t>(kth_channel_view<1>(m_gradients->_view),kderiv,kth_channel_view<1>(m_gradients->_view), convolve_option_extend_constant);
-
+/*
     gray32F_image_t module(img.dimensions());
     gray8_image_t filtered_module(img.dimensions());
     ModuleGradient( kth_channel_view<0>(m_gradients->_view), kth_channel_view<1>(m_gradients->_view), view(module));
@@ -106,6 +104,9 @@ void GILEnergyPolicy::LoadFile(const std::string &str)
 			at_c<1>(grad) = 0.;
 		}
 	}
+	*/ 
+	tiff_write_view("gradients_x.tif", kth_channel_view<0>(m_gradients->_view));
+	tiff_write_view("gradients_y.tif", kth_channel_view<1>(m_gradients->_view));
 }
 
 double GILEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
@@ -199,7 +200,7 @@ void GILEnergyPolicy::Add8CirclePoints(float xCenter, float yCenter, float dx, f
 // http://www.cplusplus.happycodings.com/Computer_Graphics/code16.html
 double GILEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
 {
-	double res = m_defaultEnergy;
+	double res = 0.;
 	float x = 0;
 	float y = n.radius();
 	float p = 3 - 2*n.radius();
@@ -219,7 +220,8 @@ double GILEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
         x++;
         Add8CirclePoints(xCenter, yCenter, x, y, res);
     } 
-	return res / n.radius();
+    
+	return (res / n.radius()) + m_defaultEnergy;
 }
 
 struct ImageExporter::export_image_t : public gray8_image_t
@@ -297,4 +299,36 @@ void ImageExporter::ExportNode(const Rectangle_2 &n) const
 	}
 }
 
-ImageExporter exporter;
+
+void ExportTestImage(const char *nomOut, int rayon)
+{
+	gray16_image_t img;
+	img.recreate(251,251);
+	fill_pixels(img._view, 0);
+	
+	unsigned int centrex = 120, centrey=120;
+	float r2 = rayon * rayon;
+	
+	for (unsigned int l=0; l<img.dimensions().y; ++l)
+		for (unsigned int c=0; c<img.dimensions().x; ++c)
+		{
+			float dc = c;
+			dc -= centrex;
+			float dl = l;
+			dl -= centrey;
+			float d2 = dc*dc+dl*dl;
+			if (d2 < r2)
+				img._view(c,l) = 1;
+		}
+
+	tiff_write_view(nomOut, img._view);
+}
+
+int main_test (int argc, char **argv)
+{
+	ExportTestImage("1cercle_r025.tif", 25);
+	ExportTestImage("1cercle_r050.tif", 50);
+	ExportTestImage("1cercle_r075.tif", 75);
+	ExportTestImage("1cercle_r100.tif",100);
+	return 0;
+}

@@ -44,8 +44,6 @@ void BuildingsDetectorParametersSingleton::SetFromText(const std::vector< std::p
 void BuildingsDetectorParametersSingleton::ReadConfigFile(const char *filename)
 {
 	po::variables_map vm;
-	std::ifstream config_file(filename);
-	po::store(po::parse_config_file(config_file, m_desc), vm);
 	po::notify(vm);
 	ComputeProb();
 }
@@ -75,17 +73,14 @@ bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
 
 	if (vm.count("config"))
 	{
-		ReadConfigFile(vm["config"].as<std::string>().c_str());
+		std::ifstream config_file(vm["config"].as<std::string>().c_str());
+		po::store(po::parse_config_file(config_file, m_desc), vm);
 	}
-//	else if (vm.count("configxml"))
+	po::notify(vm);
+	ComputeProb();
+//	else
 //	{
-//		ReadXMLConfigFile(vm["configxml"].as<std::string>().c_str());
 //	}
-	else
-	{
-		po::notify(vm);
-		ComputeProb();
-	}
 	return true;
 }
 

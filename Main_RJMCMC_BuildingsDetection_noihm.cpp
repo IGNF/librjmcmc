@@ -23,14 +23,18 @@ int main (int argc, char **argv)
 	if (!BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc, argv))
 		return -1;
 	
+	//std::cout << BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() << std::endl;
+	//std::cout << BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath() << std::endl;
+	//std::cout << BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy() << std::endl;
+	
 	BBox::PointType size , origin;
 	size[0] = BuildingsDetectorParametersSingleton::Instance()->RunningWidth()-1;
 	size[1] = BuildingsDetectorParametersSingleton::Instance()->RunningHeight()-1;
 	origin[0] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginX();
 	origin[1] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginY();
 	BuildingsDetector buildingsDetector(BBox(size, origin));
+	buildingsDetector.Init(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath(), BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy());
 	Sampler< BuildingsDetector > sampler( BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
-	std::cout << BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() << std::endl;
 
 	// Formattage du log sous forme de tableau, ca facilite la creation de graphiques ...
 	std::ostringstream my_out_stream;
