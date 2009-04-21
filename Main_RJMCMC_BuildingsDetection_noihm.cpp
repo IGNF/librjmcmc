@@ -18,10 +18,16 @@ typedef VariantImageExporter<VariantType> ImageExporterType;
 //typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, GILEnergyPolicy >	BuildingsDetector;
 //typedef ImageExporter ImageExporterType;
 
+void generate_test_images();
+
 int main (int argc, char **argv)
 {	
+
 	if (!BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc, argv))
-		return -1;
+	{
+		generate_test_images();
+		return 0;
+	}
 	
 	//std::cout << BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() << std::endl;
 	//std::cout << BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath() << std::endl;
@@ -63,12 +69,12 @@ int main (int argc, char **argv)
 			std::cout << my_out_stream.str();
 			clock_local = clock();
 			ImageExporterType exporter;
-			exporter.InitExport("./data/ZTerrain_c3_8bits.tif");
+			exporter.InitExport(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath().c_str());
 			BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
 			for (; it_v != fin_v; ++it_v)
 				exporter.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());
 			std::ostringstream oss;
-			oss << "out_" << current_iter << ".tif";
+			oss << BuildingsDetectorParametersSingleton::Instance()->OutputFilePath() << current_iter << ".tif";
 			exporter.EndExport(oss.str().c_str());
 		}
 		sampler.Itere(buildingsDetector);

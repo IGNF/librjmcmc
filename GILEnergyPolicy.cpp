@@ -105,8 +105,8 @@ void GILEnergyPolicy::Init(const std::string &str, double defaultEnergy)
 		}
 	}
 	*/ 
-	tiff_write_view("gradients_x.tif", kth_channel_view<0>(m_gradients->_view));
-	tiff_write_view("gradients_y.tif", kth_channel_view<1>(m_gradients->_view));
+//	tiff_write_view("gradients_x.tif", kth_channel_view<0>(m_gradients->_view));
+//	tiff_write_view("gradients_y.tif", kth_channel_view<1>(m_gradients->_view));
 }
 
 double GILEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
@@ -239,7 +239,10 @@ void ImageExporter::InitExport(const char *filename) const
 		fill_pixels(m_img->_view, 0);
 	}
 	else
-		tiff_read_image(filename, *m_img);
+	{
+		m_img->recreate(tiff_read_dimensions(filename));
+		tiff_read_and_convert_view(filename, m_img->_view, dummy_color_converter());
+	}
 }
 
 void ImageExporter::EndExport(const char *filename) const
@@ -300,7 +303,7 @@ void ImageExporter::ExportNode(const Rectangle_2 &n) const
 }
 
 
-void ExportTestImage(const char *nomOut, int rayon)
+void ExportCercleTestImage(const char *nomOut, int rayon)
 {
 	gray16_image_t img;
 	img.recreate(251,251);
@@ -318,17 +321,43 @@ void ExportTestImage(const char *nomOut, int rayon)
 			dl -= centrey;
 			float d2 = dc*dc+dl*dl;
 			if (d2 < r2)
-				img._view(c,l) = 1;
+				img._view(c,l) = 100;
 		}
 
 	tiff_write_view(nomOut, img._view);
 }
 
-int main_test (int argc, char **argv)
+void ExportRectangleTestImage(const char *nomOut, int demilargeur, int demihauteur)
 {
-	ExportTestImage("1cercle_r025.tif", 25);
-	ExportTestImage("1cercle_r050.tif", 50);
-	ExportTestImage("1cercle_r075.tif", 75);
-	ExportTestImage("1cercle_r100.tif",100);
-	return 0;
+	gray16_image_t img;
+	img.recreate(251,251);
+	fill_pixels(img._view, 0);
+	
+	unsigned int centrex = 120, centrey=120;
+	
+	for (unsigned int l=0; l<img.dimensions().y; ++l)
+		for (unsigned int c=0; c<img.dimensions().x; ++c)
+		{
+			float dc = c;
+			dc -= centrex;
+			dc = abs(dc);
+			float dl = l;
+			dl -= centrey;
+			dl = abs(dl);
+			if ((dc < demilargeur) && (dl < demihauteur))
+				img._view(c,l) = 100;
+		}
+
+	tiff_write_view(nomOut, img._view);
+}
+
+void generate_test_images ()
+{
+	ExportCercleTestImage("test_1cercle_r025.tif", 25);
+	ExportCercleTestImage("test_1cercle_r050.tif", 50);
+	ExportCercleTestImage("test_1cercle_r075.tif", 75);
+	ExportCercleTestImage("test_1cercle_r100.tif",100);
+	
+	ExportRectangleTestImage("test_1rectangle_l050h020.tif", 25, 10);
+	ExportRectangleTestImage("test_1rectangle_l100h100.tif", 50, 50);
 }

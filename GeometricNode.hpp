@@ -81,7 +81,7 @@ inline bool IsValid(const BBox &box, const Rectangle_2 &r)
 	Point_2 c = r.center();
 	if ((c.x()-dx < box.Min()[0]) || (c.y()-dy < box.Min()[1]) || (c.x()+dx > box.Max()[0]) || (c.y()+dy > box.Max()[1]))
 		return false;
-/*
+
 	float length0 = 4*r.normal_squared_length();
 	float length1 = r.ratio()*r.ratio()*length0;
 	if (length0 > length1)
@@ -96,7 +96,7 @@ inline bool IsValid(const BBox &box, const Rectangle_2 &r)
 	maxSize *= maxSize;
 	if (length1 > maxSize)
 		return false;
-*/
+
 	if ((r.ratio() > BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalRatio()) ||
 		(1./r.ratio() > BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalRatio()))
 		return false;

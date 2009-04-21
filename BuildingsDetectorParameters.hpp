@@ -32,6 +32,7 @@ public:
 	inline const std::vector<double> &CumulatedProbabilities() const { return m_probas; }
 
 	inline const std::string &InputDataFilePath() const { return m_inputDataFilePath; }
+	inline const std::string &OutputFilePath() const { return m_outputFilePath; }
 
 	inline unsigned int RunningOriginX() const { return m_runningOriginX; }
 	inline unsigned int RunningOriginY() const { return m_runningOriginY; }
@@ -65,6 +66,7 @@ private:
 	double m_probaBirth;
 	double m_probaDeath;
 	std::string m_inputDataFilePath;
+	std::string m_outputFilePath;
 	unsigned int m_runningOriginX;
 	unsigned int m_runningOriginY;
 	unsigned int m_runningWidth;

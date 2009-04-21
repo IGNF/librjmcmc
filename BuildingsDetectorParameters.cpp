@@ -85,7 +85,7 @@ bool BuildingsDetectorParametersSingleton::ParseCmdLine(int argc, char **argv)
 }
 
 BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
-	m_desc("buildings detector options"),
+	m_desc("RJMCMC detector options"),
 	m_initialTemperature(350.),
 	m_nbIterations(5000000),
 	m_nbIterationsDump(10000),
@@ -99,6 +99,7 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 //	m_inputDataFilePath("./data/Marseille/Crop_MNE_Marseille.tif"),
 //	m_inputDataFilePath("/home/olivier/work/data/MNESaintMande.tif"),
 	m_inputDataFilePath("./data/ZTerrain_c3.tif"),
+	m_outputFilePath("out_"),
 	m_runningOriginX(0),
 	m_runningOriginY(0),
 	m_runningWidth(653),
@@ -111,7 +112,7 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_individualEnergy(150.)
 {
 	m_desc.add_options()
-	("help,h", "Message d'aide...")
+	("help,h", "Message d'aide (et generation des images de test)...")
 	("config,c",	po::value< std::string >(), "Fichier de configuration")
 	//("configxml,X",	po::value< std::string >(), "Fichier de configuration XML (boost::serialization)")
 	("temp,t", 		po::value< double >		(&(m_initialTemperature))->default_value(m_initialTemperature) , "Temperature initiale")
@@ -122,6 +123,7 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	("pbirth,B",	po::value< double >		(&(m_probaBirth))->default_value(m_probaBirth), "Probabilite de naissance")
 	("pdeath,D",	po::value< double >		(&(m_probaDeath))->default_value(m_probaDeath), "Probabilite de mort")
 	("input,i",		po::value< std::string >(&(m_inputDataFilePath))->default_value(m_inputDataFilePath), "Fichier image d'entree")
+	("output,o",	po::value< std::string >(&(m_outputFilePath))->default_value(m_outputFilePath), "Fichier image en sortie")
 	("xorig,x",		po::value< unsigned int>(&(m_runningOriginX))->default_value(m_runningOriginX), "Origine (X) de la zone a traiter")
 	("yorig,y",		po::value< unsigned int>(&(m_runningOriginY))->default_value(m_runningOriginY), "Origine (Y) de la zone a traiter")
 	("width,w",		po::value< unsigned int>(&(m_runningWidth))->default_value(m_runningWidth), "Largeur de la zone a traiter")
