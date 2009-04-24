@@ -20,6 +20,11 @@ struct GILEnergyPolicy::gradients_image_t: public dev2n32F_image_t
 {
 };
 
+struct GILEnergyPolicy::mask_image_t: public gray8_image_t
+{
+};
+
+
 template<typename Kernel1D>
 void initKernelGaussian1D(Kernel1D& kernel, double sigma)
 {
@@ -57,10 +62,10 @@ void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 		*i /= sum;
 }
 
-GILEnergyPolicy::GILEnergyPolicy() : m_defaultEnergy(0.), m_gradients(new gradients_image_t)
+GILEnergyPolicy::GILEnergyPolicy() : m_defaultEnergy(0.), m_gradients(new gradients_image_t), m_mask (new mask_image_t)
 {}
 
-void GILEnergyPolicy::Init(const std::string &str, double defaultEnergy)
+void GILEnergyPolicy::Init(const std::string &nomIm, const std::string &nomMask, double defaultEnergy)
 {
 	m_defaultEnergy = defaultEnergy;
 	double sigmaD = 1.;
@@ -72,9 +77,10 @@ void GILEnergyPolicy::Init(const std::string &str, double defaultEnergy)
 	initKernelGaussianDeriv1D(kderiv,sigmaD);
 
     gray16_image_t img;
-    tiff_read_image(str ,img);
+    tiff_read_image(nomIm ,img);
 	m_gradients->recreate(img.dimensions());
 
+	tiff_read_image(nomMask, *m_mask);
 
 	convolve_cols<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<0>(m_gradients->_view), convolve_option_extend_constant);
 	convolve_rows<gray32F_pixel_t>(kth_channel_view<0>(m_gradients->_view),kderiv,kth_channel_view<0>(m_gradients->_view), convolve_option_extend_constant);
@@ -129,14 +135,17 @@ double GILEnergyPolicy::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Po
 	Segment_2 s(gridIn, gridOut);
 	CGAL::Segment_2_iterator<Segment_2> it(s);
 	dev2n32F_view_t::xy_locator loc_grad = m_gradients->_view.xy_at(gridIn.x(), gridIn.y());
-	point2<std::ptrdiff_t> movement[2] = { point2<std::ptrdiff_t>(it.Step(0),0), point2<std::ptrdiff_t>(0,it.Step(1)) };
+	gray8_view_t::xy_locator loc_mask = m_mask->_view.xy_at(gridIn.x(), gridIn.y());
+	point2<std::ptrdiff_t> mvt[2] = { point2<std::ptrdiff_t>(it.Step(0),0), point2<std::ptrdiff_t>(0,it.Step(1)) };
 	for (; !it.end(); ++it)
 	{
 		const float length = it.length();
-		const dev2n32F_pixel_t &grad = *loc_grad;
-		gradient_sum[0] += length * at_c<0>(grad);
-		gradient_sum[1] += length * at_c<1>(grad);
-		loc_grad += movement[it.axis()];
+		dev2n32F_pixel_t grad = (*loc_grad);
+		float mask = 1 - *loc_mask;
+		gradient_sum[0] += length * at_c<0>(grad) * mask;
+		gradient_sum[1] += length * at_c<1>(grad) * mask;
+		loc_grad += mvt[it.axis()];
+		loc_mask += mvt[it.axis()];
 //		std::cout << "new : " << at_c<0>(grad) << "\t" << at_c<1>(grad) << std::endl;
 //		const dev2n32F_pixel_t old_grad = m_gradients->_view(it.x(), it.y());
 //		std::cout << "old : " << at_c<0>(old_grad) << "\t" << at_c<1>(old_grad) << std::endl;
@@ -153,43 +162,52 @@ void GILEnergyPolicy::Add8CirclePoints(float xCenter, float yCenter, float dx, f
 {
 	Vector_2 vgrad, vnorm;
 	dev2n32F_pixel_t grad;
+	float mask;
 	grad = m_gradients->_view(xCenter + dx, yCenter + dy);
-	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
+	mask = m_mask->_view(xCenter + dx, yCenter + dy);
+	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
 	vnorm = Vector_2( dx, dy);
 	res -= vgrad*vnorm;
 
 	grad = m_gradients->_view(xCenter - dx, yCenter + dy);
-	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
+	mask = m_mask->_view(xCenter - dx, yCenter + dy);
+	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
 	vnorm = Vector_2(-dx, dy);
 	res -= vgrad*vnorm;
 
 	grad = m_gradients->_view(xCenter - dx, yCenter - dy);
-	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
+	mask = m_mask->_view(xCenter - dx, yCenter - dy);
+	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
 	vnorm = Vector_2(-dx,-dy);
 	res -= vgrad*vnorm;
 
 	grad = m_gradients->_view(xCenter + dx, yCenter - dy);
-	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
+	mask = m_mask->_view(xCenter + dx, yCenter - dy);
+	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
 	vnorm = Vector_2( dx,-dy);
 	res -= vgrad*vnorm;
 
 	grad = m_gradients->_view(xCenter + dy, yCenter + dx);
-	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
+	mask = m_mask->_view(xCenter + dy, yCenter + dx);
+	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
 	vnorm = Vector_2( dy, dx);
 	res -= vgrad*vnorm;
 
 	grad = m_gradients->_view(xCenter - dy, yCenter + dx);
-	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
+	mask = m_mask->_view(xCenter - dy, yCenter + dx);
+	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
 	vnorm = Vector_2(-dy, dx);
 	res -= vgrad*vnorm;
 
 	grad = m_gradients->_view(xCenter - dy, yCenter - dx);
-	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
+	mask = m_mask->_view(xCenter - dy, yCenter - dx);
+	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
 	vnorm = Vector_2(-dy,-dx);
 	res -= vgrad*vnorm;
 
 	grad = m_gradients->_view(xCenter + dy, yCenter - dx);
-	vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
+	mask = m_mask->_view(xCenter + dy, yCenter - dx);
+	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
 	vnorm = Vector_2( dy,-dx);
 	res -= vgrad*vnorm;
 }

@@ -11,7 +11,7 @@ class GILEnergyPolicy
 public:
 	GILEnergyPolicy();
 
-	void Init(const std::string &str, double defaultEnergy);
+	void Init(const std::string &nomIm, const std::string &nomMask, double defaultEnergy);
 
 	double ComputeDataEnergy(const Rectangle_2 &n) const;
 	double ComputeSegmentDataEnergy(const Point_2 &gridIn,const Point_2 &gridOut) const;
@@ -30,6 +30,8 @@ private :
 
 	struct gradients_image_t;
 	boost::shared_ptr<gradients_image_t> m_gradients;
+	struct mask_image_t;
+	boost::shared_ptr<mask_image_t> m_mask;
 };
 
 
