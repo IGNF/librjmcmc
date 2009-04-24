@@ -18,6 +18,7 @@ public:
 
 	double ComputeDataEnergy(const Cercle_2 &n) const;
 	void Add8CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const;
+	void Add1CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const;
 
 	template<class NodeGeometry>
 	inline double ComputeDataEnergy(const GeometricNode<NodeGeometry> &n) const

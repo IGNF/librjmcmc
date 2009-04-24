@@ -39,7 +39,7 @@ int main (int argc, char **argv)
 	origin[0] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginX();
 	origin[1] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginY();
 	BuildingsDetector buildingsDetector(BBox(size, origin));
-	buildingsDetector.Init(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath(), "mask.tif", BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy());
+	buildingsDetector.Init(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath(), "data/MNS-veget/seuil_ndvi_StMichel.tif", BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy());
 	Sampler< BuildingsDetector > sampler( BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
 
 	// Formattage du log sous forme de tableau, ca facilite la creation de graphiques ...

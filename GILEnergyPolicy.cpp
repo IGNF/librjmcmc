@@ -121,8 +121,9 @@ double GILEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
 	for (unsigned int i = 0; i < 4; ++i)
 	{
 		double delta = -ComputeSegmentDataEnergy(n.point(i),n.point(i + 1));
-		if ( delta <= 0. )
-			res += delta;
+		res += delta;
+//		if ( delta <= 0. )
+//			res += delta;
 	}
 	return res;
 }
@@ -141,9 +142,11 @@ double GILEnergyPolicy::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Po
 	{
 		const float length = it.length();
 		dev2n32F_pixel_t grad = (*loc_grad);
-		float mask = 1 - *loc_mask;
-		gradient_sum[0] += length * at_c<0>(grad) * mask;
-		gradient_sum[1] += length * at_c<1>(grad) * mask;
+		if (*loc_mask == 255)
+		{
+			gradient_sum[0] += length * at_c<0>(grad);
+			gradient_sum[1] += length * at_c<1>(grad);
+		}
 		loc_grad += mvt[it.axis()];
 		loc_mask += mvt[it.axis()];
 //		std::cout << "new : " << at_c<0>(grad) << "\t" << at_c<1>(grad) << std::endl;
@@ -158,58 +161,30 @@ double GILEnergyPolicy::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Po
 	return CGAL::to_double(normale * sum);
 }
 
+void GILEnergyPolicy::Add1CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const
+{
+ 	gray8_pixel_t mask = m_mask->_view(xCenter + dx, yCenter + dy);
+	dev2n32F_pixel_t grad = m_gradients->_view(xCenter + dx, yCenter + dy);
+	Vector_2 vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
+	Vector_2 vnorm = Vector_2( dx, dy);
+	if (mask == 255)
+	{
+		res -= vgrad*vnorm;
+	}
+}
+
 void GILEnergyPolicy::Add8CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const
 {
-	Vector_2 vgrad, vnorm;
-	dev2n32F_pixel_t grad;
-	float mask;
-	grad = m_gradients->_view(xCenter + dx, yCenter + dy);
-	mask = m_mask->_view(xCenter + dx, yCenter + dy);
-	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
-	vnorm = Vector_2( dx, dy);
-	res -= vgrad*vnorm;
+	Add1CirclePoints(xCenter, yCenter, dx, dy, res);
+	Add1CirclePoints(xCenter, yCenter,-dx, dy, res);
+	Add1CirclePoints(xCenter, yCenter,-dx,-dy, res);
+	Add1CirclePoints(xCenter, yCenter, dx,-dy, res);
 
-	grad = m_gradients->_view(xCenter - dx, yCenter + dy);
-	mask = m_mask->_view(xCenter - dx, yCenter + dy);
-	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
-	vnorm = Vector_2(-dx, dy);
-	res -= vgrad*vnorm;
+	Add1CirclePoints(xCenter, yCenter, dy, dx, res);
+	Add1CirclePoints(xCenter, yCenter,-dy, dx, res);
+	Add1CirclePoints(xCenter, yCenter,-dy,-dx, res);
+	Add1CirclePoints(xCenter, yCenter, dy,-dx, res);
 
-	grad = m_gradients->_view(xCenter - dx, yCenter - dy);
-	mask = m_mask->_view(xCenter - dx, yCenter - dy);
-	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
-	vnorm = Vector_2(-dx,-dy);
-	res -= vgrad*vnorm;
-
-	grad = m_gradients->_view(xCenter + dx, yCenter - dy);
-	mask = m_mask->_view(xCenter + dx, yCenter - dy);
-	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
-	vnorm = Vector_2( dx,-dy);
-	res -= vgrad*vnorm;
-
-	grad = m_gradients->_view(xCenter + dy, yCenter + dx);
-	mask = m_mask->_view(xCenter + dy, yCenter + dx);
-	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
-	vnorm = Vector_2( dy, dx);
-	res -= vgrad*vnorm;
-
-	grad = m_gradients->_view(xCenter - dy, yCenter + dx);
-	mask = m_mask->_view(xCenter - dy, yCenter + dx);
-	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
-	vnorm = Vector_2(-dy, dx);
-	res -= vgrad*vnorm;
-
-	grad = m_gradients->_view(xCenter - dy, yCenter - dx);
-	mask = m_mask->_view(xCenter - dy, yCenter - dx);
-	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
-	vnorm = Vector_2(-dy,-dx);
-	res -= vgrad*vnorm;
-
-	grad = m_gradients->_view(xCenter + dy, yCenter - dx);
-	mask = m_mask->_view(xCenter + dy, yCenter - dx);
-	vgrad = Vector_2(at_c<0>(grad) * mask, at_c<1>(grad) * mask);
-	vnorm = Vector_2( dy,-dx);
-	res -= vgrad*vnorm;
 }
 
 // Pour ca, tout vient de 
@@ -249,6 +224,22 @@ struct ImageExporter::export_image_t : public gray8_image_t
 ImageExporter::ImageExporter() : m_img(new export_image_t)
 {}
 
+struct local_cc
+{
+	template<class SrcType, class DstType>
+	void operator()(const SrcType &src, DstType &dst) const
+	{
+		dst = src;
+	}
+
+};
+	
+template<>
+void local_cc::operator()<gray16_pixel_t, gray8_pixel_t>(const gray16_pixel_t &src, gray8_pixel_t &dst) const
+{
+	dst = src - 900;
+}
+
 void ImageExporter::InitExport(const char *filename) const
 {
 	if (std::string(filename).empty())
@@ -259,7 +250,7 @@ void ImageExporter::InitExport(const char *filename) const
 	else
 	{
 		m_img->recreate(tiff_read_dimensions(filename));
-		tiff_read_and_convert_view(filename, m_img->_view, dummy_color_converter());
+		tiff_read_and_convert_view(filename, m_img->_view, local_cc());
 	}
 }
 
@@ -371,6 +362,20 @@ void ExportRectangleTestImage(const char *nomOut, int demilargeur, int demihaute
 
 void generate_test_images ()
 {
+/*
+ * 	gray16_image_t in;
+	gray16_image_t out;
+	tiff_read_image ("data/MNS-veget/ZCarto-SaintMichel-50.crop.reechground.tif", in);
+	out.recreate(in.dimensions());
+
+	gray16_view_t::iterator it_in = view(in).begin(), fin_in = view(in).end();
+	gray16_view_t::iterator it_out = view(out).begin();
+	for (; it_in != fin_in; ++it_in, ++it_out)
+		*it_out = *it_in + 1000;
+	
+	tiff_write_view("out.tif", out._view);
+	return;
+*/
 	ExportCercleTestImage("test_1cercle_r025.tif", 25);
 	ExportCercleTestImage("test_1cercle_r050.tif", 50);
 	ExportCercleTestImage("test_1cercle_r075.tif", 75);
