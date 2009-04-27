@@ -98,7 +98,8 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 //	m_inputImageHeight(1575),
 //	m_inputDataFilePath("./data/Marseille/Crop_MNE_Marseille.tif"),
 //	m_inputDataFilePath("/home/olivier/work/data/MNESaintMande.tif"),
-	m_inputDataFilePath("./data/ZTerrain_c3.tif"),
+	m_inputImageFilePath("./data/ZTerrain_c3.tif"),
+	m_inputMaskFilePath(""),
 	m_outputFilePath("out_"),
 	m_runningOriginX(0),
 	m_runningOriginY(0),
@@ -109,20 +110,22 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	m_maximalSize(200.),
 	m_rectangleMaximalRatio(5.),
 	m_ponderationSurfaceIntersection(1.),
-	m_individualEnergy(150.)
+	m_individualEnergy(150.),
+	m_coefIndividualEnergy(0.5)
 {
 	m_desc.add_options()
 	("help,h", "Message d'aide (et generation des images de test)...")
 	("config,c",	po::value< std::string >(), "Fichier de configuration")
 	//("configxml,X",	po::value< std::string >(), "Fichier de configuration XML (boost::serialization)")
 	("temp,t", 		po::value< double >		(&(m_initialTemperature))->default_value(m_initialTemperature) , "Temperature initiale")
-	("nbiter,I", 	po::value< unsigned int>(&(m_nbIterations))->default_value(m_nbIterations), "Nombre d'iterations")
+	("nbiter,n", 	po::value< unsigned int>(&(m_nbIterations))->default_value(m_nbIterations), "Nombre d'iterations")
 	("nbdump,d",	po::value< unsigned int>(&(m_nbIterationsDump))->default_value(m_nbIterationsDump), "Nombre d'iterations entre chaque affichage")
 	("nbsave,S",	po::value< unsigned int>(&(m_nbIterationsSave))->default_value(m_nbIterationsSave), "Nombre d'iterations entre chaque sauvegarde")
 	("deccoef,C",	po::value< double >		(&(m_decreaseCoefficient))->default_value(m_decreaseCoefficient), "Coefficient de decroissance")
 	("pbirth,B",	po::value< double >		(&(m_probaBirth))->default_value(m_probaBirth), "Probabilite de naissance")
 	("pdeath,D",	po::value< double >		(&(m_probaDeath))->default_value(m_probaDeath), "Probabilite de mort")
-	("input,i",		po::value< std::string >(&(m_inputDataFilePath))->default_value(m_inputDataFilePath), "Fichier image d'entree")
+	("input,i",		po::value< std::string >(&(m_inputImageFilePath))->default_value(m_inputImageFilePath), "Fichier image en entree")
+	("inputmask,I",	po::value< std::string >(&(m_inputMaskFilePath))->default_value(m_inputMaskFilePath), "Fichier masque de vegetation en entree")
 	("output,o",	po::value< std::string >(&(m_outputFilePath))->default_value(m_outputFilePath), "Fichier image en sortie")
 	("xorig,x",		po::value< unsigned int>(&(m_runningOriginX))->default_value(m_runningOriginX), "Origine (X) de la zone a traiter")
 	("yorig,y",		po::value< unsigned int>(&(m_runningOriginY))->default_value(m_runningOriginY), "Origine (Y) de la zone a traiter")
@@ -134,6 +137,7 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	("maxratio,R",	po::value< double >		(&(m_rectangleMaximalRatio))->default_value(m_rectangleMaximalRatio), "Rapport longueur / largeur maximal d'un rectangle")
 	("surface,s",	po::value< double >		(&(m_ponderationSurfaceIntersection))->default_value(m_ponderationSurfaceIntersection), "Ponderation de la surface d'intersection")
 	("energy,e",	po::value< double >		(&(m_individualEnergy))->default_value(m_individualEnergy), "Energie d'existence d'un objet")
+	("coefenergy,E",	po::value< double >		(&(m_coefIndividualEnergy))->default_value(m_coefIndividualEnergy), "Energie d'existence d'un objet")
 	;
 	ComputeProb();
 }

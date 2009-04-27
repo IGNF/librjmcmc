@@ -57,12 +57,13 @@ void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 		*i /= sum;
 }
 
-GILEnergyPolicy::GILEnergyPolicy() : m_defaultEnergy(0.), m_gradients_rectangle(new gradients_image_t), m_gradients_cercle(new gradients_image_t)
+GILEnergyPolicy::GILEnergyPolicy() : m_defaultEnergy(0.), m_coefDefaultEnergy(0.), m_gradients_cercle(new gradients_image_t), m_gradients_rectangle(new gradients_image_t)
 {}
 
-void GILEnergyPolicy::Init(const std::string &nomIm, const std::string &nomMask, double defaultEnergy)
+void GILEnergyPolicy::Init(double defaultEnergy, double coefDefaultEnergy, const std::string &nomIm, const std::string &nomMask)
 {
 	m_defaultEnergy = defaultEnergy;
+	m_coefDefaultEnergy = coefDefaultEnergy;
 	double sigmaD = 1.;
 	unsigned int half_size = 3*sigmaD;
 	const size_t kws = 2 * half_size+1;
@@ -140,7 +141,7 @@ void GILEnergyPolicy::Init(const std::string &nomIm, const std::string &nomMask,
 
 double GILEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
 {
-	double res = m_defaultEnergy;
+	double res = m_defaultEnergy + m_coefDefaultEnergy * ::sqrt(n.perimeter());
 	for (unsigned int i = 0; i < 4; ++i)
 	{
 		double delta = -ComputeSegmentDataEnergy(n.point(i),n.point(i + 1));
@@ -231,7 +232,7 @@ double GILEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
 		Add8CirclePoints(xCenter, yCenter, dx, dy, n.squared_radius(), res);
     } 
     
-	return (res / n.radius()) + m_defaultEnergy;
+	return (res / n.radius()) + m_defaultEnergy + m_coefDefaultEnergy * ::sqrt(n.perimeter());
 }
 
 struct ImageExporter::export_image_t : public gray8_image_t

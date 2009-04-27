@@ -31,7 +31,8 @@ public:
 	inline double ProbaModification() const { return 1-m_probaDeath-m_probaBirth; }
 	inline const std::vector<double> &CumulatedProbabilities() const { return m_probas; }
 
-	inline const std::string &InputDataFilePath() const { return m_inputDataFilePath; }
+	inline const std::string &InputImageFilePath() const { return m_inputImageFilePath; }
+	inline const std::string &InputMaskFilePath() const { return m_inputMaskFilePath; }
 	inline const std::string &OutputFilePath() const { return m_outputFilePath; }
 
 	inline unsigned int RunningOriginX() const { return m_runningOriginX; }
@@ -46,6 +47,7 @@ public:
 	inline double MaximalSize() const { return m_maximalSize; }
 	inline double RectangleMaximalRatio() const { return m_rectangleMaximalRatio; }
 	inline double IndividualEnergy() const { return m_individualEnergy; }
+	inline double CoefIndividualEnergy() const { return m_coefIndividualEnergy; }
 
 	inline unsigned int NbIterationsDump() const { return m_nbIterationsDump; }
 	inline unsigned int NbIterationsSave() const { return m_nbIterationsSave; }
@@ -65,7 +67,8 @@ private:
 	double m_decreaseCoefficient;
 	double m_probaBirth;
 	double m_probaDeath;
-	std::string m_inputDataFilePath;
+	std::string m_inputImageFilePath;
+	std::string m_inputMaskFilePath;
 	std::string m_outputFilePath;
 	unsigned int m_runningOriginX;
 	unsigned int m_runningOriginY;
@@ -77,30 +80,7 @@ private:
 	double m_rectangleMaximalRatio;
 	double m_ponderationSurfaceIntersection;
 	double m_individualEnergy;
-//	template<class Archive>
-//	void serialize(Archive & ar , const unsigned int &version)
-//	{
-//		ar & BOOST_SERIALIZATION_NVP(m_initialTemperature)
-//		& BOOST_SERIALIZATION_NVP(m_nbIterations)
-//		& BOOST_SERIALIZATION_NVP(m_nbIterationsDump)
-//		& BOOST_SERIALIZATION_NVP(m_nbIterationsSave)
-//		& BOOST_SERIALIZATION_NVP(m_decreaseCoefficient)
-//		& BOOST_SERIALIZATION_NVP(m_probaBirth)
-//		& BOOST_SERIALIZATION_NVP(m_probaDeath)
-//		& BOOST_SERIALIZATION_NVP(m_inputDataFilePath)
-//		& BOOST_SERIALIZATION_NVP(m_runningOriginX)
-//		& BOOST_SERIALIZATION_NVP(m_runningOriginY)
-//		& BOOST_SERIALIZATION_NVP(m_runningWidth)
-//		& BOOST_SERIALIZATION_NVP(m_runningHeight)
-//		& BOOST_SERIALIZATION_NVP(m_varianceGaussianFilter)
-//		& BOOST_SERIALIZATION_NVP(m_ponderationSurfaceIntersection)
-//		& BOOST_SERIALIZATION_NVP(m_ponderationPointsDistance)
-//		& BOOST_SERIALIZATION_NVP(m_pointsDistanceMax)
-//		& BOOST_SERIALIZATION_NVP(m_rectangleMinimalSize)
-//		& BOOST_SERIALIZATION_NVP(m_rectangleMaximalRatio)
-//		& BOOST_SERIALIZATION_NVP(m_individualEnergy)
-//		;
-//	}
+	double m_coefIndividualEnergy;
 
 	BuildingsDetectorParametersSingleton();
 	BuildingsDetectorParametersSingleton(const BuildingsDetectorParametersSingleton &);

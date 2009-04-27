@@ -11,7 +11,7 @@ class GILEnergyPolicy
 public:
 	GILEnergyPolicy();
 
-	void Init(const std::string &nomIm, const std::string &nomMask, double defaultEnergy);
+	void Init(double defaultEnergy, double coefDefaultEnergy, const std::string &nomIm, const std::string &nomMask = "");
 
 	double ComputeDataEnergy(const Rectangle_2 &n) const;
 	double ComputeDataEnergy(const Cercle_2 &n) const;
@@ -29,7 +29,7 @@ private :
 	void Add1CirclePoints(double xCenter, double yCenter, double dx, double dy, double coef, double & res) const;
 
 	double m_defaultEnergy;
-
+	double m_coefDefaultEnergy;
 	struct gradients_image_t;
 	boost::shared_ptr<gradients_image_t> m_gradients_cercle;
 	boost::shared_ptr<gradients_image_t> m_gradients_rectangle;

@@ -39,7 +39,7 @@ int main (int argc, char **argv)
 	origin[0] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginX();
 	origin[1] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginY();
 	BuildingsDetector buildingsDetector(BBox(size, origin));
-	buildingsDetector.Init(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath(), "data/MNS-veget/seuil_ndvi_StMichel.tif", BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy());
+	buildingsDetector.Init(BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy(), BuildingsDetectorParametersSingleton::Instance()->CoefIndividualEnergy(), BuildingsDetectorParametersSingleton::Instance()->InputImageFilePath(), BuildingsDetectorParametersSingleton::Instance()->InputMaskFilePath());
 	Sampler< BuildingsDetector > sampler( BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
 
 	// Formattage du log sous forme de tableau, ca facilite la creation de graphiques ...
@@ -69,7 +69,7 @@ int main (int argc, char **argv)
 			std::cout << my_out_stream.str();
 			clock_local = clock();
 			ImageExporterType exporter;
-			exporter.InitExport(BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath().c_str());
+			exporter.InitExport(BuildingsDetectorParametersSingleton::Instance()->InputImageFilePath().c_str());
 			BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
 			for (; it_v != fin_v; ++it_v)
 				exporter.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());

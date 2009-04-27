@@ -172,21 +172,22 @@ public:
   Point_2 c;
   Vector_2 n;
   FT r;
-  FT n2;
-  FT inv_n2;
-  FT rn2;
+  FT nl2;
+  FT nl;
+  FT inv_nl2;
 
 /* Constructors */
   Rectangle_2() : c(0.,0.), n(0.,0.), r(0.) {}
 
   Rectangle_2(const Point_2 &p, const Vector_2 &v, const FT &f)
-    : c(p), n(v), r(abs(f)), n2(n*n), inv_n2(1./n2), rn2 (r*n2) {}
+    : c(p), n(v), r(abs(f)), nl2(n*n), nl(::sqrt(nl2)), inv_nl2(1./nl2) {}
 
   Rectangle_2(const Point_2 &p0, const Point_2 &p1, const Point_2 &p2) : n(0.5*(p1-p0)) 
   {
-      n2 = n.squared_length();
-      inv_n2 = 1/n2;
-      if(is_zero(n2)) 
+      nl2 = n.squared_length();
+      nl = ::sqrt(nl2);
+      inv_nl2 = 1/nl2;
+      if(is_zero(nl2)) 
       {  // degeneracy p0=p1
         r = 0;
         c = midpoint(p0,p2);
@@ -195,10 +196,9 @@ public:
       else 
       {  // non-degenerate edge [p0,p1]
         Vector_2 m(-n.y(),n.x());
-		r = abs(0.5*((p2-p1)*m)*inv_n2);
+		r = abs(0.5*((p2-p1)*m)*inv_nl2);
 		c = midpoint(p0,p1)+r*m;
       }
-      rn2 = r*n2;
     }
 
 /* Equality */
@@ -270,7 +270,8 @@ public:
   // moves one segment of this to match the supporting line of the furthest corresponding segment of a
   // rotated version of b. The rotation is the smallest of the 4 possible rotations to align b with this.
   // the moving segment is based on the quadrant (n+-45°,m+-45°,-n+-45° or -m+-45°) b.c is relative to this
-  Self merge(const Rectangle_2 &b) const {
+  Self merge(const Rectangle_2 &b) const 
+  {
     Vector_2 v(c,b.c);
     FT ar(abs(r));
     Vector_2 an(n), am(-n.y(),n.x());
@@ -296,7 +297,7 @@ public:
   Bounded_side  bounded_side(const Point_2& q) const 
   {
    Vector_2 v(q-c);
-   FT n2  = n.squared_length(); 
+   FT n2 = this->squared_normal_length(); 
    n2 *= n2;
    FT dot = n*v;
    Sign s0 = sign(dot*dot-n2);
@@ -323,7 +324,7 @@ public:
 /* Rectangle predicates */
   inline bool is_iso_rectangle() const { return (CGAL_NTS is_zero(n.x()*n.y())); }
   inline bool is_square() const { return (r*r==RT(1)); }
-  inline bool is_degenerate() const { return CGAL_NTS is_zero(r*n2); }
+  inline bool is_degenerate() const { return CGAL_NTS is_zero(r*this->normal_squared_length()); }
 
 /* Access methods */
   Bbox_2 bbox() const {
@@ -337,16 +338,17 @@ public:
     return Bbox_2(cx.first-dx,cy.first-dy,cx.second+dx,cy.second+dy);
   }
 
-  inline FT area() const { return 4*rn2; }
+  inline FT area() const { return 4*r*normal_squared_length(); }
+  inline FT perimeter() const { return 4*(1+r)*normal_length(); }
   // optimized version of edge(i).squared_length();
-  inline FT squared_length(int i) const { FT l2=4*n2; return (i%2)?(r*r*l2):l2; }
+  inline FT squared_length(int i) const { FT l2=4*this->normal_squared_length(); return (i%2)?(r*r*l2):l2; }
 
   inline Point_2  center() const { return c; }
   inline Vector_2 normal() const { return n; }
   inline FT       ratio () const { return r; }
-  inline FT normal_squared_length() const { return n2; }
-  inline FT not_normal_squared_length() const { return rn2; }
-  inline FT inv_normal_squared_length() const { return inv_n2; }
+  inline FT normal_length() const { return nl; }
+  inline FT normal_squared_length() const { return nl2; }
+  inline FT inv_normal_squared_length() const { return inv_nl2; }
 
   inline int left_vertex   () const { return (r*n.y()>0)?((n.x()>0)?3:2):((n.x()>0)?0:1); }
   inline int right_vertex  () const { return (r*n.y()>0)?((n.x()>0)?1:0):((n.x()>0)?2:3); }
@@ -409,7 +411,7 @@ public:
   {
   // optimization: line(i)==edge(i).supporting_line();
     Vector_2 rn(r*n);
-    FT dot = rn2;
+    FT dot = r*normal_squared_length();
     switch (i%4) {
     case  0: return Line_2(- n.y(),  n.x(), c.x()* n.y()-c.y()* n.x()+dot);
     case  2: return Line_2(  n.y(),- n.x(),-c.x()* n.y()+c.y()* n.x()+dot);
@@ -468,14 +470,14 @@ public:
 
     FT br = b.r;
     FT ax0 = n*v;
-    FT dax = dot+br*det+n2;
+    FT dax = dot+br*det+ normal_squared_length();
     if(ax0*ax0>=dax*dax) return false;
 
     FT ay0 = n.x()*v.y()-n.y()*v.x();
-    FT day = det+br*dot+r*n2;
+    FT day = det+br*dot+r*normal_squared_length();
     if(ay0*ay0>=day*day) return false;
 
-    FT bn2 = b.n.squared_length();
+    FT bn2 = b.normal_squared_length();
     FT bx0 = b.n*v;
     FT dbx = dot+r*det+bn2;
     if(bx0*bx0>=dbx*dbx) return false;
@@ -515,7 +517,7 @@ public:
 	FT cn = vc*n;
 
 	Vector_2 ln[] = {  n, trn };
-	FT lc[] = { cn+n2, ctrn+rn2, cn-n2, ctrn-rn2 };
+	FT lc[] = { cn+this->normal_squared_length(), ctrn+r*this->normal_squared_length(), cn-this->normal_squared_length(), ctrn-r*this->normal_squared_length() };
 
  // basically it is the iterative intersection of the convex polygon initialized with b
  // with the 2 slabs line0/line2 and line1/line3.
@@ -687,7 +689,7 @@ public:
    	Vector_2 v(c,b.c);
    	Vector_2 m(-n.y(),n.x());
   
-   	FT m2 = rn2;
+   	FT m2 = r*this->normal_squared_length();
 	FT br = b.r;
     FT cx = n*v;
     FT cy = m*v;
@@ -702,8 +704,8 @@ public:
 		FT rx = cx+mx;
 		FT by = cy-ny;
 		FT ty = cy+ny;
-        	if(rx<=-n2 || n2<=lx || ty<=-m2 || m2<=by) return 0;
-		return (min(n2,rx)-max(-n2,lx))*(min(m2,ty)-max(-m2,by))*inv_n2;
+        if(rx<=-this->normal_squared_length() || this->normal_squared_length()<=lx || ty<=-m2 || m2<=by) return 0;
+		return (min(this->normal_squared_length(),rx)-max(-this->normal_squared_length(),lx))*(min(m2,ty)-max(-m2,by))*this->inv_normal_squared_length();
 		}
 	case NEGATIVE : // b.n =rotate180(b.n)
 		{ nx = -nx; ny = -ny; }
@@ -717,8 +719,8 @@ public:
 		FT rx = cx+nx;
 		FT by = cy-my;
 		FT ty = cy+my;
-        	if(rx<=-n2 || n2<=lx || ty<=-m2 || m2<=by) return 0;
-		return (min(n2,rx)-max(-n2,lx))*(min(m2,ty)-max(-m2,by))*inv_n2;
+        	if(rx<=-this->normal_squared_length() || this->normal_squared_length()<=lx || ty<=-m2 || m2<=by) return 0;
+		return (min(this->normal_squared_length(),rx)-max(-this->normal_squared_length(),lx))*(min(m2,ty)-max(-m2,by)) * this->inv_normal_squared_length();
 		}
 	case NEGATIVE : // b.n =rotate90(b.n)
 		nx = -nx; std::swap(nx,mx);
@@ -728,19 +730,19 @@ public:
 		FT difx(nx-mx), dify(ny-my);
 		FT x[] = { cx-sumx, cx+difx, cx+sumx, cx-difx }; // bottom, right, top, left
 		FT y[] = { cy-sumy, cy+dify, cy+sumy, cy-dify };
-	        if(y[0]>=m2 || y[2]<=-m2 || x[3]>=n2 || x[1]<=-n2) return 0; // one edge of "this" separates the 2 rectangles
-		FT area =  triangle_area(n2, m2, x[2], y[2], x[1], y[1])
-			+  triangle_area(m2, n2, y[3],-x[3], y[2],-x[2])
-			+  triangle_area(n2, m2,-x[0],-y[0],-x[3],-y[3])
-			+  triangle_area(m2, n2,-y[1], x[1],-y[0], x[0]);
+	        if(y[0]>=m2 || y[2]<=-m2 || x[3]>=this->normal_squared_length() || x[1]<=-this->normal_squared_length()) return 0; // one edge of "this" separates the 2 rectangles
+		FT area =  triangle_area(this->normal_squared_length(), m2, x[2], y[2], x[1], y[1])
+			+  triangle_area(m2, this->normal_squared_length(), y[3],-x[3], y[2],-x[2])
+			+  triangle_area(this->normal_squared_length(), m2,-x[0],-y[0],-x[3],-y[3])
+			+  triangle_area(m2, this->normal_squared_length(),-y[1], x[1],-y[0], x[0]);
 		// iso-rectangle area
 		FT lx = x[0], by = y[1];
 		FT rx = x[2], ty = y[3];
 		FT s  = 1;
 		if(lx>rx) { std::swap(lx,rx); s=-s; }
 		if(by>ty) { std::swap(by,ty); s=-s; }
-		if(by>=m2 || ty<=-m2 || lx>=n2 || rx<=-n2) return area*inv_n2;
-		return (area + s*(min(n2,rx)-max(-n2,lx))*(min(m2,ty)-max(-m2,by)))*inv_n2;
+		if(by>=m2 || ty<=-m2 || lx>=this->normal_squared_length() || rx<=-this->normal_squared_length()) return area*this->inv_normal_squared_length();
+		return (area + s*(min(this->normal_squared_length(),rx)-max(-this->normal_squared_length(),lx))*(min(m2,ty)-max(-m2,by)))* this->inv_normal_squared_length();
 	}
 	}
 

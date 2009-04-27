@@ -26,6 +26,7 @@ public:
 	inline FT squared_radius() const { return m_squared_radius; }
 
 	inline FT area() const {return M_PI*squared_radius(); }
+	inline FT perimeter() const {return 2*M_PI*radius(); }
 	inline bool do_intersect(const Cercle_2 &c) const 
 	{
 		Vector_2 diff = c.center() - center();
