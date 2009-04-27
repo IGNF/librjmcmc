@@ -20,11 +20,6 @@ struct GILEnergyPolicy::gradients_image_t: public dev2n32F_image_t
 {
 };
 
-struct GILEnergyPolicy::mask_image_t: public gray8_image_t
-{
-};
-
-
 template<typename Kernel1D>
 void initKernelGaussian1D(Kernel1D& kernel, double sigma)
 {
@@ -62,7 +57,7 @@ void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 		*i /= sum;
 }
 
-GILEnergyPolicy::GILEnergyPolicy() : m_defaultEnergy(0.), m_gradients(new gradients_image_t), m_mask (new mask_image_t)
+GILEnergyPolicy::GILEnergyPolicy() : m_defaultEnergy(0.), m_gradients_rectangle(new gradients_image_t), m_gradients_cercle(new gradients_image_t)
 {}
 
 void GILEnergyPolicy::Init(const std::string &nomIm, const std::string &nomMask, double defaultEnergy)
@@ -78,15 +73,13 @@ void GILEnergyPolicy::Init(const std::string &nomIm, const std::string &nomMask,
 
     gray16_image_t img;
     tiff_read_image(nomIm ,img);
-	m_gradients->recreate(img.dimensions());
+	m_gradients_rectangle->recreate(img.dimensions());
 
-	tiff_read_image(nomMask, *m_mask);
+	convolve_cols<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<0>(m_gradients_rectangle->_view), convolve_option_extend_constant);
+	convolve_rows<gray32F_pixel_t>(kth_channel_view<0>(m_gradients_rectangle->_view),kderiv,kth_channel_view<0>(m_gradients_rectangle->_view), convolve_option_extend_constant);
 
-	convolve_cols<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<0>(m_gradients->_view), convolve_option_extend_constant);
-	convolve_rows<gray32F_pixel_t>(kth_channel_view<0>(m_gradients->_view),kderiv,kth_channel_view<0>(m_gradients->_view), convolve_option_extend_constant);
-
-	convolve_rows<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<1>(m_gradients->_view), convolve_option_extend_constant);
-    convolve_cols<gray32F_pixel_t>(kth_channel_view<1>(m_gradients->_view),kderiv,kth_channel_view<1>(m_gradients->_view), convolve_option_extend_constant);
+	convolve_rows<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<1>(m_gradients_rectangle->_view), convolve_option_extend_constant);
+    convolve_cols<gray32F_pixel_t>(kth_channel_view<1>(m_gradients_rectangle->_view),kderiv,kth_channel_view<1>(m_gradients_rectangle->_view), convolve_option_extend_constant);
 /*
     gray32F_image_t module(img.dimensions());
     gray8_image_t filtered_module(img.dimensions());
@@ -111,8 +104,38 @@ void GILEnergyPolicy::Init(const std::string &nomIm, const std::string &nomMask,
 		}
 	}
 	*/ 
-//	tiff_write_view("gradients_x.tif", kth_channel_view<0>(m_gradients->_view));
-//	tiff_write_view("gradients_y.tif", kth_channel_view<1>(m_gradients->_view));
+	if (nomMask == "")
+		m_gradients_cercle = m_gradients_rectangle;
+	else
+	{
+		gray8_image_t mask;
+		tiff_read_image(nomMask, mask);
+		m_gradients_cercle->recreate(m_gradients_rectangle->dimensions());
+		gray8_view_t::iterator it_mask = view(mask).begin();
+		dev2n32F_view_t::iterator it_rectangle = m_gradients_rectangle->_view.begin();
+		dev2n32F_view_t::iterator it_cercle = m_gradients_cercle->_view.begin();
+		dev2n32F_view_t::iterator fin_cercle = m_gradients_cercle->_view.end();
+		for (; it_cercle != fin_cercle; ++it_mask, ++it_rectangle, ++it_cercle)
+		{
+			dev2n32F_pixel_t grad = *it_rectangle;
+			dev2n32F_pixel_t zero (0);
+			if (*it_mask == 255)
+			{
+				*it_cercle = grad;
+				*it_rectangle = zero;
+			}
+			else
+			{
+				*it_cercle = zero;
+				*it_rectangle = grad;
+			}
+		}
+	}
+
+//	tiff_write_view("gradients_rec_x.tif", kth_channel_view<0>(m_gradients_rectangle->_view));
+//	tiff_write_view("gradients_rec_y.tif", kth_channel_view<1>(m_gradients_rectangle->_view));
+//	tiff_write_view("gradients_cer_x.tif", kth_channel_view<0>(m_gradients_cercle->_view));
+//	tiff_write_view("gradients_cer_y.tif", kth_channel_view<1>(m_gradients_cercle->_view));
 }
 
 double GILEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
@@ -121,9 +144,9 @@ double GILEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
 	for (unsigned int i = 0; i < 4; ++i)
 	{
 		double delta = -ComputeSegmentDataEnergy(n.point(i),n.point(i + 1));
-		res += delta;
-//		if ( delta <= 0. )
-//			res += delta;
+//		res += delta;
+		if ( delta <= 0. )
+			res += delta;
 	}
 	return res;
 }
@@ -135,20 +158,15 @@ double GILEnergyPolicy::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Po
 
 	Segment_2 s(gridIn, gridOut);
 	CGAL::Segment_2_iterator<Segment_2> it(s);
-	dev2n32F_view_t::xy_locator loc_grad = m_gradients->_view.xy_at(gridIn.x(), gridIn.y());
-	gray8_view_t::xy_locator loc_mask = m_mask->_view.xy_at(gridIn.x(), gridIn.y());
+	dev2n32F_view_t::xy_locator loc_grad = m_gradients_rectangle->_view.xy_at(gridIn.x(), gridIn.y());
 	point2<std::ptrdiff_t> mvt[2] = { point2<std::ptrdiff_t>(it.Step(0),0), point2<std::ptrdiff_t>(0,it.Step(1)) };
 	for (; !it.end(); ++it)
 	{
 		const float length = it.length();
 		dev2n32F_pixel_t grad = (*loc_grad);
-		if (*loc_mask == 255)
-		{
-			gradient_sum[0] += length * at_c<0>(grad);
-			gradient_sum[1] += length * at_c<1>(grad);
-		}
+		gradient_sum[0] += length * at_c<0>(grad);
+		gradient_sum[1] += length * at_c<1>(grad);
 		loc_grad += mvt[it.axis()];
-		loc_mask += mvt[it.axis()];
 //		std::cout << "new : " << at_c<0>(grad) << "\t" << at_c<1>(grad) << std::endl;
 //		const dev2n32F_pixel_t old_grad = m_gradients->_view(it.x(), it.y());
 //		std::cout << "old : " << at_c<0>(old_grad) << "\t" << at_c<1>(old_grad) << std::endl;
@@ -161,30 +179,29 @@ double GILEnergyPolicy::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Po
 	return CGAL::to_double(normale * sum);
 }
 
-void GILEnergyPolicy::Add1CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const
+void GILEnergyPolicy::Add1CirclePoints(double xCenter, double yCenter, double dx, double dy, double coef, double & res) const
 {
- 	gray8_pixel_t mask = m_mask->_view(xCenter + dx, yCenter + dy);
-	dev2n32F_pixel_t grad = m_gradients->_view(xCenter + dx, yCenter + dy);
+	dev2n32F_pixel_t grad = m_gradients_cercle->_view(xCenter + dx, yCenter + dy);
 	Vector_2 vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
 	Vector_2 vnorm = Vector_2( dx, dy);
-	if (mask == 255)
-	{
-		res -= vgrad*vnorm;
-	}
+	res -= coef * vgrad * vnorm;
 }
 
-void GILEnergyPolicy::Add8CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const
+void GILEnergyPolicy::Add8CirclePoints(double xCenter, double yCenter, double dx, double dy, double radius2, double & res) const
 {
-	Add1CirclePoints(xCenter, yCenter, dx, dy, res);
-	Add1CirclePoints(xCenter, yCenter,-dx, dy, res);
-	Add1CirclePoints(xCenter, yCenter,-dx,-dy, res);
-	Add1CirclePoints(xCenter, yCenter, dx,-dy, res);
+	double half_sqrt2 = 1.4143/2;
+	double coef = (half_sqrt2 - std::abs(::sqrt(dx*dx+dy*dy) - ::sqrt(radius2))) / half_sqrt2;
+//	std::cout << ::sqrt(radius2) << "\t" << ::sqrt(dx*dx+dy*dy) << "\t" << coef << std::endl;
+//	getchar();
+	Add1CirclePoints(xCenter, yCenter, dx, dy, coef, res);
+	Add1CirclePoints(xCenter, yCenter,-dx, dy, coef, res);
+	Add1CirclePoints(xCenter, yCenter,-dx,-dy, coef, res);
+	Add1CirclePoints(xCenter, yCenter, dx,-dy, coef, res);
 
-	Add1CirclePoints(xCenter, yCenter, dy, dx, res);
-	Add1CirclePoints(xCenter, yCenter,-dy, dx, res);
-	Add1CirclePoints(xCenter, yCenter,-dy,-dx, res);
-	Add1CirclePoints(xCenter, yCenter, dy,-dx, res);
-
+	Add1CirclePoints(xCenter, yCenter, dy, dx, coef, res);
+	Add1CirclePoints(xCenter, yCenter,-dy, dx, coef, res);
+	Add1CirclePoints(xCenter, yCenter,-dy,-dx, coef, res);
+	Add1CirclePoints(xCenter, yCenter, dy,-dx, coef, res);
 }
 
 // Pour ca, tout vient de 
@@ -194,24 +211,24 @@ void GILEnergyPolicy::Add8CirclePoints(float xCenter, float yCenter, float dx, f
 double GILEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
 {
 	double res = 0.;
-	float x = 0;
-	float y = n.radius();
-	float p = 3 - 2*n.radius();
-	float xCenter = n.center().x(), yCenter = n.center().y();
-    Add8CirclePoints(xCenter, yCenter, x, y, res);
-    while (x < y) 
+	double dx = 0;
+	double dy = n.radius();
+	double p = 3 - 2*n.radius();
+	double xCenter = n.center().x(), yCenter = n.center().y();
+	Add8CirclePoints(xCenter, yCenter, dx, dy, n.squared_radius(), res);
+    while (dx < dy) 
 	{
         if (p < 0) 
 		{
-            p += 4*x+6;
+            p += 4*dx+6;
         }
 		else 
 		{
-            y--;
-            p += 4*(x-y)+10;
+            dy--;
+            p += 4*(dx-dy)+10;
         }
-        x++;
-        Add8CirclePoints(xCenter, yCenter, x, y, res);
+        dx++;
+		Add8CirclePoints(xCenter, yCenter, dx, dy, n.squared_radius(), res);
     } 
     
 	return (res / n.radius()) + m_defaultEnergy;

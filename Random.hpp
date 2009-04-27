@@ -1,28 +1,23 @@
 #ifndef RANDOM_HPP_
 #define RANDOM_HPP_
 
-#include <boost/random.hpp>
+#include <ctime>
 
-#ifndef WIN32
-#include <sys/time.h>
-#include <unistd.h>
-#endif
+#include <boost/random.hpp>
 
 typedef boost::mt19937 RJMCMCRandom;
 
 static RJMCMCRandom &GetRandom()
 {
 	static RJMCMCRandom randomness;
-#ifndef WIN32
 	static bool initialyze = true;
 	if (initialyze)
 	{
-		struct timeval tv;
-		gettimeofday(&tv,0);
-		randomness.seed( tv.tv_sec + tv.tv_usec );
+		boost::uint32_t it = std::time(00);
+		std::cout << "init random : " << it <<std::endl;
+		randomness.seed(it);
 		initialyze = false;
 	}
-#endif
 	return randomness;
 }
 

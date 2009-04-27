@@ -14,11 +14,7 @@ public:
 	void Init(const std::string &nomIm, const std::string &nomMask, double defaultEnergy);
 
 	double ComputeDataEnergy(const Rectangle_2 &n) const;
-	double ComputeSegmentDataEnergy(const Point_2 &gridIn,const Point_2 &gridOut) const;
-
 	double ComputeDataEnergy(const Cercle_2 &n) const;
-	void Add8CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const;
-	void Add1CirclePoints(float xCenter, float yCenter, float dx, float dy, double & res) const;
 
 	template<class NodeGeometry>
 	inline double ComputeDataEnergy(const GeometricNode<NodeGeometry> &n) const
@@ -27,12 +23,16 @@ public:
 	}
 
 private :
+	double ComputeSegmentDataEnergy(const Point_2 &gridIn,const Point_2 &gridOut) const;
+
+	void Add8CirclePoints(double xCenter, double yCenter, double dx, double dy, double radius2, double & res) const;
+	void Add1CirclePoints(double xCenter, double yCenter, double dx, double dy, double coef, double & res) const;
+
 	double m_defaultEnergy;
 
 	struct gradients_image_t;
-	boost::shared_ptr<gradients_image_t> m_gradients;
-	struct mask_image_t;
-	boost::shared_ptr<mask_image_t> m_mask;
+	boost::shared_ptr<gradients_image_t> m_gradients_cercle;
+	boost::shared_ptr<gradients_image_t> m_gradients_rectangle;
 };
 
 
