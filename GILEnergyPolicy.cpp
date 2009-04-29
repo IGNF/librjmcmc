@@ -180,29 +180,30 @@ double GILEnergyPolicy::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Po
 	return CGAL::to_double(normale * sum);
 }
 
-void GILEnergyPolicy::Add1CirclePoints(double xCenter, double yCenter, double dx, double dy, double coef, double & res) const
+double GILEnergyPolicy::Add1CirclePoints(double xCenter, double yCenter, double dx, double dy) const
 {
 	dev2n32F_pixel_t grad = m_gradients_cercle->_view(xCenter + dx, yCenter + dy);
 	Vector_2 vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
 	Vector_2 vnorm = Vector_2( dx, dy);
-	res -= coef * vgrad * vnorm;
+	return vgrad * vnorm;
 }
 
-void GILEnergyPolicy::Add8CirclePoints(double xCenter, double yCenter, double dx, double dy, double radius2, double & res) const
-{
-	double half_sqrt2 = 1.4143/2;
-	double coef = (half_sqrt2 - std::abs(::sqrt(dx*dx+dy*dy) - ::sqrt(radius2))) / half_sqrt2;
-//	std::cout << ::sqrt(radius2) << "\t" << ::sqrt(dx*dx+dy*dy) << "\t" << coef << std::endl;
-//	getchar();
-	Add1CirclePoints(xCenter, yCenter, dx, dy, coef, res);
-	Add1CirclePoints(xCenter, yCenter,-dx, dy, coef, res);
-	Add1CirclePoints(xCenter, yCenter,-dx,-dy, coef, res);
-	Add1CirclePoints(xCenter, yCenter, dx,-dy, coef, res);
+const double sqrt_2 = ::sqrt(2.);
 
-	Add1CirclePoints(xCenter, yCenter, dy, dx, coef, res);
-	Add1CirclePoints(xCenter, yCenter,-dy, dx, coef, res);
-	Add1CirclePoints(xCenter, yCenter,-dy,-dx, coef, res);
-	Add1CirclePoints(xCenter, yCenter, dy,-dx, coef, res);
+void GILEnergyPolicy::Add8CirclePoints(double xCenter, double yCenter, double dx, double dy, double radius, double & res) const
+{
+	const double coef = 1. - sqrt_2 * std::abs(::sqrt(dx*dx+dy*dy) - radius);
+//	std::cout << radius << "\t" << ::sqrt(dx*dx+dy*dy) << "\t" << coef << std::endl;
+//	getchar();
+	res -= coef * Add1CirclePoints(xCenter, yCenter, dx, dy);
+	res -= coef * Add1CirclePoints(xCenter, yCenter,-dx, dy);
+	res -= coef * Add1CirclePoints(xCenter, yCenter,-dx,-dy);
+	res -= coef * Add1CirclePoints(xCenter, yCenter, dx,-dy);
+
+	res -= coef * Add1CirclePoints(xCenter, yCenter, dy, dx);
+	res -= coef * Add1CirclePoints(xCenter, yCenter,-dy, dx);
+	res -= coef * Add1CirclePoints(xCenter, yCenter,-dy,-dx);
+	res -= coef * Add1CirclePoints(xCenter, yCenter, dy,-dx);
 }
 
 // Pour ca, tout vient de 
@@ -216,8 +217,8 @@ double GILEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
 	double dy = n.radius();
 	double p = 3 - 2*n.radius();
 	double xCenter = n.center().x(), yCenter = n.center().y();
-	Add8CirclePoints(xCenter, yCenter, dx, dy, n.squared_radius(), res);
-    while (dx < dy) 
+	Add8CirclePoints(xCenter, yCenter, dx, dy, n.radius(), res);
+    while (dx < dy)
 	{
         if (p < 0) 
 		{
@@ -229,7 +230,7 @@ double GILEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
             p += 4*(dx-dy)+10;
         }
         dx++;
-		Add8CirclePoints(xCenter, yCenter, dx, dy, n.squared_radius(), res);
+		Add8CirclePoints(xCenter, yCenter, dx, dy, n.radius(), res);
     } 
     
 	return (res / n.radius()) + m_defaultEnergy + m_coefDefaultEnergy * ::sqrt(n.perimeter());

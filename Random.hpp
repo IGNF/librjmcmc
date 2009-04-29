@@ -14,7 +14,7 @@ static RJMCMCRandom &GetRandom()
 	if (initialyze)
 	{
 		boost::uint32_t it = std::time(00);
-		std::cout << "init random : " << it <<std::endl;
+		std::cout << "Random seed : " << it <<std::endl;
 		randomness.seed(it);
 		initialyze = false;
 	}

@@ -25,8 +25,8 @@ public:
 private :
 	double ComputeSegmentDataEnergy(const Point_2 &gridIn,const Point_2 &gridOut) const;
 
-	void Add8CirclePoints(double xCenter, double yCenter, double dx, double dy, double radius2, double & res) const;
-	void Add1CirclePoints(double xCenter, double yCenter, double dx, double dy, double coef, double & res) const;
+	void Add8CirclePoints(double xCenter, double yCenter, double dx, double dy, double radius, double & res) const;
+	double Add1CirclePoints(double xCenter, double yCenter, double dx, double dy) const;
 
 	double m_defaultEnergy;
 	double m_coefDefaultEnergy;
