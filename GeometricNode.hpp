@@ -150,6 +150,7 @@ public :
 	void Weight( double w ) { m_weight = w; }
 
 	const NodeGeometry & Geometry() const { return m_geometry; }
+	double Surface() const { return Geometry().area(); }
 
 private :
 	NodeGeometry m_geometry;

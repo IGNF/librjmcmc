@@ -141,7 +141,7 @@ void GILEnergyPolicy::Init(double defaultEnergy, double coefDefaultEnergy, const
 
 double GILEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
 {
-	double res = m_defaultEnergy + m_coefDefaultEnergy * ::sqrt(n.perimeter());
+	double res = m_defaultEnergy + m_coefDefaultEnergy * /*::sqrt*/(n.perimeter());
 	for (unsigned int i = 0; i < 4; ++i)
 	{
 		double delta = -ComputeSegmentDataEnergy(n.point(i),n.point(i + 1));
@@ -233,7 +233,7 @@ double GILEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
 		Add8CirclePoints(xCenter, yCenter, dx, dy, n.radius(), res);
     } 
     
-	return (res / n.radius()) + m_defaultEnergy + m_coefDefaultEnergy * ::sqrt(n.perimeter());
+	return (res / n.radius()) + m_defaultEnergy + m_coefDefaultEnergy * /*::sqrt*/(n.perimeter());
 }
 
 struct ImageExporter::export_image_t : public gray8_image_t

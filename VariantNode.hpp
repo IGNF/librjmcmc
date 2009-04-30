@@ -58,6 +58,24 @@ public:
 	}
 };
 
+class SurfaceVisitor
+{
+public :
+	typedef double result_type;
+	
+	SurfaceVisitor() {}
+	
+	result_type operator()(const Rectangle_2 & n) const
+	{
+		return n.area();
+	}
+
+    result_type operator()(const Cercle_2 & n) const
+	{
+		return n.area();
+	}
+};
+
 template<class NodeGeometry>
 class VariantNode
 {
@@ -95,6 +113,11 @@ public :
 
 	const double Weight() const { return m_weight; }
 	void Weight( double w ) { m_weight = w; }
+
+	double Surface() const 
+	{
+		return boost::apply_visitor(SurfaceVisitor(), Geometry());
+	}
 
 	const NodeGeometry & Geometry() const { return m_geometry; }
 

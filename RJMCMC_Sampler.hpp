@@ -145,8 +145,9 @@ public :
 			{
 				delta = delta_birth(detector, modif);
 				//R = 1.- detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
-				double surface = BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
-				surface *= surface*detector.GetNbVertices();
+				double surface = detector.TotalSurface();
+				//double surface = BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
+				//surface *= surface*detector.GetNbVertices();
 				R = detector.GetBox().Volume() / (surface+1) ;
 				break;
 			}
@@ -154,8 +155,9 @@ public :
 			{
 				delta = delta_death(detector, modif);
 				//R = detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
-				double surface = BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
-				surface *= surface*detector.GetNbVertices();
+				double surface = detector.TotalSurface();
+				//double surface = BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
+				//surface *= surface*detector.GetNbVertices();
 				R = surface / detector.GetBox().Volume();
 				break;
 			}

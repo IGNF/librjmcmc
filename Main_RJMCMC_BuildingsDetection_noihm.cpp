@@ -94,6 +94,8 @@ int main (int argc, char **argv)
 	my_out_stream << "Graph Data energy integrity : " << buildingsDetector.CheckGraphDataEnergyIntegrity() << std::endl;
 	my_out_stream << "Graph Prior energy integrity: " << buildingsDetector.CheckGraphPriorEnergyIntegrity() << std::endl;
 	my_out_stream << "Graph Structure integrity : " << buildingsDetector.CheckGraphStructureIntegrity() << std::endl;
+	my_out_stream << "Total Surface : " << buildingsDetector.TotalSurface() << std::endl;
+	my_out_stream << "Total Surface integrity : " << buildingsDetector.CheckTotalSurfaceIntegrity() << std::endl;
 	buildingsDetector.Dump(my_out_stream);
 	std::cout << my_out_stream.str();
 //	buildingsDetector.InitExport();

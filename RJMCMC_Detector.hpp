@@ -54,12 +54,13 @@ private :
 
 public:
 
-	inline RJMCMC_Detector(const MultiDimensionnalBBox<DIMENSION> &box) : m_box(box), m_priorEnergy(0.), m_dataEnergy(0.) {}
+	inline RJMCMC_Detector(const MultiDimensionnalBBox<DIMENSION> &box) : m_box(box), m_priorEnergy(0.), m_dataEnergy(0.), m_totalSurface(0.) {}
 	inline ~RJMCMC_Detector() {}
 
 	inline vertex_descriptor AddNode (const NodeType &node)
 	{
 		m_dataEnergy += node.Weight();
+		m_totalSurface += node.Surface();
 		vertex_descriptor n = add_vertex(node, m_graph);
 		vertex_iterator it = vertices(m_graph).first, fin = vertices(m_graph).second;
 		for (; it != fin; ++it)
@@ -80,8 +81,10 @@ public:
 	inline void ChangeVertex (vertex_iterator vi, const NodeType &node, const std::vector<neighboor_and_weight> &newNeighboors)
 	{
 		m_dataEnergy -= m_graph[*vi].Weight();
+		m_totalSurface -= m_graph[*vi].Surface();
 		m_graph[*vi] = node;
 		m_dataEnergy += node.Weight();
+		m_totalSurface += node.Surface();
 
 		// Soustraction des prior terms sur toutes les aretes adjacentes
 		std::pair< typename GraphType::out_edge_iterator , typename GraphType::out_edge_iterator > pair_edges = out_edges( *vi , m_graph );
@@ -113,6 +116,7 @@ public:
 			m_priorEnergy -= m_graph[ *(pair_edges.first) ].Weight();
 		}
 		m_dataEnergy -= m_graph[*vi].Weight();
+		m_totalSurface -= m_graph[*vi].Surface();
 		clear_vertex( *vi, m_graph);
 		remove_vertex( *vi , m_graph);
 	}
@@ -149,6 +153,18 @@ public:
 			computedEnergy += ComputeDataEnergy( m_graph[*it_v] );
 		}
 		return computedEnergy-m_dataEnergy;
+	}
+
+	double CheckTotalSurfaceIntegrity()
+	{
+		// On parcourt tous les sommets et on verifie que la somme des energies vaut l'energie courante
+		double totalSurface = 0.;
+		vertex_iterator it_v = vertices(m_graph).first, fin_v = vertices(m_graph).second;
+		for (; it_v != fin_v; ++it_v)
+		{
+			totalSurface += m_graph[*it_v].Surface();
+		}
+		return totalSurface-m_totalSurface;
 	}
 
 	double CheckGraphPriorEnergyIntegrity()
@@ -208,9 +224,8 @@ public:
 	/** Accesseurs
 	*/
 	inline const double PriorEnergy() const { return m_priorEnergy; }
-	inline void PriorEnergy( double pe ) { m_priorEnergy = pe; }
 	inline const double DataEnergy() const { return m_dataEnergy; }
-	inline void DataEnergy( double de ) { m_dataEnergy = de; }
+	inline const double TotalSurface() const { return m_totalSurface; }
 
 	inline const MultiDimensionnalBBox<DIMENSION> & GetBox() const { return m_box; }
 	inline const GraphType & GetGraph() const {return m_graph;}
@@ -222,6 +237,7 @@ private:
 	MultiDimensionnalBBox<DIMENSION> m_box;
 	double m_priorEnergy;
 	double m_dataEnergy;
+	double m_totalSurface;
 };
 
 #endif // RJMCMC_BUILDINGS_DETECTOR_HPP
