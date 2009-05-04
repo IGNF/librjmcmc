@@ -47,7 +47,7 @@ inline void RandomInit(const BBox &box, Cercle_2 &c)
 	Point_2 p(diex(), diey());
 
 	boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > dieradius( GetRandom(), 
-			boost::uniform_real<>(BuildingsDetectorParametersSingleton::Instance()->MinimalSize(), BuildingsDetectorParametersSingleton::Instance()->MaximalSize()));
+			boost::uniform_real<>(BuildingsDetectorParametersSingleton::Instance()->CircleMinimalSize(), BuildingsDetectorParametersSingleton::Instance()->CircleMaximalSize()));
 
 	c = Cercle_2(p, dieradius());
 }
@@ -60,7 +60,7 @@ inline void RandomInit(const BBox &box, Rectangle_2 &rect)
 		boost::uniform_real<>(box.Min()[1], box.Max()[1]));
 
 	boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > dievec( GetRandom(), 
-			boost::uniform_real<>(BuildingsDetectorParametersSingleton::Instance()->MinimalSize(), BuildingsDetectorParametersSingleton::Instance()->MaximalSize()));
+			boost::uniform_real<>(BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize(), BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalSize()));
 
 	Point_2 p(diex(), diey());
 	Point_2 q(p.x() + dievec(), p.y() + dievec());
@@ -87,11 +87,11 @@ inline bool IsValid(const BBox &box, const Rectangle_2 &r)
 	if (length0 > length1)
 		std::swap(length0, length1);
 
-	float minSize = (float)BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
+	float minSize = (float)BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize();
 	if ( length0 < minSize)
 		return false;
 
-	float maxSize = (float)BuildingsDetectorParametersSingleton::Instance()->MaximalSize();
+	float maxSize = (float)BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalSize();
 	if (length1 > maxSize)
 		return false;
 
@@ -104,10 +104,10 @@ inline bool IsValid(const BBox &box, const Rectangle_2 &r)
 
 inline bool IsValid(const BBox &box, const Cercle_2 &ce)
 {
-	float minSize = (float)BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
+	float minSize = (float)BuildingsDetectorParametersSingleton::Instance()->CircleMinimalSize();
 	if ( ce.radius() < minSize)
 		return false;
-	float maxSize = (float)BuildingsDetectorParametersSingleton::Instance()->MaximalSize();
+	float maxSize = (float)BuildingsDetectorParametersSingleton::Instance()->CircleMaximalSize();
 	if ( ce.radius() > maxSize)
 		return false;
 

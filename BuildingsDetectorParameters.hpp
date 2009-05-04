@@ -21,7 +21,6 @@ class BuildingsDetectorParametersSingleton : public PatternSingleton<BuildingsDe
 	friend class PatternSingleton<BuildingsDetectorParametersSingleton>;
 //	friend class boost::serialization::access;
 
-
 public:
 	inline double InitialTemperature()  const { return m_initialTemperature; }
 	inline unsigned int NbIterations()  const { return m_nbIterations; }
@@ -43,9 +42,12 @@ public:
 	inline double VarianceGaussianFilter() const { return m_varianceGaussianFilter; }
 	inline double IntersectionSurfacePonderation() const { return m_ponderationSurfaceIntersection; }
 
-	inline double MinimalSize() const { return m_minimalSize; }
-	inline double MaximalSize() const { return m_maximalSize; }
 	inline double RectangleMaximalRatio() const { return m_rectangleMaximalRatio; }
+	inline double RectangleMinimalSize() const { return m_rectangleMinimalSize; }
+	inline double RectangleMaximalSize() const { return m_rectangleMaximalSize; }
+	inline double CircleMinimalSize() const { return m_circleMinimalSize; }
+	inline double CircleMaximalSize() const { return m_circleMaximalSize; }
+
 	inline double IndividualEnergy() const { return m_individualEnergy; }
 	inline double CoefIndividualEnergy() const { return m_coefIndividualEnergy; }
 
@@ -75,9 +77,11 @@ private:
 	unsigned int m_runningWidth;
 	unsigned int m_runningHeight;
 	double m_varianceGaussianFilter;
-	double m_minimalSize;
-	double m_maximalSize;
 	double m_rectangleMaximalRatio;
+	double m_rectangleMinimalSize;
+	double m_rectangleMaximalSize;
+	double m_circleMinimalSize;
+	double m_circleMaximalSize;
 	double m_ponderationSurfaceIntersection;
 	double m_individualEnergy;
 	double m_coefIndividualEnergy;

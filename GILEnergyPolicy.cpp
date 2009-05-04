@@ -206,6 +206,18 @@ void GILEnergyPolicy::Add8CirclePoints(double xCenter, double yCenter, double dx
 	res -= coef * Add1CirclePoints(xCenter, yCenter, dy,-dx);
 }
 
+void GILEnergyPolicy::Add4CirclePoints(double xCenter, double yCenter, double dy, double radius, double & res) const
+{
+//	const double coef = 1. - sqrt_2 * std::abs(::sqrt(dx*dx+dy*dy) - radius);
+	const double coef = 1.;
+//	std::cout << radius << "\t" << ::sqrt(dx*dx+dy*dy) << "\t" << coef << std::endl;
+//	getchar();
+	res -= coef * Add1CirclePoints(xCenter, yCenter, 0, dy);
+	res -= coef * Add1CirclePoints(xCenter, yCenter, 0,-dy);
+	res -= coef * Add1CirclePoints(xCenter, yCenter, dy, 0);
+	res -= coef * Add1CirclePoints(xCenter, yCenter,-dy, 0);
+}
+
 // Pour ca, tout vient de 
 // http://escience.anu.edu.au/lecture/cg/Circle/
 // Corrige par :
@@ -217,7 +229,7 @@ double GILEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
 	double dy = n.radius();
 	double p = 3 - 2*n.radius();
 	double xCenter = n.center().x(), yCenter = n.center().y();
-	Add8CirclePoints(xCenter, yCenter, dx, dy, n.radius(), res);
+	Add4CirclePoints(xCenter, yCenter, dy, n.radius(), res);
     while (dx < dy)
 	{
         if (p < 0) 
@@ -240,7 +252,7 @@ struct ImageExporter::export_image_t : public gray8_image_t
 {
 };
 
-ImageExporter::ImageExporter() : m_img(new export_image_t)
+ImageExporter::ImageExporter(bool fill) : m_fill(fill), m_img(new export_image_t)
 {}
 
 struct local_cc
@@ -261,16 +273,14 @@ void local_cc::operator()<gray16_pixel_t, gray8_pixel_t>(const gray16_pixel_t &s
 
 void ImageExporter::InitExport(const char *filename) const
 {
-	if (std::string(filename).empty())
-	{
-		m_img->recreate(700, 700);
-		fill_pixels(m_img->_view, 0);
-	}
-	else
-	{
-		m_img->recreate(tiff_read_dimensions(filename));
-		tiff_read_and_convert_view(filename, m_img->_view, local_cc());
-	}
+	m_img->recreate(tiff_read_dimensions(filename));
+	tiff_read_and_convert_view(filename, m_img->_view, local_cc());
+}
+
+void ImageExporter::InitExport(int width, int height) const
+{
+	m_img->recreate(width, height);
+	fill_pixels(m_img->_view, 0);
 }
 
 void ImageExporter::EndExport(const char *filename) const
@@ -288,6 +298,20 @@ void ImageExporter::Export8Points(int xCenter, int yCenter, int dx, int dy) cons
 	m_img->_view(xCenter - dy, yCenter + dx) = 255;
 	m_img->_view(xCenter - dy, yCenter - dx) = 255;
 	m_img->_view(xCenter + dy, yCenter - dx) = 255;
+
+	if (m_fill)
+	{
+		for (int x = (xCenter - dx); x < (xCenter + dx); ++x)
+		{
+			m_img->_view(x, yCenter + dy) = 255;
+			m_img->_view(x, yCenter - dy) = 255;
+		}
+		for (int x = (xCenter - dy); x < (xCenter + dy); ++x)
+		{
+			m_img->_view(x, yCenter + dx) = 255;
+			m_img->_view(x, yCenter - dx) = 255;
+		}
+	}
 }
 
 void ImageExporter::ExportNode(const Cercle_2 &n) const
@@ -313,20 +337,23 @@ void ImageExporter::ExportNode(const Cercle_2 &n) const
     } 
 }
 
-void ImageExporter::ExportNode(const Segment_2 &s) const
-{
-	CGAL::Segment_2_iterator<Segment_2> it(s);
-	for (; !it.end(); ++it)
-	{
-		m_img->_view(it.x(), it.y()) = 255;
-	}
-}
-
 void ImageExporter::ExportNode(const Rectangle_2 &n) const
 {
 	for (unsigned int i = 0; i < 4; ++i)
 	{
-		ExportNode(Segment_2(n.point(i),n.point(i + 1)));
+		CGAL::Segment_2_iterator<Segment_2> it(Segment_2(n.point(i),n.point(i + 1)));
+		for (; !it.end(); ++it)
+		{
+			m_img->_view(it.x(), it.y()) = 255;
+		}
+	}
+	if (m_fill)
+	{
+		CGAL::Rectangle_2_point_iterator<Rectangle_2> it(n);
+		for (; !it.end(); ++it)
+		{
+			m_img->_view(it.x(), it.y()) = 255;
+		}
 	}
 }
 

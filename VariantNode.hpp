@@ -136,6 +136,9 @@ class VariantImageExporter : public ImageExporter
 public :
 	typedef void result_type;
 
+	VariantImageExporter(bool fill=false) : ImageExporter(fill) 
+	{;}
+	
 	void ExportNode(const VariantNodeGeometry &n) const
 	{
 		boost::apply_visitor(*this, n);

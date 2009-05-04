@@ -98,11 +98,23 @@ int main (int argc, char **argv)
 	my_out_stream << "Total Surface integrity : " << buildingsDetector.CheckTotalSurfaceIntegrity() << std::endl;
 	buildingsDetector.Dump(my_out_stream);
 	std::cout << my_out_stream.str();
-//	buildingsDetector.InitExport();
-//	BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
-//	for (; it_v != fin_v; ++it_v)
-//		buildingsDetector.ExportNode(buildingsDetector.GetGraph()[*it_v].Geometry());
-//	buildingsDetector.EndExport("final_out.tif");
+
+	ImageExporterType exporter_rec(true), exporter_cir(true);
+	exporter_rec.InitExport(1695, 1575);
+	exporter_cir.InitExport(1695, 1575);
+	BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
+	for (; it_v != fin_v; ++it_v)
+	{
+		VariantType v = buildingsDetector.GetGraph()[*it_v].Geometry();
+		if (v.which() == 0)
+		{
+			exporter_rec.ExportNode(v);
+		}
+		else
+			exporter_cir.ExportNode(v);
+	}
+	exporter_rec.EndExport("fill_rec.tif");
+	exporter_cir.EndExport("fill_cir.tif");
 
 	return 0;
 }

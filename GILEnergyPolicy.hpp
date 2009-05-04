@@ -26,6 +26,7 @@ private :
 	double ComputeSegmentDataEnergy(const Point_2 &gridIn,const Point_2 &gridOut) const;
 
 	void Add8CirclePoints(double xCenter, double yCenter, double dx, double dy, double radius, double & res) const;
+	void Add4CirclePoints(double xCenter, double yCenter, double dy, double radius, double & res) const;
 	double Add1CirclePoints(double xCenter, double yCenter, double dx, double dy) const;
 
 	double m_defaultEnergy;
@@ -39,16 +40,18 @@ private :
 class ImageExporter
 {
 public :
-	ImageExporter();
+	ImageExporter(bool fill=false);
 
 	void InitExport(const char *filename) const;
+	void InitExport(int width, int height) const;
+
 	void EndExport(const char *filename) const;
 	void Export8Points(int xCenter, int yCenter, int dx, int dy) const;
 	void ExportNode(const Cercle_2 &n) const;
-	void ExportNode(const Segment_2 &s) const;
 	void ExportNode(const Rectangle_2 &n) const;
 
 private :
+	bool m_fill;
 	struct export_image_t;
 	boost::shared_ptr<export_image_t> m_img;
 };

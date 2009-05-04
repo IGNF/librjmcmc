@@ -145,10 +145,10 @@ public :
 			{
 				delta = delta_birth(detector, modif);
 				//R = 1.- detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
-				double surface = detector.TotalSurface();
+				double surface = detector.TotalSurface() + modif.Node().Surface();
 				//double surface = BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
 				//surface *= surface*detector.GetNbVertices();
-				R = detector.GetBox().Volume() / (surface+1) ;
+				R = detector.GetBox().Volume() / surface ;
 				break;
 			}
 			case eDEATH :
