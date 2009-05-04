@@ -19,10 +19,13 @@ typedef VariantImageExporter<VariantType> ImageExporterType;
 //typedef ImageExporter ImageExporterType;
 
 void generate_test_images();
+void res_evaluator(const char * nom_in, const char * nom_ref, const char * nom_mask);
 
 int main (int argc, char **argv)
 {	
-
+	res_evaluator("fill_rec.tif", "data/MNS-veget/cadastre_saisie_50cm_complete_img.tif", "data/MNS-veget/cadastre_ref_20cm_complete_img_masque.tif");
+	return 0;
+	
 	if (!BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc, argv))
 	{
 		generate_test_images();

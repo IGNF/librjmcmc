@@ -430,3 +430,44 @@ void generate_test_images ()
 	ExportRectangleTestImage("test_1rectangle_l050h020.tif", 25, 10);
 	ExportRectangleTestImage("test_1rectangle_l100h100.tif", 50, 50);
 }
+
+void res_evaluator(const char * nom_in, const char * nom_ref, const char * nom_mask)
+{
+	gray8_image_t in, ref, mask;
+	tiff_read_image(nom_in, in);
+	tiff_read_image(nom_ref, ref);
+	tiff_read_image(nom_mask, mask);
+	gray8_view_t::iterator it_in = in._view.begin(), fin_in = in._view.end();
+	gray8_view_t::iterator it_ref = ref._view.begin();
+	gray8_view_t::iterator it_mask = mask._view.begin();
+
+	unsigned nb_pixels = 0;
+
+	unsigned int nb_tp =0, nb_fn = 0, nb_tn = 0, nb_fp = 0;
+	for (; it_in != fin_in; ++it_in, ++it_ref, ++it_mask)
+	{
+		if (*it_mask == 0)
+			continue;
+		if (*it_ref == 0)
+		{
+			if (*it_in == 0)
+				++nb_tn;
+			else
+				++nb_fp;
+		}
+		else
+		{
+			if (*it_in == 0)
+				++nb_fn;
+			else
+				++nb_tp;
+		}
+		++nb_pixels;
+	}
+
+	float inv = 100. / nb_pixels;
+	std::cout << "True positive : " << nb_tp << " soit " << nb_tp * inv << " \%" << std::endl; 
+	std::cout << "True negative : " << nb_tn << " soit " << nb_tn * inv << " \%" << std::endl; 
+	std::cout << "False positive : " << nb_fp << " soit " << nb_fp * inv << " \%" << std::endl; 
+	std::cout << "False negative : " << nb_fn << " soit " << nb_fn * inv << " \%" << std::endl; 
+}
