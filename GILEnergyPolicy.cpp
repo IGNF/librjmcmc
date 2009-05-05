@@ -451,14 +451,14 @@ void res_evaluator(const char * nom_in, const char * nom_ref, const char * nom_m
 		if (*it_ref == 0)
 		{
 			if (*it_in == 0)
-				++nb_tn;
+				++nb_fn;
 			else
 				++nb_fp;
 		}
 		else
 		{
 			if (*it_in == 0)
-				++nb_fn;
+				++nb_tn;
 			else
 				++nb_tp;
 		}
@@ -467,7 +467,7 @@ void res_evaluator(const char * nom_in, const char * nom_ref, const char * nom_m
 
 	float inv = 100. / nb_pixels;
 	std::cout << "True positive : " << nb_tp << " soit " << nb_tp * inv << " \%" << std::endl; 
+	std::cout << "False negative : " << nb_fn << " soit " << nb_fn * inv << " \%" << std::endl; 
 	std::cout << "True negative : " << nb_tn << " soit " << nb_tn * inv << " \%" << std::endl; 
 	std::cout << "False positive : " << nb_fp << " soit " << nb_fp * inv << " \%" << std::endl; 
-	std::cout << "False negative : " << nb_fn << " soit " << nb_fn * inv << " \%" << std::endl; 
 }

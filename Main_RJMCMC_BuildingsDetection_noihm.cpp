@@ -22,10 +22,7 @@ void generate_test_images();
 void res_evaluator(const char * nom_in, const char * nom_ref, const char * nom_mask);
 
 int main (int argc, char **argv)
-{	
-	res_evaluator("fill_rec.tif", "data/MNS-veget/cadastre_saisie_50cm_complete_img.tif", "data/MNS-veget/cadastre_ref_20cm_complete_img_masque.tif");
-	return 0;
-	
+{		
 	if (!BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc, argv))
 	{
 		generate_test_images();
@@ -119,5 +116,9 @@ int main (int argc, char **argv)
 	exporter_rec.EndExport("fill_rec.tif");
 	exporter_cir.EndExport("fill_cir.tif");
 
+	std::cout << "Evaluation des rectangles" << std::endl;
+	res_evaluator("fill_rec.tif", "data/MNS-veget/cadastre_saisie_50cm_complete_img.tif", "data/MNS-veget/cadastre_ref_20cm_complete_img_masque.tif");
+	std::cout << "Evaluation des cercles" << std::endl;
+	res_evaluator("fill_cir.tif", "data/MNS-veget/vegetation_saint_michel.tif", "data/MNS-veget/cadastre_ref_20cm_complete_img_masque.tif");
 	return 0;
 }
