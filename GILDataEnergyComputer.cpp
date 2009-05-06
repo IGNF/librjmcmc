@@ -14,9 +14,9 @@ typedef dev2n32F_pixel_t*						dev2n32F_pixel_ptr_t;
 typedef image_type<float,devicen_layout_t<2> >::type	dev2n32F_image_t;
 typedef dev2n32F_image_t::view_t				dev2n32F_view_t;
 
-#include "GILEnergyPolicy.hpp"
+#include "GILDataEnergyComputer.hpp"
 
-struct GILEnergyPolicy::gradients_image_t: public dev2n32F_image_t
+struct GILDataEnergyComputer::gradients_image_t: public dev2n32F_image_t
 {
 };
 
@@ -57,13 +57,9 @@ void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 		*i /= sum;
 }
 
-GILEnergyPolicy::GILEnergyPolicy() : m_defaultEnergy(0.), m_coefDefaultEnergy(0.), m_gradients_cercle(new gradients_image_t), m_gradients_rectangle(new gradients_image_t)
-{}
-
-void GILEnergyPolicy::Init(double defaultEnergy, double coefDefaultEnergy, const std::string &nomIm, const std::string &nomMask)
+GILDataEnergyComputer::GILDataEnergyComputer(double defaultEnergy, double coefDefaultEnergy, const std::string &nomIm, const std::string &nomMask) :
+m_defaultEnergy(defaultEnergy), m_coefDefaultEnergy(coefDefaultEnergy), m_gradients_cercle(new gradients_image_t), m_gradients_rectangle(new gradients_image_t)
 {
-	m_defaultEnergy = defaultEnergy;
-	m_coefDefaultEnergy = coefDefaultEnergy;
 	double sigmaD = 1.;
 	unsigned int half_size = 3*sigmaD;
 	const size_t kws = 2 * half_size+1;
@@ -139,7 +135,7 @@ void GILEnergyPolicy::Init(double defaultEnergy, double coefDefaultEnergy, const
 //	tiff_write_view("gradients_cer_y.tif", kth_channel_view<1>(m_gradients_cercle->_view));
 }
 
-double GILEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
+double GILDataEnergyComputer::Compute(const Rectangle_2 &n) const
 {
 	double res = m_defaultEnergy + m_coefDefaultEnergy * /*::sqrt*/(n.perimeter());
 	for (unsigned int i = 0; i < 4; ++i)
@@ -153,7 +149,7 @@ double GILEnergyPolicy::ComputeDataEnergy(const Rectangle_2 &n) const
 }
 
 //TODO: improve --> 40%
-double GILEnergyPolicy::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Point_2 &gridOut) const
+double GILDataEnergyComputer::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Point_2 &gridOut) const
 {
 	float gradient_sum[2] = {0.,0.};
 
@@ -180,7 +176,7 @@ double GILEnergyPolicy::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Po
 	return CGAL::to_double(normale * sum);
 }
 
-double GILEnergyPolicy::Add1CirclePoints(double xCenter, double yCenter, double dx, double dy) const
+double GILDataEnergyComputer::Add1CirclePoints(double xCenter, double yCenter, double dx, double dy) const
 {
 	dev2n32F_pixel_t grad = m_gradients_cercle->_view(xCenter + dx, yCenter + dy);
 	Vector_2 vgrad = Vector_2(at_c<0>(grad), at_c<1>(grad));
@@ -190,7 +186,7 @@ double GILEnergyPolicy::Add1CirclePoints(double xCenter, double yCenter, double 
 
 const double sqrt_2 = ::sqrt(2.);
 
-void GILEnergyPolicy::Add8CirclePoints(double xCenter, double yCenter, double dx, double dy, double radius, double & res) const
+void GILDataEnergyComputer::Add8CirclePoints(double xCenter, double yCenter, double dx, double dy, double radius, double & res) const
 {
 	const double coef = 1. - sqrt_2 * std::abs(::sqrt(dx*dx+dy*dy) - radius);
 //	std::cout << radius << "\t" << ::sqrt(dx*dx+dy*dy) << "\t" << coef << std::endl;
@@ -206,7 +202,7 @@ void GILEnergyPolicy::Add8CirclePoints(double xCenter, double yCenter, double dx
 	res -= coef * Add1CirclePoints(xCenter, yCenter, dy,-dx);
 }
 
-void GILEnergyPolicy::Add4CirclePoints(double xCenter, double yCenter, double dy, double radius, double & res) const
+void GILDataEnergyComputer::Add4CirclePoints(double xCenter, double yCenter, double dy, double radius, double & res) const
 {
 //	const double coef = 1. - sqrt_2 * std::abs(::sqrt(dx*dx+dy*dy) - radius);
 	const double coef = 1.;
@@ -222,7 +218,7 @@ void GILEnergyPolicy::Add4CirclePoints(double xCenter, double yCenter, double dy
 // http://escience.anu.edu.au/lecture/cg/Circle/
 // Corrige par :
 // http://www.cplusplus.happycodings.com/Computer_Graphics/code16.html
-double GILEnergyPolicy::ComputeDataEnergy(const Cercle_2 &n) const
+double GILDataEnergyComputer::Compute(const Cercle_2 &n) const
 {
 	double res = 0.;
 	double dx = 0;

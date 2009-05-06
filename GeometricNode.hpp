@@ -74,24 +74,24 @@ inline void RandomInit(const BBox &box, Rectangle_2 &rect)
 inline bool IsValid(const BBox &box, const Rectangle_2 &r)
 {
 	Vector_2 n = r.normal();
-	float anx = std::abs(n.x());
-	float any = std::abs(n.y());
-	float dx = anx + r.ratio()*any;
-	float dy = any + r.ratio()*anx;
+	double anx = std::abs(n.x());
+	double any = std::abs(n.y());
+	double dx = anx + r.ratio()*any;
+	double dy = any + r.ratio()*anx;
 	Point_2 c = r.center();
 	if ((c.x()-dx < box.Min()[0]) || (c.y()-dy < box.Min()[1]) || (c.x()+dx > box.Max()[0]) || (c.y()+dy > box.Max()[1]))
 		return false;
 
-	float length0 = r.normal_length();
-	float length1 = r.ratio()*length0;
+	double length0 = r.normal_length();
+	double length1 = r.ratio()*length0;
 	if (length0 > length1)
 		std::swap(length0, length1);
 
-	float minSize = (float)BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize();
+	double minSize = BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize();
 	if ( length0 < minSize)
 		return false;
 
-	float maxSize = (float)BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalSize();
+	double maxSize = (float)BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalSize();
 	if (length1 > maxSize)
 		return false;
 
@@ -104,10 +104,10 @@ inline bool IsValid(const BBox &box, const Rectangle_2 &r)
 
 inline bool IsValid(const BBox &box, const Cercle_2 &ce)
 {
-	float minSize = (float)BuildingsDetectorParametersSingleton::Instance()->CircleMinimalSize();
+	double minSize = BuildingsDetectorParametersSingleton::Instance()->CircleMinimalSize();
 	if ( ce.radius() < minSize)
 		return false;
-	float maxSize = (float)BuildingsDetectorParametersSingleton::Instance()->CircleMaximalSize();
+	double maxSize = BuildingsDetectorParametersSingleton::Instance()->CircleMaximalSize();
 	if ( ce.radius() > maxSize)
 		return false;
 
@@ -157,11 +157,11 @@ private :
 	double m_weight;
 };
 
-class IntersectionPriorEnergyPolicy
+class IntersectionPriorEnergyComputer
 {
 	double m_coefSurface;
 public :
-	inline IntersectionPriorEnergyPolicy(): m_coefSurface(BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()) {;}
+	inline IntersectionPriorEnergyComputer(double coefSurface): m_coefSurface(coefSurface) {;}
 
 	template<class NodeGeometry>
 	inline double ComputePriorEnergy(const GeometricNode<NodeGeometry> & n1, const GeometricNode<NodeGeometry> & n2) const
@@ -174,7 +174,7 @@ public :
 	}
 };
 
-class SurfaceDataEnergyPolicy
+class SurfaceDataEnergyComputer
 {
 public :
 	template<class NodeGeometry>

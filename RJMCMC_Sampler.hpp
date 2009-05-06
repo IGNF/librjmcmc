@@ -11,7 +11,7 @@ enum eProposition
 	,eNONE
 };
 
-template < class DetectorType  >
+template < class DetectorType>
 class Modification
 {
 public:
@@ -50,7 +50,7 @@ private:
 
 };
 
-template < class DetectorType>
+template < class DetectorType, unsigned int DIMENSION = 2>
 class Sampler
 {
 	double m_temp;
@@ -58,8 +58,8 @@ class Sampler
 	std::vector<double> m_probas;
 
 public :
-
-	Sampler(double tempInitiale, double coef_descente, const std::vector<double> &probas): m_temp(tempInitiale), m_q(coef_descente), m_probas(probas)
+	Sampler(MultiDimensionnalBBox<DIMENSION> &box, double tempInitiale, double coef_descente, const std::vector<double> &probas):
+	   m_box(box), m_temp(tempInitiale), m_q(coef_descente), m_probas(probas)
 	{}
 
 	double Temperature() const { return m_temp; }
@@ -70,6 +70,8 @@ public :
 
 	const std::vector<double> &CumulatedProbabilities() const { return m_probas; }
 	void CumulatedProbabilities(const std::vector<double> &p) { m_probas = p; }
+
+	inline const MultiDimensionnalBBox<DIMENSION> & GetBox() const { return m_box; }
 
 	eProposition Itere(DetectorType &detector)
 	{
@@ -104,7 +106,7 @@ public :
 			case eBIRTH :
 			{
 				typename DetectorType::InternalNodeType node;
-				node.RandomInit(detector.GetBox()) ;
+				node.RandomInit(GetBox()) ;
 				node.Weight(detector.ComputeDataEnergy(node));
 				modif.SetBirth( node );
 				modif.Vertex( vertices( detector.GetGraph() ).second );
@@ -119,7 +121,7 @@ public :
 			{
 				typename DetectorType::GraphType::vertex_iterator vertex = ChooseRandomVertex( detector.GetGraph() );
 				typename DetectorType::InternalNodeType node = detector.GetGraph()[ *vertex ];
-				node.RandomModify(detector.GetBox()) ;
+				node.RandomModify(GetBox()) ;
 				node.Weight(detector.ComputeDataEnergy(node));
 				modif.SetModify(vertex, node);
 				break;
@@ -143,28 +145,28 @@ public :
 		{
 			case eBIRTH :
 			{
-				delta = delta_birth(detector, modif);
-				//R = 1.- detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
+				delta = detector.delta_birth(modif.Node(), modif.Vertex(), modif.m_newNeighboors);
+				//R = 1.- detector.GetNbVertices() / double( GetBox().Volume() ) ;
 				double surface = detector.TotalSurface() + modif.Node().Surface();
 				//double surface = BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
 				//surface *= surface*detector.GetNbVertices();
-				R = detector.GetBox().Volume() / surface ;
+				R = GetBox().Volume() / surface ;
 				break;
 			}
 			case eDEATH :
 			{
-				delta = delta_death(detector, modif);
-				//R = detector.GetNbVertices() / double( detector.GetBox().Volume() ) ;
+				delta = detector.delta_death(modif.Vertex());
+				//R = detector.GetNbVertices() / double( GetBox().Volume() ) ;
 				double surface = detector.TotalSurface();
 				//double surface = BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
 				//surface *= surface*detector.GetNbVertices();
-				R = surface / detector.GetBox().Volume();
+				R = surface / GetBox().Volume();
 				break;
 			}
 			case eMODIFY :
 			{
-				delta = delta_death(detector, modif);
-				delta+= delta_birth(detector, modif);
+				delta = detector.delta_death(modif.Vertex());
+				delta+= detector.delta_birth(modif.Node(), modif.Vertex(), modif.m_newNeighboors);
 				// Ici : delta = 0 => acceptation = 50 %
 				R = .5;
 				//R = 1.;
@@ -191,7 +193,7 @@ public :
 		switch ( modif.Type() )
 		{
 			case eBIRTH :
-				detector.AddNode( modif.Node() );
+				detector.AddNode( modif.Node(), modif.m_newNeighboors );
 				break;
 			case eDEATH :
 				detector.RemoveVertex( modif.Vertex() );
@@ -213,44 +215,7 @@ private :
 		return it;
 	}
 
-	double delta_birth(DetectorType &detector, Modification<DetectorType> &modif)
-	{
-		double delta = modif.Node().Weight();
-		typename DetectorType::vertex_iterator it_v = vertices(detector.GetGraph()).first, fin_v = vertices(detector.GetGraph()).second;
-		// optim
-		const typename DetectorType::GraphType::vertex_iterator &modifiedVertex = modif.Vertex();
-		const typename DetectorType::InternalNodeType &modifiedNode = modif.Node();
-		for (; it_v != fin_v; ++it_v)
-		{
-			/// Si on est en modification, il ne faut pas prendre en compte l'interaction avec la version non modifee
-			if (it_v == modifiedVertex)
-				continue;
-			double weight = detector.ComputePriorEnergy( detector.GetGraph()[ *it_v ], modifiedNode);
-			if ( weight != 0 )
-			{
-				modif.m_newNeighboors.push_back(typename DetectorType::neighboor_and_weight(it_v, weight));
-				delta += weight;
-			}
-		}
-		return delta;
-	}
-
-	double delta_death(DetectorType &detector, Modification<DetectorType> &modif)
-	{
-		double delta = -detector.GetGraph()[ *modif.Vertex()].Weight();
-		if ( modif.Vertex() != vertices(  detector.GetGraph() ).second && detector.GetNbVertices() > 1 )
-		{
-			std::pair< typename DetectorType::out_edge_iterator, typename DetectorType::out_edge_iterator > pair_edges ;
-			pair_edges = out_edges( *(modif.Vertex()) ,  detector.GetGraph());
-			for(;pair_edges.first!=pair_edges.second; ++pair_edges.first)
-			{
-				delta -= detector.GetGraph()[ *(pair_edges.first) ].Weight();
-			}
-		}
-		return delta;
-	}
-
-
+	MultiDimensionnalBBox<DIMENSION> m_box;
 };
 
 #endif // RJMCMC_SAMPLER_HPP

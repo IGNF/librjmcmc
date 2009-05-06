@@ -1,25 +1,23 @@
-#ifndef GILENERGYPOLICY_HPP
-#define GILENERGYPOLICY_HPP
+#ifndef GILDATAENERGYCOMPUTER_HPP
+#define GILDATAENERGYCOMPUTER_HPP
 
 #include <boost/shared_ptr.hpp>
 
 #include "cgal_types.h"
 #include "GeometricNode.hpp"
 
-class GILEnergyPolicy
+class GILDataEnergyComputer
 {
 public:
-	GILEnergyPolicy();
+	GILDataEnergyComputer(double defaultEnergy, double coefDefaultEnergy, const std::string &nomIm, const std::string &nomMask = "");
 
-	void Init(double defaultEnergy, double coefDefaultEnergy, const std::string &nomIm, const std::string &nomMask = "");
-
-	double ComputeDataEnergy(const Rectangle_2 &n) const;
-	double ComputeDataEnergy(const Cercle_2 &n) const;
+	double Compute(const Rectangle_2 &n) const;
+	double Compute(const Cercle_2 &n) const;
 
 	template<class NodeGeometry>
-	inline double ComputeDataEnergy(const GeometricNode<NodeGeometry> &n) const
+	inline double Compute(const GeometricNode<NodeGeometry> &n) const
 	{
-		return ComputeDataEnergy(n.Geometry());
+		return Compute(n.Geometry());
 	}
 
 private :
@@ -31,6 +29,7 @@ private :
 
 	double m_defaultEnergy;
 	double m_coefDefaultEnergy;
+
 	struct gradients_image_t;
 	boost::shared_ptr<gradients_image_t> m_gradients_cercle;
 	boost::shared_ptr<gradients_image_t> m_gradients_rectangle;
@@ -56,4 +55,4 @@ private :
 	boost::shared_ptr<export_image_t> m_img;
 };
 
-#endif //#ifndef GILENERGYPOLICY_HPP
+#endif //#ifndef GILDATAENERGYCOMPUTER_HPP

@@ -3,7 +3,8 @@
 
 #include <boost/array.hpp>
 
-template<unsigned int Dimension=2> class MultiDimensionnalBBox
+template<unsigned int Dimension=2> 
+class MultiDimensionnalBBox
 {
 public :
 	typedef boost::array<float,Dimension> PointType;

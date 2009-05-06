@@ -1,16 +1,16 @@
 #include <iostream>
 #include <strstream>
 
-#include "GILEnergyPolicy.hpp"
+#include "GILDataEnergyComputer.hpp"
 
 #include "BuildingsDetectorParameters.hpp"
 #include "GeometricNode.hpp"
-#include "RJMCMC_Detector.hpp"
+#include "RJMCMC_EnergeticContainer.hpp"
 #include "RJMCMC_Sampler.hpp"
 
 #include "VariantNode.hpp"
 typedef boost::variant<Rectangle_2, Cercle_2> VariantType;
-typedef RJMCMC_Detector<VariantNode< VariantType >, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
+typedef RJMCMC_EnergeticContainer< VariantNode< VariantType >, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
 typedef VariantImageExporter<VariantType> ImageExporterType;
 
 //typedef GeometricNode<Rectangle_2> MyNode;
@@ -38,9 +38,15 @@ int main (int argc, char **argv)
 	size[1] = BuildingsDetectorParametersSingleton::Instance()->RunningHeight()-1;
 	origin[0] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginX();
 	origin[1] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginY();
-	BuildingsDetector buildingsDetector(BBox(size, origin));
-	buildingsDetector.Init(BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy(), BuildingsDetectorParametersSingleton::Instance()->CoefIndividualEnergy(), BuildingsDetectorParametersSingleton::Instance()->InputImageFilePath(), BuildingsDetectorParametersSingleton::Instance()->InputMaskFilePath());
-	Sampler< BuildingsDetector > sampler( BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
+	shared_ptr< VariantGradientDataEnergy<VariantType> > data(new VariantGradientDataEnergy<VariantType>(
+		BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy(), 
+		BuildingsDetectorParametersSingleton::Instance()->CoefIndividualEnergy(), 
+		BuildingsDetectorParametersSingleton::Instance()->InputImageFilePath(), 
+		BuildingsDetectorParametersSingleton::Instance()->InputMaskFilePath()));
+	shared_ptr< VariantIntersectionPriorEnergy<VariantType> > prior(new VariantIntersectionPriorEnergy<VariantType>(
+		BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()));
+	BuildingsDetector buildingsDetector(prior, data);
+	Sampler< BuildingsDetector > sampler(BBox(size, origin), BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
 
 	// Formattage du log sous forme de tableau, ca facilite la creation de graphiques ...
 	std::ostringstream my_out_stream;
@@ -94,7 +100,6 @@ int main (int argc, char **argv)
 	my_out_stream << "Graph Data energy integrity : " << buildingsDetector.CheckGraphDataEnergyIntegrity() << std::endl;
 	my_out_stream << "Graph Prior energy integrity: " << buildingsDetector.CheckGraphPriorEnergyIntegrity() << std::endl;
 	my_out_stream << "Graph Structure integrity : " << buildingsDetector.CheckGraphStructureIntegrity() << std::endl;
-	my_out_stream << "Total Surface : " << buildingsDetector.TotalSurface() << std::endl;
 	my_out_stream << "Total Surface integrity : " << buildingsDetector.CheckTotalSurfaceIntegrity() << std::endl;
 	buildingsDetector.Dump(my_out_stream);
 	std::cout << my_out_stream.str();

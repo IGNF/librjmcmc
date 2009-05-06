@@ -156,24 +156,28 @@ public :
 };
 
 template<class VariantNodeGeometry>
-class VariantGradientDataEnergy : public GILEnergyPolicy
+class VariantGradientDataEnergy : public GILDataEnergyComputer
 {
 public :
 	typedef double result_type;
 
-	inline double ComputeDataEnergy(VariantNode<VariantNodeGeometry> const  &n) const
+	VariantGradientDataEnergy(double defaultEnergy, double coefDefaultEnergy, const std::string &nomIm, const std::string &nomMask = "") :
+	GILDataEnergyComputer(defaultEnergy, coefDefaultEnergy, nomIm, nomMask)
+	{;}
+
+	inline double Compute(VariantNode<VariantNodeGeometry> const  &n) const
     {
 		return 	boost::apply_visitor(*this, n.Geometry());
     }
 
 	inline result_type operator()(const Rectangle_2 &r) const
     {
-		return GILEnergyPolicy::ComputeDataEnergy(r);
+		return GILDataEnergyComputer::Compute(r);
     }
 
     inline result_type operator()(const Cercle_2 &c) const
     {
-		return GILEnergyPolicy::ComputeDataEnergy(c);
+		return GILDataEnergyComputer::Compute(c);
     }
 };
 
@@ -185,9 +189,9 @@ class VariantIntersectionPriorEnergy
 public :
 	typedef double result_type;
 
-	inline VariantIntersectionPriorEnergy() : m_coefSurface(BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()) {}
+	inline VariantIntersectionPriorEnergy(double coefSurface) : m_coefSurface(coefSurface) {}
 
-	inline result_type ComputePriorEnergy(VariantNode<VariantNodeGeometry> const  &n1, VariantNode<VariantNodeGeometry> const  &n2) const
+	inline result_type Compute(VariantNode<VariantNodeGeometry> const  &n1, VariantNode<VariantNodeGeometry> const  &n2) const
 	{
 		return 	boost::apply_visitor(*this, n1.Geometry(), n2.Geometry());
 	}
