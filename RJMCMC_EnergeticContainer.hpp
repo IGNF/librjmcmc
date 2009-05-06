@@ -10,6 +10,10 @@ template <class NodeType, class PriorEnergyComputer, class DataEnergyComputer>
 class RJMCMC_EnergeticContainer : public RJMCMC_Container<NodeType>
 {
 public:
+	typedef typename RJMCMC_Container<NodeType>::vertex_iterator 		vertex_iterator;
+	typedef typename RJMCMC_Container<NodeType>::neighboor_and_weight 	neighboor_and_weight;
+	typedef typename RJMCMC_Container<NodeType>::edge_iterator 			edge_iterator;
+	typedef typename RJMCMC_Container<NodeType>::out_edge_iterator 		out_edge_iterator;
 
 	inline RJMCMC_EnergeticContainer(	shared_ptr<PriorEnergyComputer> priorComputer,
 										shared_ptr<DataEnergyComputer> dataComputer) :  
@@ -18,10 +22,10 @@ public:
 		;
 	}
 	
-	double delta_birth(const InternalNodeType &newNode, vertex_iterator oldVertex, std::vector<typename neighboor_and_weight> &newNeighboors)
+	double delta_birth(const NodeType &newNode, vertex_iterator oldVertex, std::vector<neighboor_and_weight> &newNeighboors)
 	{
 		double delta = newNode.Weight();
-		typename vertex_iterator it_v = vertices(GetGraph()).first, fin_v = vertices(GetGraph()).second;
+		vertex_iterator it_v = vertices(this->GetGraph()).first, fin_v = vertices(this->GetGraph()).second;
 		// optim
 //		const typename vertex_iterator &modifiedVertex = modif.Vertex();
 //		const typename InternalNodeType &modifiedNode = modif.Node();
@@ -30,10 +34,10 @@ public:
 			/// Si on est en modification, il ne faut pas prendre en compte l'interaction avec la version non modifee
 			if (it_v == oldVertex)
 				continue;
-			double weight = ComputePriorEnergy( GetGraph()[ *it_v ], newNode);
+			double weight = ComputePriorEnergy( this->GetGraph()[ *it_v ], newNode);
 			if ( weight != 0 )
 			{
-				newNeighboors.push_back(typename neighboor_and_weight(it_v, weight));
+				newNeighboors.push_back(neighboor_and_weight(it_v, weight));
 				delta += weight;
 			}
 		}
@@ -43,13 +47,13 @@ public:
 
 	double delta_death(vertex_iterator vertex)
 	{
-		double delta = -GetGraph()[*vertex].Weight();
-		if ( vertex != vertices(  GetGraph() ).second && GetNbVertices() > 1 )
+		double delta = -this->GetGraph()[*vertex].Weight();
+		if ( vertex != vertices(  this->GetGraph() ).second && this->GetNbVertices() > 1 )
 		{
-			std::pair< typename out_edge_iterator, typename out_edge_iterator > pair_edges = out_edges( *vertex ,  GetGraph());
+			std::pair< out_edge_iterator, out_edge_iterator > pair_edges = out_edges( *vertex ,  this->GetGraph());
 			for(;pair_edges.first!=pair_edges.second; ++pair_edges.first)
 			{
-				delta -= GetGraph()[ *(pair_edges.first) ].Weight();
+				delta -= this->GetGraph()[ *(pair_edges.first) ].Weight();
 			}
 		}
 		return delta;
@@ -69,49 +73,49 @@ public:
 	{
 		// On parcourt tous les sommets et on verifie que la somme des energies vaut l'energie courante
 		double computedEnergy = 0.;
-		vertex_iterator it_v = vertices(m_graph).first, fin_v = vertices(m_graph).second;
+		vertex_iterator it_v = vertices(this->GetGraph()).first, fin_v = vertices(this->GetGraph()).second;
 		for (; it_v != fin_v; ++it_v)
 		{
-			computedEnergy += m_dataComputer->Compute( m_graph[*it_v] );
+			computedEnergy += m_dataComputer->Compute( this->GetGraph()[*it_v] );
 		}
-		return computedEnergy-m_dataEnergy;
+		return computedEnergy-this->m_dataEnergy;
 	}
 
 	double CheckTotalSurfaceIntegrity()
 	{
 		// On parcourt tous les sommets et on verifie que la somme des energies vaut l'energie courante
 		double totalSurface = 0.;
-		vertex_iterator it_v = vertices(m_graph).first, fin_v = vertices(m_graph).second;
+		vertex_iterator it_v = vertices(this->GetGraph()).first, fin_v = vertices(this->GetGraph()).second;
 		for (; it_v != fin_v; ++it_v)
 		{
-			totalSurface += m_graph[*it_v].Surface();
+			totalSurface += this->GetGraph()[*it_v].Surface();
 		}
-		return totalSurface-m_totalSurface;
+		return totalSurface-this->m_totalSurface;
 	}
 
 	double CheckGraphPriorEnergyIntegrity()
 	{
 		// On parcourt toutes les aretes et on verifie que la somme des energies vaut l'energie courante
 		double computedEnergy = 0.;
-		std::pair< edge_iterator, edge_iterator > it_edges = edges(m_graph);
+		std::pair< edge_iterator, edge_iterator > it_edges = edges(this->GetGraph());
 		for(edge_iterator it = it_edges.first; it != it_edges.second;++it)
-			computedEnergy += m_priorComputer->Compute( m_graph[source(*it,m_graph)], m_graph[target(*it, m_graph)]);
-		return computedEnergy-m_priorEnergy;
+			computedEnergy += m_priorComputer->Compute( this->GetGraph()[source(*it,this->GetGraph())], this->GetGraph()[target(*it, this->GetGraph())]);
+		return computedEnergy-this->m_priorEnergy;
 	}
 
 	unsigned int CheckGraphStructureIntegrity()
 	{
 		// On parcourt tous les couples de noeuds et on verifie que les aretes qui doivent exister existent bien
 		unsigned int nb_err = 0;
-		vertex_iterator it_1 = vertices(m_graph).first;
-		vertex_iterator fin = vertices(m_graph).second;
+		vertex_iterator it_1 = vertices(this->GetGraph()).first;
+		vertex_iterator fin = vertices(this->GetGraph()).second;
 		for (; it_1 != fin; ++it_1)
 		{
 			vertex_iterator it_2 = it_1; ++it_2;
 			for (; it_2 != fin; ++it_2)
 			{
-				bool computed = (m_priorComputer->Compute(m_graph[*it_1], m_graph[*it_2]) != 0);
-				bool stored = edge(*it_1, *it_2, m_graph).second;
+				bool computed = (m_priorComputer->Compute(this->GetGraph()[*it_1], this->GetGraph()[*it_2]) != 0);
+				bool stored = edge(*it_1, *it_2, this->GetGraph()).second;
 				if (computed != stored)
 					++nb_err;
 			}

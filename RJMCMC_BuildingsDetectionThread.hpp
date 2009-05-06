@@ -17,16 +17,16 @@
 #include "RJMCMC_BuildingsDetectionFrame.hpp"
 #endif //#if USE_IHM
 
-#include "GILEnergyPolicy.hpp"
+#include "GILDataEnergyComputer.hpp"
 
 #include "GeometricNode.hpp"
 
-#include "RJMCMC_Detector.hpp"
+#include "RJMCMC_EnergeticContainer.hpp"
 #include "RJMCMC_Sampler.hpp"
 
 typedef GeometricNode<Rectangle_2> MyNode;
 //typedef GeometricNode<Cercle_2> MyNode;
-typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, GILEnergyPolicy >	BuildingsDetector;
+typedef RJMCMC_EnergeticContainer<MyNode, IntersectionPriorEnergyComputer, GILDataEnergyComputer >	BuildingsDetector;
 
 void* RJMCMC_BuildingsDetectionThread::Entry()
 {
@@ -35,9 +35,15 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 	size[1] = BuildingsDetectorParametersSingleton::Instance()->RunningHeight()-1;
 	origin[0] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginX();
 	origin[1] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginY();
-	Sampler< BuildingsDetector > sampler( BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
-
-	BuildingsDetector buildingsDetector(BBox(size, origin));
+	shared_ptr< GILDataEnergyComputer > data(new GILDataEnergyComputer(
+		BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy(), 
+		BuildingsDetectorParametersSingleton::Instance()->CoefIndividualEnergy(), 
+		BuildingsDetectorParametersSingleton::Instance()->InputImageFilePath(), 
+		BuildingsDetectorParametersSingleton::Instance()->InputMaskFilePath()));
+	shared_ptr< IntersectionPriorEnergyComputer > prior(new IntersectionPriorEnergyComputer(
+		BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()));
+	BuildingsDetector buildingsDetector(prior, data);
+	Sampler< BuildingsDetector > sampler(BBox(size, origin), BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
 
 	unsigned int nb_accepted[4];
 	for (unsigned int i=0; i<4; ++i)

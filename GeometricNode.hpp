@@ -164,7 +164,7 @@ public :
 	inline IntersectionPriorEnergyComputer(double coefSurface): m_coefSurface(coefSurface) {;}
 
 	template<class NodeGeometry>
-	inline double ComputePriorEnergy(const GeometricNode<NodeGeometry> & n1, const GeometricNode<NodeGeometry> & n2) const
+	inline double Compute(const GeometricNode<NodeGeometry> & n1, const GeometricNode<NodeGeometry> & n2) const
 	{
 		if (n1.Geometry().do_intersect(n2.Geometry()))
 		{

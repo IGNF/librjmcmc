@@ -53,12 +53,13 @@ private:
 template < class DetectorType, unsigned int DIMENSION = 2>
 class Sampler
 {
+	MultiDimensionnalBBox<DIMENSION> m_box;
 	double m_temp;
 	double m_q;
 	std::vector<double> m_probas;
 
 public :
-	Sampler(MultiDimensionnalBBox<DIMENSION> &box, double tempInitiale, double coef_descente, const std::vector<double> &probas):
+	Sampler(const MultiDimensionnalBBox<DIMENSION> &box, double tempInitiale, double coef_descente, const std::vector<double> &probas):
 	   m_box(box), m_temp(tempInitiale), m_q(coef_descente), m_probas(probas)
 	{}
 
@@ -214,8 +215,6 @@ private :
 		std::advance(it, die());
 		return it;
 	}
-
-	MultiDimensionnalBBox<DIMENSION> m_box;
 };
 
 #endif // RJMCMC_SAMPLER_HPP
