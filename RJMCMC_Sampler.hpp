@@ -25,7 +25,7 @@ public:
 
 	inline const std::vector<typename DetectorType::neighboor_and_weight> & NewNeighboors() const { return m_newNeighboors; }
 
-	inline void SetBirth(const typename DetectorType::InternalNodeType &node, typename DetectorType::GraphType::vertex_iterator vertex, const typename DetectorType &detector)
+	inline void SetBirth(const typename DetectorType::InternalNodeType &node, typename DetectorType::GraphType::vertex_iterator vertex, const DetectorType &detector)
 	{
 		m_type = eBIRTH;
 		m_node = node;
@@ -34,7 +34,7 @@ public:
 		m_deltaSurface = m_node.Surface();
 	}
 
-	inline void SetDeath(typename DetectorType::GraphType::vertex_iterator vertex, const typename DetectorType &detector)
+	inline void SetDeath(typename DetectorType::GraphType::vertex_iterator vertex, const DetectorType &detector)
 	{
 		m_type = eDEATH;
 		m_vertex = vertex;
@@ -42,7 +42,7 @@ public:
 		m_deltaSurface = - detector.GetGraph()[*(this->Vertex())].Surface();
 	}
 
-	inline void SetModify(typename DetectorType::GraphType::vertex_iterator vertex, const typename DetectorType::InternalNodeType &node, const typename DetectorType &detector)
+	inline void SetModify(typename DetectorType::GraphType::vertex_iterator vertex, const typename DetectorType::InternalNodeType &node, const DetectorType &detector)
 	{
 		m_type = eMODIFY;
 		m_vertex = vertex;

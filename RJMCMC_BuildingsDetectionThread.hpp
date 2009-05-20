@@ -24,9 +24,10 @@
 #include "RJMCMC_EnergeticContainer.hpp"
 #include "RJMCMC_Sampler.hpp"
 
-typedef GeometricNode<Rectangle_2> MyNode;
-//typedef GeometricNode<Cercle_2> MyNode;
-typedef RJMCMC_EnergeticContainer<MyNode, IntersectionPriorEnergyComputer, GILDataEnergyComputer >	BuildingsDetector;
+typedef GeometricNode<Rectangle_2> NodeType;
+//typedef GeometricNode<Cercle_2> NodeType;
+typedef RJMCMC_EnergeticContainer<NodeType, IntersectionPriorEnergyComputer, GILDataEnergyComputer >	BuildingsDetector;
+typedef ImageExporter ImageExporterType;
 
 void* RJMCMC_BuildingsDetectionThread::Entry()
 {
@@ -146,7 +147,7 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 			BuildingsDetector::vertex_iterator it = vertices( buildingsDetector.GetGraph() ).first, fin = vertices( buildingsDetector.GetGraph() ).second;
 			for (; it != fin; ++it)
 			{
-				MyNode n = buildingsDetector.GetGraph()[*it];
+				NodeType n = buildingsDetector.GetGraph()[*it];
 				std::vector<double> vectx, vecty;
 				for (unsigned int i=0; i<5;++i)
 				{
