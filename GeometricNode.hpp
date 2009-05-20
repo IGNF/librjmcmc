@@ -60,7 +60,7 @@ inline void RandomInit(const BBox &box, Rectangle_2 &rect)
 		boost::uniform_real<>(box.Min()[1], box.Max()[1]));
 
 	boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > dievec( GetRandom(), 
-			boost::uniform_real<>(BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize(), BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalSize()));
+		boost::uniform_real<>(::sqrt(BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize()), ::sqrt(BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalSize())));
 
 	Point_2 p(diex(), diey());
 	Point_2 q(p.x() + dievec(), p.y() + dievec());
@@ -82,17 +82,10 @@ inline bool IsValid(const BBox &box, const Rectangle_2 &r)
 	if ((c.x()-dx < box.Min()[0]) || (c.y()-dy < box.Min()[1]) || (c.x()+dx > box.Max()[0]) || (c.y()+dy > box.Max()[1]))
 		return false;
 
-	double length0 = r.normal_length();
-	double length1 = r.ratio()*length0;
-	if (length0 > length1)
-		std::swap(length0, length1);
-
+	double area = r.area();
 	double minSize = BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize();
-	if ( length0 < minSize)
-		return false;
-
-	double maxSize = (float)BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalSize();
-	if (length1 > maxSize)
+	double maxSize = BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalSize();
+	if (( area < minSize) || (area > maxSize))
 		return false;
 
 	if ((r.ratio() > BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalRatio()) ||
@@ -167,10 +160,9 @@ public :
 	inline double Compute(const GeometricNode<NodeGeometry> & n1, const GeometricNode<NodeGeometry> & n2) const
 	{
 		if (n1.Geometry().do_intersect(n2.Geometry()))
-		{
 			return m_coefSurface * n1.Geometry().intersection_area(n2.Geometry());
-		}
-		return 0.;
+		else
+			return 0.;
 	}
 };
 

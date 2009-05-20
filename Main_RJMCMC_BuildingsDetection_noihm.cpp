@@ -8,15 +8,16 @@
 #include "RJMCMC_EnergeticContainer.hpp"
 #include "RJMCMC_Sampler.hpp"
 
-#include "VariantNode.hpp"
-typedef boost::variant<Rectangle_2, Cercle_2> VariantType;
-typedef RJMCMC_EnergeticContainer< VariantNode< VariantType >, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
-typedef VariantImageExporter<VariantType> ImageExporterType;
+//#include "VariantNode.hpp"
+//typedef boost::variant<Rectangle_2, Cercle_2> VariantType;
+//typedef VariantNode< VariantType > NodeType;
+//typedef RJMCMC_EnergeticContainer< NodeType, VariantIntersectionPriorEnergy<VariantType>, VariantGradientDataEnergy<VariantType> >	BuildingsDetector;
+//typedef VariantImageExporter<VariantType> ImageExporterType;
 
-//typedef GeometricNode<Rectangle_2> MyNode;
-//typedef GeometricNode<Cercle_2> MyNode;
-//typedef RJMCMC_Detector<MyNode, IntersectionPriorEnergyPolicy, GILEnergyPolicy >	BuildingsDetector;
-//typedef ImageExporter ImageExporterType;
+typedef GeometricNode<Rectangle_2> NodeType;
+//typedef GeometricNode<Cercle_2> NodeType;
+typedef RJMCMC_EnergeticContainer<NodeType, IntersectionPriorEnergyComputer, GILDataEnergyComputer >	BuildingsDetector;
+typedef ImageExporter ImageExporterType;
 
 void generate_test_images();
 void res_evaluator(const char * nom_in, const char * nom_ref, const char * nom_mask);
@@ -38,12 +39,14 @@ int main (int argc, char **argv)
 	size[1] = BuildingsDetectorParametersSingleton::Instance()->RunningHeight()-1;
 	origin[0] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginX();
 	origin[1] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginY();
-	shared_ptr< VariantGradientDataEnergy<VariantType> > data(new VariantGradientDataEnergy<VariantType>(
+//	shared_ptr< VariantGradientDataEnergy<VariantType> > data(new VariantGradientDataEnergy<VariantType>(
+	shared_ptr< GILDataEnergyComputer > data(new GILDataEnergyComputer(
 		BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy(), 
 		BuildingsDetectorParametersSingleton::Instance()->CoefIndividualEnergy(), 
 		BuildingsDetectorParametersSingleton::Instance()->InputImageFilePath(), 
 		BuildingsDetectorParametersSingleton::Instance()->InputMaskFilePath()));
-	shared_ptr< VariantIntersectionPriorEnergy<VariantType> > prior(new VariantIntersectionPriorEnergy<VariantType>(
+//	shared_ptr< VariantIntersectionPriorEnergy<VariantType> > prior(new VariantIntersectionPriorEnergy<VariantType>(
+	shared_ptr< IntersectionPriorEnergyComputer > prior(new IntersectionPriorEnergyComputer(
 		BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()));
 	BuildingsDetector buildingsDetector(prior, data);
 	Sampler< BuildingsDetector > sampler(BBox(size, origin), BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() , BuildingsDetectorParametersSingleton::Instance()->DecreaseCoefficient(), BuildingsDetectorParametersSingleton::Instance()->CumulatedProbabilities() );
@@ -105,25 +108,27 @@ int main (int argc, char **argv)
 	std::cout << my_out_stream.str();
 
 	ImageExporterType exporter_rec(true), exporter_cir(true);
+//	exporter_rec.InitExport(BuildingsDetectorParametersSingleton::Instance()->InputImageFilePath().c_str());
 	exporter_rec.InitExport(1695, 1575);
 	exporter_cir.InitExport(1695, 1575);
 	BuildingsDetector::vertex_iterator it_v = vertices(buildingsDetector.GetGraph()).first, fin_v = vertices(buildingsDetector.GetGraph()).second;
 	for (; it_v != fin_v; ++it_v)
 	{
-		VariantType v = buildingsDetector.GetGraph()[*it_v].Geometry();
-		if (v.which() == 0)
+		Rectangle_2 v = buildingsDetector.GetGraph()[*it_v].Geometry();
+//		VariantType v = buildingsDetector.GetGraph()[*it_v].Geometry();
+//		if (v.which() == 0)
 		{
 			exporter_rec.ExportNode(v);
 		}
-		else
-			exporter_cir.ExportNode(v);
+//		else
+//			exporter_cir.ExportNode(v);
 	}
 	exporter_rec.EndExport("fill_rec.tif");
 	exporter_cir.EndExport("fill_cir.tif");
 
 	std::cout << "Evaluation des rectangles" << std::endl;
 	res_evaluator("fill_rec.tif", "data/MNS-veget/cadastre_saisie_50cm_complete_img.tif", "data/MNS-veget/cadastre_ref_20cm_complete_img_masque.tif");
-	std::cout << "Evaluation des cercles" << std::endl;
-	res_evaluator("fill_cir.tif", "data/MNS-veget/vegetation_saint_michel.tif", "data/MNS-veget/cadastre_ref_20cm_complete_img_masque.tif");
+//	std::cout << "Evaluation des cercles" << std::endl;
+//	res_evaluator("fill_cir.tif", "data/MNS-veget/vegetation_saint_michel.tif", "data/MNS-veget/cadastre_ref_20cm_complete_img_masque.tif");
 	return 0;
 }

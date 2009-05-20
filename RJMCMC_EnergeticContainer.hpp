@@ -22,13 +22,11 @@ public:
 		;
 	}
 	
-	double delta_birth(const NodeType &newNode, vertex_iterator oldVertex, std::vector<neighboor_and_weight> &newNeighboors)
+	double delta_birth(NodeType &newNode, vertex_iterator oldVertex, std::vector<neighboor_and_weight> &newNeighboors) const
 	{
-		double delta = newNode.Weight();
+		double delta = this->ComputeDataEnergy(newNode);
+		newNode.Weight(delta);
 		vertex_iterator it_v = vertices(this->GetGraph()).first, fin_v = vertices(this->GetGraph()).second;
-		// optim
-//		const typename vertex_iterator &modifiedVertex = modif.Vertex();
-//		const typename InternalNodeType &modifiedNode = modif.Node();
 		for (; it_v != fin_v; ++it_v)
 		{
 			/// Si on est en modification, il ne faut pas prendre en compte l'interaction avec la version non modifee
@@ -45,7 +43,7 @@ public:
 	}
 
 
-	double delta_death(vertex_iterator vertex)
+	double delta_death(vertex_iterator vertex) const
 	{
 		double delta = -this->GetGraph()[*vertex].Weight();
 		if ( vertex != vertices(  this->GetGraph() ).second && this->GetNbVertices() > 1 )

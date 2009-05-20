@@ -20,6 +20,10 @@ struct GILDataEnergyComputer::gradients_image_t: public dev2n32F_image_t
 {
 };
 
+struct GILDataEnergyComputer::input_image_t: public gray16_image_t
+{
+};
+
 template<typename Kernel1D>
 void initKernelGaussian1D(Kernel1D& kernel, double sigma)
 {
@@ -58,7 +62,8 @@ void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 }
 
 GILDataEnergyComputer::GILDataEnergyComputer(double defaultEnergy, double coefDefaultEnergy, const std::string &nomIm, const std::string &nomMask) :
-m_defaultEnergy(defaultEnergy), m_coefDefaultEnergy(coefDefaultEnergy), m_gradients_cercle(new gradients_image_t), m_gradients_rectangle(new gradients_image_t)
+m_defaultEnergy(defaultEnergy), m_coefDefaultEnergy(coefDefaultEnergy), 
+m_img(new input_image_t), m_gradients_cercle(new gradients_image_t), m_gradients_rectangle(new gradients_image_t)
 {
 	double sigmaD = 1.;
 	unsigned int half_size = 3*sigmaD;
@@ -67,15 +72,13 @@ m_defaultEnergy(defaultEnergy), m_coefDefaultEnergy(coefDefaultEnergy), m_gradie
 	kernel_1d<float> kderiv(kws,kws/2);
 	initKernelGaussian1D(ksmooth,sigmaD);
 	initKernelGaussianDeriv1D(kderiv,sigmaD);
+    tiff_read_image(nomIm ,*m_img);
+	m_gradients_rectangle->recreate(m_img->dimensions());
 
-    gray16_image_t img;
-    tiff_read_image(nomIm ,img);
-	m_gradients_rectangle->recreate(img.dimensions());
-
-	convolve_cols<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<0>(m_gradients_rectangle->_view), convolve_option_extend_constant);
+	convolve_cols<gray32F_pixel_t>(const_view(*m_img),ksmooth,kth_channel_view<0>(m_gradients_rectangle->_view), convolve_option_extend_constant);
 	convolve_rows<gray32F_pixel_t>(kth_channel_view<0>(m_gradients_rectangle->_view),kderiv,kth_channel_view<0>(m_gradients_rectangle->_view), convolve_option_extend_constant);
 
-	convolve_rows<gray32F_pixel_t>(const_view(img),ksmooth,kth_channel_view<1>(m_gradients_rectangle->_view), convolve_option_extend_constant);
+	convolve_rows<gray32F_pixel_t>(const_view(*m_img),ksmooth,kth_channel_view<1>(m_gradients_rectangle->_view), convolve_option_extend_constant);
     convolve_cols<gray32F_pixel_t>(kth_channel_view<1>(m_gradients_rectangle->_view),kderiv,kth_channel_view<1>(m_gradients_rectangle->_view), convolve_option_extend_constant);
 /*
     gray32F_image_t module(img.dimensions());
@@ -138,13 +141,37 @@ m_defaultEnergy(defaultEnergy), m_coefDefaultEnergy(coefDefaultEnergy), m_gradie
 double GILDataEnergyComputer::Compute(const Rectangle_2 &n) const
 {
 	double res = m_defaultEnergy + m_coefDefaultEnergy * /*::sqrt*/(n.perimeter());
+	std::vector<double> vec_seg(4);
 	for (unsigned int i = 0; i < 4; ++i)
 	{
 		double delta = -ComputeSegmentDataEnergy(n.point(i),n.point(i + 1));
-//		res += delta;
-		if ( delta <= 0. )
-			res += delta;
+//		if ( delta <= 0. )
+//			res += delta;
+		vec_seg[i] = delta;
 	}
+	std::sort(vec_seg.begin(), vec_seg.end());
+	res += vec_seg[0] + vec_seg[1];
+	if (vec_seg[2] < 0)
+	{
+		res+= vec_seg[2];
+		if (vec_seg[3] < 0)
+			res += vec_seg[3];
+	}
+
+	/// TEST AVEC ENERGIE INTERNE
+	/*
+	std::vector<signed short> vec;
+	vec.reserve(n.area());
+	CGAL::Rectangle_2_point_iterator<Rectangle_2> it(n);
+	for (; !it.end(); ++it)
+	{
+		vec.push_back(m_img->_view(it.x(), it.y()));
+	}
+	std::sort(vec.begin(), vec.end());
+	unsigned int pos = vec.size()/4;
+	signed short med = *(vec.rbegin() + pos) - *(vec.begin() + pos);
+	res += med;
+	*/
 	return res;
 }
 
@@ -335,6 +362,33 @@ void ImageExporter::ExportNode(const Cercle_2 &n) const
 
 void ImageExporter::ExportNode(const Rectangle_2 &n) const
 {
+	if (m_fill)
+	{
+		CGAL::Rectangle_2_point_iterator<Rectangle_2> it(n);
+		for (; !it.end(); ++it)
+		{
+			m_img->_view(it.x(), it.y()) = 255;
+		}
+/**
+		std::vector<signed short> vec;
+		CGAL::Rectangle_2_point_iterator<Rectangle_2> it(n);
+		for (; !it.end(); ++it)
+		{
+			vec.push_back(m_img->_view(it.x(), it.y()));
+		}
+		std::sort(vec.begin(), vec.end());
+		unsigned int pos = vec.size()/4;
+		signed short med = *(vec.rbegin() + pos) - *(vec.begin() + pos);
+		med *= 7;
+		if (med > 255)
+			med = 255;
+		it = CGAL::Rectangle_2_point_iterator<Rectangle_2>(n);
+		for (; !it.end(); ++it)
+		{
+			m_img->_view(it.x(), it.y()) = med;
+		}
+*/
+	}
 	for (unsigned int i = 0; i < 4; ++i)
 	{
 		CGAL::Segment_2_iterator<Segment_2> it(Segment_2(n.point(i),n.point(i + 1)));
@@ -343,16 +397,7 @@ void ImageExporter::ExportNode(const Rectangle_2 &n) const
 			m_img->_view(it.x(), it.y()) = 255;
 		}
 	}
-	if (m_fill)
-	{
-		CGAL::Rectangle_2_point_iterator<Rectangle_2> it(n);
-		for (; !it.end(); ++it)
-		{
-			m_img->_view(it.x(), it.y()) = 255;
-		}
-	}
 }
-
 
 void ExportCercleTestImage(const char *nomOut, int rayon)
 {
@@ -433,37 +478,58 @@ void res_evaluator(const char * nom_in, const char * nom_ref, const char * nom_m
 	tiff_read_image(nom_in, in);
 	tiff_read_image(nom_ref, ref);
 	tiff_read_image(nom_mask, mask);
+
+	rgb8_image_t diff(in.dimensions());
+	rgb8_pixel_t tp_px(255,255,255), fn_px(0,0,0), fp_px(255,0,0), tn_px(0,0,255);
+
 	gray8_view_t::iterator it_in = in._view.begin(), fin_in = in._view.end();
 	gray8_view_t::iterator it_ref = ref._view.begin();
 	gray8_view_t::iterator it_mask = mask._view.begin();
-
-	unsigned nb_pixels = 0;
+	rgb8_view_t::iterator it_diff = diff._view.begin();
 
 	unsigned int nb_tp =0, nb_fn = 0, nb_tn = 0, nb_fp = 0;
-	for (; it_in != fin_in; ++it_in, ++it_ref, ++it_mask)
+	for (; it_in != fin_in; ++it_in, ++it_ref, ++it_mask, ++it_diff)
 	{
 		if (*it_mask == 0)
+		{
+			*it_diff = fn_px;
 			continue;
+		}
 		if (*it_ref == 0)
 		{
 			if (*it_in == 0)
+			{
 				++nb_fn;
+				*it_diff = fn_px;
+			}
 			else
+			{
 				++nb_fp;
+				*it_diff = fp_px;
+			}
 		}
 		else
 		{
 			if (*it_in == 0)
+			{
 				++nb_tn;
+				*it_diff = tn_px;
+			}
 			else
+			{
 				++nb_tp;
+				*it_diff = tp_px;
+			}
 		}
-		++nb_pixels;
 	}
 
-	float inv = 100. / nb_pixels;
-	std::cout << "True positive : " << nb_tp << " soit " << nb_tp * inv << " \%" << std::endl; 
-	std::cout << "False negative : " << nb_fn << " soit " << nb_fn * inv << " \%" << std::endl; 
-	std::cout << "True negative : " << nb_tn << " soit " << nb_tn * inv << " \%" << std::endl; 
-	std::cout << "False positive : " << nb_fp << " soit " << nb_fp * inv << " \%" << std::endl; 
+	std::cout << "True positive : " << nb_tp << std::endl; 
+	std::cout << "False negative : " << nb_fn << std::endl; 
+	std::cout << "True negative : " << nb_tn << std::endl; 
+	std::cout << "False positive : " << nb_fp << std::endl; 
+
+	std::cout << "Exhaustivite : " << (nb_tp *100.) / (nb_tp + nb_tn) << " %."<< std::endl;
+	std::cout << "Exactitude : " << (nb_tp *100.)/(nb_tp + nb_fp) << " %."<< std::endl;
+
+	tiff_write_view("diff.tif", diff._view);
 }

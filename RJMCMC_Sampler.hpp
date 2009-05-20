@@ -15,39 +15,67 @@ template < class DetectorType>
 class Modification
 {
 public:
-	Modification() {;}
+	Modification() : m_deltaEnergy(0.) {;}
 
-	eProposition Type() const { return m_type; }
-	const typename DetectorType::InternalNodeType &Node() const { return m_node; }
-	const typename DetectorType::GraphType::vertex_iterator &Vertex() { return m_vertex; }
-	void Vertex( typename DetectorType::GraphType::vertex_iterator vertex ) { m_vertex = vertex; }
+	inline eProposition Type() const { return m_type; }
+	inline const typename DetectorType::InternalNodeType &Node() const { return m_node; }
+	inline const typename DetectorType::GraphType::vertex_iterator &Vertex() const { return m_vertex; }
+	inline double DeltaEnergy() const { return m_deltaEnergy; }
+	inline double DeltaSurface() const { return m_deltaSurface; }
 
-	void SetBirth(const typename DetectorType::InternalNodeType &node)
+	inline const std::vector<typename DetectorType::neighboor_and_weight> & NewNeighboors() const { return m_newNeighboors; }
+
+	inline void SetBirth(const typename DetectorType::InternalNodeType &node, typename DetectorType::GraphType::vertex_iterator vertex, const typename DetectorType &detector)
 	{
 		m_type = eBIRTH;
 		m_node = node;
+		m_vertex = vertex;
+		m_deltaEnergy = detector.delta_birth(this->m_node, this->Vertex(), this->m_newNeighboors );
+		m_deltaSurface = m_node.Surface();
 	}
 
-	void SetDeath(typename DetectorType::GraphType::vertex_iterator vertex)
+	inline void SetDeath(typename DetectorType::GraphType::vertex_iterator vertex, const typename DetectorType &detector)
 	{
 		m_type = eDEATH;
 		m_vertex = vertex;
+		m_deltaEnergy = detector.delta_death(this->Vertex());
+		m_deltaSurface = - detector.GetGraph()[*(this->Vertex())].Surface();
 	}
 
-	void SetModify(typename DetectorType::GraphType::vertex_iterator vertex, const typename DetectorType::InternalNodeType &node)
+	inline void SetModify(typename DetectorType::GraphType::vertex_iterator vertex, const typename DetectorType::InternalNodeType &node, const typename DetectorType &detector)
 	{
 		m_type = eMODIFY;
 		m_vertex = vertex;
 		m_node = node;
+		m_deltaEnergy = detector.delta_death(vertex) + detector.delta_birth(this->m_node, this->m_vertex, this->m_newNeighboors);
+		m_deltaSurface = m_node.Surface() - detector.GetGraph()[*(this->Vertex())].Surface();
 	}
 
-	std::vector<typename DetectorType::neighboor_and_weight> m_newNeighboors;
+	void Apply( DetectorType &detector ) const
+	{
+		switch ( this->Type() )
+		{
+			case eBIRTH :
+				detector.AddNode( this->Node(), this->NewNeighboors() );
+				break;
+			case eDEATH :
+				detector.RemoveVertex( this->Vertex() );
+				break;
+			case eMODIFY :
+				detector.ChangeVertex( this->Vertex(), this->Node(), this->NewNeighboors() );
+				break;
+			default :
+				throw;
+		}
+	}
 
 private:
 	eProposition m_type;
 	typename DetectorType::InternalNodeType m_node;
 	typename DetectorType::GraphType::vertex_iterator m_vertex;
-
+	double m_deltaEnergy;
+	double m_deltaSurface;
+	std::vector<typename DetectorType::neighboor_and_weight> m_newNeighboors;
 };
 
 template < class DetectorType, unsigned int DIMENSION = 2>
@@ -63,14 +91,9 @@ public :
 	   m_box(box), m_temp(tempInitiale), m_q(coef_descente), m_probas(probas)
 	{}
 
-	double Temperature() const { return m_temp; }
-	void Temperature(double temp) { m_temp = temp; }
-
-	double CoefDescente() const { return m_q; }
-	void CoefDescente(double coef) { m_q = coef; }
-
-	const std::vector<double> &CumulatedProbabilities() const { return m_probas; }
-	void CumulatedProbabilities(const std::vector<double> &p) { m_probas = p; }
+	inline double Temperature() const { return m_temp; }
+	inline double CoefDescente() const { return m_q; }
+	inline const std::vector<double> &CumulatedProbabilities() const { return m_probas; }
 
 	inline const MultiDimensionnalBBox<DIMENSION> & GetBox() const { return m_box; }
 
@@ -80,7 +103,7 @@ public :
 		ProposeModification(detector, modif);
 		if ( AcceptModification(detector, modif) )
 		{
-			ApplyModification(detector, modif);
+			modif.Apply(detector);
 			return modif.Type();
 		}
 		return eNONE;
@@ -108,14 +131,14 @@ public :
 			{
 				typename DetectorType::InternalNodeType node;
 				node.RandomInit(GetBox()) ;
-				node.Weight(detector.ComputeDataEnergy(node));
-				modif.SetBirth( node );
-				modif.Vertex( vertices( detector.GetGraph() ).second );
+				typename DetectorType::GraphType::vertex_iterator vertex = vertices( detector.GetGraph() ).second;
+				modif.SetBirth( node, vertex, detector );
 				break;
 			}
 			case eDEATH :
 			{
-				modif.SetDeath( ChooseRandomVertex( detector.GetGraph() ) );
+				typename DetectorType::GraphType::vertex_iterator vertex = ChooseRandomVertex( detector.GetGraph() );
+				modif.SetDeath( vertex, detector );
 				break;
 			}
 			default : // eMODIFY
@@ -123,8 +146,7 @@ public :
 				typename DetectorType::GraphType::vertex_iterator vertex = ChooseRandomVertex( detector.GetGraph() );
 				typename DetectorType::InternalNodeType node = detector.GetGraph()[ *vertex ];
 				node.RandomModify(GetBox()) ;
-				node.Weight(detector.ComputeDataEnergy(node));
-				modif.SetModify(vertex, node);
+				modif.SetModify(vertex, node, detector);
 				break;
 			}
 		}
@@ -141,14 +163,13 @@ public :
 		//   1. Delta(Ep) = - Somme( Ep(removed_node,voisins_removed_node) )
 		//   2. Delta(Ed) = - Ed(removed_node)
 
-		double R = 0., delta = 0.;
+		double R;
 		switch ( modif.Type() )
 		{
 			case eBIRTH :
 			{
-				delta = detector.delta_birth(modif.Node(), modif.Vertex(), modif.m_newNeighboors);
 				//R = 1.- detector.GetNbVertices() / double( GetBox().Volume() ) ;
-				double surface = detector.TotalSurface() + modif.Node().Surface();
+				double surface = detector.TotalSurface() + modif.DeltaSurface();
 				//double surface = BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
 				//surface *= surface*detector.GetNbVertices();
 				R = GetBox().Volume() / surface ;
@@ -156,9 +177,8 @@ public :
 			}
 			case eDEATH :
 			{
-				delta = detector.delta_death(modif.Vertex());
 				//R = detector.GetNbVertices() / double( GetBox().Volume() ) ;
-				double surface = detector.TotalSurface();
+				double surface = detector.TotalSurface() - modif.DeltaSurface();
 				//double surface = BuildingsDetectorParametersSingleton::Instance()->MinimalSize();
 				//surface *= surface*detector.GetNbVertices();
 				R = surface / GetBox().Volume();
@@ -166,46 +186,30 @@ public :
 			}
 			case eMODIFY :
 			{
-				delta = detector.delta_death(modif.Vertex());
-				delta+= detector.delta_birth(modif.Node(), modif.Vertex(), modif.m_newNeighboors);
 				// Ici : delta = 0 => acceptation = 50 %
-				R = .5;
+//				R = .5;
 				//R = 1.;
+				double surface = detector.TotalSurface() + modif.DeltaSurface();
+				R = surface / GetBox().Volume();
 				break;
 			}
 			default :
 				throw ;
 		}
 
+		double delta = modif.DeltaEnergy();
 		// Cas non stochastique : on accepte les descentes
 		if (m_temp == 0)
 			return (delta <= 0);
 
-		m_temp *= m_q;
 		R *= exp ( - delta / m_temp );
+		m_temp *= m_q;
 		if (R >= 1.)
 			return true;
 		boost::variate_generator<RJMCMCRandom&, boost::bernoulli_distribution<> > die(GetRandom(), boost::bernoulli_distribution<>(R));
 		return die();
 	}
 
-	void ApplyModification( DetectorType &detector, Modification<DetectorType> &modif )
-	{
-		switch ( modif.Type() )
-		{
-			case eBIRTH :
-				detector.AddNode( modif.Node(), modif.m_newNeighboors );
-				break;
-			case eDEATH :
-				detector.RemoveVertex( modif.Vertex() );
-				break;
-			case eMODIFY :
-				detector.ChangeVertex( modif.Vertex(), modif.Node(), modif.m_newNeighboors);
-				break;
-			default :
-				throw;
-		}
-	}
 
 private :
 	typename DetectorType::GraphType::vertex_iterator ChooseRandomVertex(const typename DetectorType::GraphType &graph)

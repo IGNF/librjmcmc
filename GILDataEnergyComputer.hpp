@@ -30,6 +30,8 @@ private :
 	double m_defaultEnergy;
 	double m_coefDefaultEnergy;
 
+	struct input_image_t;
+	boost::shared_ptr<input_image_t> m_img;
 	struct gradients_image_t;
 	boost::shared_ptr<gradients_image_t> m_gradients_cercle;
 	boost::shared_ptr<gradients_image_t> m_gradients_rectangle;
