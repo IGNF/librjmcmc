@@ -145,8 +145,6 @@ double GILDataEnergyComputer::Compute(const Rectangle_2 &n) const
 	for (unsigned int i = 0; i < 4; ++i)
 	{
 		double delta = -ComputeSegmentDataEnergy(n.point(i),n.point(i + 1));
-//		if ( delta <= 0. )
-//			res += delta;
 		vec_seg[i] = delta;
 	}
 	std::sort(vec_seg.begin(), vec_seg.end());
@@ -159,19 +157,40 @@ double GILDataEnergyComputer::Compute(const Rectangle_2 &n) const
 	}
 
 	/// TEST AVEC ENERGIE INTERNE
-	/*
 	std::vector<signed short> vec;
-	vec.reserve(n.area());
+	vec.reserve(n.area()+1);
 	CGAL::Rectangle_2_point_iterator<Rectangle_2> it(n);
 	for (; !it.end(); ++it)
 	{
 		vec.push_back(m_img->_view(it.x(), it.y()));
 	}
-	std::sort(vec.begin(), vec.end());
-	unsigned int pos = vec.size()/4;
-	signed short med = *(vec.rbegin() + pos) - *(vec.begin() + pos);
-	res += med;
-	*/
+	std::nth_element(vec.begin(), vec.begin()+ vec.size()/2, vec.end());
+	signed short mediane_interne = *(vec.begin() + vec.size()/2);
+	vec.clear();
+
+	/// Expansion du rectangle
+
+	Vector_2 dn = n.normal() * (n.normal_length() + 2) / n.normal_length();
+	// dr * dn = r * n + 2
+	double dr = (n.ratio() * n.normal_length() + 2) / n.normal_length();
+	Rectangle_2 drec(n.center(), dn, dr);
+	vec.reserve(drec.perimeter() +1);
+	/// mediane de l'exterieur
+	for (unsigned int i = 0; i < 4; ++i)
+	{
+		Segment_2 s(n.point(i),n.point(i + 1));
+		CGAL::Segment_2_iterator<Segment_2> it(s);
+		for (; !it.end(); ++it)
+		{
+			vec.push_back(m_img->_view(it.x(), it.y()));
+		}
+	}
+	std::nth_element(vec.begin(), vec.begin()+ vec.size()/2, vec.end());
+	signed short mediane_externe = *(vec.begin() + vec.size()/2);
+
+	double delta_int = 10 * (mediane_externe - mediane_interne);
+	std::cout << res << "\t" << delta_int << "\n";
+	res += delta_int;
 	return res;
 }
 

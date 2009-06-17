@@ -60,7 +60,7 @@ inline void RandomInit(const BBox &box, Rectangle_2 &rect)
 		boost::uniform_real<>(box.Min()[1], box.Max()[1]));
 
 	boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > dievec( GetRandom(), 
-		boost::uniform_real<>(::sqrt(BuildingsDetectorParametersSingleton::Instance()->RectangleMinimalSize()), ::sqrt(BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalSize())));
+		boost::uniform_real<>(0, BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalRatio() * ::sqrt(BuildingsDetectorParametersSingleton::Instance()->RectangleMaximalSize())));
 
 	Point_2 p(diex(), diey());
 	Point_2 q(p.x() + dievec(), p.y() + dievec());
