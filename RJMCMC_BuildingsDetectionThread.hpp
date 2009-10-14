@@ -40,7 +40,9 @@ void* RJMCMC_BuildingsDetectionThread::Entry()
 		BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy(), 
 		BuildingsDetectorParametersSingleton::Instance()->CoefIndividualEnergy(), 
 		BuildingsDetectorParametersSingleton::Instance()->InputImageFilePath(), 
-		BuildingsDetectorParametersSingleton::Instance()->InputMaskFilePath()));
+		// TODO: reparer
+		""
+		/*BuildingsDetectorParametersSingleton::Instance()->InputMaskFilePath()*/));
 	shared_ptr< IntersectionPriorEnergyComputer > prior(new IntersectionPriorEnergyComputer(
 		BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()));
 	BuildingsDetector buildingsDetector(prior, data);

@@ -62,7 +62,7 @@ void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 }
 
 GILDataEnergyComputer::GILDataEnergyComputer(double defaultEnergy, double coefDefaultEnergy, const std::string &nomIm, const std::string &nomMask) :
-m_defaultEnergy(defaultEnergy), m_coefDefaultEnergy(coefDefaultEnergy), 
+m_defaultEnergy(defaultEnergy), m_coefDefaultEnergy(coefDefaultEnergy),
 m_img(new input_image_t), m_gradients_cercle(new gradients_image_t), m_gradients_rectangle(new gradients_image_t)
 {
 	double sigmaD = 1.;
@@ -103,7 +103,7 @@ m_img(new input_image_t), m_gradients_cercle(new gradients_image_t), m_gradients
 			at_c<1>(grad) = 0.;
 		}
 	}
-	*/ 
+	*/
 	if (nomMask == "")
 		m_gradients_cercle = m_gradients_rectangle;
 	else
@@ -189,7 +189,7 @@ double GILDataEnergyComputer::Compute(const Rectangle_2 &n) const
 	signed short mediane_externe = *(vec.begin() + vec.size()/2);
 
 	double delta_int = 10 * (mediane_externe - mediane_interne);
-	std::cout << res << "\t" << delta_int << "\n";
+	//std::cout << res << "\t" << delta_int << "\n";
 	res += delta_int;
 	return res;
 }
@@ -260,7 +260,7 @@ void GILDataEnergyComputer::Add4CirclePoints(double xCenter, double yCenter, dou
 	res -= coef * Add1CirclePoints(xCenter, yCenter,-dy, 0);
 }
 
-// Pour ca, tout vient de 
+// Pour ca, tout vient de
 // http://escience.anu.edu.au/lecture/cg/Circle/
 // Corrige par :
 // http://www.cplusplus.happycodings.com/Computer_Graphics/code16.html
@@ -274,19 +274,19 @@ double GILDataEnergyComputer::Compute(const Cercle_2 &n) const
 	Add4CirclePoints(xCenter, yCenter, dy, n.radius(), res);
     while (dx < dy)
 	{
-        if (p < 0) 
+        if (p < 0)
 		{
             p += 4*dx+6;
         }
-		else 
+		else
 		{
             dy--;
             p += 4*(dx-dy)+10;
         }
         dx++;
 		Add8CirclePoints(xCenter, yCenter, dx, dy, n.radius(), res);
-    } 
-    
+    }
+
 	return (res / n.radius()) + m_defaultEnergy + m_coefDefaultEnergy * /*::sqrt*/(n.perimeter());
 }
 
@@ -306,7 +306,7 @@ struct local_cc
 	}
 
 };
-	
+
 template<>
 void local_cc::operator()<gray16_pixel_t, gray8_pixel_t>(const gray16_pixel_t &src, gray8_pixel_t &dst) const
 {
@@ -363,20 +363,20 @@ void ImageExporter::ExportNode(const Cercle_2 &n) const
 	int p = 3 - 2*n.radius();
 	int xCenter = n.center().x(), yCenter = n.center().y();
     Export8Points(xCenter, yCenter, x, y);
-    while (x < y) 
+    while (x < y)
 	{
-        if (p < 0) 
+        if (p < 0)
 		{
             p += 4*x+6;
         }
-		else 
+		else
 		{
             y--;
             p += 4*(x-y)+10;
         }
         x++;
         Export8Points(xCenter, yCenter, x, y);
-    } 
+    }
 }
 
 void ImageExporter::ExportNode(const Rectangle_2 &n) const
@@ -423,10 +423,10 @@ void ExportCercleTestImage(const char *nomOut, int rayon)
 	gray16_image_t img;
 	img.recreate(251,251);
 	fill_pixels(img._view, 0);
-	
+
 	unsigned int centrex = 120, centrey=120;
 	float r2 = rayon * rayon;
-	
+
 	for (unsigned int l=0; l<img.dimensions().y; ++l)
 		for (unsigned int c=0; c<img.dimensions().x; ++c)
 		{
@@ -447,9 +447,9 @@ void ExportRectangleTestImage(const char *nomOut, int demilargeur, int demihaute
 	gray16_image_t img;
 	img.recreate(251,251);
 	fill_pixels(img._view, 0);
-	
+
 	unsigned int centrex = 120, centrey=120;
-	
+
 	for (unsigned int l=0; l<img.dimensions().y; ++l)
 		for (unsigned int c=0; c<img.dimensions().x; ++c)
 		{
@@ -478,7 +478,7 @@ void generate_test_images ()
 	gray16_view_t::iterator it_out = view(out).begin();
 	for (; it_in != fin_in; ++it_in, ++it_out)
 		*it_out = *it_in + 1000;
-	
+
 	tiff_write_view("out.tif", out._view);
 	return;
 */
@@ -486,7 +486,7 @@ void generate_test_images ()
 	ExportCercleTestImage("test_1cercle_r050.tif", 50);
 	ExportCercleTestImage("test_1cercle_r075.tif", 75);
 	ExportCercleTestImage("test_1cercle_r100.tif",100);
-	
+
 	ExportRectangleTestImage("test_1rectangle_l050h020.tif", 25, 10);
 	ExportRectangleTestImage("test_1rectangle_l100h100.tif", 50, 50);
 }
@@ -542,10 +542,10 @@ void res_evaluator(const char * nom_in, const char * nom_ref, const char * nom_m
 		}
 	}
 
-	std::cout << "True positive : " << nb_tp << std::endl; 
-	std::cout << "False negative : " << nb_fn << std::endl; 
-	std::cout << "True negative : " << nb_tn << std::endl; 
-	std::cout << "False positive : " << nb_fp << std::endl; 
+	std::cout << "True positive : " << nb_tp << std::endl;
+	std::cout << "False negative : " << nb_fn << std::endl;
+	std::cout << "True negative : " << nb_tn << std::endl;
+	std::cout << "False positive : " << nb_fp << std::endl;
 
 	std::cout << "Exhaustivite : " << (nb_tp *100.) / (nb_tp + nb_tn) << " %."<< std::endl;
 	std::cout << "Exactitude : " << (nb_tp *100.)/(nb_tp + nb_fp) << " %."<< std::endl;

@@ -23,17 +23,17 @@ void generate_test_images();
 void res_evaluator(const char * nom_in, const char * nom_ref, const char * nom_mask);
 
 int main (int argc, char **argv)
-{		
+{
 	if (!BuildingsDetectorParametersSingleton::Instance()->ParseCmdLine(argc, argv))
 	{
 		generate_test_images();
 		return 0;
 	}
-	
+
 	//std::cout << BuildingsDetectorParametersSingleton::Instance()->InitialTemperature() << std::endl;
 	//std::cout << BuildingsDetectorParametersSingleton::Instance()->InputDataFilePath() << std::endl;
 	//std::cout << BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy() << std::endl;
-	
+
 	BBox::PointType size , origin;
 	size[0] = BuildingsDetectorParametersSingleton::Instance()->RunningWidth()-1;
 	size[1] = BuildingsDetectorParametersSingleton::Instance()->RunningHeight()-1;
@@ -41,10 +41,12 @@ int main (int argc, char **argv)
 	origin[1] = BuildingsDetectorParametersSingleton::Instance()->RunningOriginY();
 //	shared_ptr< VariantGradientDataEnergy<VariantType> > data(new VariantGradientDataEnergy<VariantType>(
 	shared_ptr< GILDataEnergyComputer > data(new GILDataEnergyComputer(
-		BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy(), 
-		BuildingsDetectorParametersSingleton::Instance()->CoefIndividualEnergy(), 
-		BuildingsDetectorParametersSingleton::Instance()->InputImageFilePath(), 
-		BuildingsDetectorParametersSingleton::Instance()->InputMaskFilePath()));
+		BuildingsDetectorParametersSingleton::Instance()->IndividualEnergy(),
+		BuildingsDetectorParametersSingleton::Instance()->CoefIndividualEnergy(),
+		BuildingsDetectorParametersSingleton::Instance()->InputImageFilePath(),
+		//TODO: reparer
+		""
+		/*BuildingsDetectorParametersSingleton::Instance()->InputMaskFilePath()*/));
 //	shared_ptr< VariantIntersectionPriorEnergy<VariantType> > prior(new VariantIntersectionPriorEnergy<VariantType>(
 	shared_ptr< IntersectionPriorEnergyComputer > prior(new IntersectionPriorEnergyComputer(
 		BuildingsDetectorParametersSingleton::Instance()->IntersectionSurfacePonderation()));

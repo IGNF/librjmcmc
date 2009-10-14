@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 
 #include "BuildingsDetectorParameters.hpp"
 
@@ -31,12 +32,15 @@ void BuildingsDetectorParametersSingleton::SetFromText(const std::vector< std::p
 			}
 		}
 	}
+
 	po::command_line_parser parser(read_options);
 	parser.options(m_desc);
 
 	po::variables_map vm;
-	po::store(parser.run(), vm);
-	po::notify(vm);
+
+	// TODO : c'est quoi tout ca ??? ca fait exploser le programme !!!!!!
+//	po::store(parser.run(), vm);
+//	po::notify(vm);
 
 	ComputeProb();
 }
@@ -99,7 +103,8 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 //	m_inputDataFilePath("./data/Marseille/Crop_MNE_Marseille.tif"),
 //	m_inputDataFilePath("/home/olivier/work/data/MNESaintMande.tif"),
 	m_inputImageFilePath("./data/ZTerrain_c3.tif"),
-	m_inputMaskFilePath(""),
+	//TODO: reparer
+	//m_inputMaskFilePath(""),
 	m_outputFilePath("out_"),
 	m_runningOriginX(0),
 	m_runningOriginY(0),
@@ -127,7 +132,8 @@ BuildingsDetectorParametersSingleton::BuildingsDetectorParametersSingleton() :
 	("pbirth,B",	po::value< double >		(&(m_probaBirth))->default_value(m_probaBirth), "Probabilite de naissance")
 	("pdeath,D",	po::value< double >		(&(m_probaDeath))->default_value(m_probaDeath), "Probabilite de mort")
 	("input,i",		po::value< std::string >(&(m_inputImageFilePath))->default_value(m_inputImageFilePath), "Fichier image en entree")
-	("inputmask,I",	po::value< std::string >(&(m_inputMaskFilePath))->default_value(m_inputMaskFilePath), "Fichier masque de vegetation en entree")
+	// TODO: reparer ...
+	//("inputmask,I",	po::value< std::string >(&(m_inputMaskFilePath))->default_value(m_inputMaskFilePath), "Fichier masque de vegetation en entree")
 	("output,o",	po::value< std::string >(&(m_outputFilePath))->default_value(m_outputFilePath), "Fichier image en sortie")
 	("xorig,x",		po::value< unsigned int>(&(m_runningOriginX))->default_value(m_runningOriginX), "Origine (X) de la zone a traiter")
 	("yorig,y",		po::value< unsigned int>(&(m_runningOriginY))->default_value(m_runningOriginY), "Origine (Y) de la zone a traiter")
