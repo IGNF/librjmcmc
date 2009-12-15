@@ -1,4 +1,3 @@
-#if USE_GUI
 #include "rjmcmc_building_footprint_extraction_thread.hpp"
 
 Layer::ptrLayerType& operator<<(Layer::ptrLayerType& layer, const building_configuration& config) {
@@ -85,4 +84,3 @@ void* rjmcmc_building_footprint_extraction_thread::Entry()
 	return NULL;
 }
 
-#endif

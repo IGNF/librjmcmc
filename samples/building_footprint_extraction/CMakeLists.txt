@@ -1,16 +1,5 @@
 set( ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
 
-file( GLOB ALL_CORE_HEADER_FILES ${ROOT_DIR}/core/*.h ${ROOT_DIR}/core/*.hpp )
-file( GLOB ALL_GEOMETRY_HEADER_FILES ${ROOT_DIR}/geometry/*.h ${ROOT_DIR}/geometry/*.hpp )
-file( GLOB ALL_MAIN_HEADER_FILES ${ROOT_DIR}/*.h ${ROOT_DIR}/*.hpp )
-aux_source_directory( ${ROOT_DIR}/core ALL_CORE_SRC )
-aux_source_directory( ${ROOT_DIR}/geometry ALL_GEOMETRY_SRC )
-aux_source_directory( ${ROOT_DIR} ALL_MAIN_SRC )
-set( SRC ${ALL_CORE_HEADER_FILES} ${ALL_CORE_SRC}
-         ${ALL_GEOMETRY_HEADER_FILES} ${ALL_GEOMETRY_SRC} )
-set( MAIN_SRC ${ALL_MAIN_HEADER_FILES} ${ALL_MAIN_SRC} )
-set( RJMCMC_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/lib/libRJMCMC/ )
-
 # Find BOOST
 find_package( Boost 1.37 COMPONENTS thread program_options system )
 set( Boost_ADDITIONAL_VERSIONS "1.39.0" "1.39" "1.40.0" "1.40" )
@@ -31,12 +20,16 @@ endif()
 option(BUILD_CLI "build building_footprint_extraction CLI sample" ON)
 option(BUILD_GUI "build building_footprint_extraction GUI sample" ON)
 
-set( BUILDING_FOOTPRINT_EXTRACTION_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
-include_directories( ${RJMCMC_INCLUDE_DIR} ${BUILDING_FOOTPRINT_EXTRACTION_INCLUDE_DIR} )
-set( BUILDING_FOOTPRINT_EXTRACTION_LIBRARIES ${Boost_LIBRARIES} ${CGAL_LIBRARIES} building_footprint_extraction )
-
 if(BUILD_CLI OR BUILD_GUI)
+  include_directories( ${CMAKE_SOURCE_DIR}/lib/libRJMCMC/ ${CMAKE_CURRENT_SOURCE_DIR} )
+  file( GLOB ALL_CORE_HEADER_FILES ${ROOT_DIR}/core/*.h ${ROOT_DIR}/core/*.hpp )
+  file( GLOB ALL_GEOMETRY_HEADER_FILES ${ROOT_DIR}/geometry/*.h ${ROOT_DIR}/geometry/*.hpp )
+  aux_source_directory( ${ROOT_DIR}/core ALL_CORE_SRC )
+  aux_source_directory( ${ROOT_DIR}/geometry ALL_GEOMETRY_SRC )
+  set( SRC ${ALL_CORE_HEADER_FILES} ${ALL_CORE_SRC}
+         ${ALL_GEOMETRY_HEADER_FILES} ${ALL_GEOMETRY_SRC} )
   add_library(building_footprint_extraction ${SRC})
+  set( BUILDING_FOOTPRINT_EXTRACTION_LIBRARIES ${Boost_LIBRARIES} ${CGAL_LIBRARIES} building_footprint_extraction )
 endif(BUILD_CLI OR BUILD_GUI)
 
 if(BUILD_CLI)

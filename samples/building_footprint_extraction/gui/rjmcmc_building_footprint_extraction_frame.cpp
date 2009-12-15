@@ -9,7 +9,7 @@
 #include "core/building_footprint_extraction_parameters.hpp"
 #include "parameters_frame.hpp"
 #include "rjmcmc_building_footprint_extraction_frame.hpp"
-#include "../rjmcmc_building_footprint_extraction_thread.hpp"
+#include "rjmcmc_building_footprint_extraction_thread.hpp"
 
 enum
 {

@@ -1,4 +1,3 @@
-#if USE_GUI
 #ifndef __RJMCMC_BUILDING_DETECTION_THREAD_H__
 #define __RJMCMC_BUILDING_DETECTION_THREAD_H__
 
@@ -27,4 +26,3 @@ private:
 };
 
 #endif //__RJMCMC_BUILDING_DETECTION_THREAD_H__
-#endif

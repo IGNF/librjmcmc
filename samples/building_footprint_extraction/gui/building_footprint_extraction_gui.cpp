@@ -1,5 +1,5 @@
 #include "core/building_footprint_extraction_parameters.hpp"
-#include "../rjmcmc_building_footprint_extraction_thread.hpp"
+#include "rjmcmc_building_footprint_extraction_thread.hpp"
 
 #include <wx/app.h>
 
