@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "building_footprint_extraction_parameters.hpp"
+namespace po = boost::program_options;
 
 void building_footprint_extraction_parameters::store_string_map(std::map<std::string, std::string> &map_options) const
 {
@@ -69,7 +70,7 @@ bool building_footprint_extraction_parameters::parse_command_line(int argc, char
 }
 
 building_footprint_extraction_parameters::building_footprint_extraction_parameters() :
-	m_desc("buildings detector options")
+	m_desc("building footprint extraction options")
 {
 	m_desc.add_options()
 	("help,h", "Message d'aide...")

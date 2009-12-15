@@ -1,12 +1,10 @@
-#ifndef BUILDINGSDETECTORPARAMETERS_HPP_
-#define BUILDINGSDETECTORPARAMETERS_HPP_
+#ifndef __BUILDING_FOOTPRINT_EXTRACTION_PARAMETERS_HPP__
+#define __BUILDING_FOOTPRINT_EXTRACTION_PARAMETERS_HPP__
 
 #include <cstdlib>
 #include <vector>
 #include <sstream>
-
 #include <boost/program_options.hpp>
-namespace po = boost::program_options;
 
 #include "core/pattern_singleton.hpp"
 
@@ -44,8 +42,8 @@ public:
 	bool parse_command_line(int argc, char **argv);
 
 private:
-	po::options_description m_desc;
-	po::variables_map m_vm;
+	boost::program_options::options_description m_desc;
+	boost::program_options::variables_map m_vm;
 
 	double m_initialTemperature;
 	unsigned int m_nbIterations;
@@ -73,4 +71,4 @@ private:
 	building_footprint_extraction_parameters(const building_footprint_extraction_parameters &);
 };
 
-#endif /* BUILDINGSDETECTORPARAMETERS_HPP_ */
+#endif /* __BUILDING_FOOTPRINT_EXTRACTION_PARAMETERS_HPP__ */

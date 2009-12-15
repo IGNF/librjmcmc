@@ -2,6 +2,8 @@
 #define __RJMCMC_SAMPLER_HPP__
 
 #include "core/random.hpp"
+#include "core/bbox.hpp"
+#include <boost/tuple/tuple.hpp>
 
 
 
@@ -23,8 +25,20 @@ inline unsigned int random_apply(double x, boost::tuples::cons<H, T>& t, C &c, M
 	return random_apply(x-p,t.get_tail(),c,m,R,i+H::size);
 }
 
+template<typename T> struct cons_list_kernel_traits {
+	enum { size = 0 };
+};
+
+template <class H, class T> struct cons_list_kernel_traits < boost::tuples::cons<H, T> > {
+	enum { size = H::size + cons_list_kernel_traits<T>::size };
+};
 
 }
+
+template<typename T> struct kernel_traits {
+	enum { size = internal::cons_list_kernel_traits<typename T::inherited>::size };
+};
+
 
 //////////////////
 
@@ -228,11 +242,13 @@ private:
 	#define IF_VARIADIC(x,y) y
 #endif
 
-template<typename IF_VARIADIC(K...,Kernels)>
+template<typename IF_VARIADIC(K...,Kernels_)>
 class rjmcmc_sampler
 {
-	IF_VARIADIC(typedef std::tuple<K...> Kernels, )
+	IF_VARIADIC(typedef std::tuple<K...> Kernels_, )
 public:
+	typedef Kernels_ Kernels;
+
 // constructor
 	rjmcmc_sampler(const IF_VARIADIC(K&...,Kernels&) k) :
 		m_kernel(IF_VARIADIC(k...,k)), m_die(GetRandom(), boost::uniform_real<>(0,1))
@@ -243,11 +259,11 @@ public:
 
 	template<unsigned int N>
 	inline const typename boost::tuples::element<N, Kernels>::type& kernel() const {
-		return m_kernel.get<N>();
+		return boost::tuples::get<N>(m_kernel);
 	}
 	template<unsigned int N>
 	inline typename boost::tuples::element<N, Kernels>::type& kernel() {
-		return m_kernel.get<N>();
+		return boost::tuples::get<N>(m_kernel);
 	}
 
 // statistics accessors

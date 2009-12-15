@@ -1,5 +1,5 @@
-#ifndef __RJMCMC_BUILDINGS_DETECTOR_HPP__
-#define __RJMCMC_BUILDINGS_DETECTOR_HPP__
+#ifndef __RJMCMC_CONFIGURATION_HPP__
+#define __RJMCMC_CONFIGURATION_HPP__
 
 //////////////////////////////////////////////////////////
 
@@ -437,4 +437,4 @@ bool audit_configuration(const Configuration& c, std::ostream &out = std::cout, 
 }
 
 
-#endif // __RJMCMC_BUILDINGS_DETECTOR_HPP__
+#endif // __RJMCMC_CONFIGURATION_HPP__

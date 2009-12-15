@@ -107,7 +107,7 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 		layer->PolygonsRingsWidth(3);
 		layer->TextsVisibility(false);
 
-		m_thread = new rjmcmc_building_footprint_extraction_thread(layer, m_panel, this );
+		m_thread = new rjmcmc_building_footprint_extraction_thread(layer, this);
 		m_thread->Create();
 		m_thread->Run();
 	}
