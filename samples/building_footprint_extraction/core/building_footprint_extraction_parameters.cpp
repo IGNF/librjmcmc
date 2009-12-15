@@ -81,7 +81,7 @@ building_footprint_extraction_parameters::building_footprint_extraction_paramete
 	("deccoef,C", po::value<double>(&(m_decreaseCoefficient))->default_value(0.999999), "Coefficient de decroissance")
 	("pbirth,B", po::value<double>(&(m_birthProbability))->default_value(0.1), "Probabilite de naissance")
 	("pdeath,D", po::value<double>(&(m_deathProbability))->default_value(0.1), "Probabilite de mort")
-	("input,i", po::value<std::string>(&(m_inputDataFilePath))->default_value("../../../data/ZTerrain_c3.tif"), "Fichier image d'entree")
+	("input,i", po::value<std::string>(&(m_inputDataFilePath))->default_value("../data/ZTerrain_c3.tif"), "Fichier image d'entree")
 	("xmin,x", po::value<unsigned int>(&(m_runningMinX))->default_value(0), "Zone a traiter (xmin)")
 	("ymin,y", po::value<unsigned int>(&(m_runningMinY))->default_value(0), "Zone a traiter (ymin)")
 	("xmax,X", po::value<unsigned int>(&(m_runningMaxX))->default_value(652), "Zone a traiter (xmax)")
