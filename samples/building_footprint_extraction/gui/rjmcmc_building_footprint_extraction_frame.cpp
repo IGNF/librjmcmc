@@ -99,7 +99,7 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 
 	try
 	{
-		m_panel->AddLayer( ImageLayer::CreateImageLayer(building_footprint_extraction_parameters::Instance()->InputDataFilePath()) );
+		m_panel->AddLayer( ImageLayer::CreateImageLayer(building_footprint_extraction_parameters::Instance()->m_inputDataFilePath) );
 		Layer::ptrLayerType layer = VectorLayer::CreateVectorLayer(std::string("Buildings") , SHPT_POLYGON );
 		m_panel->AddLayer(layer);
 		layer->PolygonsRingsColour(wxColour(255,255,0));
