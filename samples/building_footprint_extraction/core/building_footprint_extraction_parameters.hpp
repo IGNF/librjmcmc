@@ -8,6 +8,10 @@
 
 #include "core/pattern_singleton.hpp"
 
+/**
+ * @brief Class for specific "Building footprint extraction" application parameters handling
+ * @author O. Tournaire
+ */
 struct building_footprint_extraction_parameters: public PatternSingleton<building_footprint_extraction_parameters>
 {
 	friend class PatternSingleton<building_footprint_extraction_parameters>;
@@ -20,28 +24,26 @@ struct building_footprint_extraction_parameters: public PatternSingleton<buildin
 	std::string long_name_from_description( const std::string &description );
 	std::string description_from_long_name( const std::string &long_name );
 
-	double m_initialTemperature;
-	unsigned int m_nbIterations;
-	unsigned int m_nbIterationsDump;
-	unsigned int m_nbIterationsSave;
+	double m_initial_temperature;
+	unsigned int m_nb_iterations;
+	unsigned int m_nb_iterations_dump;
+	unsigned int m_nb_iterations_save;
 	bool m_do_save;
-	unsigned int m_subSampling;
-	double m_decreaseCoefficient;
-	double m_birthProbability;
-	double m_deathProbability;
-	std::string m_inputDataFilePath;
-	unsigned int m_runningMinX;
-	unsigned int m_runningMinY;
-	unsigned int m_runningMaxX;
-	unsigned int m_runningMaxY;
-	double m_varianceGaussianFilter;
-	double m_rectangleMinimalSize;
-	double m_rectangleMaximalRatio;
-	double m_ponderationSurfaceIntersection;
-	double m_ponderationPointsDistance;
-	double m_pointsDistanceMax;
-	double m_individualEnergy;
-	double m_sigmaD;
+	unsigned int m_subsampling;
+	double m_decrease_coefficient;
+	double m_birth_probability;
+	double m_death_probability;
+	std::string m_input_data_file_path;
+	unsigned int m_running_min_x;
+	unsigned int m_running_min_y;
+	unsigned int m_running_max_x;
+	unsigned int m_running_max_y;
+	double m_variance_gaussian_filter;
+	double m_rectangle_minimal_size;
+	double m_rectangle_maximal_ratio;
+	double m_ponderation_surface_intersection;
+	double m_individual_energy;
+	double m_sigma_d;
 
 private:
 	boost::program_options::options_description m_desc;

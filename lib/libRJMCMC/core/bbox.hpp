@@ -3,6 +3,9 @@
 
 #include <boost/array.hpp>
 
+/**
+ * @brief Bounding box class, templated on the dimension
+ */
 template<typename F=float, unsigned int D=2> class bbox
 {
 public :

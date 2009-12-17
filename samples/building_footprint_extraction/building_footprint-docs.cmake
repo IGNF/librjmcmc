@@ -11,10 +11,9 @@ SET(DOXY_EXTRACT_ALL "YES")
 SET(DOXY_COLS_IN_ALPHA_INDEX "2")
 	
 set( building_footprint_DOC_SRC	${ALL_CORE_HEADER_FILES} 
-    						    ${ALL_GEOMETRY_HEADER_FILES} 
-         						${ALL_MAIN_HEADER_FILES} 
-								${ALL_CLI_HEADER_FILES} 
-								${ALL_GUI_HEADER_FILES} 
-	)
+    				${ALL_GEOMETRY_HEADER_FILES} 
+         			${ALL_MAIN_HEADER_FILES} 
+				${ALL_CLI_HEADER_FILES} 
+				${ALL_GUI_HEADER_FILES} )
 
 __add_documentation(building_footprint building_footprint_DOC_SRC)

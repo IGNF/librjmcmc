@@ -80,7 +80,7 @@ void parameters_frame::on_browse_input_button(wxCommandEvent& event)
 	if (fileDialog->ShowModal() == wxID_OK)
 	{
 		std::string full_path( fileDialog->GetPath().To8BitData() );
-		building_footprint_extraction_parameters::Instance()->m_inputDataFilePath = full_path;
+		building_footprint_extraction_parameters::Instance()->m_input_data_file_path = full_path;
 		// Update text control
 		parameters_const_iterator itb = m_parameters.begin(), ite = m_parameters.end();
 		for (;itb!=ite;++itb)

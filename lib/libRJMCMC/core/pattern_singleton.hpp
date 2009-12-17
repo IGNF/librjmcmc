@@ -4,24 +4,35 @@
 #include <iostream>
 
 #include <boost/thread/mutex.hpp>
-
+/**
+* @brief <a href="http://home.earthlink.net/~huston2/dp/singleton.html">Singleton</a> pattern.
+*
+* @code
+* // Declaration of a class which requires to have a unique instance
+* class my_singleton_object : public PatternSingleton<my_singleton_object>
+* {
+*	friend class PatternSingleton<my_singleton_object>;
+*	// ...
+* };
+* @endcode
+* @code
+* // Use of the class
+* boost::shared_ptr<my_singleton_object> unique_object = my_singleton_object::Instance();
+* @endcode
+* @author O. Tournaire
+*/
 template<typename T> class PatternSingleton
 {
 protected:
-	/// Constructeur vide
-	PatternSingleton()
-	{
-	}
-	/// Constructeur par recopie
-	PatternSingleton(const PatternSingleton&)
-	{
-	}
-	/// Destructeur
-	~PatternSingleton()
-	{
-	}
+	/// Empty constructor
+	PatternSingleton() {}
+	/// Copy constructor
+	PatternSingleton(const PatternSingleton&) {}
+	/// Destructor
+	~PatternSingleton() {}
 
 public:
+	/// This is tha main method 
 	static T* Instance()
 	{
 		if (!m_singleton)
@@ -35,9 +46,9 @@ public:
 	}
 
 	//private:
-	//    /// Le pointeur sur l'instance unique de l'objet
+	/// A pointer on the unique instance
 	static T* m_singleton;
-	//    /// Un mutex pour le <i>Double-Checked Locking Pattern</i> !
+	/// Mutex used in the <i>Double-Checked Locking Pattern</i>
 	static boost::mutex m_mutex;
 };
 

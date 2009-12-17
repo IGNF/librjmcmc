@@ -5,7 +5,7 @@ project( libMPP CXX)
 
 set(PACKAGE "libMPP")
 set(PACKAGE_BUGREPORT "bredif tournaire")
-set(PACKAGE_NAME "libMPP")
+set(PACKAGE_NAME "libRJMCMC")
 set(PACKAGE_STRING " RJMCMC library ")
 set(PACKAGE_TARNAME "libmpp")
 set(PACKAGE_VERSION "1.0")
@@ -28,9 +28,6 @@ if(WIN32)
 endif(WIN32)
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL  " real install path" FORCE)
 
-
-include(libMPP-doc.cmake)
-
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 
@@ -39,3 +36,5 @@ option(BUILD_SHARED_EXE  "Dynamic executables" ON)
 
 add_subdirectory(samples)
 add_subdirectory(lib)
+
+include(libMPP-doc.cmake)

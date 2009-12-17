@@ -46,7 +46,7 @@ bool rjmcmc_building_footprint_extraction_thread::iterate(unsigned int i, double
 	
 	if ( building_footprint_extraction_parameters::Instance()->m_do_save )
 	{
-		if ( i%building_footprint_extraction_parameters::Instance()->m_nbIterationsSave == 0 && building_footprint_extraction_parameters::Instance()->m_nbIterationsSave != 0 )
+		if ( i%building_footprint_extraction_parameters::Instance()->m_nb_iterations_save == 0 && building_footprint_extraction_parameters::Instance()->m_nb_iterations_save != 0 )
 		{
 			std::ostringstream out;
 			out.width(8);
@@ -55,7 +55,7 @@ bool rjmcmc_building_footprint_extraction_thread::iterate(unsigned int i, double
 			m_layer->Save( out.str() + ".shp" );
 		}
 	}
-	if ( i%building_footprint_extraction_parameters::Instance()->m_nbIterationsDump == 0 && building_footprint_extraction_parameters::Instance()->m_nbIterationsDump != 0 )
+	if ( i%building_footprint_extraction_parameters::Instance()->m_nb_iterations_dump == 0 && building_footprint_extraction_parameters::Instance()->m_nb_iterations_dump != 0 )
 	{
 		wxMutexGuiEnter();
 		{

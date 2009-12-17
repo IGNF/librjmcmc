@@ -10,6 +10,10 @@
 
 typedef boost::mt19937 RJMCMCRandom;
 
+/**
+ * @fn static RJMCMCRandom &GetRandom() Simple function which return an initialised random number generator
+ * @todo Properly handle Windows platform
+ */
 static RJMCMCRandom &GetRandom()
 {
 	static RJMCMCRandom randomness;
