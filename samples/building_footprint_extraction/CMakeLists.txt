@@ -1,3 +1,6 @@
+# Project name
+project( building_footprint_extraction )
+
 set( ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
 
 # Find BOOST
@@ -39,3 +42,5 @@ endif(BUILD_CLI)
 if(BUILD_GUI)
   add_subdirectory(gui)
 endif(BUILD_GUI)
+
+include(building_footprint-docs.cmake)
