@@ -24,6 +24,7 @@ struct building_footprint_extraction_parameters: public PatternSingleton<buildin
 	unsigned int m_nbIterations;
 	unsigned int m_nbIterationsDump;
 	unsigned int m_nbIterationsSave;
+	bool m_do_save;
 	unsigned int m_subSampling;
 	double m_decreaseCoefficient;
 	double m_birthProbability;

@@ -24,6 +24,8 @@ void building_footprint_extraction_parameters::store_string_map(std::map<std::st
 		{
 			value << v.as<double>();
 		}
+		else if ( name == "dosave" )
+			value << v.as<bool>();
 		else
 		{
 			value << v.as<unsigned int>();
@@ -48,10 +50,12 @@ void building_footprint_extraction_parameters::parse_string_map(const std::map<s
 	{
 		std::string desc(options[i]->description());
 		std::map<std::string, std::string>::const_iterator it = map_options.find(desc);
-		if(it==map_options.end()) continue;
+		if(it==map_options.end())
+			continue;
 		parser_options.push_back("--" + options[i]->long_name());
 		parser_options.push_back(it->second);
 	}
+	
 	po::command_line_parser parser(parser_options);
 	parser.options(m_desc);
 
@@ -106,26 +110,26 @@ building_footprint_extraction_parameters::building_footprint_extraction_paramete
 	m_desc("building footprint extraction options")
 {
 	m_desc.add_options()
-	("help,h", "Message d'aide...")
-	("config,c", po::value<std::string>(), "Fichier de configuration")
-	("temp,t", po::value<double>(&(m_initialTemperature))->default_value(150.), "Temperature initiale")
-	("nbiter,I", po::value<unsigned int>(&(m_nbIterations))->default_value(15000000), "Nombre d'iterations")
-	("nbdump,d", po::value<unsigned int>(&(m_nbIterationsDump))->default_value(10000), "Nombre d'iterations entre chaque affichage")
-	("nbsave,S", po::value<unsigned int>(&(m_nbIterationsSave))->default_value(0), "Nombre d'iterations entre chaque sauvegarde")
-	("deccoef,C", po::value<double>(&(m_decreaseCoefficient))->default_value(0.999999), "Coefficient de decroissance")
-	("pbirth,B", po::value<double>(&(m_birthProbability))->default_value(0.1), "Probabilite de naissance")
-	("pdeath,D", po::value<double>(&(m_deathProbability))->default_value(0.1), "Probabilite de mort")
-	("input,i", po::value<std::string>(&(m_inputDataFilePath))->default_value("../data/ZTerrain_c3.tif"), "Fichier image d'entree")
-	("xmin,x", po::value<unsigned int>(&(m_runningMinX))->default_value(0), "Zone a traiter (xmin)")
-	("ymin,y", po::value<unsigned int>(&(m_runningMinY))->default_value(0), "Zone a traiter (ymin)")
-	("xmax,X", po::value<unsigned int>(&(m_runningMaxX))->default_value(652), "Zone a traiter (xmax)")
-	("ymax,Y", po::value<unsigned int>(&(m_runningMaxY))->default_value(662), "Zone a traiter (ymax)")
-	("subsampling,u", po::value<unsigned int>(&(m_subSampling))->default_value(1), "Sous-échantillonnage")
-	("gaussian,g", po::value<double>(&(m_varianceGaussianFilter))->default_value(2), "Variance du filtre gaussien en entrée")
-	("sigmaD,G", po::value<double>(&(m_sigmaD))->default_value(1), "taille du noyau de flou pour le calcul des gradients")
-	("minsize,m", po::value<double>(&(m_rectangleMinimalSize))->default_value(5), "Taille minimale d'un rectangle")
-	("maxratio,M", po::value<double>(&(m_rectangleMaximalRatio))->default_value(5),
-			"Rapport longueur / largeur maximal d'un rectangle")
-	("surface,s", po::value<double>(&(m_ponderationSurfaceIntersection))->default_value(10), "Ponderation de la surface d'intersection")
-	("energy,e", po::value<double>(&(m_individualEnergy))->default_value(250), "Energie d'existence d'un objet");
+	("help,h", 			"Message d'aide...")
+	("config,c", 		po::value<std::string>(), "Fichier de configuration")
+	("temp,t", 			po::value<double>(&(m_initialTemperature))->default_value(150.), "Temperature initiale")
+	("nbiter,I", 		po::value<unsigned int>(&(m_nbIterations))->default_value(15000000), "Nombre d'iterations")
+	("nbdump,d", 		po::value<unsigned int>(&(m_nbIterationsDump))->default_value(10000), "Nombre d'iterations entre chaque affichage")
+	("nbsave,S", 		po::value<unsigned int>(&(m_nbIterationsSave))->default_value(10000), "Nombre d'iterations entre chaque sauvegarde")
+	("dosave,b", 		po::value<bool>(&(m_do_save))->default_value(false), "Sauvegarde des resultats intermediaires")
+	("deccoef,C", 		po::value<double>(&(m_decreaseCoefficient))->default_value(0.999999), "Coefficient de decroissance")
+	("pbirth,B", 		po::value<double>(&(m_birthProbability))->default_value(0.1), "Probabilite de naissance")
+	("pdeath,D", 		po::value<double>(&(m_deathProbability))->default_value(0.1), "Probabilite de mort")
+	("input,i", 		po::value<std::string>(&(m_inputDataFilePath))->default_value("../data/ZTerrain_c3.tif"), "Fichier image d'entree")
+	("xmin,x", 			po::value<unsigned int>(&(m_runningMinX))->default_value(0), "Zone a traiter (xmin)")
+	("ymin,y", 			po::value<unsigned int>(&(m_runningMinY))->default_value(0), "Zone a traiter (ymin)")
+	("xmax,X", 			po::value<unsigned int>(&(m_runningMaxX))->default_value(652), "Zone a traiter (xmax)")
+	("ymax,Y", 			po::value<unsigned int>(&(m_runningMaxY))->default_value(662), "Zone a traiter (ymax)")
+	("subsampling,u", 	po::value<unsigned int>(&(m_subSampling))->default_value(1), "Sous-échantillonnage")
+	("gaussian,g", 		po::value<double>(&(m_varianceGaussianFilter))->default_value(2), "Variance du filtre gaussien en entree")
+	("sigmaD,G", 		po::value<double>(&(m_sigmaD))->default_value(1), "taille du noyau de flou pour le calcul des gradients")
+	("minsize,m", 		po::value<double>(&(m_rectangleMinimalSize))->default_value(5), "Taille minimale d'un rectangle")
+	("maxratio,M", 		po::value<double>(&(m_rectangleMaximalRatio))->default_value(5), "Rapport longueur / largeur maximal d'un rectangle")
+	("surface,s", 		po::value<double>(&(m_ponderationSurfaceIntersection))->default_value(10), "Ponderation de la surface d'intersection")
+	("energy,e", 		po::value<double>(&(m_individualEnergy))->default_value(250), "Energie d'existence d'un objet");
 }

@@ -26,6 +26,7 @@ public:
 	
 private:
 	void on_browse_input_button(wxCommandEvent& event);
+	void on_check_save(wxCommandEvent& event);
 };
 
 #endif /* PARAMETERSFRAME_H_ */

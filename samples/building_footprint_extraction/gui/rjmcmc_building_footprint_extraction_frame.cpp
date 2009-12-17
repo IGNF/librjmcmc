@@ -95,7 +95,11 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 		parameters[std::string( m_parameters_frame->m_parameters[i].first->GetLabel().fn_str() )]
 			=  std::string( m_parameters_frame->m_parameters[i].second->GetLineText(0).fn_str() );
 	}
+	
+	// Back up stuffs erased in parse_string_map ...
+	bool back_up_do_save = building_footprint_extraction_parameters::Instance()->m_do_save;
 	building_footprint_extraction_parameters::Instance()->parse_string_map(parameters);
+	building_footprint_extraction_parameters::Instance()->m_do_save = back_up_do_save;
 
 	try
 	{

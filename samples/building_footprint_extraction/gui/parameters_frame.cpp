@@ -9,6 +9,8 @@
 #include "core/building_footprint_extraction_parameters.hpp"
 #include "parameters_frame.hpp"
 
+#define ID_CHECK_SAVE	1
+
 parameters_frame::parameters_frame(wxWindow *parent, wxWindowID id, const wxString& title, long style, const wxPoint& pos, const wxSize& size) :
 	wxDialog(parent, id, title, pos, size, style)
 {
@@ -23,8 +25,25 @@ parameters_frame::parameters_frame(wxWindow *parent, wxWindowID id, const wxStri
 	std::map<std::string, std::string>::const_iterator it;
 	for (it = options.begin(); it != options.end(); ++it)
 	{
+		// Handle particular bool values cases
+		if ( building_footprint_extraction_parameters::Instance()->long_name_from_description( it->first ) == "dosave" )
+			continue;
+			
 		wxBoxSizer *sizerH = new wxBoxSizer(wxHORIZONTAL);
+				
 		m_parameters.push_back(std::make_pair(new wxStaticText(wnd, -1, wxString(it->first.c_str(), *wxConvCurrent)), new wxTextCtrl(wnd, -1, wxString(it->second.c_str(), *wxConvCurrent))));
+		if ( building_footprint_extraction_parameters::Instance()->long_name_from_description( it->first ) == "nbsave" )
+		{
+			wxCheckBox *check_do_save = new wxCheckBox(wnd, ID_CHECK_SAVE, wxT("") /*wxString(it->first.c_str(), *wxConvCurrent)*/ );
+			check_do_save->SetValue( building_footprint_extraction_parameters::Instance()->m_do_save );
+			sizerH->Add(check_do_save, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+			check_do_save->Connect(ID_CHECK_SAVE, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(parameters_frame::on_check_save), NULL, this);
+		}
+		/*
+		else
+		{
+		}
+		* */
 		sizerH->Add(m_parameters.back().first, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
 		sizerH->Add(m_parameters.back().second, 1, wxALL, 5);
 		
@@ -72,4 +91,9 @@ void parameters_frame::on_browse_input_button(wxCommandEvent& event)
 			}
 		}
 	}
+}
+
+void parameters_frame::on_check_save(wxCommandEvent& event)
+{
+	building_footprint_extraction_parameters::Instance()->m_do_save = event.IsChecked();
 }
