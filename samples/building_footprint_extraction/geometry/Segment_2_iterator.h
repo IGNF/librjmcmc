@@ -7,10 +7,10 @@ CGAL_BEGIN_NAMESPACE
 
 // Découpage d'un segment par une grille
 
-template<class Seg2> class Segment_2_iterator {
-  typedef Seg2             Segment_2;
-  typedef typename Segment_2::R      R;
-  typedef typename R::FT             FT;
+template<typename R_> class Segment_2_iterator {
+  typedef R_                    R;
+  typedef typename R::Segment_2 Segment_2;
+  typedef typename R::FT        FT;
 public:
   // rasterize the segment s on a pixel grid [i-f,i+1-f]x[j-f,j+1-f]
   // pixels centers are (i+0.5-f, j+0.5-f)
@@ -54,7 +54,7 @@ private :
   FT NextCrossingT[2], DeltaT[2], t;
 };
 
-
 CGAL_END_NAMESPACE
 
 #endif // CGAL_SEGMENT_2_ITERATOR_H
+

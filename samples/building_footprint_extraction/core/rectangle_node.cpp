@@ -24,7 +24,7 @@ image_gradient_unary_energy::~image_gradient_unary_energy()
 double gil_image::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Point_2 &gridOut) const
 {
 	Segment_2 s(gridIn, gridOut);
-	CGAL::Segment_2_iterator<Segment_2> it(s);
+	Segment_2_iterator it(s);
 
 	typedef image_t::view_t::xy_locator xy_locator;
 	xy_locator loc_grad = m_gradients._view.xy_at(
@@ -45,7 +45,7 @@ double gil_image::ComputeSegmentDataEnergy(const Point_2 &gridIn, const Point_2 
 		loc_grad += movement[it.axis()];
 	}
 
-	Vector_2 arete(gridIn, gridOut);
+	Vector_2 arete(gridOut-gridIn);
 	Vector_2 normale = arete.perpendicular(CGAL::NEGATIVE);
 	Vector_2 sum(gradient_sum[0], gradient_sum[1]);
 	return CGAL::to_double(normale * sum);

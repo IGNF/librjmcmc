@@ -109,5 +109,4 @@ private :
 
 CGAL_END_NAMESPACE
 
-
 #endif // CGAL_RECTANGLE_ITERATOR_2_H

@@ -1,11 +1,9 @@
-#ifndef CGAL_CERCLE_2_H
-#define CGAL_CERCLE_2_H
-
-#include <CGAL/basic.h>
+#ifndef __Circle_2_H__
+#define __Circle_2_H__
 
 CGAL_BEGIN_NAMESPACE
 
-template<class R_> class Cercle_2
+template<class R_> class Circle_2
 {
 public:
 	typedef R_ R;
@@ -14,11 +12,11 @@ public:
 	typedef typename R_::Point_2 Point_2;
 	typedef typename R_::Vector_2 Vector_2;
 	typedef typename R_::Line_2 Line_2;
-	typedef Cercle_2 Self;
+	typedef Circle_2 Self;
 
-	Cercle_2()
+	Circle_2()
 	{}
-	Cercle_2(const Point_2 &center, double radius) : m_center(center), m_radius(radius), m_squared_radius(radius*radius)
+	Circle_2(const Point_2 &center, double radius) : m_center(center), m_radius(radius), m_squared_radius(radius*radius)
 	{}
 
 	inline Point_2 center() const
@@ -32,7 +30,7 @@ public:
 	{	return M_PI*squared_radius();}
 	inline FT perimeter() const
 	{	return 2*M_PI*radius();}
-	inline bool do_intersect(const Cercle_2 &c) const
+	inline bool do_intersect(const Circle_2 &c) const
 	{
 		Vector_2 diff = c.center() - center();
 		FT delta2 = diff.squared_length();
@@ -42,7 +40,7 @@ public:
 	// Tout vient de :
 	// Weisstein, Eric W. "Circle-Circle Intersection." From MathWorld--A Wolfram Web Resource.
 	// http://mathworld.wolfram.com/Circle-CircleIntersection.html
-	inline FT intersection_area(const Cercle_2 &C) const
+	inline FT intersection_area(const Circle_2 &C) const
 	{
 		Vector_2 diff = C.center() - center();
 		FT d2 = diff.squared_length();
@@ -63,7 +61,7 @@ private :
 
 template < class R >
 std::ostream &
-operator<<(std::ostream &os, const Cercle_2<R> &c)
+operator<<(std::ostream &os, const Circle_2<R> &c)
 {
 	switch(os.iword(IO::mode))
 	{
@@ -72,13 +70,13 @@ operator<<(std::ostream &os, const Cercle_2<R> &c)
 		case IO::BINARY :
 		return os << c.center() << c.radius();
 		default:
-		return os << "Cercle_2(" << c.center() << ", " << c.radius() << ")";
+		return os << "Circle_2(" << c.center() << ", " << c.radius() << ")";
 	}
 }
 
 template < class R >
 std::istream &
-operator>>(std::istream &is, Cercle_2<R> &b)
+operator>>(std::istream &is, Circle_2<R> &b)
 {
 	typename R::Point_2 p;
 	typename R::FT r;
@@ -86,10 +84,10 @@ operator>>(std::istream &is, Cercle_2<R> &b)
 	is >> p >> r;
 
 	if (is)
-	b = Cercle_2<R>(p, r);
+	b = Circle_2<R>(p, r);
 	return is;
 }
 
 CGAL_END_NAMESPACE
 
-#endif //#ifndef CGAL_CERCLE_2_H
+#endif //#ifndef __Circle_2_H__

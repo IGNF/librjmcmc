@@ -3,9 +3,10 @@
 #ifndef CGAL_RECTANGLE_2_INTERSECTION_H
 #define CGAL_RECTANGLE_2_INTERSECTION_H
 
-#include <CGAL/basic.h>
 #include "Rectangle_2.h"
+/*
 #include <CGAL/Polygon_2_algorithms.h>
+*/
 
 #ifdef CGAL_RECTANGLE_2_COMPILE_BOOLEAN_INTERSECTION
 #include <CGAL/Polygon_2.h>
@@ -112,27 +113,27 @@ template <class FT> FT triangle_area(FT n2, FT m2, FT tx, FT ty, FT rx, FT ry) {
         std::vector<Line_2> m;
         if(end0!=-1) {  // cut outside line(i+1)
             for(int j=begin1; j!=end0; j=(j+1)%n) {
-                                w.push_back(v[j]);
-                                m.push_back(l[j]);
-                        }
-                        Point_2 inter(ORIGIN);
-                        Line_2 li(ln[i].x(),ln[i].y(),-lc[i]);
-                        intersection(l[(end0+n-1)%n],li).assign(inter);
-                        w.push_back(inter-ORIGIN);
+                 w.push_back(v[j]);
+                 m.push_back(l[j]);
+            }
+            Point_2 inter(ORIGIN);
+            Line_2 li(ln[i].x(),ln[i].y(),-lc[i]);
+            intersection(l[(end0+n-1)%n],li).assign(inter);
+            w.push_back(inter-ORIGIN);
             m.push_back(li);
             m.push_back(l[(begin0+n-1)%n]);
             intersection(li,m.back()).assign(inter);
             w.push_back(inter-ORIGIN);
         }
-                if(end1!=-1) { // cut outside line(i+3)
+        if(end1!=-1) { // cut outside line(i+3)
             for(int j=begin0; j!=end1; j=(j+1)%n) {
-                                w.push_back(v[j]);
-                                m.push_back(l[j]);
-                        }
-                        Point_2 inter(ORIGIN);
-                        Line_2 li(ln[i].x(),ln[i].y(),-lc[i+2]);
-                        intersection(l[(end1+n-1)%n],li).assign(inter);
-                        w.push_back(inter-ORIGIN);
+                w.push_back(v[j]);
+                m.push_back(l[j]);
+            }
+            Point_2 inter(ORIGIN);
+            Line_2 li(ln[i].x(),ln[i].y(),-lc[i+2]);
+            intersection(l[(end1+n-1)%n],li).assign(inter);
+            w.push_back(inter-ORIGIN);
             m.push_back(li);
             m.push_back(l[(begin1+n-1)%n]);
             intersection(li,m.back()).assign(inter);
@@ -170,11 +171,10 @@ template <class FT> FT triangle_area(FT n2, FT m2, FT tx, FT ty, FT rx, FT ry) {
 
 } // namespace Impl
 
-
 /****************************************/
 /* intersection      free function      */
 /****************************************/
-
+/*
   template<class K> Object intersection(const Rectangle_2<K>& a, const typename K::Line_2 &b) {
     typedef typename K::Vector_2 Vector_2;
     typedef typename K::Segment_2 Segment_2;
@@ -291,27 +291,27 @@ template <class FT> FT triangle_area(FT n2, FT m2, FT tx, FT ty, FT rx, FT ry) {
         std::vector<Line_2> m;
         if(end0!=-1) {  // cut outside line(i+1)
             for(int j=begin1; j!=end0; j=(j+1)%n) {
-                                w.push_back(v[j]);
-                                m.push_back(l[j]);
-                        }
-                        Point_2 inter(ORIGIN);
-                        Line_2 li(ln[i].x(),ln[i].y(),-lc[i]);
-                        intersection(l[(end0+n-1)%n],li).assign(inter);
-                        w.push_back(inter-ORIGIN);
+                w.push_back(v[j]);
+                m.push_back(l[j]);
+            }
+            Point_2 inter(ORIGIN);
+            Line_2 li(ln[i].x(),ln[i].y(),-lc[i]);
+            intersection(l[(end0+n-1)%n],li).assign(inter);
+            w.push_back(inter-ORIGIN);
             m.push_back(li);
             m.push_back(l[(begin0+n-1)%n]);
             intersection(li,m.back()).assign(inter);
             w.push_back(inter-ORIGIN);
         }
-                if(end1!=-1) { // cut outside line(i+3)
+        if(end1!=-1) { // cut outside line(i+3)
             for(int j=begin0; j!=end1; j=(j+1)%n) {
-                                w.push_back(v[j]);
-                                m.push_back(l[j]);
-                        }
-                        Point_2 inter(ORIGIN);
-                        Line_2 li(ln[i].x(),ln[i].y(),-lc[i+2]);
-                        intersection(l[(end1+n-1)%n],li).assign(inter);
-                        w.push_back(inter-ORIGIN);
+                w.push_back(v[j]);
+                m.push_back(l[j]);
+            }
+            Point_2 inter(ORIGIN);
+            Line_2 li(ln[i].x(),ln[i].y(),-lc[i+2]);
+            intersection(l[(end1+n-1)%n],li).assign(inter);
+            w.push_back(inter-ORIGIN);
             m.push_back(li);
             m.push_back(l[(begin1+n-1)%n]);
             intersection(li,m.back()).assign(inter);
@@ -382,27 +382,27 @@ template <class FT> FT triangle_area(FT n2, FT m2, FT tx, FT ty, FT rx, FT ry) {
         std::vector<Line_2> m;
         if(end0!=-1) {  // cut outside line(i+1)
             for(int j=begin1; j!=end0; j=(j+1)%n) {
-                                w.push_back(v[j]);
-                                m.push_back(l[j]);
-                        }
-                        Point_2 inter(ORIGIN);
-                        Line_2 li(ln[i].x(),ln[i].y(),-lc[i]);
-                        intersection(l[(end0+n-1)%n],li).assign(inter);
-                        w.push_back(inter-ORIGIN);
+                w.push_back(v[j]);
+                m.push_back(l[j]);
+            }
+            Point_2 inter(ORIGIN);
+            Line_2 li(ln[i].x(),ln[i].y(),-lc[i]);
+            intersection(l[(end0+n-1)%n],li).assign(inter);
+            w.push_back(inter-ORIGIN);
             m.push_back(li);
             m.push_back(l[(begin0+n-1)%n]);
             intersection(li,m.back()).assign(inter);
             w.push_back(inter-ORIGIN);
         }
-                if(end1!=-1) { // cut outside line(i+3)
+        if(end1!=-1) { // cut outside line(i+3)
             for(int j=begin0; j!=end1; j=(j+1)%n) {
-                                w.push_back(v[j]);
-                                m.push_back(l[j]);
-                        }
-                        Point_2 inter(ORIGIN);
-                        Line_2 li(ln[i].x(),ln[i].y(),-lc[i+2]);
-                        intersection(l[(end1+n-1)%n],li).assign(inter);
-                        w.push_back(inter-ORIGIN);
+                w.push_back(v[j]);
+                m.push_back(l[j]);
+            }
+            Point_2 inter(ORIGIN);
+            Line_2 li(ln[i].x(),ln[i].y(),-lc[i+2]);
+            intersection(l[(end1+n-1)%n],li).assign(inter);
+            w.push_back(inter-ORIGIN);
             m.push_back(li);
             m.push_back(l[(begin1+n-1)%n]);
             intersection(li,m.back()).assign(inter);
@@ -415,13 +415,14 @@ template <class FT> FT triangle_area(FT n2, FT m2, FT tx, FT ty, FT rx, FT ry) {
     for(unsigned int i=0; i<v.size(); ++i)    { p.push_back(ORIGIN+v[i]); }
     return make_object(p);
   }
+*/
 
   template<class K> typename K::FT intersection_area(const Rectangle_2<K>& a, const Rectangle_2<K> &b) {
     typedef typename K::Vector_2 Vector_2;
     typedef typename K::FT FT;
 
     if(a.is_degenerate() || b.is_degenerate()) return 0;
-        Vector_2 v(a.center(),b.center());
+        Vector_2 v(b.center()-a.center());
         Vector_2 m(-a.normal().y(),a.normal().x());
         FT n2  = a.normal().squared_length();
         FT m2  = abs(a.ratio())*n2;
@@ -481,7 +482,7 @@ template <class FT> FT triangle_area(FT n2, FT m2, FT tx, FT ty, FT rx, FT ry) {
     }
 
 }
-
+/*
 template <class K> inline Object intersection(const typename K::Iso_rectangle_2 &s, const Rectangle_2<K> &r) {
   return intersection(r,s);
 }
@@ -497,11 +498,13 @@ template <class K> inline Object intersection(const typename K::Line_2 &s, const
 template <class K> inline Object intersection(const typename K::Ray_2 &s, const Rectangle_2<K> &r) {
   return intersection(r,s);
 }
+*/
 
 /****************************************/
 /* intersection_area free function      */
 /****************************************/
 
+/*
 template <class K> typename K::FT area(const Object &obj, const K& k) {
   typedef typename K::FT                FT;
   typedef typename K::Point_2           Point_2;
@@ -525,7 +528,7 @@ template <class P> typename P::R::FT area(const std::vector<P> &v) {
 template <class T, class U> inline typename T::R::FT intersection_area(const T &t, const U &u) {
   return area(intersection(t,u),typename T::R());
 }
-
+*/
 
 /****************************************************/
 /* do_intersect_interior free functions             */
@@ -564,6 +567,7 @@ template <class K> inline bool do_intersect_interior(const Rectangle_2<K> &a, co
     return(by0*by0<dby*dby);
 }
 
+/*
 template <class K> inline bool do_intersect_interior(const Rectangle_2<K> &r, const typename K::Iso_rectangle_2 &b)
 {
     typedef typename K::Vector_2 Vector_2;
@@ -642,7 +646,7 @@ template <class K> inline bool do_intersect_interior(const typename K::Iso_recta
 {
   return do_intersect_interior(r,i);
 }
-
+*/
 
 CGAL_END_NAMESPACE
 

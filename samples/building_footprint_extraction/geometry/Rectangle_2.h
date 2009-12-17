@@ -2,8 +2,10 @@
 
 #ifndef CGAL_RECTANGLE_2_H
 #define CGAL_RECTANGLE_2_H
+#include <utility> // for std::pair
+#include <vector>
 
-#include <CGAL/basic.h>
+#include "cgalite.hpp"
 
 CGAL_BEGIN_NAMESPACE
 
@@ -20,10 +22,11 @@ private:
   typedef typename R_::RT                    RT;
   typedef typename R_::Line_2                Line_2;
   typedef typename R_::Segment_2             Segment_2;
+/*
   typedef typename R_::Iso_rectangle_2       Iso_rectangle_2;
   typedef typename R_::Aff_transformation_2  Aff_transformation_2;
+*/
   typedef Rectangle_2                        Self;
-
   Point_2 c;
   Vector_2 n;
   FT r;
@@ -48,23 +51,23 @@ public:
 	c = midpoint(p0,p1)+r*m;
       }
     }
-
+/*
   Rectangle_2(const Iso_rectangle_2 &i)
     : c(midpoint(i.min(),i.max())), n(0.,0.), r(0.) {
       Vector_2 v(i.max()-i.min());
-      if       (!(CGAL_NTS is_zero(v.x()))) { n=Vector_2(0.5*v.x(),0.); r=v.y()/v.x();
-      } else if(!(CGAL_NTS is_zero(v.y()))) { n=Vector_2(0.,0.5*v.y()); r=v.x()/v.y();
+      if       (!(is_zero(v.x()))) { n=Vector_2(0.5*v.x(),0.); r=v.y()/v.x();
+      } else if(!(is_zero(v.y()))) { n=Vector_2(0.,0.5*v.y()); r=v.x()/v.y();
       }
     }
-
+*/
   Rectangle_2(const Segment_2 &s)
     : c(midpoint(s.source(),s.target())), n(c,s.target()), r(0.) {}
 
   Rectangle_2(const Point_2 &pmin, const Point_2 &pmax)
     : c(midpoint(pmin,pmax)), n(0.,0.), r(0.) {
       Vector_2 v(pmax-pmin);
-      if       (!(CGAL_NTS is_zero(v.x()))) { n=Vector_2(0.5*v.x(),0.); r=v.y()/v.x();
-      } else if(!(CGAL_NTS is_zero(v.y()))) { n=Vector_2(0.,0.5*v.y()); r=v.x()/v.y();
+      if       (!(is_zero(v.x()))) { n=Vector_2(0.5*v.x(),0.); r=v.y()/v.x();
+      } else if(!(is_zero(v.y()))) { n=Vector_2(0.,0.5*v.y()); r=v.x()/v.y();
       }
     }
 
@@ -85,7 +88,7 @@ public:
   inline void center(const Point_2& p ) { c=p; }
   inline void normal(const Vector_2& v) { n=v; }
   inline void ratio (FT f             ) { r=f; }
-
+/*
   Rectangle_2 transform(const Aff_transformation_2 &t) const
   {
    // correct result for reflections, translations, rotations,
@@ -95,6 +98,7 @@ public:
    // but anisotropic scalings could be allowed if its eigen vectors
    // are aligned with the direction of the rectangle.
   }
+*/
 /* Convenience Modifiers */
   inline void translate       (const Vector_2& v ) { c=c+v; }
   // if v is (r.cost,r.sint), scale_and_rotate scales the rectangle by r and rotates it by t.
@@ -211,11 +215,12 @@ public:
   inline bool has_on_unbounded_side(const Point_2& q) const { return bounded_side(q)==ON_UNBOUNDED_SIDE; }
 
 /* Rectangle predicates */
-  inline bool is_iso_rectangle() const { return (CGAL_NTS is_zero(n.x()*n.y())); }
+  inline bool is_iso_rectangle() const { return (is_zero(n.x()*n.y())); }
   inline bool is_square() const { return (r*r==RT(1)); }
-  inline bool is_degenerate() const { return CGAL_NTS is_zero(r*n.squared_length()); }
+  inline bool is_degenerate() const { return is_zero(r*n.squared_length()); }
 
 /* Access methods */
+/*
   Bbox_2 bbox() const {
     std::pair<double,double> cx = to_interval(c.x());
     std::pair<double,double> cy = to_interval(c.y());
@@ -226,7 +231,7 @@ public:
     double dy = ny+rs*nx;
     return Bbox_2(cx.first-dx,cy.first-dy,cx.second+dx,cy.second+dy);
   }
-
+*/
   // returns the positive scale so that q in on the boundary of "scaled this"
   // bounded_side = sign(scale-1)
   FT scale(const Point_2& q) const {
@@ -324,10 +329,12 @@ public:
 
 /* Casting */
 
+/*
   Iso_rectangle_2 iso_rectangle() const {
     assert(is_iso_rectangle());
     return Iso_rectangle_2(point(0),point(2));
   }
+*/
 
 /* Angle between 2 rectangle orientations */
 
@@ -344,6 +351,8 @@ public:
 /****************************************/
 /*         IO stream function           */
 /****************************************/
+
+#include <iostream>
 
 template < class R >
 std::ostream &
