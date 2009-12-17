@@ -19,9 +19,13 @@ class parameters_frame: public wxDialog
 {
 public:
 	parameters_frame(wxWindow *parent = (wxWindow *) NULL, wxWindowID id = wxID_ANY, const wxString& title = _("MPP parameters"), long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
-	virtual ~parameters_frame();
+	virtual ~parameters_frame() {}
 
 	std::vector<std::pair<wxStaticText*, wxTextCtrl*> > m_parameters;
+	typedef std::vector<std::pair<wxStaticText*, wxTextCtrl*> >::const_iterator parameters_const_iterator;
+	
+private:
+	void on_browse_input_button(wxCommandEvent& event);
 };
 
 #endif /* PARAMETERSFRAME_H_ */

@@ -27,7 +27,16 @@ parameters_frame::parameters_frame(wxWindow *parent, wxWindowID id, const wxStri
 		m_parameters.push_back(std::make_pair(new wxStaticText(wnd, -1, wxString(it->first.c_str(), *wxConvCurrent)), new wxTextCtrl(wnd, -1, wxString(it->second.c_str(), *wxConvCurrent))));
 		sizerH->Add(m_parameters.back().first, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
 		sizerH->Add(m_parameters.back().second, 1, wxALL, 5);
-		inner_sizer->Add(sizerH, 0, wxEXPAND);
+		
+		// Test if the option needs a browse button
+		if ( building_footprint_extraction_parameters::Instance()->long_name_from_description( it->first ) == "input" )
+		{
+			wxButton *browse_input_button = new wxButton(wnd,wxID_OPEN,wxT("Browse input"));
+			sizerH->Add(browse_input_button, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+			browse_input_button->Connect(wxID_OPEN, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(parameters_frame::on_browse_input_button), NULL, this);
+		}
+		
+		inner_sizer->Add(sizerH, 0, wxEXPAND);		
 		sizerH->Layout();
 	}
 
@@ -37,16 +46,30 @@ parameters_frame::parameters_frame(wxWindow *parent, wxWindowID id, const wxStri
 
 	test_sizer->Add(wnd, 1, wxEXPAND | wxALL, 5);
 	SetSizer(test_sizer);
-
-	//	SetSizer(inner_sizer);
-	//    SetAutoLayout(true);
-	//    Layout();
-
-	//SetSizerAndFit(test_sizer);
-	//test_sizer->Layout();
 }
 
-parameters_frame::~parameters_frame()
+void parameters_frame::on_browse_input_button(wxCommandEvent& event)
 {
-	// TODO Auto-generated destructor stub
+	wxString wildcard;
+	wildcard << _("Image files ");
+	wildcard << wxT("(*.tif;*.tiff;*.png;*.jpg;*.jpeg)|*.tif;*.tiff;*.TIF;*.TIFF;*.png;*.PNG;*.jpg;*.jpeg;*.JPG;*.JPEG|");
+	wildcard << wxT("TIFF (*.tif;*.tiff;*.TIF;*.TIFF)|*.tif;*.tiff;*.TIF;*.TIFF|");
+	wildcard << wxT("PNG (*.png;*.PNG)|*.png;*.PNG|");
+	wildcard << wxT("JPEG (*.jpg;*.jpeg;*.JPG;*.JPEG)|*.jpg;*.jpeg;*.JPG;*.JPEG|");
+	wxString str;
+	wxFileDialog *fileDialog = new wxFileDialog(this, _("Choose DEM"), wxT(""), wxT(""), wildcard, wxFD_OPEN|wxFD_CHANGE_DIR );
+	if (fileDialog->ShowModal() == wxID_OK)
+	{
+		std::string full_path( fileDialog->GetPath().To8BitData() );
+		building_footprint_extraction_parameters::Instance()->m_inputDataFilePath = full_path;
+		// Update text control
+		parameters_const_iterator itb = m_parameters.begin(), ite = m_parameters.end();
+		for (;itb!=ite;++itb)
+		{
+			if ( building_footprint_extraction_parameters::Instance()->long_name_from_description( std::string(itb->first->GetLabel().To8BitData()) ) == "input" )
+			{
+				itb->second->SetValue( wxString(full_path.c_str(), *wxConvCurrent) );
+			}
+		}
+	}
 }

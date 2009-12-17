@@ -16,6 +16,9 @@ struct building_footprint_extraction_parameters: public PatternSingleton<buildin
 	void parse_string_map(const std::map<std::string, std::string> &string_map);
 	void parse_config_file(const char *filename);
 	bool parse_command_line(int argc, char **argv);
+	
+	std::string long_name_from_description( const std::string &description );
+	std::string description_from_long_name( const std::string &long_name );
 
 	double m_initialTemperature;
 	unsigned int m_nbIterations;

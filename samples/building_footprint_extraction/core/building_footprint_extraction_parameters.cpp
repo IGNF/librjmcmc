@@ -12,16 +12,29 @@ void building_footprint_extraction_parameters::store_string_map(std::map<std::st
 		std::string name = options[i]->long_name();
 		std::ostringstream value;
 		const po::variable_value& v = m_vm[name];
-		if (v.empty()) continue;
-		if (name == "input") {
+		if ( v.empty() )
+			continue;
+		if (name == "input")
+		{
 			value << v.as<std::string>();
-		} else if(name == "temp" || name == "deccoef" || name == "pbirth" || name == "pdeath" ||
-		 name == "gaussian" || name == "minsize" || name == "maxratio" || name == "surface" ||
-		 name == "energy" || name == "sigmaD") {
+		}
+		else if(name == "temp" 		|| name == "deccoef" || name == "pbirth" 	|| name == "pdeath" 	||
+				name == "gaussian"	|| name == "minsize" || name == "maxratio"	|| name == "surface"	||
+				name == "energy"	|| name == "sigmaD")
+		{
 			value << v.as<double>();
-		} else {
+		}
+		else
+		{
 			value << v.as<unsigned int>();
 		}
+		
+		/*
+		std::cout << "long_name = " << options[i]->long_name() << "\n";
+		std::cout << "description = " << options[i]->description() << "\n";
+		std::cout << "format_name = " << options[i]->format_name() << "\n";
+		* */
+		
 		map_options[options[i]->description()] = value.str();
 	}
 }
@@ -51,7 +64,8 @@ void building_footprint_extraction_parameters::parse_config_file(const char *fil
 	std::ifstream config_file(filename);
 	po::store(po::parse_config_file(config_file, m_desc), m_vm);
 
-	if (m_vm.count("config")) parse_config_file(m_vm["config"].as<std::string> ().c_str());
+	if ( m_vm.count("config") )
+		parse_config_file(m_vm["config"].as<std::string> ().c_str());
 	po::notify(m_vm);
 }
 
@@ -64,9 +78,28 @@ bool building_footprint_extraction_parameters::parse_command_line(int argc, char
 		return false;
 	}
 
-	if (m_vm.count("config")) parse_config_file(m_vm["config"].as<std::string> ().c_str());
+	if ( m_vm.count("config") )
+		parse_config_file(m_vm["config"].as<std::string> ().c_str());
 	po::notify(m_vm);
 	return true;
+}
+
+std::string building_footprint_extraction_parameters::long_name_from_description( const std::string &description )
+{
+	const std::vector<boost::shared_ptr<po::option_description> > & options = m_desc.options();
+	for (unsigned int i = 0; i < options.size(); ++i)
+		if ( options[i]->description() == description )
+			return options[i]->long_name();
+	return "";
+}
+
+std::string building_footprint_extraction_parameters::description_from_long_name( const std::string &long_name )
+{
+	const std::vector<boost::shared_ptr<po::option_description> > & options = m_desc.options();
+	for (unsigned int i = 0; i < options.size(); ++i)
+		if ( options[i]->long_name() == long_name )
+			return options[i]->description();
+	return "";
 }
 
 building_footprint_extraction_parameters::building_footprint_extraction_parameters() :
