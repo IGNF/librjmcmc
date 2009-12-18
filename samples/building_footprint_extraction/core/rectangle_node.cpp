@@ -1,4 +1,53 @@
 #include "rectangle_node.hpp"
+
+
+bool BoxIsValid::operator()(const Rectangle_2 &n) const
+{
+	for (unsigned int i = 0; i < 4; ++i)
+	{
+		bbox_2::point_type ptb;
+		ptb[0] = n[i].x();
+		ptb[1] = n[i].y();
+
+		if (!m_box.is_inside(ptb)) return false;
+	}
+	if (n.squared_length(0) < m_squared_min_size || n.squared_length(1) < m_squared_min_size)
+		return false;
+
+	float ratio = std::abs(n.ratio());
+	return (ratio <= m_max_ratio && 1 <= m_max_ratio*ratio );
+}
+
+bool BoxIsValid::operator()(const Circle_2 &n) const
+{
+	bbox_2::point_type pmin = m_box.min_point();
+	bbox_2::point_type pmax = m_box.max_point();
+	if(n.center().x()<pmin[0]+n.radius() || n.center().x()>pmax[0]-n.radius()) return false;
+	if(n.center().y()<pmin[1]+n.radius() || n.center().y()>pmax[1]-n.radius()) return false;
+	if (n.radius()*n.radius() < m_squared_min_size)	return false;
+	return true;
+}
+
+
+
+double image_gradient_unary_energy::operator()(const Circle_2 &c) const
+{
+	return operator()(CGAL::Rectangle_2<K>(c.center(),Vector_2(c.radius(),0),1)); // todo : circle !!!
+}
+
+
+double image_gradient_unary_energy::operator()(const Rectangle_2 &n) const
+{
+	double res = m_defaultEnergy;
+	for (unsigned int i = 0; i < 4; ++i)
+	{
+		double delta = m_image->ComputeSegmentDataEnergy(n.point(i), n.point(i + 1));
+		if (delta >= 0.)
+			res -= delta;
+	}
+	return res;
+}
+
 #include "geometry/Segment_2_iterator.h"
 
 using namespace boost::gil;

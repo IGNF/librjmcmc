@@ -37,27 +37,28 @@ public:
 		return (delta2 < c.squared_radius() + squared_radius() + 2 * c.radius()*radius());
 	}
 
-	// Tout vient de :
-	// Weisstein, Eric W. "Circle-Circle Intersection." From MathWorld--A Wolfram Web Resource.
-	// http://mathworld.wolfram.com/Circle-CircleIntersection.html
-	inline FT intersection_area(const Circle_2 &C) const
-	{
-		Vector_2 diff = C.center() - center();
-		FT d2 = diff.squared_length();
-		FT d = ::sqrt(d2);
-		FT r = radius(), r2 = squared_radius(), R = C.radius(), R2 = C.squared_radius();
-		if (d < std::abs(r-R))
-		{
-			return M_PI * std::min(r2,R2);
-		}
-		FT area = r2*acos((d2+r2-R2)/(2.*d*r)) + R2* acos((d2+R2-r2)/(2.*d*R)) - 0.5 * ::sqrt((-d+r+R)*(d+r-R)*(d-r+R)*(d+r+R));
-		return area;
-	}
-
 private :
 	Point_2 m_center;
 	FT m_radius, m_squared_radius;
 };
+
+	// Tout vient de :
+	// Weisstein, Eric W. "Circle-Circle Intersection." From MathWorld--A Wolfram Web Resource.
+	// http://mathworld.wolfram.com/Circle-CircleIntersection.html
+template<class K> inline typename K::FT intersection_area(const Circle_2<K> &c0, const Circle_2<K> &c1)
+{
+	Vector_2 diff(c1.center() - c0.center());
+	FT d2 = diff.squared_length();
+	FT d = sqrt(to_double(d2));
+	FT r0 = c0.radius(), r02 = c0.squared_radius(), r1 = c1.radius(), r12 = c1.squared_radius();
+	if (d < std::abs(r0-r1))
+	{
+		return M_PI * std::min(r02,r12);
+	}
+	FT area = r02*acos((d2+r02-r12)/(2.*d*r0)) + r12* acos((d2+r12-r02)/(2.*d*r1)) - 0.5 * ::sqrt((-d+r0+r1)*(d+r0-r1)*(d-r0+r1)*(d+r0+r1));
+	return area;
+}
+
 
 template < class R >
 std::ostream &

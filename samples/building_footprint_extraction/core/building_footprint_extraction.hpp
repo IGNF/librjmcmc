@@ -8,6 +8,7 @@
 
 #include "core/rjmcmc_configuration.hpp"
 #include "core/rjmcmc_sampler.hpp"
+#include "boost/variant.hpp"
 
 typedef building_footprint_extraction_parameters param;
 
@@ -15,7 +16,11 @@ typedef image_gradient_unary_energy building_unary_energy;
 typedef intersection_area_binary_energy  building_binary_energy;
 typedef trivial_accelerator building_accelerator;
 typedef BoxIsValid building_is_valid;
-typedef graph_configuration<Rectangle_2, building_unary_energy, building_binary_energy, building_is_valid, building_accelerator > building_configuration;
+//typedef Rectangle_2 node_types;
+//typedef boost::variant<Rectangle_2> node_types;
+typedef boost::variant<Rectangle_2,Circle_2> node_types;
+typedef graph_configuration<node_types, building_unary_energy, building_binary_energy, building_is_valid,
+	building_accelerator > building_configuration;
 
 #define KERNELS uniform_birth_death_kernel,modification_kernel
 typedef boost::tuple<KERNELS> kernels;
@@ -62,7 +67,11 @@ template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& vi
 	);
 
 	building_accelerator accelerator;
-	building_configuration configuration(unary_energy, binary_energy, is_valid, accelerator);
+	building_configuration configuration(
+		unary_energy,
+		binary_energy,
+		is_valid,
+		accelerator);
 
 	unsigned int iterations = param::Instance()->m_nb_iterations;
 	unsigned int dump = param::Instance()->m_nb_iterations_dump;

@@ -4,7 +4,7 @@
 #include "core/random.hpp"
 #include "core/bbox.hpp"
 #include <boost/tuple/tuple.hpp>
-
+#include <boost/variant/get.hpp>
 
 
 namespace internal {
@@ -104,10 +104,13 @@ public:
 		float x1 = bbox.max_point()[0];
 		float y1 = bbox.max_point()[1];
 		do {
-			typename T::Point_2 p(x0+(x1-x0)*m_die(), y0+(y1-y0)*m_die());
-			typename T::Vector_2 v(0.5*(x1-x0)*m_die(), 0.5*(y1-y0)*m_die());
-			typename T::FT r(m_die());
-			modif.birth(T(p, v, r));
+			Point_2 p(x0+(x1-x0)*m_die(), y0+(y1-y0)*m_die());
+			Vector_2 v(0.5*(x1-x0)*m_die(), 0.5*(y1-y0)*m_die());
+			if(true) {//m_die()<0.5) {
+				modif.birth(T(Rectangle_2(p, v, m_die())));
+			} else {
+				modif.birth(T(Circle_2(p, m_die()*0.5*CGAL::min(x1-x0,y1-y0))));
+			}
 		} while (!c.is_valid(modif.birth()));
 		modif.death(c.end());
 		return 1./bbox.volume();//(0.25*(x1-x0)*(x1-x0)*(y1-y0)*(y1-y0));
@@ -123,6 +126,22 @@ public:
 		float y1 = bbox.max_point()[1];
 		return 1./bbox.volume();//(0.25*(x1-x0)*(x1-x0)*(y1-y0)*(y1-y0));
 	}
+/*
+	template<typename Configuration, typename Modification>
+	double operator()(Configuration& c, Modification& modif)
+	{
+		double pdf;
+		modif.birth(c.().sample(&pdf));
+		modif.death(c.end());
+		return pdf;
+	}
+	template<typename Configuration, typename Modification>
+	double pdf(const Configuration& c, const Modification& modif) const
+	{
+		if(modif.birth_size(c)!=0 || modif.death_size(c)!=1) return 0.;
+		return c.is_valid().pdf(modif.death());
+	}
+*/
 };
 
 class uniform_death_kernel {
@@ -133,7 +152,6 @@ public:
 	double operator()(Configuration& c, Modification& modif)
 	{
 		typedef typename Configuration::value_type T;
-		const bbox_2& bbox = c.is_valid().bbox();
 		typename Configuration::iterator it = c.begin();
 		if(!c.empty()) {
 			die_type die(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
@@ -184,29 +202,41 @@ public:
 		m_p_edge_translation(0.5), m_dx(10), m_dy(10) {}
 
 	template<typename Configuration, typename Modification>
-	double operator()(Configuration& c, Modification& modif)
+	double operator()(Configuration& config, Modification& modif)
 	{
 		typedef typename Configuration::value_type T;
-		if(c.empty()) {
-			modif.death(c.end());
+		if(config.empty()) {
+			modif.death(config.end());
 			modif.birth(T());
 			return 0;
 		}
-		typename Configuration::iterator it = c.begin();
-		int_die_type diec(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
+		typename Configuration::iterator it = config.begin();
+		int_die_type diec(GetRandom(), boost::uniform_smallint<>(0,config.size()-1));
 		std::advance(it, diec());
 		modif.death(it);
-		T n = c[it];
+		T n = config[it];
 		double d = m_dief();
+		Rectangle_2 *r = boost::get<Rectangle_2>(&n);
+		Circle_2 *c = boost::get<Circle_2>(&n);
 		if(d<m_p_edge_translation) {
 			do {
-				modif.birth(n.scaled_edge(m_die4(),2*m_dief()));
-			} while (!c.is_valid(modif.birth()));
+				//todo functor out of the lib
+				if(r) {
+					modif.birth(T(r->scaled_edge(m_die4(),2*m_dief())));
+				} else if(c) {
+					Vector_2 v(m_dx*(2*m_dief()-1),m_dy*(2*m_dief()-1));
+					modif.birth(T(Circle_2(c->center()+v,c->radius())));
+				}
+			} while (!config.is_valid(modif.birth()));
 		} else {
 			do {
-				typename T::Vector_2 v(m_dx*(2*m_dief()-1),m_dy*(2*m_dief()-1));
-				modif.birth(n.rotation_scaled_corner(m_die4(), v));
-			} while (!c.is_valid(modif.birth()));
+				if(r) {
+					Vector_2 v(m_dx*(2*m_dief()-1),m_dy*(2*m_dief()-1));
+					modif.birth(T(r->rotation_scaled_corner(m_die4(), v)));
+				} else if(c) {
+					modif.birth(T(Circle_2(c->center(),c->radius()*2*m_dief())));
+				}
+			} while (!config.is_valid(modif.birth()));
 		}
 		return 1.; // neglecting border issues
 	}

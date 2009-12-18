@@ -1,18 +1,47 @@
 #ifndef RECTANGLENODE_HPP_
 #define RECTANGLENODE_HPP_
 
-#include "geometry/cgal_types.h"
+#include "geometry/geometry.h"
+
+//////////////////////////////////////////////////////////
+
+#include "core/bbox.hpp"
+
+template<class K> inline typename K::FT intersection_area(const CGAL::Rectangle_2<K> &r, const CGAL::Circle_2<K> &c)
+{
+	return intersection_area(r,CGAL::Rectangle_2<K>(c.center(),Vector_2(c.radius(),0),1)); // todo : circle !!!
+}
+
+template<class K> inline typename K::FT intersection_area(const CGAL::Circle_2<K> &c, const CGAL::Rectangle_2<K> &r)
+{
+	return intersection_area(r,c);
+}
+
+class BoxIsValid
+{
+public:
+	typedef bool result_type;
+	BoxIsValid(const bbox_2 &box, double min_size, double max_ratio) : m_box(box), m_squared_min_size(min_size*min_size), m_max_ratio(max_ratio) {}
+	bool operator()(const Rectangle_2 &n) const;
+	bool operator()(const Circle_2 &n) const;
+	const bbox_2& bbox() const { return m_box; }
+private:
+	bbox_2 m_box;
+	double m_squared_min_size;
+	double m_max_ratio;
+};
 
 //////////////////////////////////////////////////////////
 
 class intersection_area_binary_energy
 {
 public:
+	typedef double result_type;
 	intersection_area_binary_energy(double d) : m_coefSurface(d) { }
 	template<typename T, typename U> bool interact(const T &t, const U &u) const {
 		return do_intersect_interior(t, u);
 	}
-	template<typename T, typename U> double operator()(const T &t, const U &u) const {
+	template<typename T, typename U> result_type operator()(const T &t, const U &u) const {
 		return m_coefSurface * std::abs(CGAL::to_double(intersection_area(t,u)));
 	}
 private:
@@ -172,12 +201,13 @@ class gil_image;
 class image_gradient_unary_energy
 {
 public:
+	typedef double result_type;
 
 	image_gradient_unary_energy(double default_energy, const std::string& file, double sigmaD=1, unsigned int step=0);
 	image_gradient_unary_energy(double default_energy, const std::string& file, const bbox_2& bbox, double sigmaD=1, unsigned int step=0);
 	~image_gradient_unary_energy();
-	template<typename T> double operator()(const T &n) const;
-
+	result_type operator()(const Rectangle_2 &n) const;
+	result_type operator()(const Circle_2 &c) const;
 private:
 	boost::shared_ptr<gil_image> m_image;
 	double m_defaultEnergy;
@@ -202,13 +232,8 @@ public:
 	void load(const std::string &file, double sigmaD=1, unsigned int step=0);
 	void load(const std::string &file, const bbox_2& bbox, double sigmaD=1, unsigned int step=0); // subimage loading
 	template<typename View> void init(const View& view, double sigmaD=1, unsigned int step=0);
-	template<typename T> double operator()(const T &n) const;
 };
 
-template<typename T> double image_gradient_unary_energy::operator()(const T &n) const
-{
-	return m_defaultEnergy + m_image->operator()(n);
-}
 
 #ifdef WIN32
 const double M_PI = 4.0 * atan(1.0);
@@ -249,19 +274,5 @@ typedef	typename Kernel1D::value_type vt;
 	for (i=kernel.begin(); i!=kernel.end(); ++i)
 	*i /= sum;
 }
-
-
-template<typename T> double gil_image::operator()(const T &n) const
-{
-	double res = 0;
-	for (unsigned int i = 0; i < 4; ++i)
-	{
-		double delta = -ComputeSegmentDataEnergy(n.point(i), n.point(i + 1));
-		if (delta <= 0.)
-			res += delta;
-	}
-	return res;
-}
-
 
 #endif /*RECTANGLENODE_HPP_*/
