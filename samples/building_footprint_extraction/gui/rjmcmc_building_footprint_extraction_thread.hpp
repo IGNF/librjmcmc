@@ -2,6 +2,7 @@
 #define __RJMCMC_BUILDING_DETECTION_THREAD_H__
 
 #include <wx/thread.h>
+#include <GilViewer/layers/VectorLayerGhost.h>
 #include <GilViewer/layers/ImageLayer.hpp>
 #include "gui/rjmcmc_building_footprint_extraction_frame.hpp"
 #include "core/building_footprint_extraction.hpp"

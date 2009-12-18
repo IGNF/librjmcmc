@@ -114,6 +114,22 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 	
 	// Restore backuped stuffs
 	building_footprint_extraction_parameters::Instance()->m_do_save = back_up_do_save;
+	// Check if a rectangle is defined for the area to process	
+	const VectorLayerGhost &ghost = PanelManager::Instance()->GetPanelsList()[0]->GetVectorLayerGhost();
+	wxPoint p1 = ghost.m_rectangleSelection.first;
+	wxPoint p2 = ghost.m_rectangleSelection.second;
+	if ( p1.x>0 && p2.x>0 && p1.y>0 && p2.y>0 /* && TODO */ )
+	{
+	  building_footprint_extraction_parameters::Instance()->m_running_min_x = std::min(p1.x,p2.x);
+	  building_footprint_extraction_parameters::Instance()->m_running_max_x = std::max(p1.x,p2.x);
+	  building_footprint_extraction_parameters::Instance()->m_running_min_y = std::min(p1.y,p2.y);
+	  building_footprint_extraction_parameters::Instance()->m_running_max_y = std::max(p1.y,p2.y);
+	}
+	
+	std::cout << building_footprint_extraction_parameters::Instance()->m_running_min_x << "\n";
+	std::cout << building_footprint_extraction_parameters::Instance()->m_running_min_y << "\n";
+	std::cout << building_footprint_extraction_parameters::Instance()->m_running_max_x << "\n";
+	std::cout << building_footprint_extraction_parameters::Instance()->m_running_max_y << "\n";
 	
 	// Test if input file exists
 	std::ifstream test( building_footprint_extraction_parameters::Instance()->m_input_data_file_path.c_str() , std::ios::in );
