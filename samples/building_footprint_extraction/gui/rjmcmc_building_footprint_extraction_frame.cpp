@@ -1,3 +1,6 @@
+#include <fstream>
+#include <sstream>
+
 #include <wx/artprov.h>
 
 #include <GilViewer/layers/ImageLayer.hpp>
@@ -59,6 +62,14 @@ rjmcmc_building_footprint_extraction_frame::rjmcmc_building_footprint_extraction
 	paneInfoDrawPane.CaptionVisible(false);
 	m_dockManager.AddPane( m_panel, paneInfoDrawPane );
 
+	wxAuiPaneInfo modeAndGeometryToolbarInfo;
+	modeAndGeometryToolbarInfo.Caption( _("Mode and geometry Toolbar") );
+	modeAndGeometryToolbarInfo.ToolbarPane();
+	modeAndGeometryToolbarInfo.Top();
+	modeAndGeometryToolbarInfo.CloseButton(false);
+	modeAndGeometryToolbarInfo.CaptionVisible(false);
+	m_dockManager.AddPane( m_panel->GetModeAndGeometryToolBar(this), modeAndGeometryToolbarInfo );
+
 	wxAuiPaneInfo applicationToolBarInfo;
 	applicationToolBarInfo.Caption( _("libRJMCMC toolbar") );
 	applicationToolBarInfo.ToolbarPane();
@@ -98,8 +109,24 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 	
 	// Back up stuffs erased in parse_string_map ...
 	bool back_up_do_save = building_footprint_extraction_parameters::Instance()->m_do_save;
+	
 	building_footprint_extraction_parameters::Instance()->parse_string_map(parameters);
+	
+	// Restore backuped stuffs
 	building_footprint_extraction_parameters::Instance()->m_do_save = back_up_do_save;
+	
+	// Test if input file exists
+	std::ifstream test( building_footprint_extraction_parameters::Instance()->m_input_data_file_path.c_str() , std::ios::in );
+	if ( !test.good() )
+	{
+	  std::ostringstream oss;
+	  oss << "File " << building_footprint_extraction_parameters::Instance()->m_input_data_file_path << " does not exist !";
+	  wxString message( oss.str().c_str() , *wxConvCurrent );
+	  ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
+	  // Restore interface ...
+	  OnThreadEnd();
+	  return;
+	}
 
 	try
 	{
