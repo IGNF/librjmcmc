@@ -251,11 +251,12 @@ public:
    default: return -n*v/n2;
    }
   }
-  inline FT scale_edge(int i, const Point_2& q) const { return (1+scale_center(i,q))/2; }
+  inline FT scale_edge(int i, const Point_2& q) const { return (1+scale_center(i,q))*0.5; }
 
   inline FT area() const { return 4*r*n.squared_length(); }
   inline FT squared_perimeter() const { FT f(4*(1+r)); return f*f*n.squared_length(); }
-  // optimized version of edge(i).squared_length();
+
+  // optimized version of segment(i).squared_length();
   inline FT squared_length(int i) const { FT f(4*n.squared_length()); return (i%2)?(r*r*f):f; }
 
   inline const Point_2&  center() const { return c; }
@@ -280,10 +281,9 @@ public:
   }
 
   // point(i) aliases
-  inline Point_2 vertex(int i) const { return point(i); }
   inline Point_2 operator[](int i) const { return point(i); }
 
-  inline Segment_2 edge(int i) const // edge between point(i) and point(i+1)
+  Segment_2 segment(int i) const // segment between point(i) and point(i+1)
   {
     Vector_2 m(-r*n.y(),r*n.x());
     switch (i%4) {
@@ -296,7 +296,7 @@ public:
 
   Line_2 line(int i) const // line passing through point(i) and point(i+1)
   {
-  // optimization: line(i)==edge(i).supporting_line();
+  // return segment(i).supporting_line(); // optimized version :
     Vector_2 rn(r*n);
     FT dot(rn*n);
     switch (i%4) {

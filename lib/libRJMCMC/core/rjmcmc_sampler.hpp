@@ -45,11 +45,10 @@ template<typename T> struct kernel_traits {
 
 template<typename Kernel0, typename Kernel1> class binary_kernel {
 	double m_p[2], m_p_sum;
-	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > die_type;
-	die_type m_die;
 	Kernel0 m_kernel0;
 	Kernel1 m_kernel1;
-	unsigned int m_kernel_id;
+	mutable boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > m_die;
+	mutable unsigned int m_kernel_id;
 public:
 	enum { size = 2 };
 	inline unsigned int kernel_id() const { return m_kernel_id; }
@@ -73,7 +72,7 @@ public:
 	}
 	inline double probability(unsigned int i) const { return m_p[i]; }
 	template<typename Configuration, typename Modification>
-	double operator()(Configuration& c, Modification& modif)
+	double operator()(Configuration& c, Modification& modif) const
 	{
 		if(m_die()*m_p_sum<m_p[0]) {
 			m_kernel_id = 0;
@@ -89,183 +88,72 @@ public:
 	}
 };
 
-class uniform_birth_kernel {
-	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > die_type;
-	die_type m_die;
-public:
-	uniform_birth_kernel() : m_die(GetRandom(), boost::uniform_real<>(0,1)) {}
-	template<typename Configuration, typename Modification>
-	double operator()(Configuration& c, Modification& modif)
-	{
-		typedef typename Configuration::value_type T;
-		const bbox_2& bbox = c.is_valid().bbox();
-		float x0 = bbox.min_point()[0];
-		float y0 = bbox.min_point()[1];
-		float x1 = bbox.max_point()[0];
-		float y1 = bbox.max_point()[1];
-		do {
-			Point_2 p(x0+(x1-x0)*m_die(), y0+(y1-y0)*m_die());
-			Vector_2 v(0.5*(x1-x0)*m_die(), 0.5*(y1-y0)*m_die());
-			if(true) {//m_die()<0.5) {
-				modif.birth(T(Rectangle_2(p, v, m_die())));
-			} else {
-				modif.birth(T(Circle_2(p, m_die()*0.5*CGAL::min(x1-x0,y1-y0))));
-			}
-		} while (!c.is_valid(modif.birth()));
-		modif.death(c.end());
-		return 1./bbox.volume();//(0.25*(x1-x0)*(x1-x0)*(y1-y0)*(y1-y0));
-	}
-	template<typename Configuration, typename Modification>
-	double pdf(const Configuration& c, const Modification& modif) const
-	{
-		if(modif.birth_size(c)!=0 || modif.death_size(c)!=1) return 0.;
-		const bbox_2& bbox = c.is_valid().bbox();
-		float x0 = bbox.min_point()[0];
-		float y0 = bbox.min_point()[1];
-		float x1 = bbox.max_point()[0];
-		float y1 = bbox.max_point()[1];
-		return 1./bbox.volume();//(0.25*(x1-x0)*(x1-x0)*(y1-y0)*(y1-y0));
-	}
-/*
-	template<typename Configuration, typename Modification>
-	double operator()(Configuration& c, Modification& modif)
-	{
-		double pdf;
-		modif.birth(c.().sample(&pdf));
-		modif.death(c.end());
-		return pdf;
-	}
-	template<typename Configuration, typename Modification>
-	double pdf(const Configuration& c, const Modification& modif) const
-	{
-		if(modif.birth_size(c)!=0 || modif.death_size(c)!=1) return 0.;
-		return c.is_valid().pdf(modif.death());
-	}
-*/
-};
-
-class uniform_death_kernel {
-	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > die_type;
-public:
-	uniform_death_kernel() {}
-	template<typename Configuration, typename Modification>
-	double operator()(Configuration& c, Modification& modif)
-	{
-		typedef typename Configuration::value_type T;
-		typename Configuration::iterator it = c.begin();
-		if(!c.empty()) {
-			die_type die(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
-			std::advance(it, die());
-		}
-		modif.birth(T());
-		modif.death(it);
-		return 1./c.size();
-	}
-	template<typename Configuration, typename Modification>
-	double pdf(const Configuration& c, const Modification& modif) const
-	{
-		if(modif.birth_size(c)!=1 || modif.death_size(c)!=0) return 0.;
-		return 1./(c.size()+1);
-	}
-};
-
 template<typename Kernel> class unary_kernel {
 	double m_p;
 	Kernel m_kernel;
 public:
 	enum { size = 1 };
-	unary_kernel(double p=1.) : m_p(p) {}
+	unary_kernel(const Kernel& k, double p=1.) : m_kernel(k), m_p(p) {}
 	inline unsigned int kernel_id() const { return 0; }
 	inline void probability(double p) { m_p = p; }
 	inline double probability() const { return m_p; }
 	inline void probability(unsigned int, double p) { m_p = p; }
 	inline double probability(unsigned int) const { return m_p; }
 	template<typename Configuration, typename Modification>
-	double operator()(Configuration& c, Modification& modif)
+	double operator()(Configuration& c, Modification& modif) const
 	{
 		return m_kernel(c,modif); //returns p(inverse(modif))/p(modif) //p270
 	}
 };
 
-class rectangle_modification_kernel {
-	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > int_die_type;
-	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > float_die_type;
-	mutable float_die_type m_dief;
-	mutable int_die_type   m_die4;
-	double m_p_edge_translation;
-	double m_dx;
-	double m_dy;
-public:
-	rectangle_modification_kernel() :
-		m_dief(GetRandom(), boost::uniform_real<>(0,1)),
-		m_die4(GetRandom(), boost::uniform_smallint<>(0,3)),
-		m_p_edge_translation(0.5), m_dx(10), m_dy(10) {}
 
+class uniform_death_kernel {
+	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > die_type;
+public:
+	uniform_death_kernel() {}
 	template<typename Configuration, typename Modification>
-	double operator()(Configuration& config, Modification& modif)
+	double operator()(Configuration& c, Modification& modif) const
 	{
+		modif.clear();
+		if(c.empty()) return 1.;
 		typedef typename Configuration::value_type T;
-		if(config.empty()) {
-			modif.death(config.end());
-			modif.birth(T());
-			return 0;
-		}
-		typename Configuration::iterator it = config.begin();
-		int_die_type diec(GetRandom(), boost::uniform_smallint<>(0,config.size()-1));
-		std::advance(it, diec());
-		modif.death(it);
-		T n = config[it];
-		double d = m_dief();
-		Rectangle_2 *r = boost::get<Rectangle_2>(&n);
-		Circle_2 *c = boost::get<Circle_2>(&n);
-		if(d<m_p_edge_translation) {
-			do {
-				//todo functor out of the lib
-				if(r) {
-					modif.birth(T(r->scaled_edge(m_die4(),2*m_dief())));
-				} else if(c) {
-					Vector_2 v(m_dx*(2*m_dief()-1),m_dy*(2*m_dief()-1));
-					modif.birth(T(Circle_2(c->center()+v,c->radius())));
-				}
-			} while (!config.is_valid(modif.birth()));
-		} else {
-			do {
-				if(r) {
-					Vector_2 v(m_dx*(2*m_dief()-1),m_dy*(2*m_dief()-1));
-					modif.birth(T(r->rotation_scaled_corner(m_die4(), v)));
-				} else if(c) {
-					modif.birth(T(Circle_2(c->center(),c->radius()*2*m_dief())));
-				}
-			} while (!config.is_valid(modif.birth()));
-		}
-		return 1.; // neglecting border issues
+		typename Configuration::iterator it = c.begin();
+		die_type die(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
+		std::advance(it, die());
+		modif.insert_death(it);
+		return 1./c.size();
+	}
+	template<typename Configuration, typename Modification>
+	double pdf(const Configuration& c, const Modification& modif) const
+	{
+		if(modif.birth_size()!=1 || modif.death_size()!=0) return 0.;
+		return 1./(c.size()+1);
 	}
 };
 
-
-
-typedef binary_kernel<uniform_birth_kernel,uniform_death_kernel> uniform_birth_death_kernel;
-typedef unary_kernel<rectangle_modification_kernel> modification_kernel;
-
-
-class geometric_temperature {
+template<typename Modifier>
+class modification_kernel {
+	Modifier m_modifier;
+	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > die_type;
 public:
-	geometric_temperature(double temp, double coefficient) : m_temp(temp), m_coefficient(coefficient) {}
+	modification_kernel(Modifier m) : m_modifier(m) {}
 
-	inline double  operator*() const { return m_temp; }
-	inline double& operator*()       { return m_temp; }
-	inline geometric_temperature  operator++()    { m_temp *= m_coefficient; return *this; }
-	inline geometric_temperature  operator++(int) { geometric_temperature t(*this); m_temp *= m_coefficient; return t; }
-
-	inline double coefficient() const { return m_coefficient; }
-	inline void coefficient(double coef) { m_coefficient = coef; }
-
-private:
-	double m_temp;
-	double m_coefficient;
+	template<typename Configuration, typename Modification>
+	double operator()(Configuration& c, Modification& modif) const
+	{
+		modif.clear();
+		if(c.empty()) return 1.;
+		typedef typename Configuration::value_type T;
+		typename Configuration::iterator it = c.begin();
+		die_type die(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
+		std::advance(it, die());
+		modif.insert_death(it);
+		modif.insert_birth(boost::apply_visitor(m_modifier,c[it]));
+		return m_modifier.green_ratio();
+	}
 };
 
-// variadic template supports would hide the std::tuple implementation detail
+// variadic template support would hide the std::tuple implementation detail
 #if 0
 	#define IF_VARIADIC(x,y) x
 #else

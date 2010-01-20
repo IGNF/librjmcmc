@@ -39,16 +39,17 @@ class modification
 {
 	typedef typename Configuration::value_type	value_type;
 	typedef typename Configuration::iterator	iterator;
-	value_type	m_birth;
-	iterator	m_death;
+	std::vector<value_type>	m_birth;
+	std::vector<iterator>	m_death;
 public:
-	inline const value_type& birth() const { return m_birth; }
-	inline iterator          death() const { return m_death; }
-	inline void birth(const value_type& b) { m_birth = b; }
-	template<typename T> inline void birth(const T& b) { m_birth = value_type(b); } // this is used to make variants
-	inline void death(iterator d)  { m_death=d; }
-	inline unsigned int birth_size(const Configuration &c) const { return (m_birth.empty()) ? 0 : 1; }
-	inline unsigned int death_size(const Configuration &c) const { return (m_death !=c.end()) ? 1 : 0; }
+	inline const value_type& birth() const { return m_birth.front(); }
+	inline iterator          death() const { return m_death.front(); }
+	template<typename T>
+	inline void insert_birth(const T& b) { m_birth.push_back(value_type(b)); }
+	inline void insert_death(iterator d)  { m_death.push_back(d); }
+	inline unsigned int birth_size() const { return m_birth.size(); }
+	inline unsigned int death_size() const { return m_death.size(); }
+	inline void clear() { m_birth.clear(); m_death.clear(); }
 };
 }
 
@@ -114,9 +115,9 @@ public:
 
 	template <typename Modification> double delta_birth(const Modification &modif) const
 	{
-		const_iterator v	 = modif.death();
+		if(modif.birth_size()==0) return 0;
+		const_iterator v	 = (modif.death_size())?modif.death():end();
 		const value_type& obj    = modif.birth();
-		if(obj.empty()) return 0;
 		double delta             = boost::apply_visitor(m_unary_energy,obj);
 		for (const_iterator it=begin(); it != end(); ++it)
 			if (it != v) delta += boost::apply_visitor(m_binary_energy, obj, value(it) );
@@ -125,8 +126,8 @@ public:
 
 	template <typename Modification> double delta_death(const Modification &modif) const
 	{
+		if(modif.death_size()==0) return 0;
 		const_iterator v = modif.death();
-		if ( v == end() ) return 0.;
 		const value_type& obj = value(v);
 		double delta = - energy(v);
 		for (const_iterator it=begin(); it != end(); ++it)
@@ -137,16 +138,14 @@ public:
 	// manipulators
 	template <typename Modification> void apply(const Modification &modif)
 	{
-		remove(modif.death());
-		insert(modif.birth());
+		if(modif.death_size()) remove(modif.death());
+		if(modif.birth_size()) insert(modif.birth());
 	}
 
 	void insert(const value_type &obj) { 
-		if(obj.empty()) return;
 		m_container.push_back(obj);
 	}
 	void remove( iterator v ) {
-		if(v==end()) return;
 		std::swap(*v,m_container.back());
 		m_container.pop_back();
 	}
@@ -273,9 +272,9 @@ public:
 
 	template <typename Modification> double delta_birth(const Modification &modif) const
 	{
-		iterator v 		= modif.death();
+		if(modif.birth_size()==0)  return 0.;
+		iterator v	 = (modif.death_size())?modif.death():end();
 		const value_type& obj   = modif.birth();
-		if ( obj.empty() ) return 0.;
 		double delta             = boost::apply_visitor(m_unary_energy,obj);
 		for (iterator it=begin(); it != end(); ++it)
 			if (it != v) delta += boost::apply_visitor(m_binary_energy, obj, value(it) );
@@ -284,8 +283,8 @@ public:
 
 	template <typename Modification> double delta_death(const Modification &modif) const
 	{
+		if(modif.death_size()==0)  return 0.;
 		iterator v = modif.death();
-		if ( v == end() ) return 0.;
 		double delta = - energy(v);
 		out_edge_iterator it, end;
 		for(boost::tie(it,end) = out_edges( *v, m_graph ); it!=end; ++it)
@@ -295,14 +294,13 @@ public:
 
 	template <typename Modification> void apply(const Modification &modif)
 	{
-		remove(modif.death());
-		insert(modif.birth());
+		if(modif.death_size()) remove(modif.death());
+		if(modif.birth_size()) insert(modif.birth());
 	}
 
 	// manipulators
 	void insert(const value_type& obj)
 	{
-		if(obj.empty()) return;
 		node n(obj, boost::apply_visitor(m_unary_energy,obj));
 		m_unary += n.energy();
 		vertex_descriptor d = add_vertex(n, m_graph);
@@ -320,7 +318,6 @@ public:
 
 	void remove( iterator v )
 	{
-		if ( v == end() ) return;
 		out_edge_iterator it, end;
 		for(boost::tie(it,end) = out_edges( *v, m_graph ); it!=end; ++it)
 			m_binary -= m_graph[ *it ].energy();

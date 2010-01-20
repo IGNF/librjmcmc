@@ -20,7 +20,7 @@ private:
 		}
 		building_footprint_extraction_parameters::Instance()->parse_command_line(argc,my_argv);
 		
-		m_frame = new rjmcmc_building_footprint_extraction_frame((wxFrame *)NULL, wxID_ANY, _("RJMCMC building footprint extraction"), wxPoint(50,50), wxSize(800,600) );
+		m_frame = new rjmcmc_building_footprint_extraction_frame((wxFrame *)NULL, wxID_ANY, _("RJMCMC building footprint extraction") );
 		m_frame->Show();
 		return true;
 	}

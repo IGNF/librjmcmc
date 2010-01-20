@@ -45,7 +45,7 @@ rjmcmc_building_footprint_extraction_frame::rjmcmc_building_footprint_extraction
 	PanelViewer::Register(this);
 	m_panel = PanelManager::Instance()->createObject("PanelViewer");
 
-	m_statusBar->SetStatusText(_("GilViewer - Adrien Chauve & Olivier Tournaire"));
+	m_statusBar->SetStatusText(_("libRJMCMC"));
 
 	wxAuiPaneInfo toolbarInfo;
 	toolbarInfo.Caption( _("Main toolbar") );
@@ -87,7 +87,7 @@ rjmcmc_building_footprint_extraction_frame::rjmcmc_building_footprint_extraction
 	m_dockManager.Update();
 	m_parameters_frame = new parameters_frame();
 	m_parameters_frame->SetModal(false);
-	m_parameters_frame->Show();
+	//m_parameters_frame->Show();
 }
 
 rjmcmc_building_footprint_extraction_frame::~rjmcmc_building_footprint_extraction_frame()
@@ -147,12 +147,12 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 	try
 	{
 		m_panel->AddLayer( ImageLayer::CreateImageLayer(building_footprint_extraction_parameters::Instance()->m_input_data_file_path) );
-		Layer::ptrLayerType layer = VectorLayer::CreateVectorLayer(std::string("Buildings") , SHPT_POLYGON );
+		Layer::ptrLayerType layer = VectorLayer::CreateVectorLayer(std::string("Buildings") );
 		m_panel->AddLayer(layer);
 		layer->PolygonsRingsColour(wxColour(255,255,0));
 		layer->PolygonsInsideStyle( wxTRANSPARENT );
 		layer->PolygonsRingsWidth(3);
-		layer->TextsVisibility(false);
+		layer->TextsVisibility(true);
 
 		m_thread = new rjmcmc_building_footprint_extraction_thread(layer, this);
 		m_thread->Create();

@@ -9,11 +9,10 @@ typedef K::Vector_2 Vector_2;
 typedef K::Segment_2 Segment_2;
 typedef K::FT FT;
 
-#include "Rectangle_2.h"
 #include "Rectangle_2_intersection.h"
+#include "Circle_2_intersection.h"
+#include "Circle_2_rectangle_2_intersection.h"
 typedef CGAL::Rectangle_2<K> Rectangle_2;
-
-#include "Circle_2.h"
 typedef CGAL::Circle_2<K> Circle_2;
 
 #include "Segment_2_iterator.h"

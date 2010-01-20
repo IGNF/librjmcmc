@@ -16,23 +16,18 @@ public:
     m_layer->AddPolygon(vectx, vecty );
     std::ostringstream oss;
     oss << m_energy;
-    m_layer->AddText( CGAL::to_double(r.center().x()) , CGAL::to_double(r.center().y()) , oss.str() , wxColour(255,0,0) );
+    double x = CGAL::to_double(r.center().x());
+    double y = CGAL::to_double(r.center().y());
+    m_layer->AddText(x, y, oss.str() , wxColour(255,0,0) );
   }
-  void operator()(const Circle_2& c) const { // losange... todo:make it a real circle
+  void operator()(const Circle_2& c) const {
     double x = CGAL::to_double(c.center().x());
     double y = CGAL::to_double(c.center().y());
     double r = CGAL::to_double(c.radius());
-
-    std::vector<double> vectx, vecty;
-    vectx.push_back(x-r); vectx.push_back(y-r);
-    vectx.push_back(x+r); vectx.push_back(y+r);
-    vectx.push_back(x-r); vectx.push_back(y+r);
-    vectx.push_back(x-r); vectx.push_back(y-r);
-    vectx.push_back(x+r); vectx.push_back(y-r);
-    m_layer->AddPolygon(vectx, vecty );
+    m_layer->AddCircle(x,y,r);
     std::ostringstream oss;
     oss << m_energy;
-    m_layer->AddText( x, y, oss.str() , wxColour(255,0,0) );
+    m_layer->AddText(x, y, oss.str() , wxColour(255,0,0) );
   }
 private:
   Layer::ptrLayerType& m_layer;
