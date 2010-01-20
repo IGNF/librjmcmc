@@ -1,7 +1,6 @@
-#include "rectangle_node.hpp"
+#include "core/energies.hpp"
 
-
-bool BoxIsValid::operator()(const Rectangle_2 &n) const
+bool box_is_valid::operator()(const Rectangle_2 &n) const
 {
 	for (unsigned int i = 0; i < 4; ++i)
 	{
@@ -18,7 +17,7 @@ bool BoxIsValid::operator()(const Rectangle_2 &n) const
 	return (ratio <= m_max_ratio && 1 <= m_max_ratio*ratio );
 }
 
-bool BoxIsValid::operator()(const Circle_2 &n) const
+bool box_is_valid::operator()(const Circle_2 &n) const
 {
 	bbox_2::point_type pmin = m_box.min_point();
 	bbox_2::point_type pmax = m_box.max_point();
@@ -30,6 +29,28 @@ bool BoxIsValid::operator()(const Circle_2 &n) const
 
 
 ////////////////////////////////////////////////////////////////////////////////
+
+#include <boost/gil/extension/io/tiff_dynamic_io.hpp>
+#include <boost/gil/extension/matis/float_images.hpp>
+
+namespace rjmcmc {
+class image
+{
+public:
+	typedef boost::gil::dev2n32F_image_t image_t;
+	typedef boost::gil::dev2n32F_pixel_t pixel_t;
+
+	double integrated_flux(const Segment_2 &s) const;
+	double integrated_flux(const Circle_2  &c) const;
+
+	void load(const std::string &file, double sigmaD=1, unsigned int step=0);
+	void load(const std::string &file, const bbox_2& bbox, double sigmaD=1, unsigned int step=0); // subimage loading
+
+private:
+	image_t m_gradients;
+	bbox_2 m_bbox;
+};
+};
 
 
 double image_gradient_unary_energy::operator()(const Circle_2 &c) const
@@ -47,28 +68,26 @@ double image_gradient_unary_energy::operator()(const Rectangle_2 &n) const
 	return res;
 }
 
-#include "geometry/Segment_2_iterator.h"
 
-using namespace boost::gil;
 
 image_gradient_unary_energy::image_gradient_unary_energy(double default_energy, const std::string& file, const bbox_2& bbox, double sigmaD, unsigned int step) :
 	m_defaultEnergy(default_energy), 
-	m_image(boost::shared_ptr<gil_image>(new gil_image))
+	m_image(boost::shared_ptr<rjmcmc::image>(new rjmcmc::image))
 {
 	m_image->load(file,bbox,sigmaD,step);
 }
 
 image_gradient_unary_energy::image_gradient_unary_energy(double default_energy, const std::string& file, double sigmaD, unsigned int step) :
 	m_defaultEnergy(default_energy), 
-	m_image(boost::shared_ptr<gil_image>(new gil_image))
+	m_image(boost::shared_ptr<rjmcmc::image>(new rjmcmc::image))
 {
 	m_image->load(file,sigmaD,step);
 }
 
 template<typename T> inline double Add1CirclePoints(const T& view, double cx, double cy, double dx, double dy)
 {
-	dev2n32F_pixel_t grad = view((int) (cx + dx), (int) (cy + dy) );
-	return at_c<0>(grad) * dx + at_c<1>(grad) * dy;
+	rjmcmc::image::pixel_t grad = view((int) (cx + dx), (int) (cy + dy) );
+	return boost::gil::at_c<0>(grad) * dx + boost::gil::at_c<1>(grad) * dy;
 }
 
 template<typename T> void Add4CirclePoints(const T& view, double cx, double cy, double d, double & res, double & w)
@@ -96,7 +115,7 @@ template<typename T> void Add8CirclePoints(const T& view, double cx, double cy, 
 	res += Add1CirclePoints(view, cx, cy, dy,-dx);
 }
 
-double gil_image::integrated_flux(const Circle_2 &c) const
+double rjmcmc::image::integrated_flux(const Circle_2 &c) const
 {
 	double cx = c.center().x();
 	double cy = c.center().y();
@@ -120,8 +139,10 @@ double gil_image::integrated_flux(const Circle_2 &c) const
 	return (res * c.perimeter()) / w;
 }
 
-double gil_image::integrated_flux(const Segment_2& s) const
+#include "geometry/Segment_2_iterator.h"
+double rjmcmc::image::integrated_flux(const Segment_2& s) const
 {
+	using namespace boost::gil;
 	Segment_2_iterator it(s);
 
 	typedef image_t::view_t::xy_locator xy_locator;
@@ -150,14 +171,17 @@ double gil_image::integrated_flux(const Segment_2& s) const
 }
 
 
-
-
 #include <boost/gil/extension/numeric/kernel.hpp>
 #include <boost/gil/extension/numeric/convolve.hpp>
 #include <boost/gil/extension/dynamic_image/dynamic_image_all.hpp>
 
-typedef boost::mpl::vector<gray8_image_t , gray16_image_t , gray32_image_t, gray32F_image_t , gray64F_image_t > my_images_t;
-typedef any_image<my_images_t> my_any_image_t;
+typedef boost::mpl::vector<
+	boost::gil::gray8_image_t, 
+	boost::gil::gray16_image_t,
+	boost::gil::gray32_image_t,
+	boost::gil::gray32F_image_t,
+	boost::gil::gray64F_image_t > my_images_t;
+typedef boost::gil::any_image<my_images_t> my_any_image_t;
 typedef my_any_image_t::const_view_t my_any_const_view_t;
 
 //#include "gil/extension/numeric/sampler.hpp"
@@ -170,40 +194,40 @@ template<typename Kernel1D>
 void initKernelGaussian1D(Kernel1D& kernel, double sigma)
 {
 	// Gaussian smoothing
-typedef	typename Kernel1D::value_type vt;
+	typedef	typename Kernel1D::value_type vt;
 	const vt z = 1.0 / (std::sqrt(2 * M_PI) * sigma);
 	const vt sigmasquared = sigma * sigma;
 	vt x = -1.0 * kernel.center();
-	vt sum =0.;
-	for(typename Kernel1D::iterator i = kernel.begin();i!=kernel.end(); ++i, ++x)
+	typename Kernel1D::iterator i;
+	vt sum = 0.;
+	for (i=kernel.begin(); i!=kernel.end(); ++i, ++x)
 	{
-		*i = z * (std::exp(-0.5 * (x * x / sigmasquared)));
+		*i = z * (std::exp(-0.5*(x*x/sigmasquared)));
 		sum += *i;
 	}
-	for (typename Kernel1D::iterator i = kernel.begin(); i!=kernel.end(); ++i)
-	*i /= sum;
+	for (i=kernel.begin(); i!=kernel.end(); ++i) *i /= sum;
 }
 
 template<typename Kernel1D>
 void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 {
 	// Gaussian derivative smoothing
-typedef	typename Kernel1D::value_type vt;
+	typedef	typename Kernel1D::value_type vt;
 	const vt z = 1.0 / (std::sqrt(2 * M_PI) * sigma);
 	const vt sigmasquared = sigma * sigma;
 	vt x = -1.0 * kernel.center();
 	typename Kernel1D::iterator i;
 	vt sum = 0.;
-	for (i = kernel.begin(); i!=kernel.end(); ++i, ++x)
+	for (i=kernel.begin(); i!=kernel.end(); ++i, ++x)
 	{
-		*i = - (x / sigmasquared) * z * (std::exp(-0.5 * (x * x / sigmasquared)));
+		*i = - (x/sigmasquared) * z * (std::exp(-0.5*(x*x/sigmasquared)));
 		sum += *i * x;
 	}
-	for (i=kernel.begin(); i!=kernel.end(); ++i)
-	*i /= sum;
+	for (i=kernel.begin(); i!=kernel.end(); ++i) *i /= sum;
 }
 
 template<typename I, typename V> void init(I& g, const V& v, double sigmaD=1, unsigned int step=0) {
+	using namespace boost::gil;
 	g.recreate(v.dimensions());
 	gray32F_image_t img(v.dimensions());
 
@@ -233,7 +257,7 @@ template<typename I, typename V> void init(I& g, const V& v, double sigmaD=1, un
 }
 
 
-void gil_image::load(const std::string &file, double sigmaD, unsigned int step)
+void rjmcmc::image::load(const std::string &file, double sigmaD, unsigned int step)
 {
 	my_any_image_t img;
 	tiff_read_image(file, img);
@@ -248,7 +272,7 @@ void gil_image::load(const std::string &file, double sigmaD, unsigned int step)
 	init(m_gradients, v, sigmaD);
 }
 
-void gil_image::load(const std::string &file, const bbox_2& bbox, double sigmaD, unsigned int step)
+void rjmcmc::image::load(const std::string &file, const bbox_2& bbox, double sigmaD, unsigned int step)
 {
 	my_any_image_t img;
 	tiff_read_image(file, img);

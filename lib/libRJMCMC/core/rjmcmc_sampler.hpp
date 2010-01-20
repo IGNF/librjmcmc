@@ -4,8 +4,6 @@
 #include "core/random.hpp"
 #include "core/bbox.hpp"
 #include <boost/tuple/tuple.hpp>
-#include <boost/variant/get.hpp>
-
 
 namespace internal {
 
@@ -88,24 +86,6 @@ public:
 	}
 };
 
-template<typename Kernel> class unary_kernel {
-	double m_p;
-	Kernel m_kernel;
-public:
-	enum { size = 1 };
-	unary_kernel(const Kernel& k, double p=1.) : m_kernel(k), m_p(p) {}
-	inline unsigned int kernel_id() const { return 0; }
-	inline void probability(double p) { m_p = p; }
-	inline double probability() const { return m_p; }
-	inline void probability(unsigned int, double p) { m_p = p; }
-	inline double probability(unsigned int) const { return m_p; }
-	template<typename Configuration, typename Modification>
-	double operator()(Configuration& c, Modification& modif) const
-	{
-		return m_kernel(c,modif); //returns p(inverse(modif))/p(modif) //p270
-	}
-};
-
 
 class uniform_death_kernel {
 	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > die_type;
@@ -131,12 +111,24 @@ public:
 	}
 };
 
+class unary_kernel {
+	double m_p;
+public:
+	enum { size = 1 };
+	unary_kernel(double p=1.) : m_p(p) {}
+	inline unsigned int kernel_id() const { return 0; }
+	inline void probability(double p) { m_p = p; }
+	inline double probability() const { return m_p; }
+	inline void probability(unsigned int, double p) { m_p = p; }
+	inline double probability(unsigned int) const { return m_p; }
+};
+
 template<typename Modifier>
-class modification_kernel {
+class modification_kernel : public unary_kernel {
 	Modifier m_modifier;
 	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > die_type;
 public:
-	modification_kernel(Modifier m) : m_modifier(m) {}
+	modification_kernel(Modifier m, double p=1) : unary_kernel(p), m_modifier(m) {}
 
 	template<typename Configuration, typename Modification>
 	double operator()(Configuration& c, Modification& modif) const
@@ -148,7 +140,7 @@ public:
 		die_type die(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
 		std::advance(it, die());
 		modif.insert_death(it);
-		modif.insert_birth(boost::apply_visitor(m_modifier,c[it]));
+		modif.insert_birth(rjmcmc::apply_visitor(m_modifier,c[it]));
 		return m_modifier.green_ratio();
 	}
 };

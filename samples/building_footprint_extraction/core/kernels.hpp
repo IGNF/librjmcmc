@@ -2,7 +2,9 @@
 #define KERNELS_HPP_
 
 #include <boost/variant.hpp>
-#include "core/rjmcmc_sampler.hpp"
+#include "geometry/geometry.h"
+#include "core/random.hpp"
+#include "core/bbox.hpp"
 
 class uniform_birth_kernel {
 	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > die_type;

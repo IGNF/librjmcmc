@@ -42,7 +42,7 @@ Layer::ptrLayerType& operator<<(Layer::ptrLayerType& layer, const building_confi
 	for (; it != end; ++it)
 	{
 		visitor.energy(config.energy(it));
-		boost::apply_visitor(visitor,config[it]);
+		rjmcmc::apply_visitor(visitor,config[it]);
 	}
 	return layer;
 }

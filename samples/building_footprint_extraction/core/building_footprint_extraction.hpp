@@ -3,38 +3,30 @@
 
 // déclaration des types
 
-#include "core/rectangle_node.hpp"
 #include "core/building_footprint_extraction_parameters.hpp"
 #include "core/kernels.hpp"
+#include "core/energies.hpp"
 
 #include "core/rjmcmc_configuration.hpp"
 #include "core/rjmcmc_sampler.hpp"
 #include "core/temperature.hpp"
-#include "boost/variant.hpp"
 
 typedef building_footprint_extraction_parameters param;
 
 typedef image_gradient_unary_energy building_unary_energy;
 typedef intersection_area_binary_energy  building_binary_energy;
 typedef trivial_accelerator building_accelerator;
-typedef BoxIsValid building_is_valid;
+typedef box_is_valid building_is_valid;
 //typedef Rectangle_2 node_types;
 //typedef boost::variant<Rectangle_2> node_types;
-//typedef boost::variant<Rectangle_2,Circle_2> node_types;
-struct node_types : public boost::variant<Rectangle_2,Circle_2> {
-	node_types(const Rectangle_2& n) : boost::variant<Rectangle_2,Circle_2>(n) {}
-	node_types(const Circle_2&    n) : boost::variant<Rectangle_2,Circle_2>(n) {}
-};
+typedef boost::variant<Rectangle_2,Circle_2> node_types;
+
 typedef graph_configuration<node_types, building_unary_energy, building_binary_energy,
 	building_is_valid, building_accelerator > building_configuration;
 
-
-
-
 typedef binary_kernel<uniform_birth_kernel,uniform_death_kernel> uniform_birth_death_kernel;
 typedef modifier<node_types, building_is_valid> building_modifier;
-typedef modification_kernel<building_modifier> building_modification;
-typedef unary_kernel<modification_kernel<building_modifier> > building_modification_kernel;
+typedef modification_kernel<building_modifier>  building_modification_kernel;
 
 #define KERNELS uniform_birth_death_kernel,building_modification_kernel
 typedef boost::tuple<KERNELS> kernels;
@@ -62,8 +54,7 @@ template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& vi
 	);
 
 	building_modifier modif(is_valid);
-	building_modification bmodif(modif);
-	building_modification_kernel kmodif(bmodif);
+	building_modification_kernel kmodif(modif);
 
 	uniform_birth_death_kernel kbirthdeath(
 		param::Instance()->m_birth_probability,
@@ -71,7 +62,6 @@ template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& vi
 	);
 
 	building_sampler sampler( IF_VARIADIC(,boost::make_tuple)(kbirthdeath,kmodif) );
-
 
 	building_unary_energy unary_energy(
 		param::Instance()->m_individual_energy,

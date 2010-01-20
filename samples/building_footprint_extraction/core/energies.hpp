@@ -1,20 +1,21 @@
-#ifndef RECTANGLENODE_HPP_
-#define RECTANGLENODE_HPP_
+#ifndef ENERGIES_HPP_
+#define ENERGIES_HPP_
 
 #include "geometry/geometry.h"
+#include "core/bbox.hpp"
 
 //////////////////////////////////////////////////////////
 
-#include "core/bbox.hpp"
-
-class BoxIsValid
+class box_is_valid
 {
 public:
 	typedef bool result_type;
 	result_type operator()(const Rectangle_2 &n) const;
 	result_type operator()(const Circle_2 &n) const;
 
-	BoxIsValid(const bbox_2 &box, double min_size, double max_ratio) : m_box(box), m_squared_min_size(min_size*min_size), m_max_ratio(max_ratio) {}
+	box_is_valid(const bbox_2 &box, double min_size, double max_ratio)
+	 : m_box(box), m_squared_min_size(min_size*min_size), m_max_ratio(max_ratio) {}
+
 	inline const bbox_2& bbox() const { return m_box; }
 private:
 	bbox_2 m_box;
@@ -48,7 +49,8 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/shared_ptr.hpp>
-class gil_image;
+namespace rjmcmc { class image; };
+
 class image_gradient_unary_energy
 {
 public:
@@ -60,28 +62,8 @@ public:
 	image_gradient_unary_energy(double default_energy, const std::string& file, const bbox_2& bbox, double sigmaD=1, unsigned int step=0);
 
 private:
-	boost::shared_ptr<gil_image> m_image;
+	boost::shared_ptr<rjmcmc::image> m_image;
 	double m_defaultEnergy;
 };
 
-
-#include <boost/gil/extension/io/tiff_dynamic_io.hpp>
-#include <boost/gil/extension/matis/float_images.hpp>
-
-class gil_image
-{
-public:
-	typedef boost::gil::dev2n32F_image_t image_t; 
-
-	double integrated_flux(const Segment_2 &s) const;
-	double integrated_flux(const Circle_2  &c) const;
-
-	void load(const std::string &file, double sigmaD=1, unsigned int step=0);
-	void load(const std::string &file, const bbox_2& bbox, double sigmaD=1, unsigned int step=0); // subimage loading
-
-private:
-	image_t m_gradients;
-	bbox_2 m_bbox;
-};
-
-#endif /*RECTANGLENODE_HPP_*/
+#endif /*ENERGIES_HPP_*/

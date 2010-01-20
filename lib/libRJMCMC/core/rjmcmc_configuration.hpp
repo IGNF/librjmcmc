@@ -2,26 +2,35 @@
 #define __RJMCMC_CONFIGURATION_HPP__
 
 #include <boost/variant.hpp>
-/*
-template<typename Visitor, typename Variant> 
-  inline typename Visitor::result_type apply_visitor(Visitor &v, Variant &v1) { return v(v1); }
-template<typename Visitor, typename Variant> 
-  inline typename Visitor::result_type apply_visitor(const Visitor &v, Variant &v1) { return v(v1); }
-template<typename Visitor, typename Variant1, typename Variant2> 
-  inline typename Visitor::result_type apply_visitor(Visitor &v, Variant1 &v1, Variant2 &v2) { return v(v1,v2); }
-template<typename Visitor, typename Variant1, typename Variant2> 
-  inline typename Visitor::result_type apply_visitor(const Visitor &v, Variant1 &v1, Variant2 &v2) { return v(v1,v2); }
 
-// boost::variant specialization
-template<typename Visitor, BOOST_VARIANT_ENUM_PARAMS(typename T)> 
-  inline typename Visitor::result_type apply_visitor(Visitor &v, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v1) { return boost::apply_visitor(v,v1); }
-template<typename Visitor, BOOST_VARIANT_ENUM_PARAMS(typename T)> 
-  inline typename Visitor::result_type apply_visitor(const Visitor &v, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v1) { return boost::apply_visitor(v,v1); }
-template<typename Visitor, BOOST_VARIANT_ENUM_PARAMS(typename T), BOOST_VARIANT_ENUM_PARAMS(typename U)> 
-  inline typename Visitor::result_type apply_visitor(Visitor &v, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v1, boost::variant<BOOST_VARIANT_ENUM_PARAMS(U)> &v2) { return boost::apply_visitor(v,v1,v2); }
-template<typename Visitor, BOOST_VARIANT_ENUM_PARAMS(typename T), BOOST_VARIANT_ENUM_PARAMS(typename U)> 
-  inline typename Visitor::result_type apply_visitor(const Visitor &v, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v1, boost::variant<BOOST_VARIANT_ENUM_PARAMS(U)> &v2) { return boost::apply_visitor(v,v1,v2); }
-*/
+// rjmcmc::apply_visitor generalizes boost::apply_visitor to directly call the function object if the argument is not a variant.
+
+namespace rjmcmc {
+
+template<typename Visitor, typename Variant> 
+  inline typename Visitor::result_type apply_visitor(const Visitor &v, const Variant &v1) { return v(v1); }
+
+template<typename Visitor, typename Variant1, typename Variant2> 
+  inline  typename Visitor::result_type apply_visitor(const Visitor &v, const Variant1 &v1, const Variant2 &v2) { return v(v1,v2); }
+
+template<typename Visitor, BOOST_VARIANT_ENUM_PARAMS(typename T) > 
+inline typename Visitor::result_type apply_visitor(const Visitor &v,
+	const boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v1)
+{
+	return boost::apply_visitor(v,v1);
+}
+
+template<typename Visitor,
+	BOOST_VARIANT_ENUM_PARAMS(typename T),
+	BOOST_VARIANT_ENUM_PARAMS(typename U) > 
+inline typename Visitor::result_type apply_visitor(const Visitor &v,
+	const boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v1,
+	const boost::variant<BOOST_VARIANT_ENUM_PARAMS(U)> &v2)
+{
+	return boost::apply_visitor(v,v1,v2);
+}
+
+};
 
 //////////////////////////////////////////////////////////
 
@@ -75,14 +84,14 @@ public:
 	{}
 
 	const IsValid& is_valid() const { return m_is_valid; }
-	bool is_valid(const T& t) const { return boost::apply_visitor(m_is_valid,t); }
+	bool is_valid(const T& t) const { return rjmcmc::apply_visitor(m_is_valid,t); }
 
 	// energy
 	double unary_energy() const
 	{
 		double e = 0.;
 		for (const_iterator it = begin(); it != end(); ++it)
-			e += boost::apply_visitor(m_unary_energy, *it );
+			e += rjmcmc::apply_visitor(m_unary_energy, *it );
 		return e;
 	}
 
@@ -91,7 +100,7 @@ public:
 		double e = 0.;
 		for (const_iterator i = begin(); i != end(); ++i)
 			for (const_iterator j = i+1; j != end(); ++j)
-				e += boost::apply_visitor(m_binary_energy, *i, *j );
+				e += rjmcmc::apply_visitor(m_binary_energy, *i, *j );
 		return e;
 	}
 
@@ -104,7 +113,7 @@ public:
 	inline const_iterator end  () const { return m_container.end(); }
 	inline const value_type& operator[]( const_iterator v ) const { return *v; }
 	inline const value_type& value( const_iterator v ) const { return *v; }
-	inline double energy( const_iterator v ) const { return boost::apply_visitor(m_unary_energy,*v); }
+	inline double energy( const_iterator v ) const { return rjmcmc::apply_visitor(m_unary_energy,*v); }
 
 	// evaluators
 
@@ -118,9 +127,9 @@ public:
 		if(modif.birth_size()==0) return 0;
 		const_iterator v	 = (modif.death_size())?modif.death():end();
 		const value_type& obj    = modif.birth();
-		double delta             = boost::apply_visitor(m_unary_energy,obj);
+		double delta             = rjmcmc::apply_visitor(m_unary_energy,obj);
 		for (const_iterator it=begin(); it != end(); ++it)
-			if (it != v) delta += boost::apply_visitor(m_binary_energy, obj, value(it) );
+			if (it != v) delta += rjmcmc::apply_visitor(m_binary_energy, obj, value(it) );
 		return delta;
 	}
 
@@ -131,7 +140,7 @@ public:
 		const value_type& obj = value(v);
 		double delta = - energy(v);
 		for (const_iterator it=begin(); it != end(); ++it)
-			if (it != v) delta -= boost::apply_visitor(m_binary_energy, obj, value(it) );
+			if (it != v) delta -= rjmcmc::apply_visitor(m_binary_energy, obj, value(it) );
 		return delta;
 	}
 
@@ -275,9 +284,9 @@ public:
 		if(modif.birth_size()==0)  return 0.;
 		iterator v	 = (modif.death_size())?modif.death():end();
 		const value_type& obj   = modif.birth();
-		double delta             = boost::apply_visitor(m_unary_energy,obj);
+		double delta             = rjmcmc::apply_visitor(m_unary_energy,obj);
 		for (iterator it=begin(); it != end(); ++it)
-			if (it != v) delta += boost::apply_visitor(m_binary_energy, obj, value(it) );
+			if (it != v) delta += rjmcmc::apply_visitor(m_binary_energy, obj, value(it) );
 		return delta;
 	}
 
@@ -301,14 +310,14 @@ public:
 	// manipulators
 	void insert(const value_type& obj)
 	{
-		node n(obj, boost::apply_visitor(m_unary_energy,obj));
+		node n(obj, rjmcmc::apply_visitor(m_unary_energy,obj));
 		m_unary += n.energy();
 		vertex_descriptor d = add_vertex(n, m_graph);
 		iterator   it, end;
 		
 		for (boost::tie(it,end)=m_accelerator(*this,obj); it != end; ++it) {
 			if ( *it == d ) continue;
-			double e = boost::apply_visitor(m_binary_energy, obj, value(it) );
+			double e = rjmcmc::apply_visitor(m_binary_energy, obj, value(it) );
 			if (   e == 0 ) continue;
 			edge_descriptor_bool new_edge = add_edge(d, *it, m_graph );
 			m_graph[ new_edge.first ].energy( e );
@@ -331,7 +340,7 @@ public:
 	{
 		double e = 0.;
 		for (const_iterator i=begin(); i != end(); ++i)
-			e += boost::apply_visitor(m_unary_energy, value(i) );
+			e += rjmcmc::apply_visitor(m_unary_energy, value(i) );
 		return e;
 	}
 
@@ -340,7 +349,7 @@ public:
 		double e = 0.;
 		const_edge_iterator it, end;
 		for(boost::tie(it,end) = edges( m_graph ); it!=end; ++it)
-			e += boost::apply_visitor(m_binary_energy,	m_graph[source(*it,m_graph)].value() ,
+			e += rjmcmc::apply_visitor(m_binary_energy,	m_graph[source(*it,m_graph)].value() ,
 						m_graph[target(*it,m_graph)].value() );
 		return e;
 	}
@@ -353,7 +362,7 @@ public:
 			const_iterator j = i; 
 			for (++j; j != end(); ++j)
 			{
-				bool computed = (0!= boost::apply_visitor(m_binary_energy,value(i), value(j)));
+				bool computed = (0!= rjmcmc::apply_visitor(m_binary_energy,value(i), value(j)));
 				bool stored = boost::edge(*i, *j, m_graph).second;
 				if (computed != stored)	++err;
 			}
@@ -362,7 +371,7 @@ public:
 	}
 
 	const IsValid& is_valid() const { return m_is_valid; }
-	bool is_valid(const T& t) const { return boost::apply_visitor(m_is_valid,t); }
+	bool is_valid(const T& t) const { return rjmcmc::apply_visitor(m_is_valid,t); }
 
 private:
 	graph_type m_graph;
