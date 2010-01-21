@@ -21,10 +21,11 @@ bool box_is_valid::operator()(const Circle_2 &n) const
 {
 	bbox_2::point_type pmin = m_box.min_point();
 	bbox_2::point_type pmax = m_box.max_point();
-	if(n.center().x()<pmin[0]+n.radius() || n.center().x()>pmax[0]-n.radius()) return false;
-	if(n.center().y()<pmin[1]+n.radius() || n.center().y()>pmax[1]-n.radius()) return false;
-	if(n.radius()*n.radius() < m_squared_min_size)	return false;
-	return true;
+	return 	n.center().x()>=pmin[0]+n.radius() &&
+		n.center().x()<=pmax[0]-n.radius() &&
+		n.center().y()>=pmin[1]+n.radius() &&
+		n.center().y()<=pmax[1]-n.radius() &&
+		n.squared_radius() >= m_squared_min_size;
 }
 
 

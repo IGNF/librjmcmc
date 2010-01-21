@@ -24,11 +24,15 @@ typedef boost::variant<Rectangle_2,Circle_2> node_types;
 typedef graph_configuration<node_types, building_unary_energy, building_binary_energy,
 	building_is_valid, building_accelerator > building_configuration;
 
-typedef binary_kernel<uniform_birth_kernel,uniform_death_kernel> uniform_birth_death_kernel;
+typedef generator<node_types, building_is_valid> building_generator;
+typedef uniform_birth_kernel<building_generator> building_birth_kernel;
+typedef uniform_death_kernel                     building_death_kernel;
+
+typedef binary_kernel<building_birth_kernel,building_death_kernel> building_birth_death_kernel;
 typedef modifier<node_types, building_is_valid> building_modifier;
 typedef modification_kernel<building_modifier>  building_modification_kernel;
 
-#define KERNELS uniform_birth_death_kernel,building_modification_kernel
+#define KERNELS building_birth_death_kernel,building_modification_kernel
 typedef boost::tuple<KERNELS> kernels;
 typedef rjmcmc_sampler<IF_VARIADIC(KERNELS,kernels)> building_sampler;
 
@@ -56,7 +60,12 @@ template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& vi
 	building_modifier modif(is_valid);
 	building_modification_kernel kmodif(modif);
 
-	uniform_birth_death_kernel kbirthdeath(
+	building_generator birth(is_valid);
+	building_birth_kernel kbirth(birth);
+	building_death_kernel kdeath;
+
+	building_birth_death_kernel kbirthdeath(
+		kbirth, kdeath,
 		param::Instance()->m_birth_probability,
 		param::Instance()->m_death_probability
 	);

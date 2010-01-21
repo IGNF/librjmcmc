@@ -6,45 +6,79 @@
 #include "core/random.hpp"
 #include "core/bbox.hpp"
 
-class uniform_birth_kernel {
+template< typename T, typename IsValid >
+class generator {
 	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > die_type;
 	mutable die_type m_die;
+	IsValid m_is_valid;
 public:
-	uniform_birth_kernel() : m_die(GetRandom(), boost::uniform_real<>(0,1)) {}
-	template<typename Configuration, typename Modification>
-	double operator()(Configuration& c, Modification& modif) const
-	{
-		typedef typename Configuration::value_type T;
-		const bbox_2& bbox = c.is_valid().bbox();
-		float x0 = bbox.min_point()[0];
-		float y0 = bbox.min_point()[1];
-		float x1 = bbox.max_point()[0];
-		float y1 = bbox.max_point()[1];
-		do {
-			modif.clear();
-			Point_2 p(x0+(x1-x0)*m_die(), y0+(y1-y0)*m_die());
-			Vector_2 v(0.5*(x1-x0)*m_die(), 0.5*(y1-y0)*m_die());
-			if(m_die()<0.5) {
-				modif.insert_birth(T(Rectangle_2(p, v, m_die())));
-			} else {
-				modif.insert_birth(T(Circle_2(p, m_die()*0.5*CGAL::min(x1-x0,y1-y0))));
-			}
-		} while (!c.is_valid(modif.birth()));
-		return 1./bbox.volume();//(0.25*(x1-x0)*(x1-x0)*(y1-y0)*(y1-y0)); // TODO
-	}
-	template<typename Configuration, typename Modification>
-	double pdf(const Configuration& c, const Modification& modif) const
-	{
-		if(modif.birth_size()!=0 || modif.death_size()!=1) return 0.;
-		const bbox_2& bbox = c.is_valid().bbox();
-		float x0 = bbox.min_point()[0];
-		float y0 = bbox.min_point()[1];
-		float x1 = bbox.max_point()[0];
-		float y1 = bbox.max_point()[1];
-		return 1./bbox.volume();//(0.25*(x1-x0)*(x1-x0)*(y1-y0)*(y1-y0)); // TODO
-	}
-};
+	generator(const IsValid& is_valid) :
+		m_die(GetRandom(), boost::uniform_real<>(0,1)),
+		m_is_valid(is_valid) {}
 
+	typedef double result_type;
+
+	result_type operator()(Rectangle_2 &r) const {
+		const bbox_2& bbox = m_is_valid.bbox();
+		float x0 = bbox.min_point()[0];
+		float y0 = bbox.min_point()[1];
+		float dx = bbox.max_point()[0]-x0;
+		float dy = bbox.max_point()[1]-y0;
+		do {
+			Point_2 p(x0+dx*m_die(), y0+dy*m_die());
+			Vector_2 v(0.5*dx*m_die(), 0.5*dy*m_die());
+			r = Rectangle_2(p, v, m_die());
+		} while (!m_is_valid(r));
+		return 1./bbox.volume();
+		//return 4./(dx*dx*dy*dy);
+	}
+
+	result_type operator()(Circle_2 &c) const {
+		const bbox_2& bbox = m_is_valid.bbox();
+		float x0 = bbox.min_point()[0];
+		float y0 = bbox.min_point()[1];
+		float dx = bbox.max_point()[0]-x0;
+		float dy = bbox.max_point()[1]-y0;
+		double radius = 0.5*CGAL::min(dx,dy);
+		do {
+			Point_2 p(x0+dx*m_die(), y0+dy*m_die());
+			c = Circle_2(p, m_die()*radius);
+		} while (!m_is_valid(c));
+		return 1./bbox.volume();
+		//return 1./(dx*dy*radius);
+	}
+
+	
+	class pdf_visitor {
+		IsValid m_is_valid;
+	public:
+		pdf_visitor(const IsValid& is_valid) : m_is_valid(is_valid) {}
+
+		typedef double result_type;
+
+		result_type operator()(const Rectangle_2 &r) const {
+			const bbox_2& bbox = m_is_valid.bbox();
+			return 1./bbox.volume();
+			/*float x0 = bbox.min_point()[0];
+			float y0 = bbox.min_point()[1];
+			float dx = bbox.max_point()[0]-x0;
+			float dy = bbox.max_point()[1]-y0;
+			return 4./(dx*dx*dy*dy);*/
+		}
+	
+		result_type operator()(const Circle_2 &c) const {
+			const bbox_2& bbox = m_is_valid.bbox();
+			return 1./bbox.volume();
+			/*float x0 = bbox.min_point()[0];
+			float y0 = bbox.min_point()[1];
+			float dx = bbox.max_point()[0]-x0;
+			float dy = bbox.max_point()[1]-y0;
+			double radius = 0.5*CGAL::min(dx,dy);
+			return 1./(dx*dy*radius);*/
+		}
+	};
+	inline pdf_visitor pdf() const { return pdf_visitor(m_is_valid); }
+};
 
 template< typename T, typename IsValid >
 class modifier {
@@ -52,34 +86,19 @@ class modifier {
 	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > int_die_type;
 	mutable float_die_type m_dief;
 	mutable int_die_type   m_die4;
-	mutable double m_green_ratio;
 	double m_p_translation;
-	double m_p_switch;
-	double m_dx;
-	double m_dy;
+	double m_dx, m_dy;
 	IsValid m_is_valid;
 public:
-	typedef T result_type;
 	modifier(const IsValid& is_valid) :
 		m_dief(GetRandom(), boost::uniform_real<>(0,1)),
 		m_die4(GetRandom(), boost::uniform_smallint<>(0,3)),
-		m_p_translation(0.5), m_p_switch(0.5),
+		m_p_translation(0.5),
 		m_dx(10), m_dy(10), m_is_valid(is_valid) {}
 
-	inline double green_ratio() const { return m_green_ratio; }
+	typedef double result_type;
 
-	T operator()(const Rectangle_2 &r) const {
-		if(m_dief()<m_p_switch) {
-			double radius = sqrt(r.normal().squared_length());
-			double ratio  = std::abs(r.ratio());
-			if(ratio<1) radius *= ratio;
-			Circle_2 c(r.center(),radius);
-			if(m_is_valid(c)) {
-				m_green_ratio = 1.; // TODO
-				return T(c);
-			}
-		}
-		Rectangle_2 res;
+	double operator()(const Rectangle_2 &r, Rectangle_2 &res) const {
 		if(m_dief()<m_p_translation) {
 			do {
 				res = r.scaled_edge(m_die4(),2*m_dief());
@@ -90,21 +109,10 @@ public:
 				res = r.rotation_scaled_corner(m_die4(), v);
 			} while (!m_is_valid(res));
 		}
-		m_green_ratio = 1.;
-		return T(res);
+		return 1.;
 	}
-	T operator()(const Circle_2 &c) const {
-		if(m_dief()<m_p_switch) {
-			Rectangle_2 r;
-			do {
-				Vector_2 v((2*m_dief()-1),(2*m_dief()-1));
-				v = v*(c.radius()/sqrt(v.squared_length()));
-				r = Rectangle_2(c.center(),v,1);
-			} while (!m_is_valid(r));
-			m_green_ratio = 1.; // TODO
-			return T(r);
-		}
-		Circle_2 res;
+
+	double operator()(const Circle_2 &c, Circle_2 &res) const {
 		if(m_dief()<m_p_translation) {
 			do {
 				Vector_2 v(m_dx*(2*m_dief()-1),m_dy*(2*m_dief()-1));
@@ -117,8 +125,28 @@ public:
 				res = Circle_2(c.center(),c.radius()*2*m_dief());
 			} while (!m_is_valid(res));
 		}
-		m_green_ratio = 1.;
-		return T(res);
+		return 1.;
+	}
+
+	double operator()(const Rectangle_2 &r, Circle_2 &c) const {
+		double radius = sqrt(r.normal().squared_length());
+		double ratio  = std::abs(r.ratio());
+		if(ratio<1) radius *= ratio;
+		c = Circle_2(r.center(),radius);
+		if(m_is_valid(c)) {
+			return 1.; // TODO
+		} else {
+			return 0.;
+		}
+	}
+
+	double operator()(const Circle_2 &c, Rectangle_2 &r) const {
+		do {
+			Vector_2 v((2*m_dief()-1),(2*m_dief()-1));
+			v = v*(c.radius()/sqrt(v.squared_length()));
+			r = Rectangle_2(c.center(),v,1);
+		} while (!m_is_valid(r));
+		return 1.; // TODO
 	}
 };
 

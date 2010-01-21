@@ -38,6 +38,39 @@ template<typename T> struct kernel_traits {
 };
 
 
+template<typename Variant> struct variant_size {
+	enum { value = 1 };
+};
+template<BOOST_VARIANT_ENUM_PARAMS(typename T)>
+struct variant_size<boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> > {
+	typedef boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> T;
+	enum { value = boost::mpl::size<typename T::types>::value };
+};
+
+
+template<typename Variant> 
+inline void uniform_random_type_init(Variant &v)
+{
+}
+
+#include <boost/preprocessor/iteration/local.hpp>
+template<BOOST_VARIANT_ENUM_PARAMS(typename T)> 
+inline void uniform_random_type_init(boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v)
+{
+	typedef boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> T;
+	typedef typename T::types Types;
+	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > die_type;
+	const int N = variant_size<T>::value;
+	die_type vdie(GetRandom(), boost::uniform_smallint<>(0,N-1));
+	switch(vdie())        { 
+#define BOOST_PP_LOCAL_LIMITS (0,BOOST_VARIANT_LIMIT_TYPES-1)
+#define BOOST_PP_LOCAL_MACRO(n) case n : v = typename boost::mpl::at_c<Types,n%N>::type(); break;
+#include BOOST_PP_LOCAL_ITERATE()
+		default : break;
+	}
+}
+
+
 //////////////////
 
 
@@ -50,11 +83,13 @@ template<typename Kernel0, typename Kernel1> class binary_kernel {
 public:
 	enum { size = 2 };
 	inline unsigned int kernel_id() const { return m_kernel_id; }
-	binary_kernel(double p=1.) : m_p_sum(p),
+	binary_kernel(const Kernel0& k0, const Kernel1& k1, double p=1.) : 
+		m_kernel0(k0), m_kernel1(k1), m_p_sum(p),
 		m_die(GetRandom(), boost::uniform_real<>(0,1)) {
 		m_p[0]=m_p[1]=p*0.5;
 	}
-	binary_kernel(double p0, double p1) : m_p_sum(p0+p1),
+	binary_kernel(const Kernel0& k0, const Kernel1& k1, double p0, double p1) :
+		m_kernel0(k0), m_kernel1(k1), m_p_sum(p0+p1),
 		m_die(GetRandom(), boost::uniform_real<>(0,1)) {
 		m_p[0]=p0; m_p[1]=p1;
 	}
@@ -96,7 +131,6 @@ public:
 	{
 		modif.clear();
 		if(c.empty()) return 1.;
-		typedef typename Configuration::value_type T;
 		typename Configuration::iterator it = c.begin();
 		die_type die(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
 		std::advance(it, die());
@@ -108,6 +142,37 @@ public:
 	{
 		if(modif.birth_size()!=1 || modif.death_size()!=0) return 0.;
 		return 1./(c.size()+1);
+	}
+};
+
+template<typename Generator>
+class uniform_birth_kernel {
+	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > die_type;
+	Generator m_generator;
+	mutable die_type m_die;
+public:
+	uniform_birth_kernel(const Generator& generator) : 
+		m_generator(generator),
+		m_die(GetRandom(), boost::uniform_real<>(0,1)) {}
+
+	template<typename Configuration, typename Modification>
+	double operator()(Configuration& c, Modification& modif) const
+	{
+		typedef typename Configuration::value_type T;
+		T res;
+		uniform_random_type_init(res);
+		double p = rjmcmc::apply_visitor(m_generator,res);
+		modif.insert_birth(res);
+		return p/variant_size<T>::value;
+	}
+
+	template<typename Configuration, typename Modification>
+	double pdf(const Configuration& c, const Modification& modif) const
+	{
+		typedef typename Configuration::value_type T;
+		if(modif.birth_size()!=0 || modif.death_size()!=1) return 0.;
+		double p = rjmcmc::apply_visitor(m_generator.pdf(),c[modif.death()]);
+		return p/variant_size<T>::value;
 	}
 };
 
@@ -123,12 +188,13 @@ public:
 	inline double probability(unsigned int) const { return m_p; }
 };
 
+
 template<typename Modifier>
 class modification_kernel : public unary_kernel {
 	Modifier m_modifier;
 	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > die_type;
 public:
-	modification_kernel(Modifier m, double p=1) : unary_kernel(p), m_modifier(m) {}
+	modification_kernel(const Modifier& m, double p=1) : unary_kernel(p), m_modifier(m) {}
 
 	template<typename Configuration, typename Modification>
 	double operator()(Configuration& c, Modification& modif) const
@@ -137,11 +203,16 @@ public:
 		if(c.empty()) return 1.;
 		typedef typename Configuration::value_type T;
 		typename Configuration::iterator it = c.begin();
-		die_type die(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
-		std::advance(it, die());
+		die_type cdie(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
+		std::advance(it, cdie());
+
+		T res;
+		uniform_random_type_init(res);
+		double green_ratio = rjmcmc::apply_visitor(m_modifier,c[it],res);
+
 		modif.insert_death(it);
-		modif.insert_birth(rjmcmc::apply_visitor(m_modifier,c[it]));
-		return m_modifier.green_ratio();
+		modif.insert_birth(res);
+		return green_ratio;
 	}
 };
 

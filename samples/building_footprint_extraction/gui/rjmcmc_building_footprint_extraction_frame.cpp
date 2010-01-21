@@ -152,7 +152,7 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 		layer->PolygonsRingsColour(wxColour(255,255,0));
 		layer->PolygonsInsideStyle( wxTRANSPARENT );
 		layer->PolygonsRingsWidth(3);
-		layer->TextsVisibility(true);
+		layer->TextsVisibility(false);
 
 		m_thread = new rjmcmc_building_footprint_extraction_thread(layer, this);
 		m_thread->Create();
