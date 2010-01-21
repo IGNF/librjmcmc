@@ -1,46 +1,50 @@
 #ifndef __RJMCMC_BUILDING_DETECTION_H__
 #define __RJMCMC_BUILDING_DETECTION_H__
 
-// déclaration des types
+/************** application-specific types ****************/
+
+#include "geometry/geometry.h"
+#include <boost/variant.hpp>
+//typedef Rectangle_2 object;
+//typedef boost::variant<Rectangle_2> object;
+typedef boost::variant<Rectangle_2,Circle_2> object;
+
+#include "core/energies.hpp"
+typedef box_is_valid                         is_valid;
+typedef image_gradient_unary_energy          unary_energy;
+typedef intersection_area_binary_energy      binary_energy;
+
+#include "core/kernels.hpp"
+typedef generator<object, is_valid>          generator_;
+typedef modifier <object, is_valid>          modifier_;
 
 #include "core/building_footprint_extraction_parameters.hpp"
-#include "core/kernels.hpp"
-#include "core/energies.hpp"
+typedef building_footprint_extraction_parameters         param;
+
+/************** rjmcmc library types ****************/
+
+#include "core/temperature.hpp"
+typedef rjmcmc::geometric_temperature                    temperature;
 
 #include "core/rjmcmc_configuration.hpp"
+typedef rjmcmc::graph_configuration
+//typedef rjmcmc::vector_configuration
+	<object, unary_energy, binary_energy, is_valid>  configuration;
+
 #include "core/rjmcmc_sampler.hpp"
-#include "core/temperature.hpp"
-
-typedef building_footprint_extraction_parameters param;
-
-typedef image_gradient_unary_energy building_unary_energy;
-typedef intersection_area_binary_energy  building_binary_energy;
-typedef trivial_accelerator building_accelerator;
-typedef box_is_valid building_is_valid;
-//typedef Rectangle_2 node_types;
-//typedef boost::variant<Rectangle_2> node_types;
-typedef boost::variant<Rectangle_2,Circle_2> node_types;
-
-typedef graph_configuration<node_types, building_unary_energy, building_binary_energy,
-	building_is_valid, building_accelerator > building_configuration;
-
-typedef generator<node_types, building_is_valid> building_generator;
-typedef uniform_birth_kernel<building_generator> building_birth_kernel;
-typedef uniform_death_kernel                     building_death_kernel;
-
-typedef binary_kernel<building_birth_kernel,building_death_kernel> building_birth_death_kernel;
-typedef modifier<node_types, building_is_valid> building_modifier;
-typedef modification_kernel<building_modifier>  building_modification_kernel;
-
-#define KERNELS building_birth_death_kernel,building_modification_kernel
-typedef boost::tuple<KERNELS> kernels;
-typedef rjmcmc_sampler<IF_VARIADIC(KERNELS,kernels)> building_sampler;
+typedef rjmcmc::uniform_birth_kernel<generator_>         birth_kernel;
+typedef rjmcmc::uniform_death_kernel                     death_kernel;
+typedef rjmcmc::binary_kernel<birth_kernel,death_kernel> birth_death_kernel;
+typedef rjmcmc::modification_kernel<modifier_>           modification_kernel;
+#define KERNELS birth_death_kernel,modification_kernel
+typedef boost::tuple<KERNELS>                            kernels;
+typedef rjmcmc::sampler<IF_VARIADIC(KERNELS,kernels)>    sampler;
 
 
-// déclaration du main
+/************** main ****************/
 
 template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& visitor) {
-	geometric_temperature temperature(
+	temperature temp(
 		param::Instance()->m_initial_temperature,
 		param::Instance()->m_decrease_coefficient
 	);
@@ -52,55 +56,50 @@ template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& vi
 	pmax[1] = param::Instance()->m_running_max_y;
 	bbox_2 bbox(pmin, pmax);
 
-	building_is_valid is_valid(bbox,
+	is_valid valid(bbox,
 		param::Instance()->m_rectangle_minimal_size,
 		param::Instance()->m_rectangle_maximal_ratio
 	);
 
-	building_modifier modif(is_valid);
-	building_modification_kernel kmodif(modif);
+	modifier_            modif(valid);
+	modification_kernel kmodif(modif);
 
-	building_generator birth(is_valid);
-	building_birth_kernel kbirth(birth);
-	building_death_kernel kdeath;
+	generator_    birth (valid);
+	birth_kernel kbirth(birth);
+	death_kernel kdeath;
 
-	building_birth_death_kernel kbirthdeath(
+	birth_death_kernel kbirthdeath(
 		kbirth, kdeath,
 		param::Instance()->m_birth_probability,
 		param::Instance()->m_death_probability
 	);
 
-	building_sampler sampler( IF_VARIADIC(,boost::make_tuple)(kbirthdeath,kmodif) );
+	sampler sample( IF_VARIADIC(,boost::make_tuple)(kbirthdeath,kmodif) );
 
-	building_unary_energy unary_energy(
+	unary_energy e1(
 		param::Instance()->m_individual_energy,
 		param::Instance()->m_input_data_file_path,
 		bbox,
 		param::Instance()->m_sigma_d,
 		param::Instance()->m_subsampling
 	);
-	building_binary_energy binary_energy(
+	binary_energy e2(
 		param::Instance()->m_ponderation_surface_intersection
 	);
 
-	building_accelerator accelerator;
-	building_configuration configuration(
-		unary_energy,
-		binary_energy,
-		is_valid,
-		accelerator);
+	configuration config(e1,e2,valid);
 
 	unsigned int iterations = param::Instance()->m_nb_iterations;
 	unsigned int dump = param::Instance()->m_nb_iterations_dump;
 	unsigned int save = param::Instance()->m_nb_iterations_save;
 
 	visitor.begin(dump,save);
-	for (unsigned int i=1; i<=iterations; ++i, ++temperature)
+	for (unsigned int i=1; i<=iterations; ++i, ++temp)
 	{
-		sampler(configuration,*temperature);
-		if(!visitor.iterate(i,*temperature,configuration,sampler)) break;
+		sample(config,*temp);
+		if(!visitor.iterate(i,*temp,config,sample)) break;
 	}
-	visitor.end(configuration);
+	visitor.end(config);
 }
 
 #endif // __RJMCMC_BUILDING_DETECTION_H__

@@ -1,6 +1,8 @@
 #ifndef __RJMCMC_TEMPERATURE_HPP__
 #define __RJMCMC_TEMPERATURE_HPP__
 
+namespace rjmcmc {
+
 class geometric_temperature {
 public:
 	geometric_temperature(double temp, double coefficient) : m_temp(temp), m_coefficient(coefficient) {}
@@ -17,5 +19,7 @@ private:
 	double m_temp;
 	double m_coefficient;
 };
+
+}; // namespace rjmcmc
 
 #endif // __RJMCMC_TEMPERATURE_HPP__

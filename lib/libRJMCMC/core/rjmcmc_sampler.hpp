@@ -5,6 +5,8 @@
 #include "core/bbox.hpp"
 #include <boost/tuple/tuple.hpp>
 
+namespace rjmcmc {
+
 namespace internal {
 
 // apply a random function object within a tuple
@@ -224,14 +226,14 @@ public:
 #endif
 
 template<typename IF_VARIADIC(K...,Kernels_)>
-class rjmcmc_sampler
+class sampler
 {
 	IF_VARIADIC(typedef std::tuple<K...> Kernels_, )
 public:
 	typedef Kernels_ Kernels;
 
 // constructor
-	rjmcmc_sampler(const IF_VARIADIC(K&...,Kernels&) k) :
+	sampler(const IF_VARIADIC(K&...,Kernels&) k) :
 		m_kernel(IF_VARIADIC(k...,k)), m_die(GetRandom(), boost::uniform_real<>(0,1))
 	{}
 
@@ -272,5 +274,7 @@ private:
 	double  m_green_ratio;
 	bool    m_accepted;
 };
+
+}; // namespace rjmcmc
 
 #endif // __RJMCMC_SAMPLER_HPP__

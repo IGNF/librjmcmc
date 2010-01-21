@@ -54,8 +54,6 @@ inline typename Visitor::result_type apply_visitor(const Visitor &v,
 	return boost::apply_visitor(v,v1,v2);
 }
 
-};
-
 //////////////////////////////////////////////////////////
 
 struct trivial_accelerator {
@@ -88,7 +86,7 @@ public:
 
 //////////////////////////////////////////////////////////
 
-template<typename T, typename UnaryEnergy, typename BinaryEnergy, typename IsValid, typename Accelerator>
+template<typename T, typename UnaryEnergy, typename BinaryEnergy, typename IsValid, typename Accelerator=trivial_accelerator>
 class vector_configuration
 {
 	typedef	std::vector<T> container;
@@ -104,7 +102,7 @@ public:
 	typedef	typename container::const_iterator	const_iterator;
 	typedef	typename container::iterator		iterator;
 
-	vector_configuration(UnaryEnergy unary_energy, BinaryEnergy binary_energy, IsValid is_valid, Accelerator accelerator) : m_unary_energy(unary_energy), m_binary_energy(binary_energy), m_is_valid(is_valid), m_accelerator(accelerator)
+	vector_configuration(UnaryEnergy unary_energy, BinaryEnergy binary_energy, IsValid is_valid, Accelerator accelerator=Accelerator()) : m_unary_energy(unary_energy), m_binary_energy(binary_energy), m_is_valid(is_valid), m_accelerator(accelerator)
 	{}
 
 	const IsValid& is_valid() const { return m_is_valid; }
@@ -203,13 +201,15 @@ std::ostream& operator<<(std::ostream& o, const vector_configuration<T,U,B,V,A>&
 	
 	return o;
 }
-
+}; // namespace rjmcmc
 
 //////////////////////////////////////////////////////////
 
 #include <boost/graph/adjacency_list.hpp>
 
-template<typename T, typename UnaryEnergy, typename BinaryEnergy, typename IsValid, typename Accelerator, typename OutEdgeList = boost::listS, typename VertexList = boost::listS  >
+namespace rjmcmc {
+
+template<typename T, typename UnaryEnergy, typename BinaryEnergy, typename IsValid, typename Accelerator=trivial_accelerator, typename OutEdgeList = boost::listS, typename VertexList = boost::listS  >
 class graph_configuration
 {
 public:
@@ -268,7 +268,7 @@ public:
 public:
 
 	// configuration constructors/destructors
-	graph_configuration(UnaryEnergy unary_energy, BinaryEnergy binary_energy, IsValid is_valid, Accelerator accelerator) : m_unary(0.), m_binary(0.), m_unary_energy(unary_energy), m_binary_energy(binary_energy), m_is_valid(is_valid), m_accelerator(accelerator)
+	graph_configuration(UnaryEnergy unary_energy, BinaryEnergy binary_energy, IsValid is_valid, Accelerator accelerator=Accelerator()) : m_unary(0.), m_binary(0.), m_unary_energy(unary_energy), m_binary_energy(binary_energy), m_is_valid(is_valid), m_accelerator(accelerator)
 	{}
 	~graph_configuration()
 	{}
@@ -456,5 +456,6 @@ bool audit_configuration(const Configuration& c, std::ostream &out = std::cout, 
 	return res;
 }
 
+}; // namespace rjmcmc
 
 #endif // __RJMCMC_CONFIGURATION_HPP__

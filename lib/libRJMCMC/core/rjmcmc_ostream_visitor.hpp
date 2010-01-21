@@ -6,6 +6,8 @@
 #include <time.h>
 #include "rjmcmc_sampler.hpp" // pour kernel_traits<>
 
+namespace rjmcmc {
+
 template<typename Sampler> class sampler_ostream_visitor {
 private:
 	enum { kernel_size =  kernel_traits<typename Sampler::Kernels>::size };
@@ -82,5 +84,7 @@ public:
 	}
 
 };
+
+}; // namespace rjmcmc
 
 #endif

@@ -17,7 +17,7 @@ int main(int argc , char** argv)
 	if (!building_footprint_extraction_parameters::Instance()->parse_command_line(argc, argv))
 		return -1;
 
-	sampler_ostream_visitor<building_sampler> visitor(std::cout);
+	rjmcmc::sampler_ostream_visitor<sampler> visitor(std::cout);
 	rjmcmc_building_footprint_extraction(visitor);
 
 	return 0;
