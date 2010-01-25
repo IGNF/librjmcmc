@@ -105,32 +105,26 @@ public:
 
 	double operator()(const Rectangle_2 &r, Rectangle_2 &res) const {
 		if(m_dief()<m_p_translation) {
-			do {
-				res = r.scaled_edge(m_die4(),2*m_dief());
-			} while (!m_is_valid(res));
+			res = r.scaled_edge(m_die4(),2*m_dief());
 		} else {
-			do {
-				Vector_2 v(m_dx*(2*m_dief()-1),m_dy*(2*m_dief()-1));
-				res = r.rotation_scaled_corner(m_die4(), v);
-			} while (!m_is_valid(res));
+			Vector_2 v(m_dx*(2*m_dief()-1),m_dy*(2*m_dief()-1));
+			res = r.rotation_scaled_corner(m_die4(), v);
 		}
-		return 1.;
+		if(!m_is_valid(res)) return 0.;
+		return 1.; // TODO
 	}
 
 	double operator()(const Circle_2 &c, Circle_2 &res) const {
 		if(m_dief()<m_p_translation) {
-			do {
-				Vector_2 v(m_dx*(2*m_dief()-1),m_dy*(2*m_dief()-1));
-				double dr = sqrt(v.squared_length());
-				if (m_die4()%2 && c.radius()>dr) dr = -dr;
-				res = Circle_2(c.center()+v,c.radius()+dr);
-			} while (!m_is_valid(res));
+			Vector_2 v(m_dx*(2*m_dief()-1),m_dy*(2*m_dief()-1));
+			double dr = sqrt(v.squared_length());
+			if (m_die4()%2 && c.radius()>dr) dr = -dr;
+			res = Circle_2(c.center()+v,c.radius()+dr);
 		} else {
-			do {
-				res = Circle_2(c.center(),c.radius()*2*m_dief());
-			} while (!m_is_valid(res));
+			res = Circle_2(c.center(),c.radius()*2*m_dief());
 		}
-		return 1.;
+		if(!m_is_valid(res)) return 0.;
+		return 1.; // TODO
 	}
 
 	double operator()(const Rectangle_2 &r, Circle_2 &c) const {
@@ -138,38 +132,34 @@ public:
 		double ratio  = std::abs(r.ratio());
 		if(ratio<1) radius *= ratio;
 		c = Circle_2(r.center(),radius);
-		if(m_is_valid(c)) {
-			return 1.; // TODO
-		} else {
-			return 0.;
-		}
+		if(!m_is_valid(c)) return 0.;
+		return 1.; // TODO
 	}
 
 	double operator()(const Circle_2 &c, Rectangle_2 &r) const {
-		do {
-			Vector_2 v((2*m_dief()-1),(2*m_dief()-1));
-			v = v*(c.radius()/sqrt(v.squared_length()));
-			r = Rectangle_2(c.center(),v,1);
-		} while (!m_is_valid(r));
+		Vector_2 v((2*m_dief()-1),(2*m_dief()-1));
+		v = v*(c.radius()/sqrt(v.squared_length()));
+		r = Rectangle_2(c.center(),v,1);
+		if (!m_is_valid(r)) return 0;
 		return 1.; // TODO
 	}
 
 	double operator()(const Rectangle_2 &r, std::pair<Rectangle_2,Rectangle_2> &res) const {
-		do {
-			int i = m_die4();
-			float f = m_dief();
-			float g = m_dief()*(1-f);
-			res.first  = r.scaled_edge(i  ,f);
-			res.second = r.scaled_edge(i+2,g);
-		} while (!(m_is_valid(res.first) && m_is_valid(res.second) ) );		
+		int i = m_die4();
+		float f = m_dief();
+		float g = m_dief()*(1-f);
+		res.first  = r.scaled_edge(i  ,f);
+		res.second = r.scaled_edge(i+2,g);
+		if (!(m_is_valid(res.first) && m_is_valid(res.second) )) return 0;
 		return 1.; // TODO
 	}
-/*
+
 	double operator()(const std::pair<Rectangle_2,Rectangle_2> &r, Rectangle_2 &res) const {
 		res = r.first.merge(r.second);
-		return 1.;
+		if (!(m_is_valid(res))) return 0;
+		return 1.; // TODO
 	}
-*/
+
 };
 
 #endif /*KERNELS_HPP_*/

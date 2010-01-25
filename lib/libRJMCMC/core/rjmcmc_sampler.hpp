@@ -5,6 +5,7 @@
 #include "core/bbox.hpp"
 #include <boost/tuple/tuple.hpp>
 #include <boost/mpl/insert_range.hpp>
+#include <boost/mpl/pop_front.hpp>
 
 namespace rjmcmc {
 
@@ -73,6 +74,76 @@ inline void uniform_random_type_init(boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)
 	}
 }
 
+
+
+template <typename T>
+struct pair_type
+{
+    typedef std::pair<T,T> type;
+};
+
+template <typename T,typename U>
+struct pair_type_2
+{
+    typedef std::pair<T,U> type;
+};
+
+template <typename T>
+struct modification_types {
+	typedef boost::variant<T,std::pair<T,T> > type;
+};
+
+template<typename S, typename I>
+struct modification_types_aux {
+	typedef typename boost::mpl::pop_front<I>::type tail;
+	typedef typename boost::mpl::front<I>::type     head;
+	typedef typename modification_types_aux<S,tail>::type T;	typedef typename boost::mpl::end<T>::type T_end;
+	typedef typename boost::mpl::transform<S, pair_type_2<head,boost::mpl::_1> >::type pair_types;
+	typedef typename boost::mpl::insert_range<T,T_end,pair_types>::type type;
+};
+
+template<typename S>
+struct modification_types_aux<S,boost::mpl::l_end> {
+	typedef S type;
+};
+
+template<BOOST_VARIANT_ENUM_PARAMS(typename T)>
+struct modification_types<boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> > {
+	typedef boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> T;
+	typedef typename T::types types;
+
+/* // boost::variant<Rectangle_2,Circle_2> should return :
+	typedef boost::variant<Rectangle_2,Circle_2,
+		std::pair<Rectangle_2,Rectangle_2>,
+		std::pair<Circle_2,Circle_2> > type;
+*/
+/*
+	typedef typename boost::mpl::transform<types, pair_type<boost::mpl::_1> >::type pair_types;	typedef typename boost::mpl::end<types>::type types_end;
+	typedef typename boost::mpl::insert_range<types,types_end,pair_types>::type variant_types;
+	//typedef types variant_types;
+	//typedef typename boost::make_variant_over<variant_types>::type type;
+*/
+
+/* // boost::variant<Rectangle_2,Circle_2> should return :
+	typedef boost::variant<Rectangle_2,Circle_2,
+		std::pair<Rectangle_2,Rectangle_2>,
+		std::pair<Circle_2,Rectangle_2>,
+		std::pair<Circle_2,Circle_2>,
+		std::pair<Rectangle_2,Circle_2> > type;
+*/
+	typedef typename modification_types_aux<types,types>::type aux;
+	typedef typename boost::make_variant_over<aux>::type type;
+};
+
+template<typename V> 
+struct variant_make_pair
+{
+	typedef typename modification_types<V>::type result_type;
+	template<typename T,typename U>
+	inline result_type operator()(const T& t, const U& u) const {
+		return result_type(std::make_pair(t,u));
+	}
+};
 
 //////////////////
 
@@ -192,13 +263,6 @@ public:
 };
 
 
-template <typename T>
-struct pair_type
-{
-    typedef std::pair<T,T> type;
-};
-
-
 template<typename Modifier>
 class modification_kernel : public unary_kernel {
 	Modifier m_modifier;
@@ -212,23 +276,28 @@ public:
 		modif.clear();
 		if(c.empty()) return 1.;
 		typedef typename Configuration::value_type T;
-		typename Configuration::iterator it = c.begin();
+		typedef typename Configuration::iterator iterator;
+		typename modification_types<T>::type out, in;
+
+		die_type ddie(GetRandom(), boost::uniform_smallint<>(1,2));
 		die_type cdie(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
+		iterator it = c.begin();
 		std::advance(it, cdie());
-		modif.insert_death(it);
+		if(c.size()==1 || ddie()==1) {
+			modif.insert_death(it);
+			in = c[it];
+		} else {
+			iterator it2;
+			do { it2 = c.begin(); std::advance(it2, cdie()); } while (it==it2);
+			modif.insert_death(it2);
+			variant_make_pair<T> vmp;
+			in = rjmcmc::apply_visitor(vmp,c[it],c[it2]);
+		}
 
-		typedef typename T::types types;
-		typedef typename boost::mpl::transform<types, pair_type<boost::mpl::_1> >::type pair_types;
-		typedef typename boost::mpl::end<types>::type types_end;
-		typedef typename boost::mpl::insert_range<types,types_end,pair_types>::type variant_types;
-		typename boost::make_variant_over<variant_types>::type res;
+		uniform_random_type_init(out);
+		double green_ratio = rjmcmc::apply_visitor(m_modifier,in,out);
+		rjmcmc::apply_visitor(modif.birth_inserter(),out);
 
-		//T res;
-
-		uniform_random_type_init(res);
-		double green_ratio = rjmcmc::apply_visitor(m_modifier,c[it],res);
-
-		rjmcmc::apply_visitor(modif.birth_inserter(),res);
 		return green_ratio;
 	}
 };

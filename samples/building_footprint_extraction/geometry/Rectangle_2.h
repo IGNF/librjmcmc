@@ -167,7 +167,7 @@ public:
   // rotated version of b. The rotation is the smallest of the 4 possible rotations to align b with this.
   // the moving segment is based on the quadrant (n+-45deg,m+-45deg,-n+-45deg or -m+-45deg) b.c is relative to this
   Self merge(const Rectangle_2 &b) const {
-    Vector_2 v(c,b.c);
+    Vector_2 v(b.c-c);
     FT ar(abs(r));
     Vector_2 an(n), am(-n.y(),n.x());
     FT dot =  an*v;

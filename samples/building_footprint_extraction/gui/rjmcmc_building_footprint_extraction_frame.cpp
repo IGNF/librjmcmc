@@ -87,7 +87,7 @@ rjmcmc_building_footprint_extraction_frame::rjmcmc_building_footprint_extraction
 	m_dockManager.Update();
 	m_parameters_frame = new parameters_frame();
 	m_parameters_frame->SetModal(false);
-	//m_parameters_frame->Show();
+	m_parameters_frame->Show();
 }
 
 rjmcmc_building_footprint_extraction_frame::~rjmcmc_building_footprint_extraction_frame()
