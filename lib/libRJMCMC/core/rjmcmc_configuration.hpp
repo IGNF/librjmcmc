@@ -73,8 +73,13 @@ class modification
 	std::vector<value_type>	m_birth;
 	std::vector<iterator>	m_death;
 public:
-	inline const value_type& birth() const { return m_birth.front(); }
-	inline iterator          death() const { return m_death.front(); }
+	typedef typename std::vector<value_type>::const_iterator	birth_const_iterator;
+	typedef typename std::vector<iterator>::const_iterator	death_const_iterator;
+
+	inline birth_const_iterator birth_begin() const { return m_birth.begin(); }
+	inline birth_const_iterator birth_end  () const { return m_birth.end  (); }
+	inline death_const_iterator death_begin() const { return m_death.begin(); }
+	inline death_const_iterator death_end  () const { return m_death.end  (); }
 	template<typename T>
 	inline void insert_birth(const T& b) { m_birth.push_back(value_type(b)); }
 	inline void insert_death(iterator d)  { m_death.push_back(d); }
@@ -146,31 +151,52 @@ public:
 
 	template <typename Modification> double delta_birth(const Modification &modif) const
 	{
-		if(modif.birth_size()==0) return 0;
-		const_iterator v	 = (modif.death_size())?modif.death():end();
-		const value_type& obj    = modif.birth();
-		double delta             = rjmcmc::apply_visitor(m_unary_energy,obj);
-		for (const_iterator it=begin(); it != end(); ++it)
-			if (it != v) delta += rjmcmc::apply_visitor(m_binary_energy, obj, value(it) );
+		double delta = 0;
+		typedef typename Modification::birth_const_iterator bci;
+		typedef typename Modification::death_const_iterator dci;
+		bci bbeg = modif.birth_begin();
+		bci bend = modif.birth_end();
+		dci dbeg = modif.death_begin();
+		dci dend = modif.death_end();
+		for(bci it=bbeg; it!=bend; ++it) {
+			delta += rjmcmc::apply_visitor(m_unary_energy,*it);
+			for (const_iterator it2=begin(); it2 != end(); ++it2)
+				if (std::find(dbeg,dend,it2)==dend)
+					delta += rjmcmc::apply_visitor(m_binary_energy, *it, value(it2) );
+			for (bci it2=it+1; it2 != bend; ++it2)
+				delta += rjmcmc::apply_visitor(m_binary_energy, *it, *it2);
+		}
 		return delta;
 	}
 
 	template <typename Modification> double delta_death(const Modification &modif) const
 	{
-		if(modif.death_size()==0) return 0;
-		const_iterator v = modif.death();
-		const value_type& obj = value(v);
-		double delta = - energy(v);
-		for (const_iterator it=begin(); it != end(); ++it)
-			if (it != v) delta -= rjmcmc::apply_visitor(m_binary_energy, obj, value(it) );
+		double delta = 0;
+		typedef typename Modification::death_const_iterator dci;
+		dci dbeg = modif.death_begin();
+		dci dend = modif.death_end();
+		for(dci it=dbeg; it!=dend; ++it) {
+			iterator v = *it;
+			delta -= energy(v);
+			for (const_iterator it2=begin(); it2 != end(); ++it2)
+				delta -= rjmcmc::apply_visitor(m_binary_energy, *it, value(it2) );
+			for (dci it2=it+1; it2 != dend; ++it2)
+				delta -= rjmcmc::apply_visitor(m_binary_energy, *it, *it2);
+		}
 		return delta;
 	}
 
 	// manipulators
 	template <typename Modification> void apply(const Modification &modif)
 	{
-		if(modif.death_size()) remove(modif.death());
-		if(modif.birth_size()) insert(modif.birth());
+		typedef typename Modification::birth_const_iterator bci;
+		typedef typename Modification::death_const_iterator dci;
+		dci dbeg = modif.death_begin();
+		dci dend = modif.death_end();
+		for(dci dit=dbeg; dit!=dend; ++dit) remove(*dit);
+		bci bbeg = modif.birth_begin();
+		bci bend = modif.birth_end();
+		for(bci bit=bbeg; bit!=bend; ++bit) insert(*bit);
 	}
 
 	void insert(const value_type &obj) { 
@@ -247,24 +273,6 @@ public:
 	typedef	typename graph_type::vertex_iterator	const_iterator;
 	typedef typename graph_type::edge_iterator	edge_iterator;
 	typedef typename graph_type::edge_iterator	const_edge_iterator;
-/*
-	class candidate_node : public node, public std::list<node> {
-	public:
-		candidate_node(const value_type& obj) : node(obj,0) { }
-	};
-
-	class modification {
-		std::vector<vertex_descriptor> m_death;
-		std::vector<candidate_node>    m_birth;
-		double m_delta_energy;
-	public:
-		inline double& delta_energy() { return m_delta_energy; }
-		inline double  delta_energy() const { return m_delta_energy; }
-		void push_back(const value_type& obj) { m_birth.push_back(candidate_node(obj)); }
-		void push_back(vertex_descriptor v) { m_death.push_back(v); }
-	};
-*/
-
 public:
 
 	// configuration constructors/destructors
@@ -305,30 +313,56 @@ public:
 
 	template <typename Modification> double delta_birth(const Modification &modif) const
 	{
-		if(modif.birth_size()==0)  return 0.;
-		iterator v	 = (modif.death_size())?modif.death():end();
-		const value_type& obj   = modif.birth();
-		double delta             = rjmcmc::apply_visitor(m_unary_energy,obj);
-		for (iterator it=begin(); it != end(); ++it)
-			if (it != v) delta += rjmcmc::apply_visitor(m_binary_energy, obj, value(it) );
+		double delta = 0;
+		typedef typename Modification::birth_const_iterator bci;
+		typedef typename Modification::death_const_iterator dci;
+		bci bbeg = modif.birth_begin();
+		bci bend = modif.birth_end();
+		dci dbeg = modif.death_begin();
+		dci dend = modif.death_end();
+		for(bci it=bbeg; it!=bend; ++it) {
+			delta += rjmcmc::apply_visitor(m_unary_energy,*it);
+			for (const_iterator it2=begin(); it2 != end(); ++it2) // todo accelerator
+				if (std::find(dbeg,dend,it2)==dend)
+					delta += rjmcmc::apply_visitor(m_binary_energy, *it, value(it2) );
+			for (bci it2=bbeg; it2 != it; ++it2)
+				delta += rjmcmc::apply_visitor(m_binary_energy, *it, *it2);
+		}
 		return delta;
 	}
 
 	template <typename Modification> double delta_death(const Modification &modif) const
 	{
-		if(modif.death_size()==0)  return 0.;
-		iterator v = modif.death();
-		double delta = - energy(v);
-		out_edge_iterator it, end;
-		for(boost::tie(it,end) = out_edges( *v, m_graph ); it!=end; ++it)
-			delta -= m_graph[ *it ].energy();
+		double delta = 0;
+		typedef typename Modification::death_const_iterator dci;
+		dci dbeg = modif.death_begin();
+		dci dend = modif.death_end();
+		for(dci it=dbeg; it!=dend; ++it) {
+			iterator v = *it;
+			delta -= energy(v);
+			out_edge_iterator it2, end;
+			for(boost::tie(it2,end) = out_edges( *v, m_graph ); it2!=end; ++it2) {
+				vertex_descriptor dtarget = target(*it2, m_graph);
+				bool found = false;
+				for(dci it3=dbeg; it3!=it && !found; ++it3)
+					found = (**it3 == dtarget);
+				if (!found)
+					delta -= m_graph[ *it2 ].energy();
+			 }
+		}
 		return delta;
 	}
 
 	template <typename Modification> void apply(const Modification &modif)
 	{
-		if(modif.death_size()) remove(modif.death());
-		if(modif.birth_size()) insert(modif.birth());
+		typedef typename Modification::birth_const_iterator bci;
+		typedef typename Modification::death_const_iterator dci;
+		dci dbeg = modif.death_begin();
+		dci dend = modif.death_end();
+		for(dci dit=dbeg; dit!=dend; ++dit) remove(*dit);
+		bci bbeg = modif.birth_begin();
+		bci bend = modif.birth_end();
+		for(bci bit=bbeg; bit!=bend; ++bit) insert(*bit);
 	}
 
 	// manipulators

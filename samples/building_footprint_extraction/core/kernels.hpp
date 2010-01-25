@@ -6,7 +6,7 @@
 #include "core/random.hpp"
 #include "core/bbox.hpp"
 
-template< typename T, typename IsValid >
+template< typename IsValid >
 class generator {
 	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > die_type;
 	mutable die_type m_die;
@@ -80,7 +80,7 @@ public:
 	inline pdf_visitor pdf() const { return pdf_visitor(m_is_valid); }
 };
 
-template< typename T, typename IsValid >
+template< typename IsValid >
 class modifier {
 	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_real<> > float_die_type;
 	typedef boost::variate_generator<RJMCMCRandom&, boost::uniform_smallint<> > int_die_type;
@@ -97,6 +97,11 @@ public:
 		m_dx(10), m_dy(10), m_is_valid(is_valid) {}
 
 	typedef double result_type;
+
+	template<typename T0, typename T1>
+	double operator()(const T0 &t0, T1 &t1) const {
+		return 0;
+	}
 
 	double operator()(const Rectangle_2 &r, Rectangle_2 &res) const {
 		if(m_dief()<m_p_translation) {
@@ -148,6 +153,23 @@ public:
 		} while (!m_is_valid(r));
 		return 1.; // TODO
 	}
+
+	double operator()(const Rectangle_2 &r, std::pair<Rectangle_2,Rectangle_2> &res) const {
+		do {
+			int i = m_die4();
+			float f = m_dief();
+			float g = m_dief()*(1-f);
+			res.first  = r.scaled_edge(i  ,f);
+			res.second = r.scaled_edge(i+2,g);
+		} while (!(m_is_valid(res.first) && m_is_valid(res.second) ) );		
+		return 1.; // TODO
+	}
+/*
+	double operator()(const std::pair<Rectangle_2,Rectangle_2> &r, Rectangle_2 &res) const {
+		res = r.first.merge(r.second);
+		return 1.;
+	}
+*/
 };
 
 #endif /*KERNELS_HPP_*/

@@ -1,6 +1,7 @@
 #ifndef __RJMCMC_SAMPLER_HPP__
 #define __RJMCMC_SAMPLER_HPP__
 
+#include "geometry/geometry.h"
 #include "core/random.hpp"
 #include "core/bbox.hpp"
 #include <boost/tuple/tuple.hpp>
@@ -173,7 +174,7 @@ public:
 	{
 		typedef typename Configuration::value_type T;
 		if(modif.birth_size()!=0 || modif.death_size()!=1) return 0.;
-		double p = rjmcmc::apply_visitor(m_generator.pdf(),c[modif.death()]);
+		double p = rjmcmc::apply_visitor(m_generator.pdf(),c[*modif.death_begin()]);
 		return p/variant_size<T>::value;
 	}
 };
@@ -207,13 +208,32 @@ public:
 		typename Configuration::iterator it = c.begin();
 		die_type cdie(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
 		std::advance(it, cdie());
+		modif.insert_death(it);
 
-		T res;
+		//todo: sortir ces lignes specifiques de la lib
+		typedef std::pair<Rectangle_2,Rectangle_2> Rectangle_2_pair;
+		boost::variant<Rectangle_2,Circle_2,Rectangle_2_pair
+		> res;
+
 		uniform_random_type_init(res);
 		double green_ratio = rjmcmc::apply_visitor(m_modifier,c[it],res);
 
-		modif.insert_death(it);
-		modif.insert_birth(res);
+
+		//todo: sortir ces lignes specifiques de la lib
+		Rectangle_2      *r=boost::get<Rectangle_2>(&res);
+		Circle_2         *n=boost::get<Circle_2>(&res);
+		Rectangle_2_pair *p=boost::get<Rectangle_2_pair>(&res);
+		if(r) {
+			modif.insert_birth(*r);
+		}
+		if(n) {
+			modif.insert_birth(*n);
+		}
+		if(p) {
+			modif.insert_birth(p->first);
+			modif.insert_birth(p->second);
+		}
+
 		return green_ratio;
 	}
 };

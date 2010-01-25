@@ -15,8 +15,8 @@ typedef image_gradient_unary_energy          unary_energy;
 typedef intersection_area_binary_energy      binary_energy;
 
 #include "core/kernels.hpp"
-typedef generator<object, is_valid>          generator_;
-typedef modifier <object, is_valid>          modifier_;
+typedef generator<is_valid>          generator_;
+typedef modifier <is_valid>          modifier_;
 
 #include "core/building_footprint_extraction_parameters.hpp"
 typedef building_footprint_extraction_parameters         param;
