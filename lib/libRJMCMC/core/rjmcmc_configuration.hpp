@@ -86,6 +86,26 @@ public:
 	inline unsigned int birth_size() const { return m_birth.size(); }
 	inline unsigned int death_size() const { return m_death.size(); }
 	inline void clear() { m_birth.clear(); m_death.clear(); }
+
+
+	template<typename V> class inserter {
+		mutable V& m_v;
+		public:
+		inserter(V& v) : m_v(v) {}
+		typedef void result_type;
+		template<typename T> void operator()(const T& t) const { m_v.push_back(value_type(t)); }
+		template<typename T, typename U> void operator()(const std::pair<T,U>& t) const {
+			m_v.push_back(value_type(t.first));
+			m_v.push_back(value_type(t.second));
+		}
+	};
+
+	inline inserter<std::vector<value_type> > birth_inserter() {
+		return inserter<std::vector<value_type> > (m_birth);
+	}
+	inline inserter<std::vector<iterator> > death_inserter() {
+		return inserter<std::vector<iterator> >(m_death);
+	}
 };
 }
 

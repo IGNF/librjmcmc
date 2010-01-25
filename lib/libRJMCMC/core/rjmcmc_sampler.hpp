@@ -1,10 +1,10 @@
 #ifndef __RJMCMC_SAMPLER_HPP__
 #define __RJMCMC_SAMPLER_HPP__
 
-#include "geometry/geometry.h"
 #include "core/random.hpp"
 #include "core/bbox.hpp"
 #include <boost/tuple/tuple.hpp>
+#include <boost/mpl/insert_range.hpp>
 
 namespace rjmcmc {
 
@@ -192,6 +192,13 @@ public:
 };
 
 
+template <typename T>
+struct pair_type
+{
+    typedef std::pair<T,T> type;
+};
+
+
 template<typename Modifier>
 class modification_kernel : public unary_kernel {
 	Modifier m_modifier;
@@ -210,30 +217,18 @@ public:
 		std::advance(it, cdie());
 		modif.insert_death(it);
 
-		//todo: sortir ces lignes specifiques de la lib
-		typedef std::pair<Rectangle_2,Rectangle_2> Rectangle_2_pair;
-		boost::variant<Rectangle_2,Circle_2,Rectangle_2_pair
-		> res;
+		typedef typename T::types types;
+		typedef typename boost::mpl::transform<types, pair_type<boost::mpl::_1> >::type pair_types;
+		typedef typename boost::mpl::end<types>::type types_end;
+		typedef typename boost::mpl::insert_range<types,types_end,pair_types>::type variant_types;
+		typename boost::make_variant_over<variant_types>::type res;
+
+		//T res;
 
 		uniform_random_type_init(res);
 		double green_ratio = rjmcmc::apply_visitor(m_modifier,c[it],res);
 
-
-		//todo: sortir ces lignes specifiques de la lib
-		Rectangle_2      *r=boost::get<Rectangle_2>(&res);
-		Circle_2         *n=boost::get<Circle_2>(&res);
-		Rectangle_2_pair *p=boost::get<Rectangle_2_pair>(&res);
-		if(r) {
-			modif.insert_birth(*r);
-		}
-		if(n) {
-			modif.insert_birth(*n);
-		}
-		if(p) {
-			modif.insert_birth(p->first);
-			modif.insert_birth(p->second);
-		}
-
+		rjmcmc::apply_visitor(modif.birth_inserter(),res);
 		return green_ratio;
 	}
 };
@@ -280,6 +275,11 @@ public:
 	{
 		typename Configuration::modification modif;
 		m_kernel_id   = internal::random_apply(m_die(),m_kernel,c,modif,m_green_ratio);
+		if(m_green_ratio<=0) {
+			m_delta   =0;
+			m_accepted=false;
+			return;
+		}
 		m_delta       = c.delta_energy(modif);
 		m_green_ratio*= exp(-m_delta/temp);
 		m_accepted    = ( m_die() < m_green_ratio );
