@@ -46,5 +46,3 @@ endif(BUILD_CLI)
 if(BUILD_GUI)
   add_subdirectory(gui)
 endif(BUILD_GUI)
-
-include(building_footprint-docs.cmake)
