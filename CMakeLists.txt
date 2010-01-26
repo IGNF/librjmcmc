@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 2.6)
 #       This policy was introduced in CMake version 2.8.0.  CMake version
 #       2.8.0 warns when the policy is not set and uses OLD behavior.  Use the
 #       cmake_policy command to set it to OLD or NEW explicitly.
-cmake_policy(SET CMP0014 OLD)
+#cmake_policy(SET CMP0014 OLD)
 
 # Project name
 project( libMPP CXX)

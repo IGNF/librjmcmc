@@ -9,9 +9,13 @@
 //typedef boost::variant<Rectangle_2> object;
 typedef boost::variant<Rectangle_2,Circle_2> object;
 
-#include "core/energies.hpp"
+#include "core/box_is_valid.hpp"
 typedef box_is_valid                         is_valid;
+
+#include "core/image_gradient_unary_energy.hpp"
 typedef image_gradient_unary_energy          unary_energy;
+
+#include "core/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy      binary_energy;
 
 #include "core/kernels.hpp"
