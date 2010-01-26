@@ -1,5 +1,5 @@
 #include "core/image_gradient_unary_energy.hpp"
-#include "core/image.hpp"
+#include "core/gradient_image.hpp"
 
 double image_gradient_unary_energy::operator()(const Circle_2 &c) const
 {
@@ -20,14 +20,14 @@ double image_gradient_unary_energy::operator()(const Rectangle_2 &n) const
 
 image_gradient_unary_energy::image_gradient_unary_energy(double default_energy, const std::string& file, const bbox_2& bbox, double sigmaD, unsigned int step) :
 	m_defaultEnergy(default_energy), 
-	m_image(boost::shared_ptr<rjmcmc::image>(new rjmcmc::image))
+	m_image(boost::shared_ptr<rjmcmc::gradient_image>(new rjmcmc::gradient_image))
 {
 	m_image->load(file,bbox,sigmaD,step);
 }
 
 image_gradient_unary_energy::image_gradient_unary_energy(double default_energy, const std::string& file, double sigmaD, unsigned int step) :
 	m_defaultEnergy(default_energy), 
-	m_image(boost::shared_ptr<rjmcmc::image>(new rjmcmc::image))
+	m_image(boost::shared_ptr<rjmcmc::gradient_image>(new rjmcmc::gradient_image))
 {
 	m_image->load(file,sigmaD,step);
 }

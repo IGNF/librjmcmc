@@ -5,7 +5,7 @@
 #include "core/bbox.hpp"
 #include <boost/shared_ptr.hpp>
 
-namespace rjmcmc { class image; };
+namespace rjmcmc { class gradient_image; };
 
 class image_gradient_unary_energy
 {
@@ -18,7 +18,7 @@ public:
 	image_gradient_unary_energy(double default_energy, const std::string& file, const bbox_2& bbox, double sigmaD=1, unsigned int step=0);
 
 private:
-	boost::shared_ptr<rjmcmc::image> m_image;
+	boost::shared_ptr<rjmcmc::gradient_image> m_image;
 	double m_defaultEnergy;
 };
 
