@@ -6,6 +6,9 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/mpl/insert_range.hpp>
 #include <boost/mpl/pop_front.hpp>
+#include <boost/preprocessor/repetition/enum.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
 
 namespace rjmcmc {
 
@@ -75,40 +78,28 @@ inline void uniform_random_type_init(boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)
 }
 
 
-
-template <typename T>
-struct pair_type
-{
-    typedef std::pair<T,T> type;
-};
-
 template <typename T,typename U>
-struct pair_type_2
-{
-    typedef std::pair<T,U> type;
-};
+struct std_pair { typedef std::pair<T,U> type; };
 
 template <typename T>
-struct modification_types {
-	typedef boost::variant<T,std::pair<T,T> > type;
-};
+struct variant_pairs { typedef boost::variant<T,std::pair<T,T> > type; };
 
 template<typename S, typename I>
-struct modification_types_aux {
+struct variant_pairs_detail {
 	typedef typename boost::mpl::pop_front<I>::type tail;
 	typedef typename boost::mpl::front<I>::type     head;
-	typedef typename modification_types_aux<S,tail>::type T;	typedef typename boost::mpl::end<T>::type T_end;
-	typedef typename boost::mpl::transform<S, pair_type_2<head,boost::mpl::_1> >::type pair_types;
+	typedef typename variant_pairs_detail<S,tail>::type T;	typedef typename boost::mpl::end<T>::type T_end;	typedef std_pair<head,boost::mpl::_1> make_std_pair;
+	typedef typename boost::mpl::transform<S,make_std_pair>::type pair_types;
 	typedef typename boost::mpl::insert_range<T,T_end,pair_types>::type type;
 };
 
 template<typename S>
-struct modification_types_aux<S,boost::mpl::l_end> {
+struct variant_pairs_detail<S,boost::mpl::l_end> {
 	typedef S type;
 };
 
 template<BOOST_VARIANT_ENUM_PARAMS(typename T)>
-struct modification_types<boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> > {
+struct variant_pairs<boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> > {
 	typedef boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> T;
 	typedef typename T::types types;
 
@@ -131,14 +122,14 @@ struct modification_types<boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> > {
 		std::pair<Circle_2,Circle_2>,
 		std::pair<Rectangle_2,Circle_2> > type;
 */
-	typedef typename modification_types_aux<types,types>::type aux;
-	typedef typename boost::make_variant_over<aux>::type type;
+	typedef typename variant_pairs_detail<types,types>::type pairs;
+	typedef typename boost::make_variant_over<pairs>::type type;
 };
 
 template<typename V> 
-struct variant_make_pair
+struct make_variant_pair
 {
-	typedef typename modification_types<V>::type result_type;
+	typedef typename variant_pairs<V>::type result_type;
 	template<typename T,typename U>
 	inline result_type operator()(const T& t, const U& u) const {
 		return result_type(std::make_pair(t,u));
@@ -277,12 +268,15 @@ public:
 		if(c.empty()) return 1.;
 		typedef typename Configuration::value_type T;
 		typedef typename Configuration::iterator iterator;
-		typename modification_types<T>::type out, in;
+		typedef typename variant_pairs<T>::type MT;
+		MT out, in;
 
 		die_type ddie(GetRandom(), boost::uniform_smallint<>(1,2));
 		die_type cdie(GetRandom(), boost::uniform_smallint<>(0,c.size()-1));
 		iterator it = c.begin();
 		std::advance(it, cdie());
+		double num = variant_size<MT>::value;
+		double den = c.size();
 		if(c.size()==1 || ddie()==1) {
 			modif.insert_death(it);
 			in = c[it];
@@ -290,36 +284,54 @@ public:
 			iterator it2;
 			do { it2 = c.begin(); std::advance(it2, cdie()); } while (it==it2);
 			modif.insert_death(it2);
-			variant_make_pair<T> vmp;
+			make_variant_pair<T> vmp;
 			in = rjmcmc::apply_visitor(vmp,c[it],c[it2]);
+			den *= (c.size()-1);
 		}
 
 		uniform_random_type_init(out);
 		double green_ratio = rjmcmc::apply_visitor(m_modifier,in,out);
 		rjmcmc::apply_visitor(modif.birth_inserter(),out);
 
-		return green_ratio;
+		return green_ratio*num/den;
 	}
 };
 
-// variadic template support would hide the std::tuple implementation detail
+// variadic template support
 #if 0
-	#define IF_VARIADIC(x,y) x
-#else
-	#define IF_VARIADIC(x,y) y
-#endif
 
-template<typename IF_VARIADIC(K...,Kernels_)>
+#define RJMCMC_SAMPLER_LIMIT_TYPES 10000000000 
+template<typename K...>
 class sampler
 {
-	IF_VARIADIC(typedef std::tuple<K...> Kernels_, )
 public:
-	typedef Kernels_ Kernels;
+	typedef std::tuple<K...> Kernels;
+	sampler(const K&... k) : m_kernel(k...),
+		m_die(GetRandom(), boost::uniform_real<>(0,1)) {}
 
-// constructor
-	sampler(const IF_VARIADIC(K&...,Kernels&) k) :
-		m_kernel(IF_VARIADIC(k...,k)), m_die(GetRandom(), boost::uniform_real<>(0,1))
-	{}
+#else
+
+#define RJMCMC_SAMPLER_LIMIT_TYPES 10
+#define RJMCMC_SAMPLER_ENUM_PARAMS(x) \
+	BOOST_PP_ENUM_PARAMS(RJMCMC_SAMPLER_LIMIT_TYPES,x)
+#define RJMCMC_SAMPLER_ENUM_BINARY_PARAMS(x,y) \
+	BOOST_PP_ENUM_BINARY_PARAMS(RJMCMC_SAMPLER_LIMIT_TYPES,x,y)
+#define RJMCMC_SAMPLER_ENUM_PARAMS_WITH_A_DEFAULT(x,y) \
+	BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(RJMCMC_SAMPLER_LIMIT_TYPES,x,y)
+#define RJMCMC_SAMPLER_ENUM(x) \
+	BOOST_PP_ENUM(RJMCMC_SAMPLER_LIMIT_TYPES,x,nil)
+#define RJMCMC_SAMPLER_ARG(z,n,_) const K##n& k##n = K##n()
+
+template<RJMCMC_SAMPLER_ENUM_PARAMS_WITH_A_DEFAULT(typename K,boost::tuples::null_type)>
+class sampler
+{
+public:
+	typedef boost::tuple<RJMCMC_SAMPLER_ENUM_PARAMS(K)> Kernels;
+	sampler(RJMCMC_SAMPLER_ENUM(RJMCMC_SAMPLER_ARG)) :
+		m_kernel(RJMCMC_SAMPLER_ENUM_PARAMS(k)),
+		m_die(GetRandom(), boost::uniform_real<>(0,1)) {}
+
+#endif
 
 // kernel accessors
 	enum { size = boost::tuples::length<Kernels>::value };

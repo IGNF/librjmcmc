@@ -40,9 +40,7 @@ typedef rjmcmc::uniform_birth_kernel<generator_>         birth_kernel;
 typedef rjmcmc::uniform_death_kernel                     death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel> birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_>           modification_kernel;
-#define KERNELS birth_death_kernel,modification_kernel
-typedef boost::tuple<KERNELS>                            kernels;
-typedef rjmcmc::sampler<IF_VARIADIC(KERNELS,kernels)>    sampler;
+typedef rjmcmc::sampler<birth_death_kernel,modification_kernel>    sampler;
 
 
 /************** main ****************/
@@ -78,7 +76,7 @@ template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& vi
 		param::Instance()->m_death_probability
 	);
 
-	sampler sample( IF_VARIADIC(,boost::make_tuple)(kbirthdeath,kmodif) );
+	sampler sample( kbirthdeath, kmodif );
 
 	unary_energy e1(
 		param::Instance()->m_individual_energy,

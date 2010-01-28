@@ -154,6 +154,21 @@ public:
 		return 1.; // TODO
 	}
 
+	double operator()(const Rectangle_2 &r, std::pair<Rectangle_2,Circle_2> &res) const {
+		// todo: verifier que ca fait pas n'importe quoi...
+		int i = m_die4();
+		float f = m_dief();
+		float g = m_dief();
+		float h = m_dief();
+		Vector_2 n = r.normal(i)*std::min(1.,std::abs(r.ratio()));
+		if(i%2) n = n*(1./r.ratio());
+		Vector_2 v(-n.x()+n.y(),-n.y()-n.x());
+		res.first  = r.scaled_edge(i,f).scaled_edge(i+1,g);
+		res.second = Circle_2(r[i+3]+v*h,h*std::sqrt(n.squared_length()));
+		if (!(m_is_valid(res.first) && m_is_valid(res.second) )) return 0;
+		return 1.; // TODO
+	}
+
 	double operator()(const std::pair<Rectangle_2,Rectangle_2> &r, Rectangle_2 &res) const {
 		res = r.first.merge(r.second);
 		if (!(m_is_valid(res))) return 0;
