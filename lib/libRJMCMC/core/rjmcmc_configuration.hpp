@@ -1,59 +1,9 @@
 #ifndef __RJMCMC_CONFIGURATION_HPP__
 #define __RJMCMC_CONFIGURATION_HPP__
 
-#include <boost/variant.hpp>
-
-// rjmcmc::apply_visitor generalizes boost::apply_visitor to directly call the function object if the argument is not a variant.
+#include "core/variant.hpp"
 
 namespace rjmcmc {
-
-template<typename Visitor, typename Variant> 
-  inline typename Visitor::result_type apply_visitor(const Visitor &v, const Variant &v1) { return v(v1); }
-
-template<typename Visitor, typename Variant> 
-  inline typename Visitor::result_type apply_visitor(const Visitor &v, Variant &v1) { return v(v1); }
-
-template<typename Visitor, typename Variant1, typename Variant2> 
-  inline  typename Visitor::result_type apply_visitor(const Visitor &v, const Variant1 &v1, const Variant2 &v2) { return v(v1,v2); }
-
-template<typename Visitor, typename Variant1, typename Variant2> 
-  inline  typename Visitor::result_type apply_visitor(const Visitor &v, const Variant1 &v1, Variant2 &v2) { return v(v1,v2); }
-
-template<typename Visitor, BOOST_VARIANT_ENUM_PARAMS(typename T) > 
-inline typename Visitor::result_type apply_visitor(const Visitor &v,
-	const boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v1)
-{
-	return boost::apply_visitor(v,v1);
-}
-
-template<typename Visitor, BOOST_VARIANT_ENUM_PARAMS(typename T) > 
-inline typename Visitor::result_type apply_visitor(const Visitor &v,
-	boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v1)
-{
-	return boost::apply_visitor(v,v1);
-}
-
-template<typename Visitor,
-	BOOST_VARIANT_ENUM_PARAMS(typename T),
-	BOOST_VARIANT_ENUM_PARAMS(typename U) > 
-inline typename Visitor::result_type apply_visitor(const Visitor &v,
-	const boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v1,
-	const boost::variant<BOOST_VARIANT_ENUM_PARAMS(U)> &v2)
-{
-	return boost::apply_visitor(v,v1,v2);
-}
-
-
-template<typename Visitor,
-	BOOST_VARIANT_ENUM_PARAMS(typename T),
-	BOOST_VARIANT_ENUM_PARAMS(typename U) > 
-inline typename Visitor::result_type apply_visitor(const Visitor &v,
-	const boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v1,
-	boost::variant<BOOST_VARIANT_ENUM_PARAMS(U)> &v2)
-{
-	return boost::apply_visitor(v,v1,v2);
-}
-
 //////////////////////////////////////////////////////////
 
 struct trivial_accelerator {
@@ -111,27 +61,23 @@ public:
 
 //////////////////////////////////////////////////////////
 
-template<typename T, typename UnaryEnergy, typename BinaryEnergy, typename IsValid, typename Accelerator=trivial_accelerator>
+template<typename T, typename UnaryEnergy, typename BinaryEnergy, typename Accelerator=trivial_accelerator>
 class vector_configuration
 {
 	typedef	std::vector<T> container;
 	container	m_container;
 	UnaryEnergy	m_unary_energy;
 	BinaryEnergy	m_binary_energy;
-	IsValid		m_is_valid;
 	Accelerator	m_accelerator;
 public:
 	typedef T					value_type;
-	typedef vector_configuration<T,UnaryEnergy, BinaryEnergy, IsValid, Accelerator> Self;
-	typedef internal::modification<Self>	modification;
+	typedef vector_configuration<T,UnaryEnergy, BinaryEnergy, Accelerator> Self;
+	typedef internal::modification<Self>	        modification;
 	typedef	typename container::const_iterator	const_iterator;
 	typedef	typename container::iterator		iterator;
 
-	vector_configuration(UnaryEnergy unary_energy, BinaryEnergy binary_energy, IsValid is_valid, Accelerator accelerator=Accelerator()) : m_unary_energy(unary_energy), m_binary_energy(binary_energy), m_is_valid(is_valid), m_accelerator(accelerator)
+	vector_configuration(UnaryEnergy unary_energy, BinaryEnergy binary_energy, Accelerator accelerator=Accelerator()) : m_unary_energy(unary_energy), m_binary_energy(binary_energy), m_accelerator(accelerator)
 	{}
-
-	const IsValid& is_valid() const { return m_is_valid; }
-	bool is_valid(const T& t) const { return rjmcmc::apply_visitor(m_is_valid,t); }
 
 	// energy
 	double unary_energy() const
@@ -199,9 +145,9 @@ public:
 			iterator v = *it;
 			delta -= energy(v);
 			for (const_iterator it2=begin(); it2 != end(); ++it2)
-				delta -= rjmcmc::apply_visitor(m_binary_energy, *it, value(it2) );
+				delta -= rjmcmc::apply_visitor(m_binary_energy, value(*it), *it2 );
 			for (dci it2=it+1; it2 != dend; ++it2)
-				delta -= rjmcmc::apply_visitor(m_binary_energy, *it, *it2);
+				delta -= rjmcmc::apply_visitor(m_binary_energy, value(*it), value(*it2) );
 		}
 		return delta;
 	}
@@ -234,13 +180,13 @@ public:
 };
 
 
-template<typename T, typename U, typename B, typename V, typename A>
-std::ostream& operator<<(std::ostream& o, const vector_configuration<T,U,B,V,A>& c) {
+template<typename T, typename U, typename B, typename A>
+std::ostream& operator<<(std::ostream& o, const vector_configuration<T,U,B,A>& c) {
 	o << "energy     : " << c.unary_energy() + c.binary_energy();
 	o << " = " << c.unary_energy() << " + " << c.binary_energy() << " (Data+Prior)\n";
 	o << "Nb objects : " << c.size() << "\n";
 	{
-		typename vector_configuration<T,U,B,V,A>::const_iterator it = c.begin(), end = c.end();
+		typename vector_configuration<T,U,B,A>::const_iterator it = c.begin(), end = c.end();
 		for (; it != end; ++it)
 			o << *it <<"\t" << c.energy(it)<<"\t" << c[it] << std::endl;
 	}
@@ -255,11 +201,11 @@ std::ostream& operator<<(std::ostream& o, const vector_configuration<T,U,B,V,A>&
 
 namespace rjmcmc {
 
-template<typename T, typename UnaryEnergy, typename BinaryEnergy, typename IsValid, typename Accelerator=trivial_accelerator, typename OutEdgeList = boost::listS, typename VertexList = boost::listS  >
+template<typename T, typename UnaryEnergy, typename BinaryEnergy, typename Accelerator=trivial_accelerator, typename OutEdgeList = boost::listS, typename VertexList = boost::listS  >
 class graph_configuration
 {
 public:
-	typedef graph_configuration<T,UnaryEnergy, BinaryEnergy, IsValid, Accelerator, OutEdgeList, VertexList> Self;
+	typedef graph_configuration<T,UnaryEnergy, BinaryEnergy, Accelerator, OutEdgeList, VertexList> Self;
 	typedef internal::modification<Self>	modification;
 	typedef T	value_type;
 private:
@@ -296,7 +242,7 @@ public:
 public:
 
 	// configuration constructors/destructors
-	graph_configuration(UnaryEnergy unary_energy, BinaryEnergy binary_energy, IsValid is_valid, Accelerator accelerator=Accelerator()) : m_unary(0.), m_binary(0.), m_unary_energy(unary_energy), m_binary_energy(binary_energy), m_is_valid(is_valid), m_accelerator(accelerator)
+	graph_configuration(UnaryEnergy unary_energy, BinaryEnergy binary_energy, Accelerator accelerator=Accelerator()) : m_unary(0.), m_binary(0.), m_unary_energy(unary_energy), m_binary_energy(binary_energy), m_accelerator(accelerator)
 	{}
 	~graph_configuration()
 	{}
@@ -448,34 +394,30 @@ public:
 		return err;
 	}
 
-	const IsValid& is_valid() const { return m_is_valid; }
-	bool is_valid(const T& t) const { return rjmcmc::apply_visitor(m_is_valid,t); }
-
 private:
 	graph_type m_graph;
 	UnaryEnergy	m_unary_energy;
 	BinaryEnergy	m_binary_energy;
-	IsValid		m_is_valid;
 	Accelerator	m_accelerator;
 	double m_unary;
 	double m_binary;
 };
 
 
-template<typename T, typename U, typename B, typename V, typename A>
-std::ostream& operator<<(std::ostream& o, const graph_configuration<T,U,B,V,A>& c) {
+template<typename T, typename U, typename B, typename A>
+std::ostream& operator<<(std::ostream& o, const graph_configuration<T,U,B,A>& c) {
 	o << "energy     : " << c.unary_energy() + c.binary_energy();
 	o << " = " << c.unary_energy() << " + " << c.binary_energy() << " (Data+Prior)\n";
 	o << "Nb objects : " << c.size() << "\n";
 	o << "Nb edges   : " << c.size_of_interactions() << std::endl;
 	{
-		typename graph_configuration<T,U,B,V,A>::const_iterator it = c.begin(), end = c.end();
+		typename graph_configuration<T,U,B,A>::const_iterator it = c.begin(), end = c.end();
 		for (; it != end; ++it)
 			o << *it <<"\t" << c.energy(it)<<"\t" << c[it] << std::endl;
 	}
 	
 	{
-		typename graph_configuration<T,U,B,V,A>::const_edge_iterator it = c.interactions_begin(), end = c.interactions_end();
+		typename graph_configuration<T,U,B,A>::const_edge_iterator it = c.interactions_begin(), end = c.interactions_end();
 		for (; it != end; ++it)
 			o << *it <<"\t:\t" << c.energy(it) << std::endl;
 	}

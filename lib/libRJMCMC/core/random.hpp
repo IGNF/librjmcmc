@@ -8,26 +8,30 @@
 #	include <unistd.h>
 #endif
 
-typedef boost::mt19937 RJMCMCRandom;
+namespace rjmcmc {
+
+typedef boost::mt19937 generator;
 
 /**
  * @fn static RJMCMCRandom &GetRandom() Simple function which return an initialised random number generator
  * @todo Properly handle Windows platform
  */
-static RJMCMCRandom &GetRandom()
+static generator &random()
 {
-	static RJMCMCRandom randomness;
+	static generator g;
 #ifndef WIN32
-	static bool is_already_initialised = true;
-	if (is_already_initialised)
+	static bool uninitialised = true;
+	if (uninitialised)
 	{
 		struct timeval tv;
 		gettimeofday(&tv, 0);
-		randomness.seed(tv.tv_sec + tv.tv_usec);
-		is_already_initialised = false;
+		g.seed(tv.tv_sec + tv.tv_usec);
+		uninitialised = false;
 	}
 #endif
-	return randomness;
+	return g;
 }
+
+}; // namespace rjmcmc
 
 #endif /* RANDOM_HPP_ */

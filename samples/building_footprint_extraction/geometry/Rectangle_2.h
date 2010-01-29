@@ -106,6 +106,14 @@ public:
   inline void scale           (const FT &f       ) { n=f*n; }
   inline void reverse_orientation () { r = -r; }
 
+  inline Self rotate(int i) const { 
+    switch (i%4) {
+    case  0: return Self(c, n,r);
+    case  2: return Self(c,-n,r);
+    case  1: { Vector_2 m(-r*n.y(), r*n.x()); return Self(c,m,1/r); }
+    default: { Vector_2 m( r*n.y(),-r*n.x()); return Self(c,m,1/r); }
+    }
+  }
 /* Variants */
 /*
   Self offset(const FT& d) const { // requires sqrt

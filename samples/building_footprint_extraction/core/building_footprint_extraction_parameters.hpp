@@ -44,6 +44,7 @@ struct building_footprint_extraction_parameters: public PatternSingleton<buildin
 	double m_ponderation_surface_intersection;
 	double m_individual_energy;
 	double m_sigma_d;
+	double m_poisson;
 
 private:
 	boost::program_options::options_description m_desc;

@@ -20,7 +20,7 @@ void building_footprint_extraction_parameters::store_string_map(std::map<std::st
 		}
 		else if(name == "temp" 		|| name == "deccoef" || name == "pbirth" 	|| name == "pdeath" 	||
 				name == "gaussian"	|| name == "minsize" || name == "maxratio"	|| name == "surface"	||
-				name == "energy"	|| name == "sigmaD")
+				name == "energy"	|| name == "sigmaD"	|| name == "poisson")
 		{
 			value << v.as<double>();
 		}
@@ -131,5 +131,6 @@ building_footprint_extraction_parameters::building_footprint_extraction_paramete
 	("minsize,m", 		po::value<double>(&(m_rectangle_minimal_size))->default_value(5), "Taille minimale d'un rectangle")
 	("maxratio,M", 		po::value<double>(&(m_rectangle_maximal_ratio))->default_value(5), "Rapport longueur / largeur maximal d'un rectangle")
 	("surface,s", 		po::value<double>(&(m_ponderation_surface_intersection))->default_value(10), "Ponderation de la surface d'intersection")
-	("energy,e", 		po::value<double>(&(m_individual_energy))->default_value(250), "Energie d'existence d'un objet");
+	("energy,e", 		po::value<double>(&(m_individual_energy))->default_value(250), "Energie d'existence d'un objet")
+	("poisson,p", 		po::value<double>(&(m_poisson))->default_value(200), "Parametre du processus de Poisson");
 }
