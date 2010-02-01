@@ -4,11 +4,11 @@
 #include <ostream>
 #include <iomanip>
 #include <time.h>
-#include "rjmcmc_sampler.hpp" // pour kernel_traits<>
+#include "rjmcmc/sampler.hpp" // pour kernel_traits<>
 
 namespace rjmcmc {
 
-template<typename Sampler> class sampler_ostream_visitor {
+template<typename Sampler> class ostream_visitor {
 private:
 	enum { kernel_size =  kernel_traits<typename Sampler::Kernels>::size };
 	unsigned int m_proposed[kernel_size];
@@ -20,7 +20,7 @@ private:
 	std::ostream& m_out;
 
 public:
-	sampler_ostream_visitor(std::ostream& out) : m_out(out) {}
+	ostream_visitor(std::ostream& out) : m_out(out) {}
 
 	void begin(unsigned int dump, unsigned int save) {
 		m_dump = dump;

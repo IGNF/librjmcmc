@@ -29,7 +29,7 @@ if(USE_CGAL)
 endif(USE_CGAL)
 
 if(BUILD_CLI OR BUILD_GUI)
-  include_directories( ${CMAKE_SOURCE_DIR}/lib/rjmcmc ${CMAKE_SOURCE_DIR}/lib ${CMAKE_CURRENT_SOURCE_DIR} )
+  include_directories( ${CMAKE_SOURCE_DIR}/lib ${CMAKE_CURRENT_SOURCE_DIR} )
   file( GLOB ALL_CORE_HEADER_FILES ${ROOT_DIR}/core/*.h ${ROOT_DIR}/core/*.hpp )
   file( GLOB ALL_GEOMETRY_HEADER_FILES ${CMAKE_SOURCE_DIR}/lib/geometry/*.h ${CMAKE_SOURCE_DIR}/lib/geometry/*.hpp )
   aux_source_directory( ${ROOT_DIR}/core ALL_CORE_SRC )

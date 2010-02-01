@@ -32,12 +32,12 @@ typedef building_footprint_extraction_parameters         param;
 #include "rjmcmc/temperature.hpp"
 typedef rjmcmc::geometric_temperature                    temperature;
 
-#include "rjmcmc/rjmcmc_configuration.hpp"
+#include "rjmcmc/configuration.hpp"
 typedef rjmcmc::graph_configuration
 //typedef rjmcmc::vector_configuration
 	<object, unary_energy, binary_energy>            configuration;
 
-#include "rjmcmc/rjmcmc_sampler.hpp"
+#include "rjmcmc/sampler.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_>         birth_kernel;
 typedef rjmcmc::uniform_death_kernel                     death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel> birth_death_kernel;

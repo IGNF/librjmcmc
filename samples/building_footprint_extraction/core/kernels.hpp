@@ -1,9 +1,9 @@
 #ifndef KERNELS_HPP_
 #define KERNELS_HPP_
 
-#include "geometry/geometry.h"
 #include "rjmcmc/random.hpp"
-#include "rjmcmc/bbox.hpp"
+#include "geometry/geometry.h"
+#include "geometry/bbox.hpp"
 
 template< typename IsValid >
 class generator {

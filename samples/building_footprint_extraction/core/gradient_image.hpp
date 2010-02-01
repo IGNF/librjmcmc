@@ -3,7 +3,7 @@
 
 #include <boost/gil/extension/io/tiff_dynamic_io.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
-#include "rjmcmc/bbox.hpp"
+#include "geometry/bbox.hpp"
 #include "geometry/geometry.h"
 
 namespace rjmcmc {

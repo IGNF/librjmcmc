@@ -6,7 +6,7 @@
 #include <GilViewer/layers/ImageLayer.hpp>
 #include "gui/rjmcmc_building_footprint_extraction_frame.hpp"
 #include "core/building_footprint_extraction.hpp"
-#include "rjmcmc/rjmcmc_ostream_visitor.hpp"
+#include "rjmcmc/ostream_visitor.hpp"
 
 class rjmcmc_building_footprint_extraction_thread : public wxThread
 {
@@ -22,7 +22,7 @@ private:
 	Layer::ptrLayerType m_layer;
 	rjmcmc_building_footprint_extraction_frame *m_frame;
 	std::ostringstream m_out;
-	rjmcmc::sampler_ostream_visitor<sampler> m_visitor;
+	rjmcmc::ostream_visitor<sampler> m_visitor;
 	unsigned int m_dump;
 };
 
