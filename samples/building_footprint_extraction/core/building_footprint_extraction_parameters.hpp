@@ -6,7 +6,7 @@
 #include <sstream>
 #include <boost/program_options.hpp>
 
-#include "core/pattern_singleton.hpp"
+#include "rjmcmc/pattern_singleton.hpp"
 
 /**
  * @brief Class for specific "Building footprint extraction" application parameters handling

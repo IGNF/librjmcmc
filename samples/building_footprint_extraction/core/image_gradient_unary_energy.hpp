@@ -2,7 +2,7 @@
 #define IMAGE_GRADIENT_UNARY_ENERGY_HPP_
 
 #include "geometry/geometry.h"
-#include "core/bbox.hpp"
+#include "rjmcmc/bbox.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace rjmcmc { class gradient_image; };

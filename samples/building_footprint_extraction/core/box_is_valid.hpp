@@ -2,7 +2,7 @@
 #define BOX_IS_VALID_HPP_
 
 #include "geometry/geometry.h"
-#include "core/bbox.hpp"
+#include "rjmcmc/bbox.hpp"
 
 //////////////////////////////////////////////////////////
 

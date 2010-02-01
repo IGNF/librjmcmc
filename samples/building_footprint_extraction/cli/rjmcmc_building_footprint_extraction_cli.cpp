@@ -1,5 +1,5 @@
 #include "core/building_footprint_extraction.hpp"
-#include "core/rjmcmc_ostream_visitor.hpp"
+#include "rjmcmc/rjmcmc_ostream_visitor.hpp"
 
 /*
 void test() {

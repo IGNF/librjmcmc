@@ -1,7 +1,7 @@
 #ifndef __RJMCMC_CONFIGURATION_HPP__
 #define __RJMCMC_CONFIGURATION_HPP__
 
-#include "core/variant.hpp"
+#include "rjmcmc/variant.hpp"
 
 namespace rjmcmc {
 //////////////////////////////////////////////////////////

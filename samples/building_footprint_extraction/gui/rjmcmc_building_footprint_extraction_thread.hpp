@@ -6,7 +6,7 @@
 #include <GilViewer/layers/ImageLayer.hpp>
 #include "gui/rjmcmc_building_footprint_extraction_frame.hpp"
 #include "core/building_footprint_extraction.hpp"
-#include "core/rjmcmc_ostream_visitor.hpp"
+#include "rjmcmc/rjmcmc_ostream_visitor.hpp"
 
 class rjmcmc_building_footprint_extraction_thread : public wxThread
 {

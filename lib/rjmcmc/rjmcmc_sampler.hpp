@@ -1,7 +1,7 @@
 #ifndef __RJMCMC_SAMPLER_HPP__
 #define __RJMCMC_SAMPLER_HPP__
 
-#include "core/random.hpp"
+#include "rjmcmc/random.hpp"
 #include <boost/tuple/tuple.hpp>
 #include <boost/mpl/insert_range.hpp>
 #include <boost/mpl/pop_front.hpp>
