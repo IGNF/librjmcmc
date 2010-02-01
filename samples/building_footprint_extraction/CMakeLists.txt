@@ -4,7 +4,7 @@ project( building_footprint_extraction )
 
 option(BUILD_CLI "build building_footprint_extraction CLI sample" ON)
 option(BUILD_GUI "build building_footprint_extraction GUI sample" ON)
-option(USE_CGAL  "" ON)
+option(USE_CGAL  "Use CGAL library" OFF)
 
 set( ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
 

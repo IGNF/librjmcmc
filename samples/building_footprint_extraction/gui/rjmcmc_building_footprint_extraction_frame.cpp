@@ -13,6 +13,7 @@
 #include "parameters_frame.hpp"
 #include "rjmcmc_building_footprint_extraction_frame.hpp"
 #include "rjmcmc_building_footprint_extraction_thread.hpp"
+#include "chart_frame.hpp"
 
 enum
 {
@@ -85,14 +86,19 @@ rjmcmc_building_footprint_extraction_frame::rjmcmc_building_footprint_extraction
 	m_dockManager.AddPane( libRJMCMCtoolbar , applicationToolBarInfo );
 
 	m_dockManager.Update();
-	m_parameters_frame = new parameters_frame();
+	m_parameters_frame = new parameters_frame(this);
 	m_parameters_frame->SetModal(false);
 	m_parameters_frame->Show();
+
+	m_chart_frame = new chart_frame(this);
+	m_chart_frame->SetModal(false);
+	m_chart_frame->Show();
 }
 
 rjmcmc_building_footprint_extraction_frame::~rjmcmc_building_footprint_extraction_frame()
 {
 	m_parameters_frame->Destroy();
+	m_chart_frame->Destroy();
 }
 
 void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& event)

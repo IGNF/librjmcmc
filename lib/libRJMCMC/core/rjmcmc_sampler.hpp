@@ -24,9 +24,9 @@ inline unsigned int random_apply(double x, const boost::tuples::null_type&, C &c
 
 template <class H, class T, typename C, typename M>
 inline unsigned int random_apply(double x, boost::tuples::cons<H, T>& t, C &c, M &m, double& R, unsigned int i=0) {
-	double p = t.get_head().probability();
-	if(x<p) { R=t.get_head()(c,m); return i+t.get_head().kernel_id(); }
-	return random_apply(x-p,t.get_tail(),c,m,R,i+H::size);
+	double xt = x - t.get_head().probability();
+	if(xt<0) { R=t.get_head()(x,c,m); return i+t.get_head().kernel_id(); }
+	return random_apply(xt,t.get_tail(),c,m,R,i+H::size);
 }
 
 template<typename T> struct cons_list_kernel_traits {
@@ -55,13 +55,13 @@ template<BOOST_VARIANT_ENUM_PARAMS(typename T)>
 inline int uniform_random_type_init(boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v)
 {
 	typedef boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> T;
-	typedef typename T::types Types;
+	typedef typename T::types types;
 	typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_smallint<> > die_type;
 	const int N = variant_size<T>::value;
 	die_type vdie(random(), boost::uniform_smallint<>(0,N-1));
 	switch(vdie())        { 
 #define BOOST_PP_LOCAL_LIMITS (0,BOOST_VARIANT_LIMIT_TYPES-1)
-#define BOOST_PP_LOCAL_MACRO(n) case n : v = typename boost::mpl::at_c<Types,n%N>::type(); return (n*(n+1)<N)?1:2;
+#define BOOST_PP_LOCAL_MACRO(n) case n : v = typename boost::mpl::at_c<types,n%N>::type(); return (n*(n+1)<N)?1:2;
 #include BOOST_PP_LOCAL_ITERATE()
 		default : return 1; // should not get here
 	}
@@ -133,19 +133,16 @@ template<typename Kernel0, typename Kernel1> class binary_kernel {
 	double m_p[2], m_p_sum;
 	Kernel0 m_kernel0;
 	Kernel1 m_kernel1;
-	mutable boost::variate_generator<rjmcmc::generator&, boost::uniform_real<> > m_die;
 	mutable unsigned int m_kernel_id;
 public:
 	enum { size = 2 };
 	inline unsigned int kernel_id() const { return m_kernel_id; }
 	binary_kernel(const Kernel0& k0, const Kernel1& k1, double p=1.) : 
-		m_kernel0(k0), m_kernel1(k1), m_p_sum(p),
-		m_die(random(), boost::uniform_real<>(0,1)) {
+		m_kernel0(k0), m_kernel1(k1), m_p_sum(p) {
 		m_p[0]=m_p[1]=p*0.5;
 	}
 	binary_kernel(const Kernel0& k0, const Kernel1& k1, double p0, double p1) :
-		m_kernel0(k0), m_kernel1(k1), m_p_sum(p0+p1),
-		m_die(random(), boost::uniform_real<>(0,1)) {
+		m_kernel0(k0), m_kernel1(k1), m_p_sum(p0+p1) {
 		m_p[0]=p0; m_p[1]=p1;
 	}
 	inline void probability(double p_sum) { 
@@ -160,9 +157,9 @@ public:
 	}
 	inline double probability(unsigned int i) const { return m_p[i]; }
 	template<typename Configuration, typename Modification>
-	double operator()(Configuration& c, Modification& modif) const
+	double operator()(double p, Configuration& c, Modification& modif) const
 	{
-		if(m_die()*m_p_sum<m_p[0]) {
+		if(p<m_p[0]) {
 			m_kernel_id = 0;
 			double x = m_p[0]*m_kernel0    (c,modif);
 			double y = m_p[1]*m_kernel1.pdf(c,modif);
@@ -203,13 +200,10 @@ public:
 
 template<typename Generator>
 class uniform_birth_kernel {
-	typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_real<> > die_type;
 	Generator m_generator;
-	mutable die_type m_die;
 public:
 	uniform_birth_kernel(const Generator& generator) : 
-		m_generator(generator),
-		m_die(random(), boost::uniform_real<>(0,1)) {}
+		m_generator(generator) {}
 
 	template<typename Configuration, typename Modification>
 	double operator()(Configuration& c, Modification& modif) const
@@ -225,10 +219,8 @@ public:
 	template<typename Configuration, typename Modification>
 	double pdf(const Configuration& c, const Modification& modif) const
 	{
-		typedef typename Configuration::value_type T;
 		if(modif.birth_size()!=0 || modif.death_size()!=1) return 0.;
-		double p = rjmcmc::apply_visitor(m_generator.pdf(),c[*modif.death_begin()]);
-		return p;
+		return rjmcmc::apply_visitor(m_generator.pdf(),c[*modif.death_begin()]);
 	}
 };
 
@@ -254,7 +246,7 @@ public:
 	modification_kernel(const Modifier& m, double poisson, double p=1) : unary_kernel(p), m_poisson(poisson), m_modifier(m) {}
 
 	template<typename Configuration, typename Modification>
-	double operator()(Configuration& c, Modification& modif) const
+	double operator()(double p, Configuration& c, Modification& modif) const
 	{
 		modif.clear();
 		if(c.empty()) return 1.;
@@ -288,7 +280,7 @@ public:
 		rjmcmc::apply_visitor(modif.birth_inserter(),out);
 
 		switch(num_births-num_deaths) {
-		case -1 : return green_ratio * m_poisson/n;
+		case -1 : return green_ratio * m_poisson /n;
 		case  0 : return green_ratio;
 		case  1 : 
 		default : return green_ratio *(n+1)/m_poisson;

@@ -288,7 +288,9 @@ public:
 		dci dend = modif.death_end();
 		for(bci it=bbeg; it!=bend; ++it) {
 			delta += rjmcmc::apply_visitor(m_unary_energy,*it);
-			for (const_iterator it2=begin(); it2 != end(); ++it2) // todo accelerator
+			const_iterator   it2, end2;
+			boost::tie(it2,end2)=m_accelerator(*this,*it);
+			for (; it2 != end2; ++it2)
 				if (std::find(dbeg,dend,it2)==dend)
 					delta += rjmcmc::apply_visitor(m_binary_energy, *it, value(it2) );
 			for (bci it2=bbeg; it2 != it; ++it2)

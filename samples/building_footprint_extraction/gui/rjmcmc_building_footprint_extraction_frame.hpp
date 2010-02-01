@@ -12,6 +12,7 @@
 
 class rjmcmc_building_footprint_extraction_thread;
 class parameters_frame;
+class chart_frame;
 
 class rjmcmc_building_footprint_extraction_frame: public BasicViewerFrame
 {
@@ -30,6 +31,7 @@ public:
 	wxCriticalSection m_cs;
 
 	parameters_frame* m_parameters_frame;
+	chart_frame* m_chart_frame;
 
 	DECLARE_GILVIEWER_METHODS_FOR_EVENTS_TABLE() ;
 	DECLARE_EVENT_TABLE() ;

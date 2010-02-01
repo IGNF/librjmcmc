@@ -1,4 +1,5 @@
 #include "rjmcmc_building_footprint_extraction_thread.hpp"
+#include "chart_frame.hpp"
 
 struct layer_visitor {
 public:
@@ -60,6 +61,7 @@ void rjmcmc_building_footprint_extraction_thread::begin(unsigned int dump, unsig
 	wxMutexGuiEnter();
 	{
 		wxLogMessage( wxString( m_out.str().c_str(),*wxConvCurrent ).GetData());
+		m_frame->m_chart_frame->begin(dump,save);
 	}
 	wxMutexGuiLeave();
 	m_out.str("");
@@ -86,6 +88,7 @@ bool rjmcmc_building_footprint_extraction_thread::iterate(unsigned int i, double
 		wxMutexGuiEnter();
 		{
 			m_layer << config;
+			m_frame->m_chart_frame->iterate(i,t,config,sample);
 			m_frame->Refresh();
 			wxLogMessage( wxString( m_out.str().c_str(),*wxConvCurrent ).GetData());
 		}
