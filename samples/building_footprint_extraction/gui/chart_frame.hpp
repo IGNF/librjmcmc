@@ -19,7 +19,7 @@ public:
 	void begin(unsigned int dump, unsigned int save);
 	void iterate(unsigned int i, double t, const configuration& config, const sampler& sample);
 private:
-	VectorDataset *m_temperature, *m_energy;
+	VectorDataset *m_dataset[2];
 };
 
 #endif /* CHART_FRAME_H_ */

@@ -65,6 +65,8 @@ public:
 	 * @param maxValue maximal data value
 	 */
 	void SetFixedBounds(double minValue, double maxValue);
+	void SetFixedMin(double minValue);
+	void SetFixedMax(double maxValue);
 
 protected:
 	virtual bool AcceptDataset(Dataset *dataset);
@@ -101,7 +103,7 @@ private:
 
 	bool m_hasLabels;
 
-	bool m_fixedBounds;
+	bool m_fixedMin, m_fixedMax;
 };
 
 #endif /*NUMBERAXIS_H_*/

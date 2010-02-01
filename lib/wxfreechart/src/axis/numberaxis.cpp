@@ -59,7 +59,8 @@ NumberAxis::NumberAxis(AXIS_LOCATION location)
 
 	m_intValues = false;
 	m_hasLabels = false;
-	m_fixedBounds = false;
+	m_fixedMin = false;
+	m_fixedMax = false;
 }
 
 NumberAxis::~NumberAxis()
@@ -72,11 +73,28 @@ bool NumberAxis::AcceptDataset(Dataset *WXUNUSED(dataset))
 	return true;
 }
 
+void NumberAxis::SetFixedMax(double maxValue)
+{
+	m_maxValue = maxValue;
+	m_fixedMax = true;
+	UpdateTickValues();
+	FireBoundsChanged();
+}
+
+void NumberAxis::SetFixedMin(double minValue)
+{
+	m_minValue = minValue;
+	m_fixedMin = true;
+	UpdateTickValues();
+	FireBoundsChanged();
+}
+
 void NumberAxis::SetFixedBounds(double minValue, double maxValue)
 {
 	m_minValue = minValue;
 	m_maxValue = maxValue;
-	m_fixedBounds = true;
+	m_fixedMin = true;
+	m_fixedMax = true;
 
 	UpdateTickValues();
 	FireBoundsChanged();
@@ -84,7 +102,7 @@ void NumberAxis::SetFixedBounds(double minValue, double maxValue)
 
 void NumberAxis::UpdateBounds()
 {
-	if (m_fixedBounds) {
+	if (m_fixedMin && m_fixedMax) {
 		return ; // bounds are fixed, so don't update
 	}
 
@@ -93,16 +111,13 @@ void NumberAxis::UpdateBounds()
 	for (size_t n = 0; n < m_datasets.Count(); n++) {
 		bool verticalAxis = IsVertical();
 
-		double minValue = m_datasets[n]->GetMinValue(verticalAxis);
-		double maxValue = m_datasets[n]->GetMaxValue(verticalAxis);
-
-		if (n == 0) {
-			m_minValue = minValue;
-			m_maxValue = maxValue;
+		if(!m_fixedMin) {
+			double minValue = m_datasets[n]->GetMinValue(verticalAxis);
+			m_minValue = (n==0)? minValue : wxMin(m_minValue, minValue);
 		}
-		else {
-			m_minValue = wxMin(m_minValue, minValue);
-			m_maxValue = wxMax(m_maxValue, maxValue);
+		if(!m_fixedMax) {
+			double maxValue = m_datasets[n]->GetMaxValue(verticalAxis);
+			m_maxValue = (n==0)? maxValue : wxMin(m_maxValue, maxValue);
 		}
 	}
 
