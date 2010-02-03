@@ -6,6 +6,8 @@
 #include "wx/xy/xylinerenderer.h"
 #include "wx/xy/xyplot.h"
 
+#include <iostream>
+
 chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& charttitle, long style, const wxPoint& pos, const wxSize& size) :
 	wxDialog(parent, id, charttitle, pos, size, style)
 {
@@ -30,12 +32,13 @@ chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& chartt
 	// link axes and datasets
 	for(unsigned int i=0; i<2; ++i) {
 		m_dataset[i] = new VectorDataset;
+                std::cout << i << "\n";
 		XYLineStepRenderer *renderer = new XYLineStepRenderer();
 		renderer->SetSerieColour(0, &color[i]);
 		m_dataset[i]->SetRenderer(renderer);
 		plot->AddDataset(m_dataset[i]);
 		NumberAxis *axis = new NumberAxis(location[i]);
-		axis->SetTitle(wxT(title[i]));
+                axis->SetTitle(wxString(title[i], *wxConvCurrent));
 		axis->SetLabelTextColour(color[i]);
 		axis->SetTitleColour(color[i]);
 		plot->AddAxis(axis);
@@ -59,8 +62,8 @@ chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& chartt
 }
 
 void chart_frame::begin(unsigned int dump, unsigned int save) {
-	m_dataset[0]->Clear();
-	m_dataset[1]->Clear();
+        m_dataset[0]->Clear();
+        m_dataset[1]->Clear();
 }
 
 void chart_frame::iterate(unsigned int i, double t, const configuration& config, const sampler& sample) {
