@@ -15,6 +15,8 @@
 #include "rjmcmc_building_footprint_extraction_thread.hpp"
 #include "chart_frame.hpp"
 
+typedef building_footprint_extraction_parameters         param;
+
 enum
 {
 	ID_BUTTON_GO,
@@ -87,11 +89,9 @@ rjmcmc_building_footprint_extraction_frame::rjmcmc_building_footprint_extraction
 
 	m_dockManager.Update();
 	m_parameters_frame = new parameters_frame(this);
-	m_parameters_frame->SetModal(false);
 	m_parameters_frame->Show();
 
 	m_chart_frame = new chart_frame(this);
-	m_chart_frame->SetModal(false);
 	m_chart_frame->Show();
 }
 
@@ -101,68 +101,106 @@ rjmcmc_building_footprint_extraction_frame::~rjmcmc_building_footprint_extractio
 	m_chart_frame->Destroy();
 }
 
+struct param_frame_reader {
+	param::const_iterator m_it;
+	param_frame_reader(param::const_iterator it) : m_it(it) {}
+	typedef void result_type;
+	template<typename T> void operator()(T& t) const {
+		wxTextCtrl *textctrl = m_it->control<wxTextCtrl>();
+		std::istringstream iss(textctrl->GetLineText(0).fn_str());
+		iss >> t;
+		std::ostringstream oss;
+		oss << t;
+		textctrl->SetValue(wxString(oss.str().c_str(), *wxConvCurrent));		
+	}
+	void operator() (bool& b) const {
+		b = m_it->control<wxCheckBox>()->GetValue();
+	}
+};
+
 void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& event)
 {
-	m_buttonGo->Disable();
-	m_buttonStop->Enable();
-	m_parameters_frame->Disable();
-	std::map< std::string, std::string > parameters;
-	for (unsigned int i=0; i<m_parameters_frame->m_parameters.size(); ++i)
-	{
-		parameters[std::string( m_parameters_frame->m_parameters[i].first->GetLabel().fn_str() )]
-			=  std::string( m_parameters_frame->m_parameters[i].second->GetLineText(0).fn_str() );
+	param *p=param::Instance();
+	for(param::iterator it = p->begin(); it!=p->end(); ++it)
+		boost::apply_visitor(param_frame_reader(it),it->value());
+	
+	wxPoint p0,p1;
+	boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
+	if(ghost->m_drawRectangleSelection) {
+		wxRect rect = ghost->GetRectangle();
+		p0 = rect.GetTopLeft();
+		p1 = rect.GetBottomRight();
+	} else {
+		p0.x = param::Instance()->get<int>("xmin");
+		p0.y = param::Instance()->get<int>("ymin");
+		p1.x = param::Instance()->get<int>("xmax");
+		p1.y = param::Instance()->get<int>("ymax");
+		if(p0.x>p1.x) std::swap(p0.x,p1.x);
+		if(p0.y>p1.y) std::swap(p0.y,p1.y);
 	}
-	
-	// Back up stuffs erased in parse_string_map ...
-	bool back_up_do_save = building_footprint_extraction_parameters::Instance()->m_do_save;
-	
-	building_footprint_extraction_parameters::Instance()->parse_string_map(parameters);
-	
-	// Restore backuped stuffs
-	building_footprint_extraction_parameters::Instance()->m_do_save = back_up_do_save;
-	// Check if a rectangle is defined for the area to process	
-	const VectorLayerGhost &ghost = PanelManager::Instance()->GetPanelsList()[0]->GetVectorLayerGhost();
-	wxPoint p1 = ghost.m_rectangleSelection.first;
-	wxPoint p2 = ghost.m_rectangleSelection.second;
-	if ( p1.x>0 && p2.x>0 && p1.y>0 && p2.y>0 /* && TODO */ )
-	{
-	  building_footprint_extraction_parameters::Instance()->m_running_min_x = std::min(p1.x,p2.x);
-	  building_footprint_extraction_parameters::Instance()->m_running_max_x = std::max(p1.x,p2.x);
-	  building_footprint_extraction_parameters::Instance()->m_running_min_y = std::min(p1.y,p2.y);
-	  building_footprint_extraction_parameters::Instance()->m_running_max_y = std::max(p1.y,p2.y);
-	}
-	
-	std::cout << building_footprint_extraction_parameters::Instance()->m_running_min_x << "\n";
-	std::cout << building_footprint_extraction_parameters::Instance()->m_running_min_y << "\n";
-	std::cout << building_footprint_extraction_parameters::Instance()->m_running_max_x << "\n";
-	std::cout << building_footprint_extraction_parameters::Instance()->m_running_max_y << "\n";
-	
-	// Test if input file exists
-	std::ifstream test( building_footprint_extraction_parameters::Instance()->m_input_data_file_path.c_str() , std::ios::in );
-	if ( !test.good() )
-	{
-	  std::ostringstream oss;
-	  oss << "File " << building_footprint_extraction_parameters::Instance()->m_input_data_file_path << " does not exist !";
-	  wxString message( oss.str().c_str() , *wxConvCurrent );
-	  ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
-	  // Restore interface ...
-	  OnThreadEnd();
-	  return;
-	}
-
 	try
 	{
-		m_panel->AddLayer( ImageLayer::CreateImageLayer(building_footprint_extraction_parameters::Instance()->m_input_data_file_path) );
-		Layer::ptrLayerType layer = VectorLayer::CreateVectorLayer(std::string("Buildings") );
-		m_panel->AddLayer(layer);
-		layer->PolygonsRingsColour(wxColour(255,255,0));
-		layer->PolygonsInsideStyle( wxTRANSPARENT );
-		layer->PolygonsRingsWidth(3);
-		layer->TextsVisibility(false);
+		LayerControl::const_iterator it  = m_panel->GetLayerControl()->begin();
+		LayerControl::const_iterator end = m_panel->GetLayerControl()->end();
+		Layer::ptrLayerType ilayer;
+		for(;it!=end && !ilayer;++it) {
+			if(dynamic_cast<ImageLayer *>(&**it)) ilayer=*it;
+		}
+		if(!ilayer) {
+			boost::filesystem::path file;
+			param::Instance()->get("input",file);
+			ilayer = ImageLayer::CreateImageLayer(file.string());
+			if ( !ilayer )
+			{
+			  std::ostringstream oss;
+			  oss << "File " << file << " does not exist !";
+			  wxString message( oss.str().c_str() , *wxConvCurrent );
+			  ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
+			  OnThreadEnd();
+			  return;
+			}
+		}
+		p0 = ilayer->ToLocal(p0);
+		p1 = ilayer->ToLocal(p1);
+		Layer::ptrLayerType vlayer = VectorLayer::CreateVectorLayer(std::string("Buildings") );
+		Layer::ptrLayerType clayer = ilayer->crop(p0.x,p0.y,p1.x,p1.y);
+		if(!clayer) {
+			  std::ostringstream oss;
+			  oss << "Cropping outside the bounds of " << ilayer->Filename() << " !";
+			  wxString message( oss.str().c_str() , *wxConvCurrent );
+			  ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
+			  OnThreadEnd();
+			  return;
+		}
+		m_panel->AddLayer(clayer);
+		m_panel->AddLayer(vlayer);
+		vlayer->TranslationX(p0.x+ilayer->TranslationX());
+		vlayer->TranslationY(p0.y+ilayer->TranslationY());
+		vlayer->ZoomFactor  (     ilayer->ZoomFactor  ());
+		clayer->TranslationX(p0.x+ilayer->TranslationX());
+		clayer->TranslationY(p0.y+ilayer->TranslationY());
+		clayer->ZoomFactor  (     ilayer->ZoomFactor  ());
+		vlayer->PolygonsRingsColour(wxColour(255,255,0));
+		vlayer->PolygonsInsideStyle( wxTRANSPARENT );
+		vlayer->PolygonsRingsWidth(3);
+		vlayer->TextsVisibility(false);
+		
+		boost::filesystem::path file(clayer->Filename());
+		param::Instance()->set("input",file);
+		param::Instance()->set("xmin",p0.x);
+		param::Instance()->set("ymin",p0.y);
+		param::Instance()->set("xmax",p1.x);
+		param::Instance()->set("ymax",p1.y);
+		
+		m_parameters_frame->Refresh();
 
-		m_thread = new rjmcmc_building_footprint_extraction_thread(layer, this);
+		m_thread = new rjmcmc_building_footprint_extraction_thread(clayer,vlayer,this);
+
 		m_thread->Create();
 		m_thread->Run();
+		m_buttonGo->Disable();
+		m_buttonStop->Enable();
+		m_parameters_frame->Disable();
 	}
 	catch( const exception &e )
 	{

@@ -9,7 +9,7 @@
 #include <iostream>
 
 chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& charttitle, long style, const wxPoint& pos, const wxSize& size) :
-	wxDialog(parent, id, charttitle, pos, size, style)
+	wxFrame(parent, id, charttitle, pos, size, style)
 {
 	wxBoxSizer *test_sizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer* inner_sizer = new wxBoxSizer(wxVERTICAL);
@@ -32,7 +32,6 @@ chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& chartt
 	// link axes and datasets
 	for(unsigned int i=0; i<2; ++i) {
 		m_dataset[i] = new VectorDataset;
-                std::cout << i << "\n";
 		XYLineStepRenderer *renderer = new XYLineStepRenderer();
 		renderer->SetSerieColour(0, &color[i]);
 		m_dataset[i]->SetRenderer(renderer);
@@ -61,9 +60,14 @@ chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& chartt
 	SetSizer(test_sizer);
 }
 
-void chart_frame::begin(unsigned int dump, unsigned int save) {
-        m_dataset[0]->Clear();
-        m_dataset[1]->Clear();
+void chart_frame::begin(unsigned int dump, unsigned int save, double t, const configuration& config) {
+	for(unsigned int i=0; i<2; ++i) {
+		m_dataset[i]->SetX0(0.);
+		m_dataset[i]->SetScaleX(dump);
+		m_dataset[i]->Clear();
+	}
+	m_dataset[0]->Add(config.unary_energy() + config.binary_energy());
+	m_dataset[1]->Add(t);
 }
 
 void chart_frame::iterate(unsigned int i, double t, const configuration& config, const sampler& sample) {

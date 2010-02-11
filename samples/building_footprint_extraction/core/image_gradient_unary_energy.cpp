@@ -16,9 +16,7 @@ double image_gradient_unary_energy::operator()(const Rectangle_2 &n) const
 	return res;
 }
 
-
-
-image_gradient_unary_energy::image_gradient_unary_energy(double default_energy, const std::string& file, const bbox_2& bbox, double sigmaD, unsigned int step) :
+image_gradient_unary_energy::image_gradient_unary_energy(double default_energy, const std::string& file, const Iso_Rectangle_2& bbox, double sigmaD, unsigned int step) :
 	m_defaultEnergy(default_energy), 
 	m_image(boost::shared_ptr<rjmcmc::gradient_image>(new rjmcmc::gradient_image))
 {

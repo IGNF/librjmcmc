@@ -3,7 +3,6 @@
 
 #include "rjmcmc/random.hpp"
 #include "geometry/geometry.h"
-#include "geometry/bbox.hpp"
 
 template< typename IsValid >
 class generator {
@@ -18,11 +17,11 @@ public:
 	typedef double result_type;
 
 	result_type operator()(Rectangle_2 &r) const {
-		const bbox_2& bbox = m_is_valid.bbox();
-		float x0 = bbox.min_point()[0];
-		float y0 = bbox.min_point()[1];
-		float dx = bbox.max_point()[0]-x0;
-		float dy = bbox.max_point()[1]-y0;
+		const Iso_Rectangle_2& bbox = m_is_valid.bbox();
+		float x0 = bbox.min().x();
+		float y0 = bbox.min().y();
+		float dx = bbox.max().x()-x0;
+		float dy = bbox.max().y()-y0;
 		do {
 			Point_2 p(x0+dx*m_die(), y0+dy*m_die());
 			Vector_2 v(0.5*dx*m_die(), 0.5*dy*m_die());
@@ -32,11 +31,11 @@ public:
 	}
 
 	result_type operator()(Circle_2 &c) const {
-		const bbox_2& bbox = m_is_valid.bbox();
-		float x0 = bbox.min_point()[0];
-		float y0 = bbox.min_point()[1];
-		float dx = bbox.max_point()[0]-x0;
-		float dy = bbox.max_point()[1]-y0;
+		const Iso_Rectangle_2& bbox = m_is_valid.bbox();
+		float x0 = bbox.min().x();
+		float y0 = bbox.min().y();
+		float dx = bbox.max().x()-x0;
+		float dy = bbox.max().y()-y0;
 		double radius = 0.5*CGAL::min(dx,dy);
 		do {
 			Point_2 p(x0+dx*m_die(), y0+dy*m_die());

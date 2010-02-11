@@ -3,41 +3,41 @@
 #include <boost/gil/extension/io/tiff_dynamic_io.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
 
-template<typename T> inline double Add1CirclePoints(const T& view, double cx, double cy, double dx, double dy)
+template<typename T> void Add1CirclePoints(const T& view, double cx, double cy, double dx, double dy, double d, double & res, double & w)
 {
-	rjmcmc::gradient_image::pixel_t grad = view((int) (cx + dx), (int) (cy + dy) );
-	return boost::gil::at_c<0>(grad) * dx + boost::gil::at_c<1>(grad) * dy;
+	int i = (int) (cx + dx);
+	int j = (int) (cy + dy);
+	if(i<0 || j<0 || i>=view.width() || j>=view.height()) return;
+	rjmcmc::gradient_image::pixel_t grad = view(i,j);
+	res += boost::gil::at_c<0>(grad) * dx + boost::gil::at_c<1>(grad) * dy;
+	w   += d;
 }
 
 template<typename T> void Add4CirclePoints(const T& view, double cx, double cy, double d, double & res, double & w)
 {
-	w   += 4*d;
-
-	res += Add1CirclePoints(view, cx, cy, 0, d);
-	res += Add1CirclePoints(view, cx, cy, 0,-d);
-	res += Add1CirclePoints(view, cx, cy, d, 0);
-	res += Add1CirclePoints(view, cx, cy,-d, 0);
+	Add1CirclePoints(view, cx, cy, 0, d, d, res, w);
+	Add1CirclePoints(view, cx, cy, 0,-d, d, res, w);
+	Add1CirclePoints(view, cx, cy, d, 0, d, res, w);
+	Add1CirclePoints(view, cx, cy,-d, 0, d, res, w);
 }
 
 template<typename T> void Add8CirclePoints(const T& view, double cx, double cy, double dx, double dy, double & res, double & w)
 {
-	w   += 8*sqrt(dx*dx+dy*dy);
-
-	res += Add1CirclePoints(view, cx, cy, dx, dy);
-	res += Add1CirclePoints(view, cx, cy,-dx, dy);
-	res += Add1CirclePoints(view, cx, cy,-dx,-dy);
-	res += Add1CirclePoints(view, cx, cy, dx,-dy);
-
-	res += Add1CirclePoints(view, cx, cy, dy, dx);
-	res += Add1CirclePoints(view, cx, cy,-dy, dx);
-	res += Add1CirclePoints(view, cx, cy,-dy,-dx);
-	res += Add1CirclePoints(view, cx, cy, dy,-dx);
+	double d = sqrt(dx*dx+dy*dy);
+	Add1CirclePoints(view, cx, cy, dx, dy, d, res, w);
+	Add1CirclePoints(view, cx, cy,-dx, dy, d, res, w);
+	Add1CirclePoints(view, cx, cy,-dx,-dy, d, res, w);
+	Add1CirclePoints(view, cx, cy, dx,-dy, d, res, w);
+	Add1CirclePoints(view, cx, cy, dy, dx, d, res, w);
+	Add1CirclePoints(view, cx, cy,-dy, dx, d, res, w);
+	Add1CirclePoints(view, cx, cy,-dy,-dx, d, res, w);
+	Add1CirclePoints(view, cx, cy, dy,-dx, d, res, w);
 }
 
 double rjmcmc::gradient_image::integrated_flux(const Circle_2 &c) const
 {
-	double cx = c.center().x();
-	double cy = c.center().y();
+	double cx = c.center().x() - m_bbox.min().x();
+	double cy = c.center().y() - m_bbox.min().y();
 	double r  = c.radius();
 	double res = 0., w = 0.;
 	double dx = 0;
@@ -55,20 +55,29 @@ double rjmcmc::gradient_image::integrated_flux(const Circle_2 &c) const
 		++dx;
 		Add8CirclePoints(m_gradients._view, cx, cy, dx, dy, res, w);
 	}
+	if(w==0) return 0.;
 	return (res * c.perimeter()) / w;
 }
 
 #include "geometry/Segment_2_iterator.h"
-double rjmcmc::gradient_image::integrated_flux(const Segment_2& s) const
+double rjmcmc::gradient_image::integrated_flux(const Segment_2& s0) const
 {
 	using namespace boost::gil;
-	Segment_2_iterator it(s);
+	Segment_2 s(s0);
+	if(!CGAL::clip(m_bbox,s)) return 0;
+	CGAL::Segment_2_iterator<K> it(s);
+
+	int x0 = (int)m_bbox.min().x();
+	int x1 = (int)m_bbox.max().x();
+	int y0 = (int)m_bbox.min().y();
+	int y1 = (int)m_bbox.max().y();
 
 	typedef image_t::view_t::xy_locator xy_locator;
 	xy_locator loc_grad = m_gradients._view.xy_at(
-		(xy_locator::x_coord_t) s.source().x(),
-		(xy_locator::y_coord_t) s.source().y()
+		(xy_locator::x_coord_t) (it.x()-x0),
+		(xy_locator::y_coord_t) (it.y()-y0)
 	);
+
 	point2<std::ptrdiff_t> movement[2] = {
 		point2<std::ptrdiff_t> (it.step(0), 0),
 		point2<std::ptrdiff_t> (0, it.step(1))
@@ -76,10 +85,12 @@ double rjmcmc::gradient_image::integrated_flux(const Segment_2& s) const
 	float gradient_sum[2] =	{ 0., 0. };
 	for (; !it.end() ; ++it)
 	{
-		float length = it.length();
-		const dev2n32F_pixel_t& grad = *loc_grad;
-		gradient_sum[0] += length * at_c<0> (grad);
-		gradient_sum[1] += length * at_c<1> (grad);
+		if(it.x()>=x0 && it.x()<x1 && it.y()>=y0 && it.y()<y1) {
+			float length = it.length();
+			const dev2n32F_pixel_t& grad = *loc_grad;
+			gradient_sum[0] += length * at_c<0> (grad);
+			gradient_sum[1] += length * at_c<1> (grad);
+		}
 		loc_grad += movement[it.axis()];
 	}
 
@@ -97,6 +108,7 @@ double rjmcmc::gradient_image::integrated_flux(const Segment_2& s) const
 typedef boost::mpl::vector<
 	boost::gil::gray8_image_t, 
 	boost::gil::gray16_image_t,
+	boost::gil::gray16s_image_t,
 	boost::gil::gray32_image_t,
 	boost::gil::gray32F_image_t,
 	boost::gil::gray64F_image_t > my_images_t;
@@ -180,28 +192,22 @@ void rjmcmc::gradient_image::load(const std::string &file, double sigmaD, unsign
 {
 	my_any_image_t img;
 	tiff_read_image(file, img);
-
-	bbox_2::point_type pmin, pmax;
-	pmin[0] = pmin[1] = 0;
-	pmax[0] = img.width();
-	pmax[1] = img.height();
-	m_bbox = bbox_2(pmin, pmax);
-
+	m_bbox = Iso_Rectangle_2(0,0,img.width(),img.height());
 	my_any_const_view_t v = const_view(img);
 	init(m_gradients, v, sigmaD);
 }
 
-void rjmcmc::gradient_image::load(const std::string &file, const bbox_2& bbox, double sigmaD, unsigned int step)
+void rjmcmc::gradient_image::load(const std::string &file, const Iso_Rectangle_2& bbox, double sigmaD, unsigned int step)
 {
 	my_any_image_t img;
 	tiff_read_image(file, img);
 
-	int width  = (int) (bbox.max_point()[0]-bbox.min_point()[0]);
-	int height = (int) (bbox.max_point()[1]-bbox.min_point()[1]);
-	m_bbox = bbox;
-
-	my_any_const_view_t v = subimage_view(const_view(img),
-		(int) bbox.min_point()[0], (int) bbox.min_point()[1], width, height );
+	int x0 = std::max((int) bbox.min().x(),0);
+	int x1 = std::min((int) bbox.max().x(),(int) img.width());
+	int y0 = std::max((int) bbox.min().y(),0);
+	int y1 = std::min((int) bbox.max().y(),(int) img.height());
+	m_bbox = Iso_Rectangle_2(x0,y0,x1,y1);
+	my_any_const_view_t v = subimage_view(const_view(img),x0,y0,x1-x0,y1-y0);
 	init(m_gradients, v, sigmaD);
 }
 

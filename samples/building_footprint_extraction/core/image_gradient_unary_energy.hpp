@@ -2,7 +2,6 @@
 #define IMAGE_GRADIENT_UNARY_ENERGY_HPP_
 
 #include "geometry/geometry.h"
-#include "geometry/bbox.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace rjmcmc { class gradient_image; };
@@ -15,7 +14,7 @@ public:
 	result_type operator()(const Circle_2 &c) const;
 
 	image_gradient_unary_energy(double default_energy, const std::string& file, double sigmaD=1, unsigned int step=0);
-	image_gradient_unary_energy(double default_energy, const std::string& file, const bbox_2& bbox, double sigmaD=1, unsigned int step=0);
+	image_gradient_unary_energy(double default_energy, const std::string& file, const Iso_Rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
 
 private:
 	boost::shared_ptr<rjmcmc::gradient_image> m_image;

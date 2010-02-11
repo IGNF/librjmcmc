@@ -3,7 +3,6 @@
 
 #include <boost/gil/extension/io/tiff_dynamic_io.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
-#include "geometry/bbox.hpp"
 #include "geometry/geometry.h"
 
 namespace rjmcmc {
@@ -17,11 +16,11 @@ public:
 	double integrated_flux(const Circle_2  &c) const;
 
 	void load(const std::string &file, double sigmaD=1, unsigned int step=0);
-	void load(const std::string &file, const bbox_2& bbox, double sigmaD=1, unsigned int step=0); // subimage loading
+	void load(const std::string &file, const Iso_Rectangle_2& bbox, double sigmaD=1, unsigned int step=0); // subimage loading
 
 private:
 	image_t m_gradients;
-	bbox_2 m_bbox;
+	Iso_Rectangle_2 m_bbox;
 };
 };
 

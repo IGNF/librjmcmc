@@ -87,8 +87,14 @@ public:
 		DatasetChanged();
 	}
 
+	void SetScaleX(double s) { m_scaleX = s; DatasetChanged(); }
+	double GetScaleX() const { return m_scaleX; }
+	void SetX0(double x) { m_X0 = x; DatasetChanged(); }
+	double GetX0() const { return m_X0; }
+
 private:
 	wxDoubleArray m_values;
+	double m_scaleX, m_X0;
 };
 
 #endif /*VECTORDATASET_H_*/

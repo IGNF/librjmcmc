@@ -50,23 +50,23 @@ typedef rjmcmc::sampler<birth_death_kernel,modification_kernel> sampler;
 template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& visitor) {
 	param *p = param::Instance();
 
-	bbox_2::point_type pmin, pmax;
-	pmin[0] = p->m_running_min_x;
-	pmin[1] = p->m_running_min_y;
-	pmax[0] = p->m_running_max_x;
-	pmax[1] = p->m_running_max_y;
-	bbox_2 bbox(pmin, pmax);
+	Iso_Rectangle_2 bbox(
+		p->get<int>("xmin"),
+		p->get<int>("ymin"),
+		p->get<int>("xmax"),
+		p->get<int>("ymax")
+	);
 
 	// energies
 	unary_energy e1(
-		p->m_individual_energy,
-		p->m_input_data_file_path,
+		p->get<double>("energy"),
+		p->get<boost::filesystem::path>("input").string(),
 		bbox,
-		p->m_sigma_d,
-		p->m_subsampling
+		p->get<double>("sigmaD"),
+		p->get<int>("subsampling")
 	);
 	binary_energy e2(
-		p->m_ponderation_surface_intersection
+		p->get<double>("surface")
 	);
 
 	// empty initial configuration
@@ -74,39 +74,41 @@ template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& vi
 
 	// sampler objects
 	is_valid valid(bbox,
-		p->m_rectangle_minimal_size,
-		p->m_rectangle_maximal_ratio
+		p->get<double>("minsize"),
+		p->get<double>("maxratio")
 	);
 
 	generator_ birth(valid);
 	modifier_  modif(valid);
 
 	birth_kernel        kbirth(birth);
-	death_kernel        kdeath(      p->m_poisson);
-	modification_kernel kmodif(modif,p->m_poisson);
+	death_kernel        kdeath(      p->get<double>("poisson"));
+	modification_kernel kmodif(modif,p->get<double>("poisson"));
 
 	birth_death_kernel kbirthdeath(
 		kbirth, kdeath,
-		p->m_birth_probability,
-		p->m_death_probability
+		p->get<double>("pbirth"),
+		p->get<double>("pdeath")
 	);
 
 	sampler sample( kbirthdeath, kmodif );
 
-	// visitation initialization
-	visitor.begin(
-		p->m_nb_iterations_dump,
-		p->m_nb_iterations_save
-	);
 
 	// simulated annealing
 	temperature temp(
-		p->m_initial_temperature,
-		p->m_decrease_coefficient
+		p->get<double>("temp"),
+		p->get<double>("deccoef")
 	);
-	unsigned int iterations = p->m_nb_iterations;
+	// visitation initialization
+	visitor.begin(
+		p->get<int>("nbdump"),
+		p->get<int>("nbsave"),
+		*temp,
+		config
+	);
 
 	// main loop
+	unsigned int iterations = p->get<int>("nbiter");
 	for (unsigned int i=1; i<=iterations; ++i, ++temp)
 	{
 		sample(config,*temp);

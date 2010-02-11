@@ -3,7 +3,7 @@
 
 int main(int argc , char** argv)
 {
-	if (!building_footprint_extraction_parameters::Instance()->parse_command_line(argc, argv))
+	if (!building_footprint_extraction_parameters::Instance()->parse(argc, argv))
 		return -1;
 
 	rjmcmc::ostream_visitor<sampler> visitor(std::cout);

@@ -18,7 +18,7 @@ private:
 			my_argv[i] = new char[mystr.size()+1];
 			strcpy(my_argv[i], mystr.To8BitData());
 		}
-		building_footprint_extraction_parameters::Instance()->parse_command_line(argc,my_argv);
+		if(!building_footprint_extraction_parameters::Instance()->parse(argc,my_argv)) return false;
 		
 		m_frame = new rjmcmc_building_footprint_extraction_frame((wxFrame *)NULL, wxID_ANY, _("RJMCMC building footprint extraction") );
 		m_frame->Show();

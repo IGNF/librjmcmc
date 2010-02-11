@@ -77,20 +77,80 @@ namespace internal {
   public:
     typedef Simple_cartesian<T> R;
     Segment_2(const Point_2<T>& p, const Point_2<T>& q) { p_[0]=p; p_[1]=q; }
-    inline Point_2<T> source() const { return p_[0]; }
-    inline Point_2<T> target() const { return p_[1]; }
+    inline const Point_2<T>& source() const { return p_[0]; }
+    inline const Point_2<T>& target() const { return p_[1]; }
   };
 
   template <typename T> inline Point_2<T> operator+(Origin, Vector_2<T>& v) { return Point_2<T>(v.x(),v.y()); }
-/*
-  class Iso_rectangle_2 {
-    Point_2 p_[2];
+
+  template <typename T> class Iso_Rectangle_2 {
+    Point_2<T> p_[2];
   public:
+    Iso_Rectangle_2() {}
+    Iso_Rectangle_2(const Point_2<T>& p, const Point_2<T>& q) {
+      p_[0]=p; p_[1]=q;
+    }
+    Iso_Rectangle_2(T x0, T y0, T x1, T y1) {
+      p_[0]=Point_2<T>(x0,y0); p_[1]=Point_2<T>(x1,y1);
+    }
+    inline const Point_2<T>& min() const { return p_[0]; }
+    inline const Point_2<T>& max() const { return p_[1]; }
+    inline const Point_2<T>& vertex(int i) const { return p_[i%2]; }
+    inline const Point_2<T>& operator[](int i) const { return p_[i%2]; }
+    T area() const { return (p_[1].x()-p_[0].x())*(p_[1].y()-p_[0].y()); }
+
+    inline bool is_degenerate () const { return (p_[1].x()==p_[0].x()) || (p_[1].y()==p_[0].y()); }
+
+    Bounded_side bounded_side ( const Point_2<T>& p) const {
+      if(p.x()<p_[0].x() || p.x()>p_[1].x() || p.y()<p_[0].y() || p.y()>p_[1].y())
+        return ON_UNBOUNDED_SIDE;
+      if(p.x()>p_[0].x() && p.x()<p_[1].x() && p.y()>p_[0].y() && p.y()<p_[1].y())
+        return ON_BOUNDED_SIDE;
+      return ON_BOUNDARY;
+    }
+
+    inline bool has_on_boundary ( const Point_2<T>& p) const {
+      return bounded_side(p)==ON_BOUNDARY;
+    }
+    inline bool has_on_bounded_side ( const Point_2<T>& p) const {
+      return (p.x()>p_[0].x() && p.x()<p_[1].x() && p.y()>p_[0].y() && p.y()<p_[1].y());
+    }
+    inline bool has_on_unbounded_side ( const Point_2<T>& p) const {
+      return (p.x()<p_[0].x() || p.x()>p_[1].x() || p.y()<p_[0].y() || p.y()>p_[1].y());
+    }
   };
-*/
-}
 
+};
 
+  template<typename T> bool clip(
+    const internal::Iso_Rectangle_2<T>& r, internal::Segment_2<T>& s)
+  {
+    const internal::Point_2<T>& p(s.source());
+    const internal::Point_2<T>& q(s.target());
+    internal::Vector_2<T> d(q-p);
+    T a[] = { p.x(), p.y() };
+    T b[] = { q.x(), q.y() };
+    T tmin = 0, tmax = 1;
+    for(int i=0; i<2; ++i) {
+      if(d[i]==0 && (p[i]<r.min()[i] || p[i]>r.max()[i])) {
+        return false;
+      } else {
+        int j = 1-i, k = (d[i] > 0);
+        int l = 1-k;
+	T m[] = {r.min()[i], r.max()[i]}, t;
+        t = (m[l]-p[i])/d[i];
+        if(t>tmin) { tmin=t; a[i]=m[l];  a[j]=p[j]+t*d[j]; } // a=p+td
+        t = (m[k]-p[i])/d[i];
+        if(t<tmax) { tmax=t; b[i]=m[k];  b[j]=p[j]+t*d[j]; } // b=p+td
+        if(tmax <= tmin) return false;
+      }
+    }
+    internal::Point_2<T> pa(a[0],a[1]);
+    internal::Point_2<T> pb(b[0],b[1]);
+    s = internal::Segment_2<T>(pa,pb);
+    return true;
+  }
+ 
   template < typename T >
   std::istream & operator>>(std::istream &is, internal::Point_2<T> &p)
   {
@@ -174,6 +234,7 @@ struct Simple_cartesian {
   typedef internal::Vector_2<T> Vector_2;
   typedef internal::Segment_2<T> Segment_2;
   typedef internal::Line_2<T> Line_2;
+  typedef internal::Iso_Rectangle_2<T> Iso_Rectangle_2;
 };
 
 CGAL_END_NAMESPACE

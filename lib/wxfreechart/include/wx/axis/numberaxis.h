@@ -86,7 +86,7 @@ protected:
 
 	virtual void GetDataBounds(double &minValue, double &maxValue);
 
-  size_t GetLabelCount() const;
+	size_t GetLabelCount() const;
 
 private:
 	void UpdateTickValues();

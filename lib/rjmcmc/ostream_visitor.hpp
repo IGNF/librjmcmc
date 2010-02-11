@@ -22,7 +22,7 @@ private:
 public:
 	ostream_visitor(std::ostream& out) : m_out(out) {}
 
-	void begin(unsigned int dump, unsigned int save) {
+	void begin(int dump, int save, double t, const configuration& config) {
 		m_dump = dump;
 		m_save = save;
 		for (unsigned int i=0; i<kernel_size; ++i) m_accepted[i] = m_proposed[i] = 0;
@@ -46,7 +46,7 @@ public:
 		m_proposed[sampler.kernel_id()]++;
 		if( sampler.accepted() ) m_accepted[sampler.kernel_id()]++;
 
-		if (i % m_dump == 0 && m_dump!=0)
+		if (m_dump && (i % m_dump == 0))
 		{
 			m_out << std::setw(w) << i;
 			m_out << std::setw(w) << configuration.size();

@@ -228,18 +228,16 @@ public:
   inline bool is_degenerate() const { return is_zero(r*n.squared_length()); }
 
 /* Access methods */
-/*
-  Bbox_2 bbox() const {
-    std::pair<double,double> cx = to_interval(c.x());
-    std::pair<double,double> cy = to_interval(c.y());
-    double nx = to_interval(abs(n.x())).second;
-    double ny = to_interval(abs(n.y())).second;
-    double rs = to_interval(abs(r)).second;
-    double dx = nx+rs*ny;
-    double dy = ny+rs*nx;
-    return Bbox_2(cx.first-dx,cy.first-dy,cx.second+dx,cy.second+dy);
+
+  Iso_Rectangle_2 bbox() const {
+    FT nx = abs(n.x());
+    FT ny = abs(n.y());
+    FT rs = abs(r);
+    FT dx = nx+rs*ny;
+    FT dy = ny+rs*nx;
+    return Iso_Rectangle_2(c.x()-dx,c.y()-dy,c.x()+dx,c.y()+dy);
   }
-*/
+
   // returns the positive scale so that q in on the boundary of "scaled this"
   // bounded_side = sign(scale-1)
   FT scale(const Point_2& q) const {

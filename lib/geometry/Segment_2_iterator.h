@@ -12,22 +12,23 @@ template<typename R_> class Segment_2_iterator {
   typedef typename R::Segment_2 Segment_2;
   typedef typename R::FT        FT;
 public:
-  // rasterize the segment s on a pixel grid [i-f,i+1-f]x[j-f,j+1-f]
-  // pixels centers are (i+0.5-f, j+0.5-f)
+  // rasterize the segment s on a pixel grid [i,i+1]x[j,j+1]
+  // pixels centers are (i+0.5, j+0.5)
   Segment_2_iterator () : t(1) {}
-  Segment_2_iterator (const Segment_2& s, FT f=0) : t(0) {
+  Segment_2_iterator (const Segment_2& s) : t(0) {
         for (int j = 0; j < 2; ++j) {
-                p[j] = (int) std::floor(to_double(s.source()[j]+f));
-                q[j] = (int) std::floor(to_double(s.target()[j]+f));
+                p[j] = (int) std::floor(to_double(s.source()[j]));
+                q[j] = (int) std::floor(to_double(s.target()[j]));
                 if(p[j]==q[j]) { NextCrossingT[j]=2; Step[j]=0; DeltaT[j]=0; continue; }
                 int dir = (q[j]>p[j]);
                 FT invlength =  1.0f / (s.target()[j]-s.source()[j]);
-                NextCrossingT[j] = (p[j]+dir -(s.source()[j]+f))*invlength;
+                NextCrossingT[j] = (p[j]+dir -(s.source()[j]))*invlength;
                 Step  [j] = 2*dir-1;
                 DeltaT[j] = Step[j] * invlength;
         }
         i = NextCrossingT[1] < NextCrossingT[0];
         if(p[i]==q[i]) NextCrossingT[i]=1;
+	if(NextCrossingT[i]<=0) operator++();
   }
   Segment_2_iterator operator++( int ) { Segment_2_iterator tmp(*this); operator++(); return tmp; }
   Segment_2_iterator& operator++() {

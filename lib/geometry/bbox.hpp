@@ -1,11 +1,12 @@
 #ifndef BOX_HPP_
 #define BOX_HPP_
-
 #include <boost/array.hpp>
 
+fdqsfds
 /**
  * @brief Bounding box class, templated on the dimension
  */
+/*
 template<typename F=float, unsigned int D=2> class bbox
 {
 public :
@@ -60,5 +61,6 @@ std::ostream& operator<<(std::ostream& o, bbox<F,D> b) {
 }
 
 typedef bbox<> bbox_2;
+*/
 
 #endif //#ifndef BOX_HPP_

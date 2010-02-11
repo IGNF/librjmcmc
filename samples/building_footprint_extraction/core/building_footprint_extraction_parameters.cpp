@@ -4,133 +4,98 @@
 #include "building_footprint_extraction_parameters.hpp"
 namespace po = boost::program_options;
 
-void building_footprint_extraction_parameters::store_string_map(std::map<std::string, std::string> &map_options) const
-{
-	const std::vector<boost::shared_ptr<po::option_description> > & options = m_desc.options();
-	for (unsigned int i = 0; i < options.size(); ++i)
-	{
-		std::string name = options[i]->long_name();
-		std::ostringstream value;
-		const po::variable_value& v = m_vm[name];
-		if ( v.empty() )
-			continue;
-		if (name == "input")
-		{
-			value << v.as<std::string>();
-		}
-		else if(name == "temp" 		|| name == "deccoef" || name == "pbirth" 	|| name == "pdeath" 	||
-				name == "gaussian"	|| name == "minsize" || name == "maxratio"	|| name == "surface"	||
-				name == "energy"	|| name == "sigmaD"	|| name == "poisson")
-		{
-			value << v.as<double>();
-		}
-		else if ( name == "dosave" )
-			value << v.as<bool>();
-		else
-		{
-			value << v.as<unsigned int>();
-		}
-		
-		/*
-		std::cout << "long_name = " << options[i]->long_name() << "\n";
-		std::cout << "description = " << options[i]->description() << "\n";
-		std::cout << "format_name = " << options[i]->format_name() << "\n";
-		* */
-		
-		map_options[options[i]->description()] = value.str();
+struct add_options {
+typedef void result_type;
+	po::options_description&  m_desc;
+	std::string m_name, m_text;
+
+	add_options(po::options_description& desc, const std::string& name, const std::string& text)
+		: m_desc(desc), m_name(name), m_text(text) {}
+
+	template<typename T> void operator()(T& t) const {
+		m_desc.add_options()(m_name.c_str(),po::value<T>(&t)->default_value(t),m_text.c_str());
+	}
+};
+
+void init_description(po::options_description& desc, building_footprint_extraction_parameters& param) {
+	desc.add_options()
+		("help,h","Message d'aide...")
+		("config,c",po::value<std::string>(), "Fichier de configuration");
+
+	typedef building_footprint_extraction_parameters::iterator iterator;
+	for(iterator it=param.begin(); it!=param.end();++it) {
+		std::string name(it->name());
+		if(it->shortcut()!='\0') name = name + ","+it->shortcut();
+		std::string text(it->description());
+		boost::apply_visitor(add_options(desc,name,text),it->value());
 	}
 }
 
-void building_footprint_extraction_parameters::parse_string_map(const std::map<std::string, std::string> &map_options)
+bool building_footprint_extraction_parameters::parse(const std::string& filename)
 {
-	m_vm = po::variables_map();
-	std::vector<std::string> parser_options;
-	const std::vector<boost::shared_ptr<po::option_description> > & options = m_desc.options();
-	for (unsigned int i = 0; i < options.size(); ++i)
+	po::options_description desc(m_caption);
+	init_description(desc,*this);
+	po::variables_map vm;
+	std::ifstream file(filename.c_str());
+	if(!file) 
 	{
-		std::string desc(options[i]->description());
-		std::map<std::string, std::string>::const_iterator it = map_options.find(desc);
-		if(it==map_options.end())
-			continue;
-		parser_options.push_back("--" + options[i]->long_name());
-		parser_options.push_back(it->second);
-	}
-	
-	po::command_line_parser parser(parser_options);
-	parser.options(m_desc);
-
-	po::store(parser.run(), m_vm);
-	po::notify(m_vm);
-}
-
-void building_footprint_extraction_parameters::parse_config_file(const char *filename)
-{
-	std::ifstream config_file(filename);
-	po::store(po::parse_config_file(config_file, m_desc), m_vm);
-
-	if ( m_vm.count("config") )
-		parse_config_file(m_vm["config"].as<std::string> ().c_str());
-	po::notify(m_vm);
-}
-
-bool building_footprint_extraction_parameters::parse_command_line(int argc, char **argv)
-{
-	po::store(po::parse_command_line(argc, argv, m_desc), m_vm);
-	if (m_vm.count("help"))
-	{
-		std::cout << m_desc << "\n";
+		std::cout << "Unable to read : "<<filename << std::endl;
 		return false;
 	}
+	po::store(po::parse_config_file(file,desc), vm);
 
-	if ( m_vm.count("config") )
-		parse_config_file(m_vm["config"].as<std::string> ().c_str());
-	po::notify(m_vm);
+	if ( vm.count("config") && !parse(vm["config"].as<std::string> ()))
+		return false;
+	po::notify(vm);
 	return true;
 }
 
-std::string building_footprint_extraction_parameters::long_name_from_description( const std::string &description )
+bool building_footprint_extraction_parameters::parse(int argc, char **argv)
 {
-	const std::vector<boost::shared_ptr<po::option_description> > & options = m_desc.options();
-	for (unsigned int i = 0; i < options.size(); ++i)
-		if ( options[i]->description() == description )
-			return options[i]->long_name();
-	return "";
+	po::options_description desc(m_caption);
+	init_description(desc,*this);
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc,argv,desc), vm);
+	if (vm.count("help"))
+	{
+		std::cout << desc << std::endl;
+		return false;
+	}
+
+	if ( vm.count("config") && !parse(vm["config"].as<std::string> ()))
+		return false;
+	po::notify(vm);
+	return true;
 }
 
-std::string building_footprint_extraction_parameters::description_from_long_name( const std::string &long_name )
-{
-	const std::vector<boost::shared_ptr<po::option_description> > & options = m_desc.options();
-	for (unsigned int i = 0; i < options.size(); ++i)
-		if ( options[i]->long_name() == long_name )
-			return options[i]->description();
-	return "";
+void building_footprint_extraction_parameters::erase(const std::string& name) {
+	std::map<std::string,iterator>::iterator it = m_index.find(name);
+	if(it==m_index.end()) return;
+	m_parameter.erase(it->second);
+	m_index.erase(it);
 }
 
-building_footprint_extraction_parameters::building_footprint_extraction_parameters() :
-	m_desc("building footprint extraction options")
+building_footprint_extraction_parameters::building_footprint_extraction_parameters()
 {
-	m_desc.add_options()
-	("help,h", 			"Message d'aide...")
-	("config,c", 		po::value<std::string>(), "Fichier de configuration")
-	("temp,t", 			po::value<double>(&(m_initial_temperature))->default_value(150.), "Temperature initiale")
-	("nbiter,I", 		po::value<unsigned int>(&(m_nb_iterations))->default_value(15000000), "Nombre d'iterations")
-	("nbdump,d", 		po::value<unsigned int>(&(m_nb_iterations_dump))->default_value(10000), "Nombre d'iterations entre chaque affichage")
-	("nbsave,S", 		po::value<unsigned int>(&(m_nb_iterations_save))->default_value(10000), "Nombre d'iterations entre chaque sauvegarde")
-	("dosave,b", 		po::value<bool>(&(m_do_save))->default_value(false), "Sauvegarde des resultats intermediaires")
-	("deccoef,C", 		po::value<double>(&(m_decrease_coefficient))->default_value(0.999999), "Coefficient de decroissance")
-	("pbirth,B", 		po::value<double>(&(m_birth_probability))->default_value(0.1), "Probabilite de naissance")
-	("pdeath,D", 		po::value<double>(&(m_death_probability))->default_value(0.1), "Probabilite de mort")
-	("input,i", 		po::value<std::string>(&(m_input_data_file_path))->default_value("../data/ZTerrain_c3.tif"), "Fichier image d'entree")
-	("xmin,x", 			po::value<unsigned int>(&(m_running_min_x))->default_value(0), "Zone a traiter (xmin)")
-	("ymin,y", 			po::value<unsigned int>(&(m_running_min_y))->default_value(0), "Zone a traiter (ymin)")
-	("xmax,X", 			po::value<unsigned int>(&(m_running_max_x))->default_value(652), "Zone a traiter (xmax)")
-	("ymax,Y", 			po::value<unsigned int>(&(m_running_max_y))->default_value(662), "Zone a traiter (ymax)")
-	("subsampling,u", 	po::value<unsigned int>(&(m_subsampling))->default_value(1), "Sous-échantillonnage")
-	("gaussian,g", 		po::value<double>(&(m_variance_gaussian_filter))->default_value(2), "Variance du filtre gaussien en entree")
-	("sigmaD,G", 		po::value<double>(&(m_sigma_d))->default_value(1), "taille du noyau de flou pour le calcul des gradients")
-	("minsize,m", 		po::value<double>(&(m_rectangle_minimal_size))->default_value(5), "Taille minimale d'un rectangle")
-	("maxratio,M", 		po::value<double>(&(m_rectangle_maximal_ratio))->default_value(5), "Rapport longueur / largeur maximal d'un rectangle")
-	("surface,s", 		po::value<double>(&(m_ponderation_surface_intersection))->default_value(10), "Ponderation de la surface d'intersection")
-	("energy,e", 		po::value<double>(&(m_individual_energy))->default_value(250), "Energie d'existence d'un objet")
-	("poisson,p", 		po::value<double>(&(m_poisson))->default_value(200), "Parametre du processus de Poisson");
+	insert<double>("temp",'t',150,"Temperature initiale");
+	insert<int>("nbiter",'I',15000000,"Nombre d'iterations");
+	insert<int>("nbdump",'d',10000,"Nombre d'iterations entre chaque affichage");
+	insert<int>("nbsave",'S',10000,"Nombre d'iterations entre chaque sauvegarde");
+	insert<bool>("dosave",'b',false, "Sauvegarde des resultats intermediaires");
+	insert<double>("deccoef",'C',0.999999,"Coefficient de decroissance");
+	insert<double>("pbirth",'B',0.1, "Probabilite de naissance");
+	insert<double>("pdeath",'D',0.1, "Probabilite de mort");
+	insert<boost::filesystem::path>("input",'i',"../data/ZTerrain_c3.tif", "Fichier image d'entree");
+	insert<int>("xmin",'x',0, "Zone a traiter (xmin)");
+	insert<int>("ymin",'y',0, "Zone a traiter (ymin)");
+	insert<int>("xmax",'X',652, "Zone a traiter (xmax)");
+	insert<int>("ymax",'Y',662, "Zone a traiter (ymax)");
+	insert<int>("subsampling",'u',1, "Sous-échantillonnage");
+	insert<double>("gaussian",'g',2, "Variance du filtre gaussien en entree");
+	insert<double>("sigmaD",'G',1, "Taille du noyau de flou pour le calcul des gradients");
+	insert<double>("minsize",'m',5, "Taille minimale d'un rectangle");
+	insert<double>("maxratio",'M',5, "Rapport longueur/largeur maximal d'un rectangle");
+	insert<double>("surface",'s',10, "Ponderation de la surface d'intersection");
+	insert<double>("energy",'e',250, "Energie d'existence d'un objet");
+	insert<double>("poisson",'p',200, "Parametre du processus de Poisson");
 }

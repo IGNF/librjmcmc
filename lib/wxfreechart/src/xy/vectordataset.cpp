@@ -14,7 +14,7 @@
 WX_DEFINE_EXPORTED_OBJARRAY(wxDoubleArray);
 
 
-VectorDataset::VectorDataset()
+VectorDataset::VectorDataset() : m_X0(1.), m_scaleX(1.)
 {
 }
 
@@ -24,7 +24,7 @@ VectorDataset::~VectorDataset()
 
 double VectorDataset::GetX(size_t index, size_t WXUNUSED(serie))
 {
-	return index + 1;
+	return m_scaleX * index + m_X0;
 }
 
 double VectorDataset::GetY(size_t index, size_t WXUNUSED(serie))
