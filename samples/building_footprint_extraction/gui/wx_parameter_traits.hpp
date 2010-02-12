@@ -14,7 +14,9 @@ struct wx_parameter_traits {
 	ctrl->SetValue(wxString(oss.str().c_str(), *wxConvCurrent));
     }
     static inline void get(type *ctrl, T&t) {
-	std::istringstream iss(ctrl->GetLineText(0).fn_str());//.data());
+        wxString temp(ctrl->GetLineText(0), *wxConvCurrent);
+        std::string temp_string(temp.mb_str());
+        std::istringstream iss(temp_string.c_str());//.data());
 	iss >> t;
 //	set(ctrl,t);
     }
