@@ -1,3 +1,7 @@
+#include "core/building_footprint_extraction_parameters.hpp"
+#include "gui/wx_parameter_traits.hpp"
+typedef parameters<wx_parameter_traits> param;
+
 #include "rjmcmc_building_footprint_extraction_thread.hpp"
 #include "chart_frame.hpp"
 
@@ -70,7 +74,7 @@ rjmcmc_building_footprint_extraction_thread::rjmcmc_building_footprint_extractio
 // todo: use ilayer->View() instead...
 	param *p = param::Instance();
 	boost::filesystem::path path;
-	p->get("input",path);
+	p->get("dem",path);
 	p->set("xmax",p->get<int>("xmax")-p->get<int>("xmin"));
 	p->set("ymin",p->get<int>("ymax")-p->get<int>("ymin"));
 	p->set("xmin",0);

@@ -24,9 +24,6 @@ typedef intersection_area_binary_energy      binary_energy;
 typedef generator<is_valid>          generator_;
 typedef modifier <is_valid>          modifier_;
 
-#include "core/building_footprint_extraction_parameters.hpp"
-typedef building_footprint_extraction_parameters         param;
-
 /************** rjmcmc library types ****************/
 
 #include "rjmcmc/temperature.hpp"
@@ -60,7 +57,7 @@ template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& vi
 	// energies
 	unary_energy e1(
 		p->get<double>("energy"),
-		p->get<boost::filesystem::path>("input").string(),
+		p->get<boost::filesystem::path>("dem").string(),
 		bbox,
 		p->get<double>("sigmaD"),
 		p->get<int>("subsampling")

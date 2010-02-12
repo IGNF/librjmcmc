@@ -14,59 +14,80 @@
  * @brief Class for specific "Building footprint extraction" application parameters handling
  * @author O. Tournaire
  */
+
+struct void_parameter_traits { 
+	template<typename T> struct control { 
+		typedef void type;
+		static inline void set(type *, const T&) {}
+		static inline void get(type *, T&) {}
+	};
+};
+
+template<typename T, typename V>
 struct parameter {
 public:
-	typedef boost::variant<boost::filesystem::path,std::string,int,double,bool> value_type;
-	template<typename T> inline const T& get() const { return boost::get<T >( m_value); }
-	template<typename T> inline T& get() { 
-		/* this may be used to debug bad_get exceptions...
-		T t;
-		std::cout << typeid(t).name() << "=="<<m_value.type().name() << std::endl;
-		*/
-		return boost::get<T>(m_value); }
-	template<typename T> inline void set(const T& t) { get<T>()=t; }
-	inline const value_type& value() const { return m_value; }
-	inline value_type& value() { return m_value; }
-	inline const std::string& name() const { return m_name; }
-	inline const std::string& description() const { return m_description; }
-	inline char shortcut() const { return m_shortcut; }
-	template<typename T> inline T* control() const { return static_cast<T*>(m_control); }
-	template<typename T> inline void control(T *t) { m_control = static_cast<void*>(t); }
-	template<typename T> parameter(const std::string& n, char c, const T&v, const std::string& d)
-		: m_name(n), m_shortcut(c), m_value(v), m_description(d), m_control(NULL) {}
+	typedef V value_type;
+	typedef typename T::template control<V> control_trait;
+	typedef typename control_trait::type control_type;
 
-	std::string string() const {
-		std::ostringstream oss;
-		oss << m_value;
-		return oss.str();
+	inline void control(control_type *c)    { m_control = c; }
+	inline void value  (const value_type& t) {
+		m_value   = t;
+		control_trait::set(m_control,t);
 	}
+	inline void update_value() { control_trait::get(m_control,m_value); }
+
+	inline const value_type&        value() const { return m_value; }
+	inline       value_type&        value()       { return m_value; }
+	inline const std::string&        name() const { return m_name; }
+	inline const std::string& description() const { return m_description; }
+	inline       char            shortcut() const { return m_shortcut; }
+	inline       control_type    control()        { return m_control; }
+
+	parameter(const std::string& n, char c, const value_type& v, const std::string& d);
+
 private:
 	std::string m_name;
 	char m_shortcut;
 	value_type m_value;
 	std::string m_description;
-	void *m_control;
+	control_type *m_control;
 };
 
-class building_footprint_extraction_parameters: public PatternSingleton<building_footprint_extraction_parameters>
+struct value_updater {
+	typedef void result_type;
+	template<typename T> void operator()(T& t) const { t.update_value(); }
+};
+
+template<typename T = void_parameter_traits >
+class parameters
+  : public PatternSingleton<parameters<T> >
 {
 public:
-	typedef std::list<parameter> container;
-	typedef container::iterator iterator;
-	typedef container::const_iterator const_iterator;
+	typedef boost::variant<
+		parameter<T,boost::filesystem::path>,
+		parameter<T,std::string>,
+		parameter<T,int>,
+		parameter<T,double>,
+		parameter<T,bool>
+	> parameter_types;
 
-	friend class PatternSingleton<building_footprint_extraction_parameters>;
+	typedef std::list<parameter_types> container;
+	typedef typename container::iterator iterator;
+	typedef typename container::const_iterator const_iterator;
+
+	friend class PatternSingleton<parameters>;
 	inline iterator       param(const std::string& s)       { return m_index.find(s)->second; }
 	inline const_iterator param(const std::string& s) const { return m_index.find(s)->second; }
 
-	template<typename T> inline const T& get(const std::string& s) const { 
-		return param(s)->get<T>();
+	template<typename V> inline const V& get(const std::string& s) const { 
+		return boost::get<parameter<T,V> >(*param(s)).value();
 	}
-	template<typename T> inline void get(const std::string& s, T& t) const { 
-		t = param(s)->get<T>();
+	template<typename V> inline void get(const std::string& s, V& v) const { 
+		v = boost::get<parameter<T,V> >(*param(s)).value();
 	}
-	template<typename T> inline void set(const std::string& s, const T& t) { 
-		param(s)->set<T>(t);
+	template<typename V> inline void set(const std::string& s, const V& v) { 
+		boost::get<parameter<T,V> >(*param(s)).value(v);
 	}
 
 	bool parse(const std::string& filename);
@@ -77,21 +98,16 @@ public:
 	inline const_iterator begin() const { return m_parameter.begin(); }
 	inline const_iterator end() const { return m_parameter.end(); }
 
-
-	template<typename T>
-	void insert(const std::string& name, char c, const T& t, const std::string& desc) {
-		m_parameter.push_back(parameter(name,c,t,desc));
-		iterator it=end();
-		m_index[name]=--it;
-	}
+	template<typename V>
+	void insert(const std::string& name, char c, const V& t, const std::string& desc);
 	void erase(const std::string& name);
-
+	void update_values();
 private:
 	std::map<std::string,iterator> m_index;
 	std::string m_caption;
 	container m_parameter;
-	building_footprint_extraction_parameters();
-	building_footprint_extraction_parameters(const building_footprint_extraction_parameters &);
+	parameters();
+	parameters(const parameters &);
 };
 
 #endif /* __BUILDING_FOOTPRINT_EXTRACTION_PARAMETERS_HPP__ */

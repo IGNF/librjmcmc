@@ -6,75 +6,71 @@
  */
 
 #include <wx/sizer.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
+#include <wx/filedlg.h>
+#include <wx/scrolwin.h>
+#include <wx/button.h>
 #include "parameters_frame.hpp"
 
 #include "core/building_footprint_extraction_parameters.hpp"
-typedef building_footprint_extraction_parameters param;
-
-#define ID_CHECK_SAVE	1
-
-
-struct param_frame_writer {
-	param::iterator m_it;
-	param_frame_writer(param::iterator it) : m_it(it) {}
-	typedef void result_type;
-	template<typename T> void operator()(T& t) const {
-		std::ostringstream oss;
-		oss << t;
-		m_it->control<wxTextCtrl>()->SetValue(wxString(oss.str().c_str(), *wxConvCurrent));
-	}
-	void operator() (bool& b) const {
-		m_it->control<wxCheckBox>()->SetValue(b);
-	}
-};
-
-void parameters_frame::Refresh() {
-	param *p = param::Instance();
-	for(param::iterator it=p->begin(); it!=p->end(); ++it)
-		boost::apply_visitor(param_frame_writer(it),it->value());
-	Update();
-}
+#include "gui/wx_parameter_traits.hpp"
+typedef parameters<wx_parameter_traits> param;
 
 struct sizer_adder {
 	typedef void result_type;
-	param::iterator m_it;
 	wxSizer *m_sizer;
 	wxWindow *m_wnd;
 	parameters_frame *m_frame;
+	std::map<long,std::string>& m_name;
 	
-	sizer_adder(wxSizer  *sizer, wxWindow* wnd, parameters_frame *frame)
-		: m_sizer(sizer), m_wnd(wnd), m_frame(frame) {}
+	sizer_adder(parameters_frame *frame, wxSizer  *sizer, wxWindow* wnd, std::map<long,std::string>& name)
+		: m_frame(frame), m_sizer(sizer), m_wnd(wnd), m_name(name) {}
 
-	void set(param::iterator it) { m_it=it; }
+	template<typename T>
+	void AddText(wxSizer *sizer, const parameter<wx_parameter_traits,T>& p) {
+		wxString s(p.description().c_str(), *wxConvCurrent);
+		wxStaticText *text = new wxStaticText(m_wnd, wxID_ANY, s);
+		sizer->Add(text, 0,wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+	}
 
-	template<typename T> void operator()(const T& t) const {
+	template<typename T>
+	void operator()(parameter<wx_parameter_traits,T>& p) {
+		AddText(m_sizer,p);
 		std::ostringstream oss;
-		oss << t;
-		wxTextCtrl   *ctrl = new wxTextCtrl(m_wnd, wxID_ANY, wxString(oss.str().c_str(), *wxConvCurrent));
-		m_it->control(ctrl);
-		m_sizer->Add(ctrl, 1, wxEXPAND);
+		oss << p.value();
+		wxString s(oss.str().c_str(), *wxConvCurrent);
+		wxTextCtrl   *ctrl = new wxTextCtrl(m_wnd, wxID_ANY, s);
+		p.control(ctrl);
+		m_sizer->Add(ctrl,0,wxEXPAND);
 	}
 
-
-	void operator()(bool b) const {
-		wxCheckBox *checkbox = new wxCheckBox(m_wnd, ID_CHECK_SAVE, wxEmptyString );
-		m_it->control(checkbox);
-		checkbox->SetValue(b);
-		m_sizer->Add(checkbox, wxEXPAND);
-		// todo : generalize this "dosave"-specific connection
-		checkbox->Connect(ID_CHECK_SAVE, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(parameters_frame::on_check_save), NULL, m_frame);
+	void operator()(parameter<wx_parameter_traits,bool>& p) {
+		AddText(m_sizer,p);
+		long id = wxNewId();
+		wxCheckBox *checkbox = new wxCheckBox(m_wnd, id, wxEmptyString);
+		p.control(checkbox);
+		checkbox->SetValue(p.value());
+		m_sizer->Add(checkbox);
+		checkbox->Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED,
+	wxCommandEventHandler(parameters_frame::on_bool_parameter), NULL, m_frame);
+		m_name[id]=p.name();
 	}
 
-	void operator()(const boost::filesystem::path& p) const {
-		wxTextCtrl   *ctrl = new wxTextCtrl(m_wnd, wxID_ANY, wxString(p.string().c_str(), *wxConvCurrent));
-		m_it->control(ctrl);
+	void operator()(parameter<wx_parameter_traits,boost::filesystem::path>& p) {
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		wxButton *browse_input_button = new wxButton(m_wnd,wxID_OPEN,wxT("..."),wxDefaultPosition,wxSize(25,25));
-		sizer->Add(browse_input_button,  wxALL);
-		sizer->Add(ctrl, wxEXPAND);
-		// todo : generalize this "input"-specific connection
-		browse_input_button->Connect(wxID_OPEN, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(parameters_frame::on_browse_input_button), NULL, m_frame);
-		m_sizer->Add(sizer, wxEXPAND);
+		wxString s(p.value().string().c_str(), *wxConvCurrent);
+		wxTextCtrl   *ctrl = new wxTextCtrl(m_wnd, wxID_ANY, s);
+		p.control(ctrl);
+		long id = wxNewId();
+		wxButton *browse_button = new wxButton(m_wnd,id,wxT("..."),wxDefaultPosition,wxSize(25,25));
+		browse_button->Connect(id, wxEVT_COMMAND_BUTTON_CLICKED,
+	wxCommandEventHandler(parameters_frame::on_file_parameter), NULL, m_frame);
+		m_name[id]=p.name();
+		sizer->Add(browse_button);
+		AddText(sizer,p);
+		m_sizer->Add(sizer,0,wxALL);
+		m_sizer->Add(ctrl ,0,wxEXPAND);
 	}
 };
 
@@ -82,31 +78,19 @@ parameters_frame::parameters_frame(wxWindow *parent, wxWindowID id, const wxStri
 	wxFrame(parent, id, title, pos, size, style)
 {
 	param *p = param::Instance();
-	wxScrolledWindow* wnd = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxT("scroll"));
-	wnd->SetScrollbars(20, 20, 50, 50);
-	
 	wxFlexGridSizer* sizer = new wxFlexGridSizer(2);
+	sizer->AddGrowableCol(1);
 	sizer->AddSpacer(10);
 	sizer->AddSpacer(10);
-	sizer_adder adder(sizer,wnd,this);
+	sizer_adder adder(this,sizer,this,m_name_for_id);
 	for(param::iterator it=p->begin(); it!=p->end(); ++it)
-	{
-		wxStaticText *text = new wxStaticText(wnd, wxID_ANY, wxString(it->description().c_str(), *wxConvCurrent));
-		sizer->Add(text, wxALL | wxALIGN_CENTER_VERTICAL);
-		adder.set(it);
-		boost::apply_visitor(adder,it->value());
-	}
-	sizer->Layout();
-
-	wnd->SetSizer(sizer);
-	wnd->SetAutoLayout(true);
-	sizer->Fit(wnd);
+		boost::apply_visitor(adder,*it);
 	SetSizer(sizer);
-    	wnd->Layout();
+	SetAutoLayout(true);
 	Refresh();
 }
 
-void parameters_frame::on_browse_input_button(wxCommandEvent& event)
+void parameters_frame::on_file_parameter(wxCommandEvent& event)
 {
 	wxString wildcard;
 	wildcard << _("Image files ");
@@ -115,17 +99,16 @@ void parameters_frame::on_browse_input_button(wxCommandEvent& event)
 	wildcard << wxT("PNG (*.png;*.PNG)|*.png;*.PNG|");
 	wildcard << wxT("JPEG (*.jpg;*.jpeg;*.JPG;*.JPEG)|*.jpg;*.jpeg;*.JPG;*.JPEG|");
 	wxString str;
-	wxFileDialog *fileDialog = new wxFileDialog(this, _("Choose DEM"), wxT(""), wxT(""), wildcard, wxFD_OPEN|wxFD_CHANGE_DIR );
+	std::string name = m_name_for_id[event.GetId()];
+	wxFileDialog *fileDialog = new wxFileDialog(this, wxString(name.c_str(), *wxConvCurrent), wxT(""), wxT(""), wildcard, wxFD_OPEN|wxFD_CHANGE_DIR );
 	if (fileDialog->ShowModal() == wxID_OK)
 	{
-		param::iterator it = param::Instance()->param("input");
 		boost::filesystem::path file( fileDialog->GetPath().To8BitData() );
-		it->set(file);
-		it->control<wxTextCtrl>()->SetValue( wxString(file.string().c_str(), *wxConvCurrent) );
+		param::Instance()->set(name,file);
 	}
 }
 
-void parameters_frame::on_check_save(wxCommandEvent& event)
+void parameters_frame::on_bool_parameter(wxCommandEvent& event)
 {
-	param::Instance()->set("dosave",event.IsChecked());
+	param::Instance()->set(m_name_for_id[event.GetId()],event.IsChecked());
 }

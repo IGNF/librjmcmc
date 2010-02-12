@@ -10,12 +10,14 @@
 #include <GilViewer/gui/define_id.hpp>
 
 #include "core/building_footprint_extraction_parameters.hpp"
+#include "gui/wx_parameter_traits.hpp"
+typedef parameters<wx_parameter_traits> param;
+
 #include "parameters_frame.hpp"
 #include "rjmcmc_building_footprint_extraction_frame.hpp"
 #include "rjmcmc_building_footprint_extraction_thread.hpp"
 #include "chart_frame.hpp"
 
-typedef building_footprint_extraction_parameters         param;
 
 enum
 {
@@ -101,29 +103,10 @@ rjmcmc_building_footprint_extraction_frame::~rjmcmc_building_footprint_extractio
 	m_chart_frame->Destroy();
 }
 
-struct param_frame_reader {
-	param::const_iterator m_it;
-	param_frame_reader(param::const_iterator it) : m_it(it) {}
-	typedef void result_type;
-	template<typename T> void operator()(T& t) const {
-		wxTextCtrl *textctrl = m_it->control<wxTextCtrl>();
-		std::istringstream iss(textctrl->GetLineText(0).fn_str());
-		iss >> t;
-		std::ostringstream oss;
-		oss << t;
-		textctrl->SetValue(wxString(oss.str().c_str(), *wxConvCurrent));		
-	}
-	void operator() (bool& b) const {
-		b = m_it->control<wxCheckBox>()->GetValue();
-	}
-};
-
 void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& event)
 {
-	param *p=param::Instance();
-	for(param::iterator it = p->begin(); it!=p->end(); ++it)
-		boost::apply_visitor(param_frame_reader(it),it->value());
-	
+	param::Instance()->update_values();
+
 	wxPoint p0,p1;
 	boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
 	if(ghost->m_drawRectangleSelection) {
@@ -148,7 +131,7 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 		}
 		if(!ilayer) {
 			boost::filesystem::path file;
-			param::Instance()->get("input",file);
+			param::Instance()->get("dem",file);
 			ilayer = ImageLayer::CreateImageLayer(file.string());
 			if ( !ilayer )
 			{
@@ -186,7 +169,7 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 		vlayer->TextsVisibility(false);
 		
 		boost::filesystem::path file(clayer->Filename());
-		param::Instance()->set("input",file);
+		param::Instance()->set("dem",file);
 		param::Instance()->set("xmin",p0.x);
 		param::Instance()->set("ymin",p0.y);
 		param::Instance()->set("xmax",p1.x);

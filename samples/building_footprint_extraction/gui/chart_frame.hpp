@@ -4,8 +4,7 @@
 #include <vector>
 #include <string>
 
-// TODO : nettoyage des headers
-#include <wx/wx.h>
+#include <wx/frame.h>
 #include "core/building_footprint_extraction.hpp"
 
 class VectorDataset;
