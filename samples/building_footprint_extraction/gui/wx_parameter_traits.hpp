@@ -1,6 +1,7 @@
 #ifndef WX_PARAMETER_TRAITS
 #define WX_PARAMETER_TRAITS
 
+#include "core/building_footprint_extraction_parameters.hpp"
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 
@@ -14,9 +15,9 @@ struct wx_parameter_traits {
 	ctrl->SetValue(wxString(oss.str().c_str(), *wxConvCurrent));
     }
     static inline void get(type *ctrl, T&t) {
-        wxString temp(ctrl->GetLineText(0), *wxConvCurrent);
-        std::string temp_string(temp.mb_str());
-        std::istringstream iss(temp_string.c_str());//.data());
+        wxString ws(ctrl->GetLineText(0), *wxConvCurrent);
+        std::string s(ws.mb_str());
+        std::istringstream iss(s.c_str());
 	iss >> t;
 //	set(ctrl,t);
     }
@@ -28,5 +29,7 @@ template<> struct wx_parameter_traits::control<bool> {
   static inline void set(type *ctrl, bool  b) { ctrl->SetValue(b); }
   static inline void get(type *ctrl, bool& b) { b = ctrl->GetValue(); }
 };
+
+typedef parameters<wx_parameter_traits> param;
 
 #endif

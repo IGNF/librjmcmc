@@ -1,6 +1,7 @@
-#include "core/building_footprint_extraction_parameters.hpp"
 #include "gui/wx_parameter_traits.hpp"
-typedef parameters<wx_parameter_traits> param;
+
+#include <GilViewer/layers/ImageLayer.hpp>
+#include <GilViewer/layers/image_types.hpp>
 
 #include "rjmcmc_building_footprint_extraction_thread.hpp"
 #include "chart_frame.hpp"
@@ -71,15 +72,6 @@ rjmcmc_building_footprint_extraction_thread::rjmcmc_building_footprint_extractio
 		rjmcmc_building_footprint_extraction_frame *frame) :
 		wxThread(wxTHREAD_JOINABLE), m_ilayer(ilayer),m_vlayer(vlayer), m_frame(frame), m_out(""), m_visitor(m_out)
 {
-// todo: use ilayer->View() instead...
-	param *p = param::Instance();
-	boost::filesystem::path path;
-	p->get("dem",path);
-	p->set("xmax",p->get<int>("xmax")-p->get<int>("xmin"));
-	p->set("ymin",p->get<int>("ymax")-p->get<int>("ymin"));
-	p->set("xmin",0);
-	p->set("ymin",0);
-	m_ilayer->Save(path.string());
 }
 
 
@@ -144,7 +136,17 @@ void rjmcmc_building_footprint_extraction_thread::end(const configuration& confi
 
 void* rjmcmc_building_footprint_extraction_thread::Entry()
 {
-	rjmcmc_building_footprint_extraction(*this);
+	ImageLayer *i = dynamic_cast<ImageLayer*>(&*m_ilayer); // not so nice...
+	building_footprint_extraction(*this,i->View()->value);
 	return NULL;
 }
 
+
+// member function instanciations
+typedef any_image_type::view_t views;
+
+#include "core/image_gradient_unary_energy_inc.hpp"
+template void image_gradient_unary_energy::gradient<views>(const views&, const Iso_Rectangle_2&, double, unsigned int);
+
+#include "core/gradient_image_inc.hpp"
+template void rjmcmc::gradient_image::load<views>(const views&, const Iso_Rectangle_2&, double, unsigned int);

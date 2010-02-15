@@ -4,6 +4,8 @@
 #include <iostream>
 
 #include "building_footprint_extraction_parameters.hpp"
+
+#include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
 template<typename T, typename V>
@@ -93,6 +95,11 @@ void parameters<T>::insert(const std::string& name, char c, const V& v, const st
 	m_index[name]=--it;
 }
 
+struct value_updater {
+	typedef void result_type;
+	template<typename T> void operator()(T& t) const { t.update_value(); }
+};
+
 template<typename T>
 void parameters<T>::update_values() {
 	for(iterator it = begin(); it!=end(); ++it)
@@ -103,6 +110,7 @@ void parameters<T>::update_values() {
 template<typename T>
 parameters<T>::parameters()
 {
+	caption("Building footprint extraction parameters");
 	insert<double>("temp",'t',150,"Temperature initiale");
 	insert<int>("nbiter",'I',15000000,"Nombre d'iterations");
 	insert<int>("nbdump",'d',10000,"Nombre d'iterations entre chaque affichage");
@@ -114,10 +122,10 @@ parameters<T>::parameters()
 	insert<double>("pdeath",'D',0.1, "Probabilite de mort");
 	insert<boost::filesystem::path>("dem",'i',"../data/ZTerrain_c3.tif", "Image DEM");
 	insert<boost::filesystem::path>("ndvi",'v',"../data/ZTerrain_c3.tif", "Image NDVI");
-	insert<int>("xmin",'x',0, "Zone a traiter (xmin)");
-	insert<int>("ymin",'y',0, "Zone a traiter (ymin)");
-	insert<int>("xmax",'X',652, "Zone a traiter (xmax)");
-	insert<int>("ymax",'Y',662, "Zone a traiter (ymax)");
+	insert<int>("xmin",'x',0, "Xmin)");
+	insert<int>("ymin",'y',0, "Ymin)");
+	insert<int>("xmax",'X',1000000, "Xmax");
+	insert<int>("ymax",'Y',1000000, "Ymax");
 	insert<int>("subsampling",'u',1, "Sous-échantillonnage");
 	insert<double>("gaussian",'g',2, "Variance du filtre gaussien en entree");
 	insert<double>("sigmaD",'G',1, "Taille du noyau de flou pour le calcul des gradients");

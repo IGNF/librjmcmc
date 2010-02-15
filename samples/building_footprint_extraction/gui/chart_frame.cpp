@@ -1,6 +1,4 @@
-#include "core/building_footprint_extraction_parameters.hpp"
 #include "gui/wx_parameter_traits.hpp"
-typedef parameters<wx_parameter_traits> param;
 
 #include "chart_frame.hpp"
 

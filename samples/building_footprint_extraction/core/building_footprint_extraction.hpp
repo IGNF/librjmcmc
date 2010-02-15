@@ -1,5 +1,5 @@
-#ifndef __RJMCMC_BUILDING_DETECTION_H__
-#define __RJMCMC_BUILDING_DETECTION_H__
+#ifndef __BUILDING_FOOTPRINT_EXTRACTION_HPP__
+#define __BUILDING_FOOTPRINT_EXTRACTION_HPP__
 
 /************** application-specific types ****************/
 
@@ -44,7 +44,8 @@ typedef rjmcmc::sampler<birth_death_kernel,modification_kernel> sampler;
 
 /************** main ****************/
 
-template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& visitor) {
+template<typename Visitor, typename View>
+void building_footprint_extraction(Visitor& visitor, const View& view) {
 	param *p = param::Instance();
 
 	Iso_Rectangle_2 bbox(
@@ -56,12 +57,14 @@ template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& vi
 
 	// energies
 	unary_energy e1(
-		p->get<double>("energy"),
-		p->get<boost::filesystem::path>("dem").string(),
-		bbox,
+		p->get<double>("energy")
+	);
+	
+	e1.gradient(view,bbox,
 		p->get<double>("sigmaD"),
 		p->get<int>("subsampling")
 	);
+
 	binary_energy e2(
 		p->get<double>("surface")
 	);
@@ -90,7 +93,6 @@ template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& vi
 
 	sampler sample( kbirthdeath, kmodif );
 
-
 	// simulated annealing
 	temperature temp(
 		p->get<double>("temp"),
@@ -114,4 +116,4 @@ template<typename Visitor> void rjmcmc_building_footprint_extraction(Visitor& vi
 	visitor.end(config);
 }
 
-#endif // __RJMCMC_BUILDING_DETECTION_H__
+#endif // __BUILDING_FOOTPRINT_EXTRACTION_HPP__

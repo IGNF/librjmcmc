@@ -3,25 +3,15 @@
 
 #include <cstdlib>
 #include <list>
-#include <sstream>
-#include <boost/program_options.hpp>
 #include <boost/variant.hpp>
 #include <boost/filesystem/path.hpp>
 
 #include "rjmcmc/pattern_singleton.hpp"
 
 /**
- * @brief Class for specific "Building footprint extraction" application parameters handling
+ * @brief Class for application parameters handling
  * @author O. Tournaire
  */
-
-struct void_parameter_traits { 
-	template<typename T> struct control { 
-		typedef void type;
-		static inline void set(type *, const T&) {}
-		static inline void get(type *, T&) {}
-	};
-};
 
 template<typename T, typename V>
 struct parameter {
@@ -54,12 +44,8 @@ private:
 	control_type *m_control;
 };
 
-struct value_updater {
-	typedef void result_type;
-	template<typename T> void operator()(T& t) const { t.update_value(); }
-};
 
-template<typename T = void_parameter_traits >
+template<typename T>
 class parameters
   : public PatternSingleton<parameters<T> >
 {
@@ -102,6 +88,10 @@ public:
 	void insert(const std::string& name, char c, const V& t, const std::string& desc);
 	void erase(const std::string& name);
 	void update_values();
+
+
+	inline void caption(const std::string& c) { m_caption=c; }
+	inline const std::string& caption() const { return m_caption; }
 private:
 	std::map<std::string,iterator> m_index;
 	std::string m_caption;

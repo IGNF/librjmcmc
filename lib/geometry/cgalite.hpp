@@ -195,6 +195,12 @@ namespace internal {
   }
 
   template < typename T >
+  bool operator==(const internal::Iso_Rectangle_2<T> &u, const internal::Iso_Rectangle_2<T> &v)
+  {
+	return u.min()==v.min() && u.max()==v.max();
+  }
+
+  template < typename T >
   std::ostream & operator<<(std::ostream &os, const internal::Vector_2<T> &v)
   {
     switch(os.iword(IO::mode)) {

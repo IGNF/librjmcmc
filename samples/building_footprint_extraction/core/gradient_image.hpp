@@ -1,8 +1,9 @@
-#ifndef IMAGE_HPP_
-#define IMAGE_HPP_
+#ifndef GRADIENT_IMAGE_HPP
+#define GRADIENT_IMAGE_HPP
 
-#include <boost/gil/extension/io/tiff_dynamic_io.hpp>
+#include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
+
 #include "geometry/geometry.h"
 
 namespace rjmcmc {
@@ -15,8 +16,10 @@ public:
 	double integrated_flux(const Segment_2 &s) const;
 	double integrated_flux(const Circle_2  &c) const;
 
-	void load(const std::string &file, double sigmaD=1, unsigned int step=0);
-	void load(const std::string &file, const Iso_Rectangle_2& bbox, double sigmaD=1, unsigned int step=0); // subimage loading
+	void load(const std::string &file, const Iso_Rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
+
+	template<typename View>
+	void load(const View& view, const Iso_Rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
 
 private:
 	image_t m_gradients;
@@ -24,4 +27,4 @@ private:
 };
 };
 
-#endif // IMAGE_HPP_
+#endif // GRADIENT_IMAGE_HPP

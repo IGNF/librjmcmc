@@ -1,7 +1,6 @@
-#include "core/building_footprint_extraction_parameters_inc.hpp"
 #include "gui/wx_parameter_traits.hpp"
+#include "core/building_footprint_extraction_parameters_inc.hpp"
 template class parameters<wx_parameter_traits>;
-typedef parameters<wx_parameter_traits> param;
 
 #include "rjmcmc_building_footprint_extraction_thread.hpp"
 

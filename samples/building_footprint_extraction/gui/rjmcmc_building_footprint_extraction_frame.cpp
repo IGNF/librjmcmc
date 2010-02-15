@@ -3,15 +3,14 @@
 
 #include <wx/artprov.h>
 
+#include <GilViewer/layers/VectorLayerGhost.h>
 #include <GilViewer/layers/ImageLayer.hpp>
 #include <GilViewer/layers/VectorLayer.hpp>
 #include <GilViewer/gui/ApplicationSettings.hpp>
 #include <GilViewer/gui/PanelManager.h>
 #include <GilViewer/gui/define_id.hpp>
 
-#include "core/building_footprint_extraction_parameters.hpp"
 #include "gui/wx_parameter_traits.hpp"
-typedef parameters<wx_parameter_traits> param;
 
 #include "parameters_frame.hpp"
 #include "rjmcmc_building_footprint_extraction_frame.hpp"
@@ -107,12 +106,33 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 {
 	param::Instance()->update_values();
 
+	LayerControl::const_iterator it  = m_panel->GetLayerControl()->begin();
+	LayerControl::const_iterator end = m_panel->GetLayerControl()->end();
+	Layer::ptrLayerType ilayer;
+	for(;it!=end && !ilayer;++it) {
+		if(dynamic_cast<ImageLayer *>(&**it)) ilayer=*it; //use dem tag??
+	}
+	if(!ilayer) {
+		boost::filesystem::path file;
+		param::Instance()->get("dem",file);
+		ilayer = ImageLayer::CreateImageLayer(file.string());
+		if ( !ilayer )
+		{
+		  std::ostringstream oss;
+		  oss << "File " << file << " does not exist !";
+		  wxString message( oss.str().c_str() , *wxConvCurrent );
+		  ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
+		  OnThreadEnd();
+		  return;
+		}
+	}
+
 	wxPoint p0,p1;
 	boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
 	if(ghost->m_drawRectangleSelection) {
 		wxRect rect = ghost->GetRectangle();
-		p0 = rect.GetTopLeft();
-		p1 = rect.GetBottomRight();
+		p0 = ilayer->ToLocal(rect.GetTopLeft    ());
+		p1 = ilayer->ToLocal(rect.GetBottomRight());
 	} else {
 		p0.x = param::Instance()->get<int>("xmin");
 		p0.y = param::Instance()->get<int>("ymin");
@@ -123,29 +143,7 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 	}
 	try
 	{
-		LayerControl::const_iterator it  = m_panel->GetLayerControl()->begin();
-		LayerControl::const_iterator end = m_panel->GetLayerControl()->end();
-		Layer::ptrLayerType ilayer;
-		for(;it!=end && !ilayer;++it) {
-			if(dynamic_cast<ImageLayer *>(&**it)) ilayer=*it;
-		}
-		if(!ilayer) {
-			boost::filesystem::path file;
-			param::Instance()->get("dem",file);
-			ilayer = ImageLayer::CreateImageLayer(file.string());
-			if ( !ilayer )
-			{
-			  std::ostringstream oss;
-			  oss << "File " << file << " does not exist !";
-			  wxString message( oss.str().c_str() , *wxConvCurrent );
-			  ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
-			  OnThreadEnd();
-			  return;
-			}
-		}
-		p0 = ilayer->ToLocal(p0);
-		p1 = ilayer->ToLocal(p1);
-		Layer::ptrLayerType vlayer = VectorLayer::CreateVectorLayer(std::string("Buildings") );
+		Layer::ptrLayerType vlayer = VectorLayer::CreateVectorLayer(std::string("Buildings"));
 		Layer::ptrLayerType clayer = ilayer->crop(p0.x,p0.y,p1.x,p1.y);
 		if(!clayer) {
 			  std::ostringstream oss;
@@ -170,10 +168,10 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 		
 		boost::filesystem::path file(clayer->Filename());
 		param::Instance()->set("dem",file);
-		param::Instance()->set("xmin",p0.x);
-		param::Instance()->set("ymin",p0.y);
-		param::Instance()->set("xmax",p1.x);
-		param::Instance()->set("ymax",p1.y);
+		param::Instance()->set("xmin",0);
+		param::Instance()->set("ymin",0);
+		param::Instance()->set("xmax",p1.x-p0.x);
+		param::Instance()->set("ymax",p1.y-p0.y);
 		
 		m_parameters_frame->Refresh();
 
