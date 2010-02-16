@@ -142,19 +142,19 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 		if(p0.y>p1.y) std::swap(p0.y,p1.y);
 	}
 	try
-	{
-		Layer::ptrLayerType vlayer = VectorLayer::CreateVectorLayer(std::string("Buildings"));
-		Layer::ptrLayerType clayer = ilayer->crop(p0.x,p0.y,p1.x,p1.y);
-		if(!clayer) {
+        {
+                Layer::ptrLayerType vlayer = VectorLayer::CreateVectorLayer(std::string("Buildings"), 1/*IMAGE_COORDINATES*/, false);
+                Layer::ptrLayerType clayer = ilayer->crop(p0.x,p0.y,p1.x,p1.y);
+                if(!clayer) {
 			  std::ostringstream oss;
-			  oss << "Cropping outside the bounds of " << ilayer->Filename() << " !";
+                          oss << "Cropping outside the bounds of " << ilayer->Filename() << " !";
 			  wxString message( oss.str().c_str() , *wxConvCurrent );
 			  ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
 			  OnThreadEnd();
 			  return;
-		}
-		m_panel->AddLayer(clayer);
-		m_panel->AddLayer(vlayer);
+                }
+                m_panel->AddLayer(clayer);
+                m_panel->AddLayer(vlayer);
 		vlayer->TranslationX(p0.x+ilayer->TranslationX());
 		vlayer->TranslationY(p0.y+ilayer->TranslationY());
 		vlayer->ZoomFactor  (     ilayer->ZoomFactor  ());
@@ -162,9 +162,9 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 		clayer->TranslationY(p0.y+ilayer->TranslationY());
                 clayer->ZoomFactor  (     ilayer->ZoomFactor  ());
                 vlayer->set_style(*wxRED, *wxBLUE, wxTRANSPARENT, wxSOLID, 3);
-		vlayer->TextsVisibility(false);
+                vlayer->TextsVisibility(false);
 		
-		boost::filesystem::path file(clayer->Filename());
+                boost::filesystem::path file(clayer->Filename());
 		param::Instance()->set("dem",file);
 		param::Instance()->set("xmin",0);
                 param::Instance()->set("ymin",0);
