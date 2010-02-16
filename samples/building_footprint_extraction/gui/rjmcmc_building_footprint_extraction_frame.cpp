@@ -160,16 +160,14 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
 		vlayer->ZoomFactor  (     ilayer->ZoomFactor  ());
 		clayer->TranslationX(p0.x+ilayer->TranslationX());
 		clayer->TranslationY(p0.y+ilayer->TranslationY());
-		clayer->ZoomFactor  (     ilayer->ZoomFactor  ());
-		vlayer->PolygonsRingsColour(wxColour(255,255,0));
-		vlayer->PolygonsInsideStyle( wxTRANSPARENT );
-		vlayer->PolygonsRingsWidth(3);
+                clayer->ZoomFactor  (     ilayer->ZoomFactor  ());
+                vlayer->set_style(*wxRED, *wxBLUE, wxTRANSPARENT, wxSOLID, 3);
 		vlayer->TextsVisibility(false);
 		
 		boost::filesystem::path file(clayer->Filename());
 		param::Instance()->set("dem",file);
 		param::Instance()->set("xmin",0);
-		param::Instance()->set("ymin",0);
+                param::Instance()->set("ymin",0);
 		param::Instance()->set("xmax",p1.x-p0.x);
 		param::Instance()->set("ymax",p1.y-p0.y);
 		
