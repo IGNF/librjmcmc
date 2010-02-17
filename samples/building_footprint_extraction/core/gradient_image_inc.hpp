@@ -79,7 +79,7 @@ template<typename I, typename V> void init(I& g, const V& v, double sigmaD=1, un
 }
 
 template<typename View>
-void rjmcmc::gradient_image::load(const View& view, const Iso_Rectangle_2& bbox, double sigmaD, unsigned int step)
+void rjmcmc::gradient_image::load(const View& view, const Iso_rectangle_2& bbox, double sigmaD, unsigned int step)
 {
 	int x0 = 0;
 	int y0 = 0;
@@ -93,12 +93,12 @@ void rjmcmc::gradient_image::load(const View& view, const Iso_Rectangle_2& bbox,
 		y1 = std::min(y1,(int) bbox.max().y());
 		v = subimage_view(v,x0,y0,x1-x0,y1-y0);
 	}
-	m_bbox = Iso_Rectangle_2(x0,y0,x1,y1);
+	m_bbox = Iso_rectangle_2(x0,y0,x1,y1);
 	init(m_gradients, v, sigmaD);
 }
 
 
-void rjmcmc::gradient_image::load(const std::string &file, const Iso_Rectangle_2& bbox, double sigmaD, unsigned int step)
+void rjmcmc::gradient_image::load(const std::string &file, const Iso_rectangle_2& bbox, double sigmaD, unsigned int step)
 {
 	boost::gil::gray32F_image_t img;
 	tiff_read_image(file.c_str(), img);

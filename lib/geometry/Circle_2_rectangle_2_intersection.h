@@ -69,7 +69,7 @@ template<class K> inline typename K::FT intersection_area(const Rectangle_2<K> &
         Vector_2 n(r.normal());
         FT n2 = n.squared_length();
         FT vn = v*n;
-        FT rn = c.radius()*sqrt(n2);
+        FT rn = sqrt(c.squared_radius()*n2);
         FT x0 = std::max(vn-n2,-rn);
         FT x1 = std::min(vn+n2, rn);
 	FT dx = x1-x0;
@@ -112,7 +112,7 @@ template<class K> bool do_intersect(const Rectangle_2<K> &r, const Circle_2<K> &
         Vector_2 n(r.normal());
         FT n2 = n.squared_length();
         FT vn = v*n;
-        FT rn = c.radius()*sqrt(n2);
+        FT rn = sqrt(c.squared_radius()*n2);
         FT x0 = std::max(vn-n2,-rn);
         FT x1 = std::min(vn+n2, rn);
 	FT dx = x1-x0;

@@ -17,12 +17,12 @@ typedef image_ndvi_t::view_t image_ndvi_view_t;
 void ndvi(const image_rgb_const_view_t& rgb, const image_pir_const_view_t& pir, const image_z_const_view_t& z, const image_ndvi_view_t& dst) {
     for (int y=0; y<dst.height(); ++y)
         for (int x=0; x<dst.width(); ++x) {
-	unsigned short r = boost::gil::at_c<0>(rgb(x,y));
-	unsigned short i = (((pir(x,y))*26.5263)+1952.3755);
+	double r = boost::gil::at_c<0>(rgb(x,y));
+	double i = (((pir(x,y))*26.5263)+1952.3755);
 	if((r+i)==0) {
 		dst(x,y) = 0;
 	} else {
-		dst(x,y) = 85+((170*(i-r))/(i+r));
+		dst(x,y) = (unsigned short) (85+((170*(i-r))/(i+r)));
 	}
 
 	/*

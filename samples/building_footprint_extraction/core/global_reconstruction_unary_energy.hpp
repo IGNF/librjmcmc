@@ -16,14 +16,14 @@ public:
 		double gradient_ponderation, double ndvi_ponderation);
 
 	template<typename View>
-	void gradient(const View& view, const Iso_Rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
+	void gradient(const View& view, const Iso_rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
 
 	template<typename View>
-	void ndvi(const View& view, const Iso_Rectangle_2& bbox, unsigned int step=0);
+	void ndvi(const View& view, const Iso_rectangle_2& bbox, unsigned int step=0);
 
-	void gradient(const std::string& s, const Iso_Rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
+	void gradient(const std::string& s, const Iso_rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
 
-	void ndvi(const std::string& s, const Iso_Rectangle_2& bbox, unsigned int step=0);
+	void ndvi(const std::string& s, const Iso_rectangle_2& bbox, unsigned int step=0);
 
 private:
 	boost::shared_ptr<rjmcmc::gradient_image> m_gradient;

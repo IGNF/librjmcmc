@@ -22,8 +22,8 @@ private:
   typedef typename R_::RT                    RT;
   typedef typename R_::Line_2                Line_2;
   typedef typename R_::Segment_2             Segment_2;
-/*
   typedef typename R_::Iso_rectangle_2       Iso_rectangle_2;
+/*
   typedef typename R_::Aff_transformation_2  Aff_transformation_2;
 */
   typedef Rectangle_2                        Self;
@@ -229,7 +229,7 @@ public:
 
 /* Access methods */
 
-  Iso_Rectangle_2 bbox() const {
+  Iso_rectangle_2 bbox() const {
     FT nx = abs(n.x());
     FT ny = abs(n.y());
     FT rs = abs(r);

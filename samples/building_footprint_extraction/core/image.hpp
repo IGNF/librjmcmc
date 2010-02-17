@@ -15,14 +15,14 @@ public:
 	double error(const Rectangle_2 &s) const;
 	double error(const Circle_2  &c) const;
 
-	void load(const std::string &file, const Iso_Rectangle_2& bbox, unsigned int step=0);
+	void load(const std::string &file, const Iso_rectangle_2& bbox, unsigned int step=0);
 
 	template<typename View>
-	void load(const View& view, const Iso_Rectangle_2& bbox, unsigned int step=0);
+	void load(const View& view, const Iso_rectangle_2& bbox, unsigned int step=0);
 
 private:
 	image_t m_image;
-	Iso_Rectangle_2 m_bbox;
+	Iso_rectangle_2 m_bbox;
 };
 };
 

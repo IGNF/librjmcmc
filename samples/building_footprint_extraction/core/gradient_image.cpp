@@ -1,4 +1,6 @@
 #include "core/gradient_image.hpp"
+#include "geometry/Iso_rectangle_2_Segment_2_clip.h"
+#include "geometry/Segment_2_iterator.h"
 
 template<typename T> void Add1CirclePoints(const T& view, double cx, double cy, double dx, double dy, double d, double & res, double & w)
 {
@@ -35,7 +37,7 @@ double rjmcmc::gradient_image::integrated_flux(const Circle_2 &c) const
 {
 	double cx = c.center().x() - m_bbox.min().x();
 	double cy = c.center().y() - m_bbox.min().y();
-	double r  = c.radius();
+	double r  = CGAL::radius(c);
 	double res = 0., w = 0.;
 	double dx = 0;
 	double dy = r;
@@ -53,15 +55,14 @@ double rjmcmc::gradient_image::integrated_flux(const Circle_2 &c) const
 		Add8CirclePoints(m_gradients._view, cx, cy, dx, dy, res, w);
 	}
 	if(w==0) return 0.;
-	return (res * c.perimeter()) / w;
+	return (res * CGAL::perimeter(c)) / w;
 }
 
-#include "geometry/Segment_2_iterator.h"
 double rjmcmc::gradient_image::integrated_flux(const Segment_2& s0) const
 {
 	using namespace boost::gil;
 	Segment_2 s(s0);
-	if(!CGAL::clip(m_bbox,s)) return 0;
+	if(!clip(m_bbox,s)) return 0;
 	CGAL::Segment_2_iterator<K> it(s);
 
 	int x0 = (int)m_bbox.min().x();

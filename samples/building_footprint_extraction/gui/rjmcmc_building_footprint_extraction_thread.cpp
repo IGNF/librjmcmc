@@ -41,7 +41,7 @@ public:
   void operator()(const Circle_2& c) const {
     double x = CGAL::to_double(c.center().x());
     double y = CGAL::to_double(c.center().y());
-    double r = CGAL::to_double(c.radius());
+    double r = CGAL::to_double(CGAL::radius(c));
     m_layer->AddCircle(x,y,r);
     std::ostringstream oss;
     oss << m_energy;
@@ -143,17 +143,14 @@ void* rjmcmc_building_footprint_extraction_thread::Entry()
 
 
 // member function instanciations
-typedef any_image_type::view_t views;
-
 #include "core/image_gradient_unary_energy_inc.hpp"
-template void image_gradient_unary_energy::gradient<views>(const views&, const Iso_Rectangle_2&, double, unsigned int);
+template void image_gradient_unary_energy::gradient<any_view_type>(const any_view_type&, const Iso_rectangle_2&, double, unsigned int);
 
 #include "core/global_reconstruction_unary_energy_inc.hpp"
-template void global_reconstruction_unary_energy::gradient<views>(const views&, const Iso_Rectangle_2&, double, unsigned int);
+template void global_reconstruction_unary_energy::gradient<any_view_type>(const any_view_type&, const Iso_rectangle_2&, double, unsigned int);
 
 #include "core/gradient_image_inc.hpp"
-template void rjmcmc::gradient_image::load<views>(const views&, const Iso_Rectangle_2&, double, unsigned int);
+template void rjmcmc::gradient_image::load<any_view_type>(const any_view_type&, const Iso_rectangle_2&, double, unsigned int);
 
 #include "core/image_inc.hpp"
-template void rjmcmc::image::load<views>(const views&, const Iso_Rectangle_2&, unsigned int);
-
+template void rjmcmc::image::load<any_view_type>(const any_view_type&, const Iso_rectangle_2&, unsigned int);

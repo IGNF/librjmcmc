@@ -16,14 +16,14 @@ public:
 	double integrated_flux(const Segment_2 &s) const;
 	double integrated_flux(const Circle_2  &c) const;
 
-	void load(const std::string &file, const Iso_Rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
+	void load(const std::string &file, const Iso_rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
 
 	template<typename View>
-	void load(const View& view, const Iso_Rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
+	void load(const View& view, const Iso_rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
 
 private:
 	image_t m_gradients;
-	Iso_Rectangle_2 m_bbox;
+	Iso_rectangle_2 m_bbox;
 };
 };
 

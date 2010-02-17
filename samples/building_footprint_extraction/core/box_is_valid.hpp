@@ -12,14 +12,14 @@ public:
 	result_type operator()(const Rectangle_2 &n) const;
 	result_type operator()(const Circle_2 &n) const;
 
-	box_is_valid(const Iso_Rectangle_2 &box, double min_size, double max_ratio)
+	box_is_valid(const Iso_rectangle_2 &box, double min_size, double max_ratio)
 	 : m_box(box), m_squared_min_size(min_size*min_size), m_max_ratio(max_ratio) {}
 
-	inline const Iso_Rectangle_2& bbox() const { return m_box; }
+	inline const Iso_rectangle_2& bbox() const { return m_box; }
 	inline double squared_min_size() const { return m_squared_min_size; }
 	inline double max_ratio() const { return m_max_ratio; }
 private:
-	Iso_Rectangle_2 m_box;
+	Iso_rectangle_2 m_box;
 	double m_squared_min_size;
 	double m_max_ratio;
 };

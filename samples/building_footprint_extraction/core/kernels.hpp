@@ -17,7 +17,7 @@ public:
 	typedef double result_type;
 
 	result_type operator()(Rectangle_2 &r) const {
-		const Iso_Rectangle_2& bbox = m_is_valid.bbox();
+		const Iso_rectangle_2& bbox = m_is_valid.bbox();
 		float x0 = bbox.min().x();
 		float y0 = bbox.min().y();
 		float dx = bbox.max().x()-x0;
@@ -31,7 +31,7 @@ public:
 	}
 
 	result_type operator()(Circle_2 &c) const {
-		const Iso_Rectangle_2& bbox = m_is_valid.bbox();
+		const Iso_rectangle_2& bbox = m_is_valid.bbox();
 		float x0 = bbox.min().x();
 		float y0 = bbox.min().y();
 		float dx = bbox.max().x()-x0;
@@ -90,11 +90,12 @@ public:
 	double operator()(const Circle_2 &c, Circle_2 &res) const {
 		if(m_dief()<m_p_translation) {
 			Vector_2 v(m_dx*(m_dief()-0.5),m_dy*(m_dief()-0.5));
-			double d = sqrt(v.squared_length());
-			if (m_die4()%2 && c.radius()>d) d = -d;
-			res = Circle_2(c.center()+v,c.radius()+d);
+			double d2 = v.squared_length();
+			double d = sqrt(d2);
+			if (m_die4()%2 && c.squared_radius()>d2) d = -d;
+			res = Circle_2(c.center()+v,CGAL::radius(c)+d);
 		} else {
-			res = Circle_2(c.center(),c.radius()*exp(0.5-m_dief()));
+			res = Circle_2(c.center(),radius(c)*exp(0.5-m_dief()));
 		}
 		if(!m_is_valid(res)) return 0.;
 		return 1.; // TODO
@@ -111,7 +112,7 @@ public:
 
 	double operator()(const Circle_2 &c, Rectangle_2 &r) const {
 		Vector_2 v((2*m_dief()-1),(2*m_dief()-1));
-		v = v*(c.radius()/sqrt(v.squared_length()));
+		v = v*(CGAL::radius(c)/sqrt(v.squared_length()));
 		r = Rectangle_2(c.center(),v,1);
 		if (!m_is_valid(r)) return 0;
 		return 1.; // TODO

@@ -1,4 +1,4 @@
-#include "core/image.hpp"
+#include "core/image_inc.hpp"
 
 #include <boost/gil/extension/dynamic_image/dynamic_image_all.hpp>
 
@@ -20,7 +20,7 @@ double rjmcmc::image::error(const Rectangle_2 &r) const {
 
 double rjmcmc::image::error(const Circle_2  &c) const
 {
-	double r = c.radius();
+	double r = CGAL::radius(c);
 	double x = c.center().x();
 	double y = c.center().y();
 	int i0 = std::max(0,(int) (x-r));
@@ -39,4 +39,12 @@ double rjmcmc::image::error(const Circle_2  &c) const
 	}
 		
 	return res;
+}
+
+#include <boost/gil/extension/io/tiff_dynamic_io.hpp>
+void rjmcmc::image::load(const std::string &file, const Iso_rectangle_2& bbox, unsigned int step)
+{
+	image_t img;
+	tiff_read_image(file.c_str(), img);
+	load(const_view(img), bbox, step);
 }

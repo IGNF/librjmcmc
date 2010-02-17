@@ -16,7 +16,7 @@ public:
 	image_gradient_unary_energy(double default_energy);
 
 	template<typename View>
-	void gradient(const View& view, const Iso_Rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
+	void gradient(const View& view, const Iso_rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
 
 private:
 	boost::shared_ptr<rjmcmc::gradient_image> m_image;

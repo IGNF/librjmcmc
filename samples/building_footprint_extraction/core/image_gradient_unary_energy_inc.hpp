@@ -5,7 +5,7 @@
 #include "core/gradient_image.hpp"
 
 template<typename View>
-void image_gradient_unary_energy::gradient(const View& view, const Iso_Rectangle_2& bbox, double sigmaD, unsigned int step)
+void image_gradient_unary_energy::gradient(const View& view, const Iso_rectangle_2& bbox, double sigmaD, unsigned int step)
 {
 	m_image->load(view,bbox,sigmaD,step);
 }

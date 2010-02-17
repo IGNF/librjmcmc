@@ -48,7 +48,7 @@ template<typename Visitor, typename View>
 void building_footprint_extraction(Visitor& visitor, const View& view) {
 	param *p = param::Instance();
 
-	Iso_Rectangle_2 bbox(
+	Iso_rectangle_2 bbox(
 		p->get<int>("xmin"),
 		p->get<int>("ymin"),
 		p->get<int>("xmax"),

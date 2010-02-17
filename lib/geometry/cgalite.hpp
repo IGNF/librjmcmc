@@ -1,20 +1,28 @@
 #ifndef __CGAL_HPP__
 #define __CGAL_HPP__
 
-
-#if USE_CGAL
-
-#include "CGAL/Simple_cartesian.h"
-
-#else
-
 #include <cmath>
-#include <iostream>
-#include <algorithm> // min & max
-
 #ifndef M_PI
 const double M_PI = 4.0 * atan(1.0);
 #endif // #ifndef M_PI
+
+#if USE_CGAL
+
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Iso_rectangle_2.h>
+
+CGAL_BEGIN_NAMESPACE
+template <typename K>
+struct Iso_rectangle_2_traits {
+  typedef Iso_rectangle_2<K> type;
+};
+CGAL_END_NAMESPACE
+
+#else
+
+#include <iostream>
+#include <algorithm> // min & max
+
 
 #define CGAL_BEGIN_NAMESPACE namespace CGAL {
 #define CGAL_END_NAMESPACE }
@@ -83,14 +91,14 @@ namespace internal {
 
   template <typename T> inline Point_2<T> operator+(Origin, Vector_2<T>& v) { return Point_2<T>(v.x(),v.y()); }
 
-  template <typename T> class Iso_Rectangle_2 {
+  template <typename T> class Iso_rectangle_2 {
     Point_2<T> p_[2];
   public:
-    Iso_Rectangle_2() {}
-    Iso_Rectangle_2(const Point_2<T>& p, const Point_2<T>& q) {
+    Iso_rectangle_2() {}
+    Iso_rectangle_2(const Point_2<T>& p, const Point_2<T>& q) {
       p_[0]=p; p_[1]=q;
     }
-    Iso_Rectangle_2(T x0, T y0, T x1, T y1) {
+    Iso_rectangle_2(T x0, T y0, T x1, T y1) {
       p_[0]=Point_2<T>(x0,y0); p_[1]=Point_2<T>(x1,y1);
     }
     inline const Point_2<T>& min() const { return p_[0]; }
@@ -122,34 +130,6 @@ namespace internal {
 
 };
 
-  template<typename T> bool clip(
-    const internal::Iso_Rectangle_2<T>& r, internal::Segment_2<T>& s)
-  {
-    const internal::Point_2<T>& p(s.source());
-    const internal::Point_2<T>& q(s.target());
-    internal::Vector_2<T> d(q-p);
-    T a[] = { p.x(), p.y() };
-    T b[] = { q.x(), q.y() };
-    T tmin = 0, tmax = 1;
-    for(int i=0; i<2; ++i) {
-      if(d[i]==0 && (p[i]<r.min()[i] || p[i]>r.max()[i])) {
-        return false;
-      } else {
-        int j = 1-i, k = (d[i] > 0);
-        int l = 1-k;
-	T m[] = {r.min()[i], r.max()[i]}, t;
-        t = (m[l]-p[i])/d[i];
-        if(t>tmin) { tmin=t; a[i]=m[l];  a[j]=p[j]+t*d[j]; } // a=p+td
-        t = (m[k]-p[i])/d[i];
-        if(t<tmax) { tmax=t; b[i]=m[k];  b[j]=p[j]+t*d[j]; } // b=p+td
-        if(tmax <= tmin) return false;
-      }
-    }
-    internal::Point_2<T> pa(a[0],a[1]);
-    internal::Point_2<T> pb(b[0],b[1]);
-    s = internal::Segment_2<T>(pa,pb);
-    return true;
-  }
  
   template < typename T >
   std::istream & operator>>(std::istream &is, internal::Point_2<T> &p)
@@ -195,7 +175,7 @@ namespace internal {
   }
 
   template < typename T >
-  bool operator==(const internal::Iso_Rectangle_2<T> &u, const internal::Iso_Rectangle_2<T> &v)
+  bool operator==(const internal::Iso_rectangle_2<T> &u, const internal::Iso_rectangle_2<T> &v)
   {
 	return u.min()==v.min() && u.max()==v.max();
   }
@@ -240,7 +220,12 @@ struct Simple_cartesian {
   typedef internal::Vector_2<T> Vector_2;
   typedef internal::Segment_2<T> Segment_2;
   typedef internal::Line_2<T> Line_2;
-  typedef internal::Iso_Rectangle_2<T> Iso_Rectangle_2;
+  typedef internal::Iso_rectangle_2<T> Iso_rectangle_2;
+};
+
+template <typename K>
+struct Iso_rectangle_2_traits {
+  typedef internal::Iso_rectangle_2<typename K::RT> type;
 };
 
 CGAL_END_NAMESPACE
