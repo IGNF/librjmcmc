@@ -97,4 +97,13 @@ void rjmcmc::gradient_image::load(const View& view, const Iso_Rectangle_2& bbox,
 	init(m_gradients, v, sigmaD);
 }
 
+
+void rjmcmc::gradient_image::load(const std::string &file, const Iso_Rectangle_2& bbox, double sigmaD, unsigned int step)
+{
+	boost::gil::gray32F_image_t img;
+	tiff_read_image(file.c_str(), img);
+	load(const_view(img), bbox, sigmaD, step);
+}
+
+
 #endif // GRADIENT_IMAGE_INC_HPP

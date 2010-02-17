@@ -148,5 +148,12 @@ typedef any_image_type::view_t views;
 #include "core/image_gradient_unary_energy_inc.hpp"
 template void image_gradient_unary_energy::gradient<views>(const views&, const Iso_Rectangle_2&, double, unsigned int);
 
+#include "core/global_reconstruction_unary_energy_inc.hpp"
+template void global_reconstruction_unary_energy::gradient<views>(const views&, const Iso_Rectangle_2&, double, unsigned int);
+
 #include "core/gradient_image_inc.hpp"
 template void rjmcmc::gradient_image::load<views>(const views&, const Iso_Rectangle_2&, double, unsigned int);
+
+#include "core/image_inc.hpp"
+template void rjmcmc::image::load<views>(const views&, const Iso_Rectangle_2&, unsigned int);
+

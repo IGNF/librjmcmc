@@ -78,6 +78,7 @@ public:
 
 	bool parse(const std::string& filename);
 	bool parse(int argc, char **argv);
+	
 
 	inline iterator begin() { return m_parameter.begin(); }
 	inline iterator end() { return m_parameter.end(); }

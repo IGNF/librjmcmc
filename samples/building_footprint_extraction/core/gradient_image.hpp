@@ -3,7 +3,6 @@
 
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
-
 #include "geometry/geometry.h"
 
 namespace rjmcmc {
@@ -13,6 +12,7 @@ public:
 	typedef boost::gil::dev2n32F_image_t image_t;
 	typedef boost::gil::dev2n32F_pixel_t pixel_t;
 
+	double integrated_flux(const Rectangle_2 &r) const;
 	double integrated_flux(const Segment_2 &s) const;
 	double integrated_flux(const Circle_2  &c) const;
 

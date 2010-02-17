@@ -20,7 +20,7 @@ chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& chartt
 	XYPlot *plot = new XYPlot();
 
 	wxColour color[] = { wxColour(0,0,255), wxColour(255,0,0) };
-	char *title[] = { "Energy", "Temperature" };
+	char * title[] = { (char *)"Energy", (char *)"Temperature" };
 	AXIS_LOCATION location[] = { AXIS_LEFT, AXIS_RIGHT };
 
 	// add dynamic datasets and axes with line renderers

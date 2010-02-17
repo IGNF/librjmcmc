@@ -12,10 +12,10 @@ typedef boost::variant<Rectangle_2,Circle_2> object;
 #include "core/box_is_valid.hpp"
 typedef box_is_valid                         is_valid;
 
-#include "core/image_gradient_unary_energy.hpp"
-typedef image_gradient_unary_energy          unary_energy;
-//#include "core/global_reconstruction_unary_energy.hpp"
-//typedef global_reconstruction_unary_energy          unary_energy;
+//#include "core/image_gradient_unary_energy.hpp"
+//typedef image_gradient_unary_energy          unary_energy;
+#include "core/global_reconstruction_unary_energy.hpp"
+typedef global_reconstruction_unary_energy          unary_energy;
 
 #include "core/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy      binary_energy;
@@ -57,14 +57,14 @@ void building_footprint_extraction(Visitor& visitor, const View& view) {
 
 	// energies
 	unary_energy e1(
-		p->get<double>("energy")
+		p->get<double>("energy"),
+		p->get<double>("ponderation_gradient"), 
+		p->get<double>("ponderation_ndvi")
 	);
 	
-	e1.gradient(view,bbox,
-		p->get<double>("sigmaD"),
-		p->get<int>("subsampling")
-	);
-
+	e1.gradient(view,bbox); 
+	e1.ndvi(p->get<boost::filesystem::path>("ndvi").string(),bbox);
+	
 	binary_energy e2(
 		p->get<double>("surface")
 	);

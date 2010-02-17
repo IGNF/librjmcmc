@@ -132,6 +132,8 @@ parameters<T>::parameters()
 	insert<double>("minsize",'m',5, "Taille minimale d'un rectangle");
 	insert<double>("maxratio",'M',5, "Rapport longueur/largeur maximal d'un rectangle");
 	insert<double>("surface",'s',10, "Ponderation de la surface d'intersection");
+	insert<double>("ponderation_gradient",'\0',10, "Ponderation de l'energie DEM");
+	insert<double>("ponderation_ndvi",'\0',0.5, "Ponderation de l'energie NDVI");
 	insert<double>("energy",'e',250, "Energie d'existence d'un objet");
 	insert<double>("poisson",'p',200, "Parametre du processus de Poisson");
 }
