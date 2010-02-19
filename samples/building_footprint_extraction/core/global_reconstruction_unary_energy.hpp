@@ -1,8 +1,8 @@
 #ifndef GLOBAL_RECONSTRUCTION_ENERGIES_HPP_
 #define GLOBAL_RECONSTRUCTION_ENERGIES_HPP_
 
-#include "geometry/geometry.h"
 #include <boost/shared_ptr.hpp>
+#include "geometry/geometry.h"
 namespace rjmcmc { class image; class gradient_image; };
 
 class global_reconstruction_unary_energy

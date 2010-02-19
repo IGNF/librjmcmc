@@ -10,7 +10,8 @@
 #include <GilViewer/gui/PanelManager.h>
 #include <GilViewer/gui/define_id.hpp>
 
-#include "gui/wx_parameter_traits.hpp"
+#include "param/wx_parameter_traits.hpp"
+#include "core/building_footprint_extraction_parameters_inc.hpp"
 
 #include "parameters_frame.hpp"
 #include "rjmcmc_building_footprint_extraction_frame.hpp"
@@ -39,7 +40,6 @@ rjmcmc_building_footprint_extraction_frame::rjmcmc_building_footprint_extraction
 {
 
 #if defined(__WXMSW__)
-	// Sous windows, on va chercher l'image dans les resources
 	wxIcon icon("logo_matis_small");
 	SetIcon (icon);
 #else
@@ -98,8 +98,11 @@ rjmcmc_building_footprint_extraction_frame::rjmcmc_building_footprint_extraction
 
 rjmcmc_building_footprint_extraction_frame::~rjmcmc_building_footprint_extraction_frame()
 {
+	m_thread->Delete();
 	m_parameters_frame->Destroy();
+	m_parameters_frame = NULL;
 	m_chart_frame->Destroy();
+	m_chart_frame = NULL;
 }
 
 void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& event)
@@ -197,8 +200,10 @@ void rjmcmc_building_footprint_extraction_frame::OnThreadEnd()
 {
 	m_buttonStop->Disable();
 	m_buttonGo->Enable();
-	m_parameters_frame->Enable();
-	m_parameters_frame->Show();
+	if(m_parameters_frame) {
+		m_parameters_frame->Enable();
+		m_parameters_frame->Show();
+	}
 }
 
 wxAboutDialogInfo rjmcmc_building_footprint_extraction_frame::getAboutInfo() const

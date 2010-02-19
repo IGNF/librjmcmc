@@ -1,4 +1,4 @@
-#include "core/box_is_valid.hpp"
+#include "energy/box_is_valid.hpp"
 
 bool box_is_valid::operator()(const Rectangle_2 &n) const
 {

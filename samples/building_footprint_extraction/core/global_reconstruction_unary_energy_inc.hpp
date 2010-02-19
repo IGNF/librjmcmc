@@ -2,8 +2,8 @@
 #define GLOBAL_RECONSTRUCTION_UNARY_ENERGY_INC_HPP_
 
 #include "core/global_reconstruction_unary_energy.hpp"
-#include "core/gradient_image.hpp"
-#include "core/image.hpp"
+#include "image/gradient_image.hpp"
+#include "image/image.hpp"
 
 template<typename View>
 void global_reconstruction_unary_energy::gradient(const View& view, const Iso_rectangle_2& bbox, double sigmaD, unsigned int step)

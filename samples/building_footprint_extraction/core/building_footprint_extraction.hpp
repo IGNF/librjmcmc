@@ -9,7 +9,7 @@
 //typedef boost::variant<Rectangle_2> object;
 typedef boost::variant<Rectangle_2,Circle_2> object;
 
-#include "core/box_is_valid.hpp"
+#include "energy/box_is_valid.hpp"
 typedef box_is_valid                         is_valid;
 
 //#include "core/image_gradient_unary_energy.hpp"
@@ -17,10 +17,10 @@ typedef box_is_valid                         is_valid;
 #include "core/global_reconstruction_unary_energy.hpp"
 typedef global_reconstruction_unary_energy          unary_energy;
 
-#include "core/intersection_area_binary_energy.hpp"
+#include "energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy      binary_energy;
 
-#include "core/kernels.hpp"
+#include "energy/kernels.hpp"
 typedef generator<is_valid>          generator_;
 typedef modifier <is_valid>          modifier_;
 

@@ -1,7 +1,7 @@
 #ifndef CONSOLE_PARAMETER_TRAITS
 #define CONSOLE_PARAMETER_TRAITS
 
-#include "core/building_footprint_extraction_parameters.hpp"
+#include "param/parameters.hpp"
 
 struct console_parameter_traits { 
 	template<typename T> struct control { 

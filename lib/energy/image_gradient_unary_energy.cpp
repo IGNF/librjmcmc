@@ -1,5 +1,5 @@
-#include "core/image_gradient_unary_energy.hpp"
-#include "core/gradient_image.hpp"
+#include "energy/image_gradient_unary_energy.hpp"
+#include "image/gradient_image.hpp"
 
 double image_gradient_unary_energy::operator()(const Circle_2 &c) const
 {

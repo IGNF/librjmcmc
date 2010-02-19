@@ -1,19 +1,12 @@
-#include "cli/console_parameter_traits.hpp"
+#include "param/console_parameter_traits.hpp"
 #include "core/building_footprint_extraction_parameters_inc.hpp"
-template class parameters<console_parameter_traits>;
 
-#include "cli/image_types.hpp"
-#include "core/image_gradient_unary_energy_inc.hpp"
-template void image_gradient_unary_energy::gradient<rjmcmc::any_const_view_t>(const rjmcmc::any_const_view_t&, const Iso_rectangle_2&, double, unsigned int);
-
+#include "energy/image_gradient_unary_energy_inc.hpp"
 #include "core/global_reconstruction_unary_energy_inc.hpp"
-template void global_reconstruction_unary_energy::gradient<rjmcmc::any_const_view_t>(const rjmcmc::any_const_view_t&, const Iso_rectangle_2&, double, unsigned int);
 
-#include "core/gradient_image_inc.hpp"
-template void rjmcmc::gradient_image::load<rjmcmc::any_const_view_t>(const rjmcmc::any_const_view_t&, const Iso_rectangle_2&, double, unsigned int);
-
-#include "core/image_inc.hpp"
-template void rjmcmc::image::load<rjmcmc::any_const_view_t>(const rjmcmc::any_const_view_t&, const Iso_rectangle_2&, unsigned int);
+#include "image/image_types.hpp"
+#include "image/gradient_image_inc.hpp"
+#include "image/image_inc.hpp"
 
 #include "core/building_footprint_extraction.hpp"
 #include "rjmcmc/ostream_visitor.hpp"

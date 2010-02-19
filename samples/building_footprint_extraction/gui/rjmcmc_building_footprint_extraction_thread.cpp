@@ -1,4 +1,4 @@
-#include "gui/wx_parameter_traits.hpp"
+#include "param/wx_parameter_traits.hpp"
 
 #include <GilViewer/layers/ImageLayer.hpp>
 #include <GilViewer/layers/image_types.hpp>
@@ -143,14 +143,7 @@ void* rjmcmc_building_footprint_extraction_thread::Entry()
 
 
 // member function instanciations
-#include "core/image_gradient_unary_energy_inc.hpp"
-template void image_gradient_unary_energy::gradient<any_view_type>(const any_view_type&, const Iso_rectangle_2&, double, unsigned int);
-
+#include "energy/image_gradient_unary_energy_inc.hpp"
 #include "core/global_reconstruction_unary_energy_inc.hpp"
-template void global_reconstruction_unary_energy::gradient<any_view_type>(const any_view_type&, const Iso_rectangle_2&, double, unsigned int);
-
-#include "core/gradient_image_inc.hpp"
-template void rjmcmc::gradient_image::load<any_view_type>(const any_view_type&, const Iso_rectangle_2&, double, unsigned int);
-
-#include "core/image_inc.hpp"
-template void rjmcmc::image::load<any_view_type>(const any_view_type&, const Iso_rectangle_2&, unsigned int);
+#include "image/gradient_image_inc.hpp"
+#include "image/image_inc.hpp"

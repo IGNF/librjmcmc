@@ -13,7 +13,7 @@
 #include <wx/button.h>
 #include "parameters_frame.hpp"
 
-#include "gui/wx_parameter_traits.hpp"
+#include "param/wx_parameter_traits.hpp"
 
 struct sizer_adder {
 	typedef void result_type;

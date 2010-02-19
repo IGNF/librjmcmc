@@ -27,8 +27,6 @@ public:
 
 	wxAboutDialogInfo getAboutInfo() const;
 
-	rjmcmc_building_footprint_extraction_thread *m_thread;
-	wxCriticalSection m_cs;
 
 	parameters_frame* m_parameters_frame;
 	chart_frame* m_chart_frame;
@@ -37,6 +35,8 @@ public:
 	DECLARE_EVENT_TABLE() ;
 
 private:
+	rjmcmc_building_footprint_extraction_thread *m_thread;
+	wxCriticalSection m_cs;
 	wxButton *m_buttonGo;
 	wxButton *m_buttonStop;
 	PanelViewer *m_panel;

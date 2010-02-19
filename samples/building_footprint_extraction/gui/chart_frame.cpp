@@ -1,4 +1,4 @@
-#include "gui/wx_parameter_traits.hpp"
+#include "param/wx_parameter_traits.hpp"
 
 #include "chart_frame.hpp"
 

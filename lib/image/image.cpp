@@ -1,8 +1,7 @@
-#include "core/image_inc.hpp"
-
 #include <boost/gil/extension/dynamic_image/dynamic_image_all.hpp>
 
 #include "geometry/Rectangle_2_point_iterator.h"
+#include "image/image_inc.hpp"
 
 double rjmcmc::image::error(const Rectangle_2 &r) const {
 	return 0;

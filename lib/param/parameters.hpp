@@ -1,12 +1,12 @@
-#ifndef __BUILDING_FOOTPRINT_EXTRACTION_PARAMETERS_HPP__
-#define __BUILDING_FOOTPRINT_EXTRACTION_PARAMETERS_HPP__
+#ifndef PARAMETERS_HPP
+#define PARAMETERS_HPP
 
 #include <cstdlib>
 #include <list>
 #include <boost/variant.hpp>
 #include <boost/filesystem/path.hpp>
 
-#include "rjmcmc/pattern_singleton.hpp"
+#include "param/pattern_singleton.hpp"
 
 /**
  * @brief Class for application parameters handling
@@ -101,4 +101,4 @@ private:
 	parameters(const parameters &);
 };
 
-#endif /* __BUILDING_FOOTPRINT_EXTRACTION_PARAMETERS_HPP__ */
+#endif // PARAMETERS_HPP

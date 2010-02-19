@@ -1,6 +1,6 @@
 #include "core/global_reconstruction_unary_energy.hpp"
-#include "core/image.hpp"
-#include "core/gradient_image.hpp"
+#include "image/image.hpp"
+#include "image/gradient_image.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 

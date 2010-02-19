@@ -1,9 +1,10 @@
 #ifndef WX_PARAMETER_TRAITS
 #define WX_PARAMETER_TRAITS
 
-#include "core/building_footprint_extraction_parameters.hpp"
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
+
+#include "param/parameters.hpp"
 
 struct wx_parameter_traits { 
 

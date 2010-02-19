@@ -1,6 +1,7 @@
-#include "core/gradient_image.hpp"
 #include "geometry/Iso_rectangle_2_Segment_2_clip.h"
 #include "geometry/Segment_2_iterator.h"
+
+#include "image/gradient_image.hpp"
 
 template<typename T> void Add1CirclePoints(const T& view, double cx, double cy, double dx, double dy, double d, double & res, double & w)
 {

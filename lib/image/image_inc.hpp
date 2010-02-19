@@ -1,7 +1,7 @@
 #ifndef IMAGE_INC_HPP
 #define IMAGE_INC_HPP
 
-#include "core/image.hpp"
+#include "image/image.hpp"
 
 struct static_cast_color_converter
 {
@@ -38,5 +38,6 @@ void rjmcmc::image::load(const View& view, const Iso_rectangle_2& bbox, unsigned
 	}
 }
 
+#include "image/image.cpp"
 
-#endif // GRADIENT_IMAGE_INC_HPP
+#endif // IMAGE_INC_HPP
