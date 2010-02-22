@@ -2,3 +2,4 @@ cmake_minimum_required(VERSION 2.6)
 
 add_subdirectory(building_footprint_extraction)
 add_subdirectory(global_reconstruction)
+add_subdirectory(building_footprint_rectangle)
