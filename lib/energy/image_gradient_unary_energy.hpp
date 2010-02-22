@@ -3,7 +3,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "geometry/geometry.h"
+#include "core/geometry.h"
 namespace rjmcmc { class gradient_image; };
 
 class image_gradient_unary_energy

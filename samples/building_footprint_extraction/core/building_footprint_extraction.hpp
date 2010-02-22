@@ -3,7 +3,7 @@
 
 /************** application-specific types ****************/
 
-#include "geometry/geometry.h"
+#include "core/geometry.h"
 #include <boost/variant.hpp>
 //typedef Rectangle_2 object;
 //typedef boost::variant<Rectangle_2> object;

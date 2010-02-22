@@ -3,7 +3,8 @@
 
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
-#include "geometry/geometry.h"
+
+#include "core/geometry.h"
 
 namespace rjmcmc {
 class image

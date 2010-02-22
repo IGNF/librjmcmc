@@ -10,10 +10,10 @@ typedef K::Segment_2 Segment_2;
 typedef K::FT FT;
 
 
-#include "Rectangle_2_intersection.h"
-#include "Circle_2.h"
-#include "Circle_2_intersection.h"
-#include "Circle_2_rectangle_2_intersection.h"
+#include "geometry/Rectangle_2_intersection.h"
+#include "geometry/Circle_2.h"
+#include "geometry/Circle_2_intersection.h"
+#include "geometry/Circle_2_rectangle_2_intersection.h"
 
 typedef CGAL::Iso_rectangle_2_traits<K>::type Iso_rectangle_2;
 typedef CGAL::Rectangle_2<K> Rectangle_2;

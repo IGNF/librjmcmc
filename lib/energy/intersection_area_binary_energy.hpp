@@ -1,8 +1,6 @@
 #ifndef INTERSECTION_AREA_BINARY_ENERGY_HPP_
 #define INTERSECTION_AREA_BINARY_ENERGY_HPP_
 
-#include "geometry/geometry.h"
-
 class intersection_area_binary_energy
 {
 public:
