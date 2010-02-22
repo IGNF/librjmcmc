@@ -1,7 +1,7 @@
 #ifndef GRADIENT_IMAGE_INC_HPP
 #define GRADIENT_IMAGE_INC_HPP
 
-#include "core/gradient_image.hpp"
+#include "image/gradient_image.hpp"
 #include <boost/gil/extension/numeric/kernel.hpp>
 #include <boost/gil/extension/numeric/convolve.hpp>
 #include <boost/gil/extension/io/tiff_dynamic_io.hpp> // to write debugging images
@@ -105,5 +105,7 @@ void rjmcmc::gradient_image::load(const std::string &file, const Iso_rectangle_2
 	load(const_view(img), bbox, sigmaD, step);
 }
 
+
+#include "image/gradient_image.cpp"
 
 #endif // GRADIENT_IMAGE_INC_HPP
