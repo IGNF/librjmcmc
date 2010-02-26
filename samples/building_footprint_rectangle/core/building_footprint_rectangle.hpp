@@ -1,20 +1,18 @@
-#ifndef __BUILDING_FOOTPRINT_EXTRACTION_HPP__
-#define __BUILDING_FOOTPRINT_EXTRACTION_HPP__
+#ifndef __BUILDING_FOOTPRINT_RECTANGLE_HPP__
+#define __BUILDING_FOOTPRINT_RECTANGLE_HPP__
 
 /************** application-specific types ****************/
 
 #include "core/geometry.h"
-#include <boost/variant.hpp>
-//typedef Rectangle_2 object;
-typedef boost::variant<Rectangle_2> object;
+typedef Rectangle_2 object;
+//#include <boost/variant.hpp>
+//typedef boost::variant<Rectangle_2> object;
 
 #include "energy/box_is_valid.hpp"
 typedef box_is_valid                         is_valid;
 
-//#include "core/image_gradient_unary_energy.hpp"
-//typedef image_gradient_unary_energy          unary_energy;
-#include "core/global_reconstruction_unary_energy.hpp"
-typedef global_reconstruction_unary_energy          unary_energy;
+#include "energy/image_gradient_unary_energy.hpp"
+typedef image_gradient_unary_energy          unary_energy;
 
 #include "energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy      binary_energy;
@@ -113,4 +111,4 @@ void building_footprint_extraction(Visitor& visitor, const View& view) {
 	visitor.end(config);
 }
 
-#endif // __BUILDING_FOOTPRINT_EXTRACTION_HPP__
+#endif // __BUILDING_FOOTPRINT_RECTANGLE_HPP__

@@ -34,11 +34,41 @@ if(WIN32)
 endif(WIN32)
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL  " real install path" FORCE)
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 
 option(BUILD_SHARED_LIBS "Dynamic libraries" ON)
 option(BUILD_SHARED_EXE  "Dynamic executables" ON)
 
-add_subdirectory(samples)
+# Find BOOST
+find_package( Boost 1.37 COMPONENTS thread program_options system )
+set( Boost_ADDITIONAL_VERSIONS "1.39.0" "1.39" "1.40.0" "1.40" )
+find_package( Boost 1.37 COMPONENTS thread program_options system )
+if( NOT Boost_FOUND )
+	message(FATAL_ERROR "Boost not found ! Please set Boost path ...")
+else()
+	include_directories( ${Boost_INCLUDE_DIRS} )
+	link_directories( ${Boost_LIBRARY_DIRS} )
+endif()
+
+
+option(USE_CGAL  "Use CGAL library" OFF)
+
+if(USE_CGAL)
+  find_package( CGAL COMPONENTS Core )
+  set(USE_CGAL ${CGAL_FOUND})
+endif(USE_CGAL)
+
+if(USE_CGAL)
+  include(${CGAL_USE_FILE})
+  set(GEOMETRY_LIBRARIES ${CGAL_LIBRARIES})
+  set(GEOMETRY_USE_FILE ${CGAL_USE_FILE})
+  set(GEOMETRY_DEFINITIONS "-DUSE_CGAL=1")
+else(USE_CGAL)
+  set(GEOMETRY_LIBRARIES geometry)
+  set(GEOMETRY_USE_FILE "")
+  set(GEOMETRY_DEFINITIONS "")
+endif(USE_CGAL)
+
 add_subdirectory(lib)
+add_subdirectory(samples)

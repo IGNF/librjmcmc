@@ -12,6 +12,8 @@ public:
 
   void energy(double e) { m_energy=e; }
   typedef void result_type;
+
+#ifdef RECTANGLE_2_H
   void operator()(const Rectangle_2& r) const {
     std::vector<double> vectx, vecty;
     for (unsigned int i=0; i<4;++i)
@@ -38,6 +40,9 @@ public:
     double y = CGAL::to_double(r.center().y());
     m_layer->AddText(x, y, oss.str() , wxColour(255,0,0) );
   }
+#endif // RECTANGLE_2_H
+
+#ifdef CIRCLE_2_H
   void operator()(const Circle_2& c) const {
     double x = CGAL::to_double(c.center().x());
     double y = CGAL::to_double(c.center().y());
@@ -47,6 +52,8 @@ public:
     oss << m_energy;
     m_layer->AddText(x, y, oss.str() , wxColour(255,0,0) );
   }
+#endif // CIRCLE_2_H
+
 private:
   Layer::ptrLayerType& m_layer;
   double m_energy;
@@ -144,6 +151,5 @@ void* rjmcmc_building_footprint_rectangle_thread::Entry()
 
 // member function instanciations
 #include "energy/image_gradient_unary_energy_inc.hpp"
-#include "core/global_reconstruction_unary_energy_inc.hpp"
 #include "image/gradient_image_inc.hpp"
 #include "image/image_inc.hpp"

@@ -4,8 +4,6 @@
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
 
-#include "core/geometry.h"
-
 namespace rjmcmc {
 class image
 {
@@ -13,17 +11,23 @@ public:
 	typedef boost::gil::gray16s_image_t image_t;
 	typedef boost::gil::gray16s_pixel_t pixel_t;
 
+#ifdef RECTANGLE_2_H
 	double error(const Rectangle_2 &s) const;
+#endif // RECTANGLE_2_H
+
+#ifdef CIRCLE_2_H
 	double error(const Circle_2  &c) const;
+#endif // CIRCLE_2_H
 
-	void load(const std::string &file, const Iso_rectangle_2& bbox, unsigned int step=0);
+	template<typename IsoRectangle>
+	void load(const std::string &file, const IsoRectangle& bbox, unsigned int step=0);
 
-	template<typename View>
-	void load(const View& view, const Iso_rectangle_2& bbox, unsigned int step=0);
+	template<typename View, typename IsoRectangle>
+	void load(const View& view, const IsoRectangle& bbox, unsigned int step=0);
 
 private:
 	image_t m_image;
-	Iso_rectangle_2 m_bbox;
+	int x0, y0;
 };
 };
 

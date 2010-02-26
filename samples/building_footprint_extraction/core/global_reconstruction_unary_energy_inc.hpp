@@ -5,27 +5,25 @@
 #include "image/gradient_image.hpp"
 #include "image/image.hpp"
 
-template<typename View>
-void global_reconstruction_unary_energy::gradient(const View& view, const Iso_rectangle_2& bbox, double sigmaD, unsigned int step)
+template<typename View, typename IsoRectangle>
+void global_reconstruction_unary_energy::gradient(const View& view, const IsoRectangle& bbox, double sigmaD, unsigned int step)
 {
 	m_gradient->load(view,bbox,sigmaD,step);
 }
 
 
-template<typename View>
-void global_reconstruction_unary_energy::ndvi(const View& view, const Iso_rectangle_2& bbox, unsigned int step)
+template<typename View, typename IsoRectangle>
+void global_reconstruction_unary_energy::ndvi(const View& view, const IsoRectangle& bbox, unsigned int step)
 {
 	m_ndvi->load(view,bbox,step);
 }
 
-void global_reconstruction_unary_energy::gradient(const std::string& s, const Iso_rectangle_2& bbox, double sigmaD, unsigned int step)
+template<typename T>
+double global_reconstruction_unary_energy::operator()(const T &t) const
 {
-	m_gradient->load(s,bbox,sigmaD,step);
-}
-
-void global_reconstruction_unary_energy::ndvi(const std::string& s, const Iso_rectangle_2& bbox, unsigned int step)
-{
-	m_ndvi->load(s,bbox,step);
+	return m_defaultEnergy
+	- m_ponderation_gradient*(*m_gradient)(t)
+	+ m_ponderation_ndvi*m_ndvi->error(t);
 }
 
 #endif

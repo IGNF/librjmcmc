@@ -2,7 +2,6 @@
 #include "core/building_footprint_rectangle_parameters_inc.hpp"
 
 #include "energy/image_gradient_unary_energy_inc.hpp"
-#include "core/global_reconstruction_unary_energy_inc.hpp"
 
 #include "image/image_types.hpp"
 #include "image/gradient_image_inc.hpp"

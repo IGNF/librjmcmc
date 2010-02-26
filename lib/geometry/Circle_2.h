@@ -1,5 +1,5 @@
-#ifndef __Circle_2_H__
-#define __Circle_2_H__
+#ifndef CIRCLE_2_H
+#define CIRCLE_2_H
 
 #if USE_CGAL
 
@@ -100,4 +100,4 @@ inline typename K::FT area(const CGAL::Circle_2<K>& c) {
 }
 CGAL_END_NAMESPACE
 
-#endif //#ifndef __Circle_2_H__
+#endif // CIRCLE_2_H

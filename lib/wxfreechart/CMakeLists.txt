@@ -5,7 +5,7 @@ IF(wxWidgets_FOUND)
 	INCLUDE(${wxWidgets_USE_FILE})
 	
 	include_directories( include )
-	file( GLOB wxfreechart_HEADER_FILES include/wx/*.h include/wx/*/*.h )
+	file( GLOB WXFREECHART_HEADERS include/wx/*.h include/wx/*/*.h )
 	add_subdirectory(sample)
 	add_subdirectory(src)
 ELSE()

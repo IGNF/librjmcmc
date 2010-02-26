@@ -1,5 +1,5 @@
 #if !USE_CGAL
-#include "cgalite.hpp"
+#include "geometry.hpp"
 
 CGAL_BEGIN_NAMESPACE
 

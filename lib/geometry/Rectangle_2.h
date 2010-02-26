@@ -1,11 +1,11 @@
 // Author(s)     : Mathieu Bredif
 
-#ifndef CGAL_RECTANGLE_2_H
-#define CGAL_RECTANGLE_2_H
+#ifndef RECTANGLE_2_H
+#define RECTANGLE_2_H
 #include <utility> // for std::pair
 #include <vector>
 
-#include "cgalite.hpp"
+#include "geometry.hpp"
 
 CGAL_BEGIN_NAMESPACE
 
@@ -391,4 +391,4 @@ operator>>(std::istream &is, Rectangle_2<R> &b)
 
 CGAL_END_NAMESPACE
 
-#endif // CGAL_RECTANGLE_2_H
+#endif // RECTANGLE_2_H

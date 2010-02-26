@@ -16,6 +16,8 @@ public:
 
 	typedef double result_type;
 
+
+#ifdef RECTANGLE_2_H
 	result_type operator()(Rectangle_2 &r) const {
 		const Iso_rectangle_2& bbox = m_is_valid.bbox();
 		float x0 = bbox.min().x();
@@ -29,7 +31,9 @@ public:
 		} while (!m_is_valid(r));
 		return 1.;
 	}
+#endif
 
+#ifdef CIRCLE_2_H
 	result_type operator()(Circle_2 &c) const {
 		const Iso_rectangle_2& bbox = m_is_valid.bbox();
 		float x0 = bbox.min().x();
@@ -43,12 +47,17 @@ public:
 		} while (!m_is_valid(c));
 		return 1.;
 	}
-
+#endif
 	
 	struct pdf_visitor {
 		typedef double result_type;
+
+#ifdef RECTANGLE_2_H
 		result_type operator()(const Rectangle_2 &r) const { return 1.; }
+#endif
+#ifdef CIRCLE_2_H
 		result_type operator()(const Circle_2 &c) const { return 1.; }
+#endif
 	};
 	inline pdf_visitor pdf() const { return pdf_visitor(); }
 };
@@ -76,6 +85,7 @@ public:
 		return 0;
 	}
 
+#ifdef RECTANGLE_2_H
 	double operator()(const Rectangle_2 &r, Rectangle_2 &res) const {
 		if(m_dief()<m_p_translation) {
 			res = r.scaled_edge(m_die4(),exp(0.5-m_dief()));
@@ -87,6 +97,24 @@ public:
 		return 1.; // TODO
 	}
 
+	double operator()(const Rectangle_2 &r, std::pair<Rectangle_2,Rectangle_2> &res) const {
+		int i = m_die4();
+		float f = m_dief();
+		float g = m_dief()*(1-f);
+		res.first  = r.scaled_edge(i  ,f);
+		res.second = r.scaled_edge(i+2,g);
+		if (!(m_is_valid(res.first) && m_is_valid(res.second) )) return 0;
+		return 1.; // TODO
+	}
+
+	double operator()(const std::pair<Rectangle_2,Rectangle_2> &r, Rectangle_2 &res) const {
+		res = r.first.rotate(m_die4()).merge(r.second.rotate(m_die4()));
+		if (!(m_is_valid(res))) return 0;
+		return 1.; // TODO
+	}
+#endif
+
+#ifdef CIRCLE_2_H
 	double operator()(const Circle_2 &c, Circle_2 &res) const {
 		if(m_dief()<m_p_translation) {
 			Vector_2 v(m_dx*(m_dief()-0.5),m_dy*(m_dief()-0.5));
@@ -100,6 +128,10 @@ public:
 		if(!m_is_valid(res)) return 0.;
 		return 1.; // TODO
 	}
+#endif
+
+#ifdef CIRCLE_2_H
+#ifdef RECTANGLE_2_H
 
 	double operator()(const Rectangle_2 &r, Circle_2 &c) const {
 		double radius = sqrt(r.normal().squared_length());
@@ -118,21 +150,6 @@ public:
 		return 1.; // TODO
 	}
 
-	double operator()(const Rectangle_2 &r, std::pair<Rectangle_2,Rectangle_2> &res) const {
-		int i = m_die4();
-		float f = m_dief();
-		float g = m_dief()*(1-f);
-		res.first  = r.scaled_edge(i  ,f);
-		res.second = r.scaled_edge(i+2,g);
-		if (!(m_is_valid(res.first) && m_is_valid(res.second) )) return 0;
-		return 1.; // TODO
-	}
-	double operator()(const std::pair<Rectangle_2,Rectangle_2> &r, Rectangle_2 &res) const {
-		res = r.first.rotate(m_die4()).merge(r.second.rotate(m_die4()));
-		if (!(m_is_valid(res))) return 0;
-		return 1.; // TODO
-	}
-
 	double operator()(const Rectangle_2 &r, std::pair<Rectangle_2,Circle_2> &res) const {
 		// todo: verifier que ca fait pas n'importe quoi...
 		int i = m_die4();
@@ -147,6 +164,8 @@ public:
 		if (!(m_is_valid(res.first) && m_is_valid(res.second) )) return 0;
 		return 1.; // TODO
 	}
+#endif
+#endif
 
 };
 

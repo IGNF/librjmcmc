@@ -4,8 +4,6 @@
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
 
-#include "core/geometry.h"
-
 namespace rjmcmc {
 class gradient_image
 {
@@ -13,18 +11,20 @@ public:
 	typedef boost::gil::dev2n32F_image_t image_t;
 	typedef boost::gil::dev2n32F_pixel_t pixel_t;
 
-	double integrated_flux(const Rectangle_2 &r) const;
-	double integrated_flux(const Segment_2 &s) const;
-	double integrated_flux(const Circle_2  &c) const;
+	typedef double result_type;
+	template<typename T> double operator()(const T&t) const {
+		return integrated_flux(boost::gil::const_view(m_gradients),x0,y0,t);
+	}
 
-	void load(const std::string &file, const Iso_rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
+	template<typename IsoRectangle>
+	void load(const std::string &file, const IsoRectangle& bbox, double sigmaD=1, unsigned int step=0);
 
-	template<typename View>
-	void load(const View& view, const Iso_rectangle_2& bbox, double sigmaD=1, unsigned int step=0);
+	template<typename View, typename IsoRectangle>
+	void load(const View& view, const IsoRectangle& bbox, double sigmaD=1, unsigned int step=0);
 
 private:
 	image_t m_gradients;
-	Iso_rectangle_2 m_bbox;
+	int x0, y0;
 };
 };
 

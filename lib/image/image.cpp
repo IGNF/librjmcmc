@@ -3,6 +3,7 @@
 #include "geometry/Rectangle_2_point_iterator.h"
 #include "image/image_inc.hpp"
 
+#ifdef RECTANGLE_2_H
 double rjmcmc::image::error(const Rectangle_2 &r) const {
 	return 0;
 	/*
@@ -10,18 +11,20 @@ double rjmcmc::image::error(const Rectangle_2 &r) const {
 	double res = 0;
 	for (; !it.end() ; ++it)
 	{
-		double ndvi = ((boost::gil::const_view(m_image))(it.x(),it.y()));
+		double ndvi = ((boost::gil::const_view(m_image))(it.x()-x0,it.y()-y0));
 		res += (ndvi-150);
 	}
 	return res;
 	*/
 }
+#endif // RECTANGLE_2_H
 
+#ifdef CIRCLE_2_H
 double rjmcmc::image::error(const Circle_2  &c) const
 {
 	double r = CGAL::radius(c);
-	double x = c.center().x();
-	double y = c.center().y();
+	double x = c.center().x()-x0;
+	double y = c.center().y()-y0;
 	int i0 = std::max(0,(int) (x-r));
 	int i1 = std::min((int) (m_image.width()-1),(int) (x+r+1));
 	int j0 = std::max(0,(int) (y-r));
@@ -39,11 +42,5 @@ double rjmcmc::image::error(const Circle_2  &c) const
 		
 	return res;
 }
+#endif // CIRCLE_2_H
 
-#include <boost/gil/extension/io/tiff_dynamic_io.hpp>
-void rjmcmc::image::load(const std::string &file, const Iso_rectangle_2& bbox, unsigned int step)
-{
-	image_t img;
-	tiff_read_image(file.c_str(), img);
-	load(const_view(img), bbox, step);
-}

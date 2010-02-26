@@ -7,8 +7,12 @@ class box_is_valid
 {
 public:
 	typedef bool result_type;
+#ifdef RECTANGLE_2_H
 	result_type operator()(const Rectangle_2 &n) const;
+#endif
+#ifdef CIRCLE_2_H
 	result_type operator()(const Circle_2 &n) const;
+#endif
 
 	box_is_valid(const Iso_rectangle_2 &box, double min_size, double max_ratio)
 	 : m_box(box), m_squared_min_size(min_size*min_size), m_max_ratio(max_ratio) {}

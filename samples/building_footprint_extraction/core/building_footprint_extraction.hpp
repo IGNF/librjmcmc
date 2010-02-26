@@ -12,7 +12,7 @@ typedef boost::variant<Rectangle_2,Circle_2> object;
 #include "energy/box_is_valid.hpp"
 typedef box_is_valid                         is_valid;
 
-//#include "core/image_gradient_unary_energy.hpp"
+//#include "energy/image_gradient_unary_energy.hpp"
 //typedef image_gradient_unary_energy          unary_energy;
 #include "core/global_reconstruction_unary_energy.hpp"
 typedef global_reconstruction_unary_energy          unary_energy;

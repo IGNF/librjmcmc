@@ -4,10 +4,16 @@
 #include "energy/image_gradient_unary_energy.hpp"
 #include "image/gradient_image.hpp"
 
-template<typename View>
-void image_gradient_unary_energy::gradient(const View& view, const Iso_rectangle_2& bbox, double sigmaD, unsigned int step)
+template<typename View, typename IsoRectangle>
+void image_gradient_unary_energy::gradient(const View& view, const IsoRectangle& bbox, double sigmaD, unsigned int step)
 {
 	m_image->load(view,bbox,sigmaD,step);
+}
+
+template<typename T>
+double image_gradient_unary_energy::operator()(const T &t) const
+{
+	return m_defaultEnergy - m_ponderation_gradient*(*m_image)(t);
 }
 
 #endif
