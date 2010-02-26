@@ -61,14 +61,13 @@ endif(USE_CGAL)
 
 if(USE_CGAL)
   include(${CGAL_USE_FILE})
+  add_definitions("-DUSE_CGAL=1")
   set(GEOMETRY_LIBRARIES ${CGAL_LIBRARIES})
-  set(GEOMETRY_USE_FILE ${CGAL_USE_FILE})
-  set(GEOMETRY_DEFINITIONS "-DUSE_CGAL=1")
 else(USE_CGAL)
   set(GEOMETRY_LIBRARIES geometry)
-  set(GEOMETRY_USE_FILE "")
-  set(GEOMETRY_DEFINITIONS "")
 endif(USE_CGAL)
+
+include_directories( lib )
 
 add_subdirectory(lib)
 add_subdirectory(samples)
