@@ -12,41 +12,34 @@ public:
 
   void energy(double e) { m_energy=e; }
   typedef void result_type;
+#ifdef GEOMETRY_RECTANGLE_2_H
   void operator()(const Rectangle_2& r) const {
     std::vector<double> vectx, vecty;
     for (unsigned int i=0; i<4;++i)
     {
-      vectx.push_back(CGAL::to_double(r[i].x()));
-      vecty.push_back(CGAL::to_double(r[i].y()));
+      vectx.push_back(geometry::to_double(r[i].x()));
+      vecty.push_back(geometry::to_double(r[i].y()));
     }
-/* // test clipping
-    Iso_Rectangle_2 bbox(100,100,500,500);
-    for (unsigned int i=0; i<4;++i)
-    {
-      Segment_2 s(r.segment(i));
-      if(!CGAL::clip(bbox,s)) continue;
-      vectx.push_back(CGAL::to_double(s.source().x()));
-      vecty.push_back(CGAL::to_double(s.source().y()));
-      vectx.push_back(CGAL::to_double(s.target().x()));
-      vecty.push_back(CGAL::to_double(s.target().y()));
-    }
-*/
     m_layer->AddPolygon(vectx, vecty );
     std::ostringstream oss;
     oss << m_energy;
-    double x = CGAL::to_double(r.center().x());
-    double y = CGAL::to_double(r.center().y());
+    double x = geometry::to_double(r.center().x());
+    double y = geometry::to_double(r.center().y());
     m_layer->AddText(x, y, oss.str() , wxColour(255,0,0) );
   }
+#endif // GEOMETRY_RECTANGLE_2_H
+
+#ifdef GEOMETRY_CIRCLE_2_H
   void operator()(const Circle_2& c) const {
-    double x = CGAL::to_double(c.center().x());
-    double y = CGAL::to_double(c.center().y());
-    double r = CGAL::to_double(CGAL::radius(c));
+    double x = geometry::to_double(c.center().x());
+    double y = geometry::to_double(c.center().y());
+    double r = geometry::to_double(geometry::radius(c));
     m_layer->AddCircle(x,y,r);
     std::ostringstream oss;
     oss << m_energy;
     m_layer->AddText(x, y, oss.str() , wxColour(255,0,0) );
   }
+#endif // GEOMETRY_CIRCLE_2_H
 private:
   Layer::ptrLayerType& m_layer;
   double m_energy;

@@ -1,20 +1,21 @@
-#ifndef CIRCLE_2_H
-#define CIRCLE_2_H
+#ifndef GEOMETRY_CIRCLE_2_H
+#define GEOMETRY_CIRCLE_2_H
 
 #if USE_CGAL
 
 #include <CGAL/Circle_2.h>
 
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
+using namespace CGAL;
+
 template<class K>
-inline typename K::FT radius(const CGAL::Circle_2<K>& c) {
+inline typename K::FT radius(const Circle_2<K>& c) {
 	return CGAL::sqrt(c.squared_radius());
 }
-CGAL_END_NAMESPACE
 
 #else
 
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
 
 template<class K_> class Circle_2
 {
@@ -77,27 +78,23 @@ operator>>(std::istream &is, Circle_2<K> &b)
 }
 
 template<class K>
-typename K::FT radius(const CGAL::Circle_2<K>& c) {
+typename K::FT radius(const Circle_2<K>& c) {
 	return c.radius();
 }
 
-CGAL_END_NAMESPACE
-
 #endif // USE_CGAL
 
-
-CGAL_BEGIN_NAMESPACE
-
 template<class K>
-inline typename K::FT perimeter(const CGAL::Circle_2<K>& c) {
+inline typename K::FT perimeter(const Circle_2<K>& c) {
 	return 2*M_PI*radius(c);
 }
 
 
 template<class K>
-inline typename K::FT area(const CGAL::Circle_2<K>& c) {
+inline typename K::FT area(const Circle_2<K>& c) {
 	return M_PI*c.squared_radius();
 }
-CGAL_END_NAMESPACE
 
-#endif // CIRCLE_2_H
+}; // namespace geometry
+
+#endif // GEOMETRY_CIRCLE_2_H

@@ -1,34 +1,30 @@
-#ifndef __CGAL_HPP__
-#define __CGAL_HPP__
+#ifndef GEOMETRY_GEOMETRY_HPP
+#define GEOMETRY_GEOMETRY_HPP
 
 #include <cmath>
 #ifndef M_PI
 const double M_PI = 4.0 * atan(1.0);
 #endif // #ifndef M_PI
 
+#include <iostream>
+#include <algorithm> // min & max
+
 #if USE_CGAL
 
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Iso_rectangle_2.h>
 
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
+using namespace CGAL;
+
 template <typename K>
 struct Iso_rectangle_2_traits {
   typedef Iso_rectangle_2<K> type;
 };
-CGAL_END_NAMESPACE
 
 #else
 
-#include <iostream>
-#include <algorithm> // min & max
-
-
-#define CGAL_BEGIN_NAMESPACE namespace CGAL {
-#define CGAL_END_NAMESPACE }
-
-
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
 
 enum Orientation { CLOCKWISE=-1, DEGENERATE=0, COUNTERCLOCKWISE=1 };
 enum Oriented_side { ON_NEGATIVE_SIDE=-1, ON_ORIENTED_BOUNDARY=0, ON_POSITIVE_SIDE=1 };
@@ -228,8 +224,8 @@ struct Iso_rectangle_2_traits {
   typedef internal::Iso_rectangle_2<typename K::RT> type;
 };
 
-CGAL_END_NAMESPACE
-
 #endif //  USE_CGAL
 
-#endif //  __CGAL_HPP__
+}; // namespace geometry
+
+#endif //  GEOMETRY_GEOMETRY_HPP

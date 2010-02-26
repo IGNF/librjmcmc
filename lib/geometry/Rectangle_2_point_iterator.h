@@ -1,9 +1,9 @@
 // Author(s)     : Mathieu Bredif
 
-#ifndef CGAL_RECTANGLE_2_POINT_ITERATOR_H
-#define CGAL_RECTANGLE_2_POINT_ITERATOR_H
+#ifndef GEOMETRY_RECTANGLE_2_POINT_ITERATOR_H
+#define GEOMETRY_RECTANGLE_2_POINT_ITERATOR_H
 
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
 
 // énumération des points de coordonnées entières contenus dans le rectangle
 
@@ -107,6 +107,6 @@ private :
 };
 */
 
-CGAL_END_NAMESPACE
+}; // namespace geometry
 
-#endif // CGAL_RECTANGLE_ITERATOR_2_H
+#endif // GEOMETRY_RECTANGLE_ITERATOR_2_H

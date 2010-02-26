@@ -7,10 +7,10 @@ class box_is_valid
 {
 public:
 	typedef bool result_type;
-#ifdef RECTANGLE_2_H
+#ifdef GEOMETRY_RECTANGLE_2_H
 	result_type operator()(const Rectangle_2 &n) const;
 #endif
-#ifdef CIRCLE_2_H
+#ifdef GEOMETRY_CIRCLE_2_H
 	result_type operator()(const Circle_2 &n) const;
 #endif
 

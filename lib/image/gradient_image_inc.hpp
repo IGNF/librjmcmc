@@ -39,7 +39,7 @@ void rjmcmc::gradient_image::load(const std::string &file, const IsoRectangle& b
 
 #include "image/gradient_image.cpp"
 
-#ifdef CIRCLE_2_H
+#ifdef GEOMETRY_CIRCLE_2_H
 template<typename View> void Add1CirclePoints(const View& view, double cx, double cy, double dx, double dy, double d, double & res, double & w)
 {
 	int i = (int) (cx + dx);
@@ -75,7 +75,7 @@ template<typename View> double integrated_flux(const View& view, int x0, int y0,
 {
 	double cx = c.center().x() - x0;
 	double cy = c.center().y() - y0;
-	double r  = CGAL::radius(c);
+	double r  = geometry::radius(c);
 	double res = 0., w = 0.;
 	double dx = 0;
 	double dy = r;
@@ -93,12 +93,12 @@ template<typename View> double integrated_flux(const View& view, int x0, int y0,
 		Add8CirclePoints(view, cx, cy, dx, dy, res, w);
 	}
 	if(w==0) return 0.;
-	return (res * CGAL::perimeter(c)) / w;
+	return (res * geometry::perimeter(c)) / w;
 }
-#endif
+#endif // GEOMETRY_CIRCLE_2_H
 
 
-#ifdef RECTANGLE_2_H
+#ifdef GEOMETRY_RECTANGLE_2_H
 #include "geometry/Segment_2_iterator.h"
 #include "geometry/Iso_rectangle_2_Segment_2_clip.h"
 template<typename View> double integrated_flux(const View& view, int x0, int y0, const Segment_2& s0)
@@ -109,7 +109,7 @@ template<typename View> double integrated_flux(const View& view, int x0, int y0,
 	Segment_2 s(s0);
 	Iso_rectangle_2 bbox(x0,y0,x1,y1);
 	if(!clip(bbox,s)) return 0;
-	CGAL::Segment_2_iterator<K> it(s);
+	geometry::Segment_2_iterator<K> it(s);
 
 	typedef typename View::xy_locator xy_locator;
 	xy_locator loc_grad = view.xy_at(
@@ -134,9 +134,9 @@ template<typename View> double integrated_flux(const View& view, int x0, int y0,
 	}
 
 	Vector_2 arete(s.target()-s.source());
-	Vector_2 normale = arete.perpendicular(CGAL::NEGATIVE);
+	Vector_2 normale = arete.perpendicular(geometry::NEGATIVE);
 	Vector_2 sum(gradient_sum[0], gradient_sum[1]);
-	return CGAL::to_double(normale * sum);
+	return geometry::to_double(normale * sum);
 }
 
 template<typename View> double integrated_flux(const View& view, int x0, int y0, const Rectangle_2& r)
@@ -146,6 +146,6 @@ template<typename View> double integrated_flux(const View& view, int x0, int y0,
 		+ std::max(0.,integrated_flux(view,x0,y0,r.segment(2)))
 		+ std::max(0.,integrated_flux(view,x0,y0,r.segment(3)));
 }
-#endif // RECTANGLE_2_H
+#endif // GEOMETRY_RECTANGLE_2_H
 
 #endif // GRADIENT_IMAGE_INC_HPP

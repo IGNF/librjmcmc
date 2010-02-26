@@ -1,7 +1,7 @@
 // Author(s)     : Mathieu Bredif
 
-#ifndef CIRCLE_2_INTERSECTION_H
-#define CIRCLE_2_INTERSECTION_H
+#ifndef GEOMETRY_CIRCLE_2_INTERSECTION_H
+#define GEOMETRY_CIRCLE_2_INTERSECTION_H
 
 #include "Circle_2.h"
 
@@ -9,9 +9,12 @@
 
 #include <CGAL/Circle_2_Circle_2_intersection.h>
 
+namespace geometry {
+using namespace CGAL;
+
 #else
 
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
 
 template<class K> inline bool do_intersect(const Circle_2<K> &c, const Circle_2<K> &d)
 {
@@ -20,16 +23,12 @@ template<class K> inline bool do_intersect(const Circle_2<K> &c, const Circle_2<
 	return (v2 < d.squared_radius() + c.squared_radius() + 2 * c.radius()*d.radius());
 }
 
-CGAL_END_NAMESPACE
-
 #endif
-
-CGAL_BEGIN_NAMESPACE
 
 	// Tout vient de :
 	// Weisstein, Eric W. "Circle-Circle Intersection." From MathWorld--A Wolfram Web Resource.
 	// http://mathworld.wolfram.com/Circle-CircleIntersection.html
-template<class K> inline typename K::FT intersection_area(const Circle_2<K> &c0, const Circle_2<K> &c1)
+template<class K> inline typename K::FT intersection_area(const geometry::Circle_2<K> &c0, const geometry::Circle_2<K> &c1)
 {
 	typename K::Vector_2 diff(c1.center() - c0.center());
 	FT d2 = diff.squared_length();
@@ -48,6 +47,6 @@ template<class K> inline typename K::FT intersection_area(const Circle_2<K> &c0,
 	return area;
 }
 
-CGAL_END_NAMESPACE
+}; // namespace geometry;
 
-#endif
+#endif // GEOMETRY_CIRCLE_2_INTERSECTION_H

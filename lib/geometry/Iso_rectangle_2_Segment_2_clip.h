@@ -1,5 +1,5 @@
-#ifndef ISO_RECTANGLE_2_SEGMENT_2_CLIP_H
-#define ISO_RECTANGLE_2_SEGMENT_2_CLIP_H
+#ifndef GEOMETRY_ISO_RECTANGLE_2_SEGMENT_2_CLIP_H
+#define GEOMETRY_ISO_RECTANGLE_2_SEGMENT_2_CLIP_H
 
 template<typename IsoRectangle, typename Segment>
 bool clip(const IsoRectangle& r, Segment& s)
@@ -35,4 +35,4 @@ bool clip(const IsoRectangle& r, Segment& s)
     return true;
 }
 
-#endif // ISO_RECTANGLE_2_SEGMENT_2_CLIP_H
+#endif // GEOMETRY_ISO_RECTANGLE_2_SEGMENT_2_CLIP_H

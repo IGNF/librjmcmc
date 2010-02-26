@@ -11,13 +11,13 @@ public:
 	typedef boost::gil::gray16s_image_t image_t;
 	typedef boost::gil::gray16s_pixel_t pixel_t;
 
-#ifdef RECTANGLE_2_H
+#ifdef GEOMETRY_RECTANGLE_2_H
 	double error(const Rectangle_2 &s) const;
-#endif // RECTANGLE_2_H
+#endif // GEOMETRY_RECTANGLE_2_H
 
-#ifdef CIRCLE_2_H
+#ifdef GEOMETRY_CIRCLE_2_H
 	double error(const Circle_2  &c) const;
-#endif // CIRCLE_2_H
+#endif // GEOMETRY_CIRCLE_2_H
 
 	template<typename IsoRectangle>
 	void load(const std::string &file, const IsoRectangle& bbox, unsigned int step=0);

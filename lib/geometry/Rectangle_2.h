@@ -1,13 +1,13 @@
 // Author(s)     : Mathieu Bredif
 
-#ifndef RECTANGLE_2_H
-#define RECTANGLE_2_H
+#ifndef GEOMETRY_RECTANGLE_2_H
+#define GEOMETRY_RECTANGLE_2_H
 #include <utility> // for std::pair
 #include <vector>
 
 #include "geometry.hpp"
 
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
 
 template <class R_>
 class Rectangle_2
@@ -389,6 +389,6 @@ operator>>(std::istream &is, Rectangle_2<R> &b)
   return is;
 }
 
-CGAL_END_NAMESPACE
+}; // namespace geometry
 
-#endif // RECTANGLE_2_H
+#endif // GEOMETRY_RECTANGLE_2_H

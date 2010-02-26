@@ -1,20 +1,18 @@
 // Author(s)     : Mathieu Bredif
 
-#ifndef CGAL_RECTANGLE_2_INTERSECTION_H
-#define CGAL_RECTANGLE_2_INTERSECTION_H
+#ifndef GEOMETRY_RECTANGLE_2_INTERSECTION_H
+#define GEOMETRY_RECTANGLE_2_INTERSECTION_H
 
 #include "Rectangle_2.h"
-/*
-#include <CGAL/Polygon_2_algorithms.h>
-*/
 
 #ifdef CGAL_RECTANGLE_2_COMPILE_BOOLEAN_INTERSECTION
+#include <CGAL/Polygon_2_algorithms.h>
 #include <CGAL/Polygon_2.h>
 #include <CGAL/Polygon_with_holes_2.h>
 #include <CGAL/Boolean_set_operations_2.h>
 #endif // CGAL_RECTANGLE_2_COMPILE_BOOLEAN_INTERSECTION
 
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
 
 namespace Impl {
 // intersection area between rectangle [-n2,n2]x[-m2,m2] and triangle (tx,ry),(rx,ry),(tx,ty)
@@ -648,6 +646,6 @@ template <class K> inline bool do_intersect_interior(const typename K::Iso_recta
 }
 */
 
-CGAL_END_NAMESPACE
+}; // namespace geometry
 
-#endif // CGAL_RECTANGLE_2_INTERSECTION_H
+#endif // GEOMETRY_RECTANGLE_2_INTERSECTION_H

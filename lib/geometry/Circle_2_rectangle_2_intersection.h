@@ -1,13 +1,16 @@
 // Author(s)     : Mathieu Bredif
 
-#ifndef CIRCLE_2_RECTANGLE_2_INTERSECTION_H
-#define CIRCLE_2_RECTANGLE_2_INTERSECTION_H
+#ifndef GEOMETRY_CIRCLE_2_RECTANGLE_2_INTERSECTION_H
+#define GEOMETRY_CIRCLE_2_RECTANGLE_2_INTERSECTION_H
 
 #include "Rectangle_2.h"
 #include "Circle_2.h"
 
 
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
+#if USE_CGAL
+using namespace CGAL;
+#endif
 
 namespace Impl {
 
@@ -57,10 +60,10 @@ template<class T> bool intersection_area_rectangle_circle_aux(
 	return false;
 }
 
-} // namespace Impl
+}; // namespace Impl
 
 
-template<class K> inline typename K::FT intersection_area(const Rectangle_2<K> &r, const Circle_2<K> &c)
+template<class K> inline typename K::FT intersection_area(const Rectangle_2<K> &r, const geometry::Circle_2<K> &c)
 {
 	typedef typename K::Vector_2 Vector_2;
 	typedef typename K::FT FT;
@@ -98,12 +101,12 @@ template<class K> inline typename K::FT intersection_area(const Rectangle_2<K> &
 	return area/n2;
 }
 
-template<class K> inline typename K::FT intersection_area(const Circle_2<K> &c, const Rectangle_2<K> &r)
+template<class K> inline typename K::FT intersection_area(const geometry::Circle_2<K> &c, const Rectangle_2<K> &r)
 {
 	return intersection_area(r,c);
 }
 
-template<class K> bool do_intersect(const Rectangle_2<K> &r, const Circle_2<K> &c)
+template<class K> bool do_intersect(const Rectangle_2<K> &r, const geometry::Circle_2<K> &c)
 {
 	typedef typename K::Vector_2 Vector_2;
 	typedef typename K::FT FT;
@@ -136,10 +139,10 @@ template<class K> bool do_intersect(const Rectangle_2<K> &r, const Circle_2<K> &
 	return true;
 }
 
-template<class K> inline bool do_intersect(const Circle_2<K> &c, const Rectangle_2<K> &r) {
+template<class K> inline bool do_intersect(const geometry::Circle_2<K> &c, const Rectangle_2<K> &r) {
 	return do_intersect(r,c);
 }
-CGAL_END_NAMESPACE
 
+}; // namespace geometry
 
-#endif
+#endif // GEOMETRY_CIRCLE_2_RECTANGLE_2_INTERSECTION_H

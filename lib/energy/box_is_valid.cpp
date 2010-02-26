@@ -1,6 +1,6 @@
 #include "energy/box_is_valid.hpp"
 
-#ifdef RECTANGLE_2_H
+#ifdef GEOMETRY_RECTANGLE_2_H
 bool box_is_valid::operator()(const Rectangle_2 &n) const
 {
 	if (!m_box.has_on_bounded_side (n.center())) return false;
@@ -12,7 +12,7 @@ bool box_is_valid::operator()(const Rectangle_2 &n) const
 }
 #endif
 
-#ifdef CIRCLE_2_H
+#ifdef GEOMETRY_CIRCLE_2_H
 bool box_is_valid::operator()(const Circle_2 &n) const
 {
 	if (!m_box.has_on_bounded_side (n.center())) return false;

@@ -3,11 +3,11 @@
 #include "geometry/Rectangle_2_point_iterator.h"
 #include "image/image_inc.hpp"
 
-#ifdef RECTANGLE_2_H
+#ifdef GEOMETRY_RECTANGLE_2_H
 double rjmcmc::image::error(const Rectangle_2 &r) const {
 	return 0;
 	/*
-	CGAL::Rectangle_2_point_iterator<Rectangle_2> it(r);
+	geometry::Rectangle_2_point_iterator<Rectangle_2> it(r);
 	double res = 0;
 	for (; !it.end() ; ++it)
 	{
@@ -17,12 +17,12 @@ double rjmcmc::image::error(const Rectangle_2 &r) const {
 	return res;
 	*/
 }
-#endif // RECTANGLE_2_H
+#endif // GEOMETRY_RECTANGLE_2_H
 
-#ifdef CIRCLE_2_H
+#ifdef GEOMETRY_CIRCLE_2_H
 double rjmcmc::image::error(const Circle_2  &c) const
 {
-	double r = CGAL::radius(c);
+	double r = geometry::radius(c);
 	double x = c.center().x()-x0;
 	double y = c.center().y()-y0;
 	int i0 = std::max(0,(int) (x-r));
@@ -42,5 +42,5 @@ double rjmcmc::image::error(const Circle_2  &c) const
 		
 	return res;
 }
-#endif // CIRCLE_2_H
+#endif // GEOMETRY_CIRCLE_2_H
 

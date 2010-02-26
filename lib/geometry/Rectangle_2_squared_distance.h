@@ -1,9 +1,9 @@
 // Author(s)     : Mathieu Bredif
 
-#ifndef CGAL_RECTANGLE_2_SQUARE_DISTANCE_H
-#define CGAL_RECTANGLE_2_SQUARE_DISTANCE_H
+#ifndef GEOMETRY_RECTANGLE_2_SQUARE_DISTANCE_H
+#define GEOMETRY_RECTANGLE_2_SQUARE_DISTANCE_H
 
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
 
   template<class K> typename K::FT squared_distance(const Rectangle_2<K> &r, const typename K::Point_2& q) {
     typedef typename K::Vector_2 Vector_2;
@@ -65,6 +65,6 @@ CGAL_BEGIN_NAMESPACE
                 min(min(d2[4],d2[5]),min(d2[6],d2[7]))/bn2);
  }
 
-CGAL_END_NAMESPACE
+}; // namespace geometry
 
-#endif // CGAL_RECTANGLE_2_SQUARE_DISTANCE_H
+#endif // GEOMETRY_RECTANGLE_2_SQUARE_DISTANCE_H

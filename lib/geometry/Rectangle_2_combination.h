@@ -1,12 +1,12 @@
 // Author(s)     : Mathieu Bredif
 
-#ifndef CGAL_RECTANGLE_2_COMBINATION_H
-#define CGAL_RECTANGLE_2_COMBINATION_H
+#ifndef GEOMETRY_RECTANGLE_2_COMBINATION_H
+#define GEOMETRY_RECTANGLE_2_COMBINATION_H
 
 #include <CGAL/Polygon_2_algorithms.h>
 #include "Rectangle_2_intersection.h"
 
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
 
 namespace Impl {
 template <class K> void collinear_orient(const typename K::Point_2& a, const typename K::Point_2& b, const typename K::Point_2& p, const typename K::Point_2& q, typename K::Point_2& min, typename K::Point_2& max) {
@@ -239,6 +239,6 @@ template<class K> typename K::FT combination_area(const Rectangle_2<K> &a, const
   }
 
 
-CGAL_END_NAMESPACE
+}; // namespace geometry
 
-#endif // CGAL_RECTANGLE_2_COMBINATION_H
+#endif // GEOMETRY_RECTANGLE_2_COMBINATION_H

@@ -17,7 +17,7 @@ public:
 	typedef double result_type;
 
 
-#ifdef RECTANGLE_2_H
+#ifdef GEOMETRY_RECTANGLE_2_H
 	result_type operator()(Rectangle_2 &r) const {
 		const Iso_rectangle_2& bbox = m_is_valid.bbox();
 		float x0 = bbox.min().x();
@@ -33,14 +33,14 @@ public:
 	}
 #endif
 
-#ifdef CIRCLE_2_H
+#ifdef GEOMETRY_CIRCLE_2_H
 	result_type operator()(Circle_2 &c) const {
 		const Iso_rectangle_2& bbox = m_is_valid.bbox();
 		float x0 = bbox.min().x();
 		float y0 = bbox.min().y();
 		float dx = bbox.max().x()-x0;
 		float dy = bbox.max().y()-y0;
-		double radius = 0.5*CGAL::min(dx,dy);
+		double radius = 0.5*geometry::min(dx,dy);
 		do {
 			Point_2 p(x0+dx*m_die(), y0+dy*m_die());
 			c = Circle_2(p, m_die()*radius);
@@ -52,10 +52,10 @@ public:
 	struct pdf_visitor {
 		typedef double result_type;
 
-#ifdef RECTANGLE_2_H
+#ifdef GEOMETRY_RECTANGLE_2_H
 		result_type operator()(const Rectangle_2 &r) const { return 1.; }
 #endif
-#ifdef CIRCLE_2_H
+#ifdef GEOMETRY_CIRCLE_2_H
 		result_type operator()(const Circle_2 &c) const { return 1.; }
 #endif
 	};
@@ -85,7 +85,7 @@ public:
 		return 0;
 	}
 
-#ifdef RECTANGLE_2_H
+#ifdef GEOMETRY_RECTANGLE_2_H
 	double operator()(const Rectangle_2 &r, Rectangle_2 &res) const {
 		if(m_dief()<m_p_translation) {
 			res = r.scaled_edge(m_die4(),exp(0.5-m_dief()));
@@ -114,24 +114,24 @@ public:
 	}
 #endif
 
-#ifdef CIRCLE_2_H
+#ifdef GEOMETRY_CIRCLE_2_H
 	double operator()(const Circle_2 &c, Circle_2 &res) const {
 		if(m_dief()<m_p_translation) {
 			Vector_2 v(m_dx*(m_dief()-0.5),m_dy*(m_dief()-0.5));
 			double d2 = v.squared_length();
 			double d = sqrt(d2);
 			if (m_die4()%2 && c.squared_radius()>d2) d = -d;
-			res = Circle_2(c.center()+v,CGAL::radius(c)+d);
+			res = Circle_2(c.center()+v,geometry::radius(c)+d);
 		} else {
-			res = Circle_2(c.center(),radius(c)*exp(0.5-m_dief()));
+			res = Circle_2(c.center(),geometry::radius(c)*exp(0.5-m_dief()));
 		}
 		if(!m_is_valid(res)) return 0.;
 		return 1.; // TODO
 	}
 #endif
 
-#ifdef CIRCLE_2_H
-#ifdef RECTANGLE_2_H
+#ifdef GEOMETRY_CIRCLE_2_H
+#ifdef GEOMETRY_RECTANGLE_2_H
 
 	double operator()(const Rectangle_2 &r, Circle_2 &c) const {
 		double radius = sqrt(r.normal().squared_length());
@@ -144,7 +144,7 @@ public:
 
 	double operator()(const Circle_2 &c, Rectangle_2 &r) const {
 		Vector_2 v((2*m_dief()-1),(2*m_dief()-1));
-		v = v*(CGAL::radius(c)/sqrt(v.squared_length()));
+		v = v*(geometry::radius(c)/sqrt(v.squared_length()));
 		r = Rectangle_2(c.center(),v,1);
 		if (!m_is_valid(r)) return 0;
 		return 1.; // TODO

@@ -1,9 +1,9 @@
 // Author(s)     : Mathieu Bredif
 
-#ifndef CGAL_SEGMENT_2_ITERATOR_H
-#define CGAL_SEGMENT_2_ITERATOR_H
+#ifndef GEOMETRY_SEGMENT_2_ITERATOR_H
+#define GEOMETRY_SEGMENT_2_ITERATOR_H
 
-CGAL_BEGIN_NAMESPACE
+namespace geometry {
 
 // Découpage d'un segment par une grille
 
@@ -55,7 +55,7 @@ private :
   FT NextCrossingT[2], DeltaT[2], t;
 };
 
-CGAL_END_NAMESPACE
+}; // namespace geometry
 
-#endif // CGAL_SEGMENT_2_ITERATOR_H
+#endif // GEOMETRY_SEGMENT_2_ITERATOR_H
 

@@ -8,12 +8,12 @@ public:
 
 	template<typename T, typename U>
 	inline bool interact(const T &t, const U &u) const {
-		return do_intersect_interior(t, u);
+		return geometry::do_intersect_interior(t, u);
 	}
 
 	template<typename T, typename U>
 	inline result_type operator()(const T &t, const U &u) const {
-		return m_coefSurface * std::abs(CGAL::to_double(intersection_area(t,u)));
+		return m_coefSurface * std::abs(geometry::to_double(geometry::intersection_area(t,u)));
 	}
 
 	intersection_area_binary_energy(double d) : m_coefSurface(d) { }
