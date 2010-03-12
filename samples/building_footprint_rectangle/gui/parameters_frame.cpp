@@ -29,7 +29,7 @@ struct sizer_adder {
 	void AddText(wxSizer *sizer, const parameter<wx_parameter_traits,T>& p) {
 		wxString s(p.description().c_str(), *wxConvCurrent);
 		wxStaticText *text = new wxStaticText(m_wnd, wxID_ANY, s);
-		sizer->Add(text, 0,wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                sizer->Add(text, 1, wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5);
 	}
 
 	template<typename T>
@@ -40,7 +40,7 @@ struct sizer_adder {
 		wxString s(oss.str().c_str(), *wxConvCurrent);
 		wxTextCtrl   *ctrl = new wxTextCtrl(m_wnd, wxID_ANY, s);
 		p.control(ctrl);
-		m_sizer->Add(ctrl,0,wxEXPAND);
+                m_sizer->Add(ctrl,1, wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5);
 	}
 
 	void operator()(parameter<wx_parameter_traits,bool>& p) {
@@ -49,7 +49,7 @@ struct sizer_adder {
 		wxCheckBox *checkbox = new wxCheckBox(m_wnd, id, wxEmptyString);
 		p.control(checkbox);
 		checkbox->SetValue(p.value());
-		m_sizer->Add(checkbox);
+                m_sizer->Add(checkbox, 1, wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5);
 		checkbox->Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED,
 	wxCommandEventHandler(parameters_frame::on_bool_parameter), NULL, m_frame);
 		m_name[id]=p.name();
@@ -61,14 +61,17 @@ struct sizer_adder {
 		wxTextCtrl   *ctrl = new wxTextCtrl(m_wnd, wxID_ANY, s);
 		p.control(ctrl);
 		long id = wxNewId();
-		wxButton *browse_button = new wxButton(m_wnd,id,wxT("..."),wxDefaultPosition,wxSize(25,25));
+                wxButton *browse_button = new wxButton(m_wnd,id,wxT("Browse"),wxDefaultPosition,wxSize(100,25));
 		browse_button->Connect(id, wxEVT_COMMAND_BUTTON_CLICKED,
 	wxCommandEventHandler(parameters_frame::on_file_parameter), NULL, m_frame);
-		m_name[id]=p.name();
-		sizer->Add(browse_button);
+                m_name[id]=p.name();
 		AddText(sizer,p);
-		m_sizer->Add(sizer,0,wxALL);
-		m_sizer->Add(ctrl ,0,wxEXPAND);
+                m_sizer->Add(sizer,1, wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5);
+
+                wxBoxSizer* sizer_browse = new wxBoxSizer(wxHORIZONTAL);
+                sizer_browse->Add(ctrl ,1, wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5);
+                sizer_browse->Add(browse_button,0, wxFIXED_MINSIZE|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
+                m_sizer->Add(sizer_browse,1, wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5);
 	}
 };
 
@@ -76,20 +79,26 @@ parameters_frame::parameters_frame(wxWindow *parent, wxWindowID id, const wxStri
 	wxFrame(parent, id, title, pos, size, style)
 {
 	param *p = param::Instance();
+        wxPanel* panel= new wxPanel(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,wxTAB_TRAVERSAL);
+        wxBoxSizer* s = new wxBoxSizer(wxVERTICAL);
+        s->Add(panel,5,wxEXPAND,wxALL);
 	wxFlexGridSizer* sizer = new wxFlexGridSizer(2);
+        panel->SetSizer(sizer);
 	sizer->AddGrowableCol(1);
 	sizer->AddSpacer(10);
 	sizer->AddSpacer(10);
-	sizer_adder adder(this,sizer,this,m_name_for_id);
+        sizer_adder adder(this,sizer,panel,m_name_for_id);
 	for(param::iterator it=p->begin(); it!=p->end(); ++it)
-		boost::apply_visitor(adder,*it);
-	SetSizer(sizer);
+                boost::apply_visitor(adder,*it);
+        //AddChild(panel);
+        SetSizer(s);
 	SetAutoLayout(true);
 	Refresh();
 }
 
 void parameters_frame::on_file_parameter(wxCommandEvent& event)
 {
+    // TODO: get wildcard from gilviewer static methods (to be implemented)
 	wxString wildcard;
 	wildcard << _("Image files ");
 	wildcard << wxT("(*.tif;*.tiff;*.png;*.jpg;*.jpeg)|*.tif;*.tiff;*.TIF;*.TIFF;*.png;*.PNG;*.jpg;*.jpeg;*.JPG;*.JPEG|");

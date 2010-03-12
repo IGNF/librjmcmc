@@ -5,7 +5,7 @@
 
 #include <GilViewer/layers/VectorLayerGhost.h>
 #include <GilViewer/layers/ImageLayer.hpp>
-#include <GilViewer/layers/VectorLayer.hpp>
+#include <GilViewer/layers/simple_vector_layer.hpp>
 #include <GilViewer/gui/ApplicationSettings.hpp>
 #include <GilViewer/gui/PanelManager.h>
 #include <GilViewer/gui/define_id.hpp>
@@ -113,7 +113,7 @@ void rjmcmc_building_footprint_rectangle_frame::OnGoButton(wxCommandEvent& event
 	LayerControl::const_iterator end = m_panel->GetLayerControl()->end();
 	Layer::ptrLayerType ilayer;
 	for(;it!=end && !ilayer;++it) {
-		if(dynamic_cast<ImageLayer *>(&**it)) ilayer=*it; //use dem tag??
+            if(boost::dynamic_pointer_cast<ImageLayer>(*it)) ilayer=*it; //use dem tag??
 	}
 	if(!ilayer) {
 		boost::filesystem::path file;
@@ -146,26 +146,33 @@ void rjmcmc_building_footprint_rectangle_frame::OnGoButton(wxCommandEvent& event
 	}
 	try
         {
-                Layer::ptrLayerType vlayer = VectorLayer::CreateVectorLayer(std::string("Buildings"), 1/*IMAGE_COORDINATES*/, false);
+            boost::shared_ptr<Layer> vlayer = boost::shared_ptr<Layer>(new simple_vector_layer("Buildings"));
                 Layer::ptrLayerType clayer = ilayer->crop(p0.x,p0.y,p1.x,p1.y);
                 if(!clayer) {
 			  std::ostringstream oss;
                           oss << "Cropping outside the bounds of " << ilayer->Filename() << " !";
 			  wxString message( oss.str().c_str() , *wxConvCurrent );
-			  ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
+                          ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
 			  OnThreadEnd();
-			  return;
+                          return;
                 }
                 m_panel->AddLayer(clayer);
                 m_panel->AddLayer(vlayer);
-		vlayer->TranslationX(p0.x+ilayer->TranslationX());
+                vlayer->TranslationX(p0.x+ilayer->TranslationX());
 		vlayer->TranslationY(p0.y+ilayer->TranslationY());
 		vlayer->ZoomFactor  (     ilayer->ZoomFactor  ());
 		clayer->TranslationX(p0.x+ilayer->TranslationX());
 		clayer->TranslationY(p0.y+ilayer->TranslationY());
                 clayer->ZoomFactor  (     ilayer->ZoomFactor  ());
-                vlayer->set_style(*wxRED, *wxBLUE, wxTRANSPARENT, wxSOLID, 3);
-                vlayer->TextsVisibility(false);
+                vlayer->set_line_color(*wxRED);
+                vlayer->set_line_style(wxSOLID);
+                vlayer->set_line_width(3);
+                vlayer->set_polygon_border_color(*wxBLUE);
+                vlayer->set_polygon_border_style(wxSOLID);
+                vlayer->set_polygon_border_width(3);
+                vlayer->set_polygon_inner_color(*wxRED);
+                vlayer->set_polygon_inner_style(wxTRANSPARENT);
+                vlayer->text_visibility(false);
 		
                 boost::filesystem::path file(clayer->Filename());
 		param::Instance()->set("dem",file);

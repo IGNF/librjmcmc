@@ -129,7 +129,7 @@ void rjmcmc_building_footprint_extraction_thread::end(const configuration& confi
 
 void* rjmcmc_building_footprint_extraction_thread::Entry()
 {
-	ImageLayer *i = dynamic_cast<ImageLayer*>(&*m_ilayer); // not so nice...
+    boost::shared_ptr<ImageLayer> i = boost::dynamic_pointer_cast<ImageLayer>(m_ilayer); // not so nice...
 	building_footprint_extraction(*this,i->View()->value);
 	return NULL;
 }

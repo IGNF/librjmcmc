@@ -17,8 +17,8 @@ public:
   Segment_2_iterator () : t(1) {}
   Segment_2_iterator (const Segment_2& s) : t(0) {
         for (int j = 0; j < 2; ++j) {
-                p[j] = (int) std::floor(to_double(s.source()[j]));
-                q[j] = (int) std::floor(to_double(s.target()[j]));
+            p[j] = (int) std::floor(/*to_double --> CGAL::to_double*/(s.source()[j]));
+                q[j] = (int) std::floor(/*to_double --> CGAL::to_double*/(s.target()[j]));
                 if(p[j]==q[j]) { NextCrossingT[j]=2; Step[j]=0; DeltaT[j]=0; continue; }
                 int dir = (q[j]>p[j]);
                 FT invlength =  1.0f / (s.target()[j]-s.source()[j]);
