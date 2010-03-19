@@ -1,0 +1,14 @@
+
+boostbook quickbook_test 
+        : 
+        src/quickbook_libMPP.qbk 
+        :
+        <xsl:param>boost.root=./
+        <xsl:param>boost.image.src=image/banniere_matis.png
+        <xsl:param>boost.image.alt="\"Quickbook_test\""
+        <xsl:param>boost.image.w=900
+        <xsl:param>boost.image.h=160
+        <xsl:param>html.stylesheet=css/boostbook.css
+        <xsl:param>nav.layout=none
+        <xsl:param>navig.graphics.path=css/images/
+        ; 
