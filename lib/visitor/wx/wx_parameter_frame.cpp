@@ -13,7 +13,7 @@
 #include <wx/button.h>
 
 #include "param/wx_parameter_traits.hpp"
-#include "param/wx_parameter_frame.hpp"
+#include "wx_parameter_frame.hpp"
 
 BEGIN_EVENT_TABLE(parameters_frame, wxFrame)
     EVT_CLOSE(parameters_frame::OnCloseWindow)

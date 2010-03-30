@@ -9,7 +9,7 @@
 #include "image/image_inc.hpp"
 
 #include "core/building_footprint_extraction.hpp"
-#include "rjmcmc/ostream_visitor.hpp"
+#include "visitor/ostream_visitor.hpp"
 #include <boost/gil/extension/io/tiff_dynamic_io.hpp>
 
 

@@ -14,7 +14,7 @@
 #include "param/wx_parameter_traits.hpp"
 #include "core/building_footprint_extraction_parameters_inc.hpp"
 
-#include "rjmcmc_building_footprint_extraction_frame.hpp"
+#include "configuration_frame.hpp"
 
 enum
 {
