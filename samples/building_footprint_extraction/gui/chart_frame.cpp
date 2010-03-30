@@ -4,11 +4,15 @@
 
 #include <wx/sizer.h>
 #include "wx/chartpanel.h"
-#include "wx/xy/vectordataset.h"
 #include "wx/xy/xylinerenderer.h"
 #include "wx/xy/xyplot.h"
 
 #include <iostream>
+
+BEGIN_EVENT_TABLE(chart_frame, wxFrame)
+    EVT_CLOSE(chart_frame::OnCloseWindow)
+END_EVENT_TABLE()
+
 
 chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& charttitle, long style, const wxPoint& pos, const wxSize& size) :
 	wxFrame(parent, id, charttitle, pos, size, style)
@@ -62,17 +66,3 @@ chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& chartt
 	SetSizer(test_sizer);
 }
 
-void chart_frame::begin(unsigned int dump, unsigned int save, double t, const configuration& config) {
-	for(unsigned int i=0; i<2; ++i) {
-		m_dataset[i]->SetX0(0.);
-		m_dataset[i]->SetScaleX(dump);
-		m_dataset[i]->Clear();
-	}
-	m_dataset[0]->Add(config.unary_energy() + config.binary_energy());
-	m_dataset[1]->Add(t);
-}
-
-void chart_frame::iterate(unsigned int i, double t, const configuration& config, const sampler& sample) {
-	m_dataset[0]->Add(config.unary_energy() + config.binary_energy());
-	m_dataset[1]->Add(t);
-}

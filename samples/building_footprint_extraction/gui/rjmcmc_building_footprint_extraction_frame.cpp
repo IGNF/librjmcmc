@@ -6,6 +6,7 @@
 #include <GilViewer/layers/VectorLayerGhost.h>
 #include <GilViewer/layers/ImageLayer.hpp>
 #include <GilViewer/layers/simple_vector_layer.hpp>
+#include <GilViewer/gui/LayerControl.hpp>
 #include <GilViewer/gui/ApplicationSettings.hpp>
 #include <GilViewer/gui/PanelManager.h>
 #include <GilViewer/gui/define_id.hpp>
@@ -13,30 +14,30 @@
 #include "param/wx_parameter_traits.hpp"
 #include "core/building_footprint_extraction_parameters_inc.hpp"
 
-#include "parameters_frame.hpp"
 #include "rjmcmc_building_footprint_extraction_frame.hpp"
-#include "rjmcmc_building_footprint_extraction_thread.hpp"
-#include "chart_frame.hpp"
-
 
 enum
 {
     ID_BUTTON_GO,
-    ID_BUTTON_STOP
+    ID_BUTTON_STOP,
+    ID_BUTTON_CHART,
+    ID_BUTTON_PARAM
 };
 
 using namespace std;
 
 BEGIN_EVENT_TABLE(rjmcmc_building_footprint_extraction_frame,BasicViewerFrame)
-	EVT_BUTTON(ID_BUTTON_GO,rjmcmc_building_footprint_extraction_frame::OnGoButton)
-	EVT_BUTTON(ID_BUTTON_STOP,rjmcmc_building_footprint_extraction_frame::OnStopButton)
-	ADD_GILVIEWER_EVENTS_TO_TABLE(rjmcmc_building_footprint_extraction_frame)
-        END_EVENT_TABLE();
+    EVT_BUTTON(ID_BUTTON_GO,rjmcmc_building_footprint_extraction_frame::OnGoButton)
+    EVT_BUTTON(ID_BUTTON_STOP,rjmcmc_building_footprint_extraction_frame::OnStopButton)
+    EVT_BUTTON(ID_BUTTON_CHART,rjmcmc_building_footprint_extraction_frame::OnChartButton)
+    EVT_BUTTON(ID_BUTTON_PARAM,rjmcmc_building_footprint_extraction_frame::OnParamButton)
+    ADD_GILVIEWER_EVENTS_TO_TABLE(rjmcmc_building_footprint_extraction_frame)
+END_EVENT_TABLE();
 
 IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(rjmcmc_building_footprint_extraction_frame,m_panel)
 
         rjmcmc_building_footprint_extraction_frame::rjmcmc_building_footprint_extraction_frame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos , const wxSize& size , long style , const wxString& name ):
-	BasicViewerFrame(parent, id, title, pos, size, style, name)
+    BasicViewerFrame(parent, id, title, pos, size, style, name)
 {
 
 #if defined(__WXMSW__)
@@ -49,7 +50,7 @@ IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(rjmcmc_building_footprint_extracti
     PanelViewer::Register(this);
     m_panel = PanelManager::Instance()->createObject("PanelViewer");
 
-    m_statusBar->SetStatusText(_("libRJMCMC"));
+    m_statusBar->SetStatusText(_("librjmcmc"));
 
     wxAuiPaneInfo toolbarInfo;
     toolbarInfo.Caption( _("Main toolbar") );
@@ -75,37 +76,46 @@ IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(rjmcmc_building_footprint_extracti
     m_dockManager.AddPane( m_panel->GetModeAndGeometryToolBar(this), modeAndGeometryToolbarInfo );
 
     wxAuiPaneInfo applicationToolBarInfo;
-    applicationToolBarInfo.Caption( _("libRJMCMC toolbar") );
+    applicationToolBarInfo.Caption( _("librjmcmc toolbar") );
     applicationToolBarInfo.ToolbarPane();
     applicationToolBarInfo.Top();
     applicationToolBarInfo.CloseButton(false);
     applicationToolBarInfo.CaptionVisible(false);
-    wxToolBar *libRJMCMCtoolbar = new wxToolBar(this,wxID_ANY);
-    m_buttonGo = new wxBitmapButton(libRJMCMCtoolbar, ID_BUTTON_GO, wxArtProvider::GetBitmap(wxART_TICK_MARK, wxART_BUTTON, wxSize(22,22)) );
-    m_buttonStop = new wxBitmapButton(libRJMCMCtoolbar, ID_BUTTON_STOP, wxArtProvider::GetBitmap(wxART_CROSS_MARK, wxART_BUTTON, wxSize(22,22)) );
+    wxToolBar *librjmcmctoolbar = new wxToolBar(this,wxID_ANY);
+    m_buttonGo = new wxBitmapButton(librjmcmctoolbar, ID_BUTTON_GO, wxArtProvider::GetBitmap(wxART_TICK_MARK, wxART_BUTTON, wxSize(22,22)) );
+    m_buttonStop = new wxBitmapButton(librjmcmctoolbar, ID_BUTTON_STOP, wxArtProvider::GetBitmap(wxART_CROSS_MARK, wxART_BUTTON, wxSize(22,22)) );
+    wxButton *button_param = new wxBitmapButton(librjmcmctoolbar, ID_BUTTON_PARAM, wxArtProvider::GetBitmap(wxART_REPORT_VIEW, wxART_BUTTON, wxSize(22,22)) );
+    wxButton *button_chart = new wxBitmapButton(librjmcmctoolbar, ID_BUTTON_CHART, wxArtProvider::GetBitmap(wxART_HELP_BOOK, wxART_BUTTON, wxSize(22,22)) );
     m_buttonStop->Disable();
-    libRJMCMCtoolbar->AddControl(m_buttonGo);
-    libRJMCMCtoolbar->AddControl(m_buttonStop);
-    m_dockManager.AddPane( libRJMCMCtoolbar , applicationToolBarInfo );
+    librjmcmctoolbar->AddControl(m_buttonGo);
+    librjmcmctoolbar->AddControl(m_buttonStop);
+    librjmcmctoolbar->AddControl(button_param);
+    librjmcmctoolbar->AddControl(button_chart);
 
+    m_dockManager.AddPane( librjmcmctoolbar , applicationToolBarInfo );
     m_dockManager.Update();
-    m_parameters_frame = new parameters_frame(this);
-    m_parameters_frame->Show();
-
-    m_chart_frame = new chart_frame(this);
-    m_chart_frame->Show();
 }
 
 rjmcmc_building_footprint_extraction_frame::~rjmcmc_building_footprint_extraction_frame()
 {
-    m_thread->Delete();
-    m_parameters_frame->Destroy();
-    m_parameters_frame = NULL;
-    m_chart_frame->Destroy();
-    m_chart_frame = NULL;
 }
 
-void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& event)
+void rjmcmc_building_footprint_extraction_frame::OnStopButton(wxCommandEvent&)
+{
+    m_controler->stop();
+}
+
+void rjmcmc_building_footprint_extraction_frame::OnParamButton(wxCommandEvent&)
+{
+    m_controler->toggle_param_visibility();
+}
+
+void rjmcmc_building_footprint_extraction_frame::OnChartButton(wxCommandEvent&)
+{
+    m_controler->toggle_chart_visibility();
+}
+
+void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent&)
 {
     param::Instance()->update_values();
 
@@ -113,7 +123,7 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
     LayerControl::const_iterator end = m_panel->GetLayerControl()->end();
     Layer::ptrLayerType ilayer;
     for(;it!=end && !ilayer;++it) {
-        if(boost::dynamic_pointer_cast<ImageLayer>(*it)) ilayer=*it; //use dem tag??
+         if(boost::dynamic_pointer_cast<ImageLayer>(*it)) ilayer=*it; //use dem tag??
     }
     if(!ilayer) {
         boost::filesystem::path file;
@@ -121,12 +131,11 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
         ilayer = ImageLayer::CreateImageLayer(file.string());
         if ( !ilayer )
         {
-            std::ostringstream oss;
-            oss << "File " << file << " does not exist !";
-            wxString message( oss.str().c_str() , *wxConvCurrent );
-            ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
-            OnThreadEnd();
-            return;
+          std::ostringstream oss;
+          oss << "File " << file << " does not exist !";
+          wxString message( oss.str().c_str() , *wxConvCurrent );
+          ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
+          return;
         }
     }
 
@@ -146,14 +155,13 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
     }
     try
     {
-        boost::shared_ptr<Layer> vlayer = boost::shared_ptr<Layer>(new simple_vector_layer("Buildings"));
+       boost::shared_ptr<Layer> vlayer = boost::shared_ptr<Layer>(new simple_vector_layer("Buildings"));
         Layer::ptrLayerType clayer = ilayer->crop(p0.x,p0.y,p1.x,p1.y);
         if(!clayer) {
             std::ostringstream oss;
             oss << "Cropping outside the bounds of " << ilayer->Filename() << " !";
             wxString message( oss.str().c_str() , *wxConvCurrent );
             ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
-            OnThreadEnd();
             return;
         }
         m_panel->AddLayer(clayer);
@@ -164,7 +172,8 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
         clayer->TranslationX(p0.x+ilayer->TranslationX());
         clayer->TranslationY(p0.y+ilayer->TranslationY());
         clayer->ZoomFactor  (     ilayer->ZoomFactor  ());
-        vlayer->set_line_color(*wxRED);
+	
+	vlayer->set_line_color(*wxRED);
         vlayer->set_line_style(wxSOLID);
         vlayer->set_line_width(3);
         vlayer->set_polygon_border_color(*wxBLUE);
@@ -173,23 +182,16 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
         vlayer->set_polygon_inner_color(*wxRED);
         vlayer->set_polygon_inner_style(wxTRANSPARENT);
         vlayer->text_visibility(false);
-
+        
         boost::filesystem::path file(clayer->Filename());
         param::Instance()->set("dem",file);
         param::Instance()->set("xmin",0);
         param::Instance()->set("ymin",0);
         param::Instance()->set("xmax",p1.x-p0.x);
         param::Instance()->set("ymax",p1.y-p0.y);
-
-        m_parameters_frame->Refresh();
-
-        m_thread = new rjmcmc_building_footprint_extraction_thread(clayer,vlayer,this);
-
-        m_thread->Create();
-        m_thread->Run();
-        m_buttonGo->Disable();
-        m_buttonStop->Enable();
-        m_parameters_frame->Disable();
+        
+        m_vlayer = vlayer;
+        m_controler->go((void *)&clayer); // todo
     }
     catch( const exception &e )
     {
@@ -198,30 +200,15 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent& even
     }
 }
 
-void rjmcmc_building_footprint_extraction_frame::OnStopButton(wxCommandEvent& event)
-{
-    m_thread->Delete();
-}
-
-void rjmcmc_building_footprint_extraction_frame::OnThreadEnd()
-{
-    m_buttonStop->Disable();
-    m_buttonGo->Enable();
-    if(m_parameters_frame) {
-        m_parameters_frame->Enable();
-        m_parameters_frame->Show();
-    }
-}
-
 wxAboutDialogInfo rjmcmc_building_footprint_extraction_frame::getAboutInfo() const
 {
     wxAboutDialogInfo info;
     info.AddDeveloper(_("Olivier Tournaire"));
-    info.AddDeveloper(_("Didier Boldo"));
     info.AddDeveloper(_("Mathieu Brédif"));
-    info.SetName(_("libRJMCMC Buildings detection sample"));
+    info.AddDeveloper(_("Didier Boldo"));
+    info.SetName(_("librjmcmc buildings detection sample"));
     info.SetVersion(_("0.1.0"));
-    info.SetWebSite(_("http://??????"), _("Home page") );
+    info.SetWebSite(_("http://librjmcmc.ign.fr"), _("Home page") );
     info.SetDescription(_("Marked point process for buildings detection from DEM"));
     info.SetCopyright(_T("olivier.tournaire@ign.fr\nmathieu.bredif@ign.fr"));
     return info;

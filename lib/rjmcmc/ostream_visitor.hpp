@@ -22,7 +22,8 @@ private:
 public:
 	ostream_visitor(std::ostream& out) : m_out(out) {}
 
-	void begin(int dump, int save, double t, const configuration& config) {
+	template<typename Config>
+	void begin(int dump, int save, double t, const Config& config) {
 		m_dump = dump;
 		m_save = save;
 		for (unsigned int i=0; i<kernel_size; ++i) m_accepted[i] = m_proposed[i] = 0;
@@ -41,15 +42,15 @@ public:
 		m_clock_begin = m_clock = clock();
 	}
 
-	template <typename Configuration> bool iterate(unsigned int i, double t,
-			const Configuration& configuration, const Sampler& sampler) {
+	template <typename Config> bool iterate(unsigned int i, double t,
+			const Config& config, const Sampler& sampler) {
 		m_proposed[sampler.kernel_id()]++;
 		if( sampler.accepted() ) m_accepted[sampler.kernel_id()]++;
 
 		if (m_dump && (i % m_dump == 0))
 		{
 			m_out << std::setw(w) << i;
-			m_out << std::setw(w) << configuration.size();
+			m_out << std::setw(w) << config.size();
 			
 			unsigned int total_accepted =0;
 			for(unsigned int i=0; i<kernel_size; ++i)
@@ -64,22 +65,22 @@ public:
 			m_out << std::setw(w) << ((clock_temp - m_clock)*1000.)/ m_dump;
 			m_clock = clock_temp;
 			m_out << std::setw(w) << t;
-			m_out << std::setw(w) << configuration.unary_energy();
-			m_out << std::setw(w) << configuration.binary_energy();
-			m_out << std::setw(w) << configuration.unary_energy() + configuration.binary_energy();
+			m_out << std::setw(w) << config.unary_energy();
+			m_out << std::setw(w) << config.binary_energy();
+			m_out << std::setw(w) << config.energy();
 			m_out << std::endl << std::flush;
 		}
 		return true;
 	}
 
-	template <typename Configuration> void end(const Configuration& configuration) {
+	template <typename Config> void end(const Config& config) {
 		clock_t clock_end = clock();
 		m_out << "Iterations finished" << std::endl;
 		m_out << "Total elapsed time (s) :  " << double(clock_end - m_clock_begin) / CLOCKS_PER_SEC << std::endl;
-		m_out << "Graph Data energy integrity : " << configuration.audit_unary_energy() - configuration.unary_energy() << std::endl;
-		m_out << "Graph Prior energy integrity: " << configuration.audit_binary_energy() - configuration.binary_energy()<< std::endl;
-		m_out << "Graph Structure integrity : " << configuration.audit_structure() << std::endl;
-		m_out << configuration;
+		m_out << "Graph Data energy integrity : " << config.audit_unary_energy() - config.unary_energy() << std::endl;
+		m_out << "Graph Prior energy integrity: " << config.audit_binary_energy() - config.binary_energy()<< std::endl;
+		m_out << "Graph Structure integrity : " << config.audit_structure() << std::endl;
+		m_out << config;
 		m_out << std::endl << std::flush;
 	}
 

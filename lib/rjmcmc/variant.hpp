@@ -1,6 +1,7 @@
 #ifndef __RJMCMC_VARIANT_HPP__
 #define __RJMCMC_VARIANT_HPP__
 
+#include <boost/mpl/size.hpp>
 #include <boost/variant.hpp>
 
 // rjmcmc::apply_visitor generalizes boost::apply_visitor to directly call the function object if the argument is not a variant.

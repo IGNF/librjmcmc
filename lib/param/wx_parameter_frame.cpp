@@ -11,9 +11,13 @@
 #include <wx/filedlg.h>
 #include <wx/scrolwin.h>
 #include <wx/button.h>
-#include "parameters_frame.hpp"
 
 #include "param/wx_parameter_traits.hpp"
+#include "param/wx_parameter_frame.hpp"
+
+BEGIN_EVENT_TABLE(parameters_frame, wxFrame)
+    EVT_CLOSE(parameters_frame::OnCloseWindow)
+END_EVENT_TABLE()
 
 struct sizer_adder {
 	typedef void result_type;

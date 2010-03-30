@@ -1,8 +1,10 @@
 #ifndef __RJMCMC_SAMPLER_HPP__
 #define __RJMCMC_SAMPLER_HPP__
 
+#include "rjmcmc/variant.hpp"
 #include "rjmcmc/random.hpp"
 #include <boost/tuple/tuple.hpp>
+#include <boost/mpl/at.hpp>
 #include <boost/mpl/insert_range.hpp>
 #include <boost/mpl/pop_front.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
@@ -337,6 +339,7 @@ public:
 	}
 
 // statistics accessors
+	inline double temperature() const { return m_temperature; }
 	inline double delta() const { return m_delta; }
 	inline double green_ratio() const { return m_green_ratio; }
 	inline int kernel_id() const { return m_kernel_id; }
@@ -346,6 +349,7 @@ public:
 	template<typename Configuration> void operator()(Configuration &c, double temp)
 	{
 		typename Configuration::modification modif;
+		m_temperature = temp;
 		m_kernel_id   = internal::random_apply(m_die(),m_kernel,c,modif,m_green_ratio);
 		if(m_green_ratio<=0) {
 			m_delta   =0;
@@ -353,7 +357,7 @@ public:
 			return;
 		}
 		m_delta       = c.delta_energy(modif);
-		m_green_ratio*= exp(-m_delta/temp);
+		m_green_ratio*= exp(-m_delta/m_temperature);
 		m_accepted    = ( m_die() < m_green_ratio );
 		if (m_accepted) c.apply(modif);
 	}
@@ -362,6 +366,7 @@ private:
 	Kernels m_kernel;
 	boost::variate_generator<rjmcmc::generator&, boost::uniform_real<> > m_die;
 	int     m_kernel_id;
+	double  m_temperature;
 	double  m_delta;
 	double  m_green_ratio;
 	bool    m_accepted;

@@ -80,6 +80,10 @@ public:
 	{}
 
 	// energy
+	inline double energy () const {
+		return unary_energy()+binary_energy();
+	}
+
 	double unary_energy() const
 	{
 		double e = 0.;
@@ -250,6 +254,9 @@ public:
 	// configuration accessors
 	inline double unary_energy () const { return m_unary;}
 	inline double binary_energy() const { return m_binary;}
+	inline double energy       () const {
+		return unary_energy()+binary_energy();
+	}
 
 	// values
 	inline size_t size() const { return num_vertices(m_graph); }

@@ -11,11 +11,13 @@ struct wx_parameter_traits {
   template<typename T> struct control { 
     typedef wxTextCtrl type;
     static inline void set(type *ctrl, const T& t) {
+	if(ctrl==NULL) return;
 	std::ostringstream oss;
 	oss << t;
 	ctrl->SetValue(wxString(oss.str().c_str(), *wxConvCurrent));
     }
     static inline void get(type *ctrl, T&t) {
+	if(ctrl==NULL) return;
         wxString ws(ctrl->GetLineText(0), *wxConvCurrent);
         std::string s(ws.mb_str());
         std::istringstream iss(s.c_str());
@@ -27,8 +29,8 @@ struct wx_parameter_traits {
 
 template<> struct wx_parameter_traits::control<bool> { 
   typedef wxCheckBox type;
-  static inline void set(type *ctrl, bool  b) { ctrl->SetValue(b); }
-  static inline void get(type *ctrl, bool& b) { b = ctrl->GetValue(); }
+  static inline void set(type *ctrl, bool  b) { if(ctrl) ctrl->SetValue(b); }
+  static inline void get(type *ctrl, bool& b) { if(ctrl) b = ctrl->GetValue(); }
 };
 
 typedef parameters<wx_parameter_traits> param;
