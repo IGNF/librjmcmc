@@ -11,8 +11,8 @@
 #include <GilViewer/gui/define_id.hpp>
 
 #include "param/wx_parameter_traits.hpp"
-#include "param/wx_parameter_frame.hpp"
-#include "param/wx_parameter_frame.cpp"
+#include "visitor/wx/wx_parameter_frame.hpp"
+#include "visitor/wx/wx_parameter_frame.cpp"
 #include "core/building_footprint_rectangle_parameters_inc.hpp"
 
 #include "rjmcmc_building_footprint_rectangle_frame.hpp"

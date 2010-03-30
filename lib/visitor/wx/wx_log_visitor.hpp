@@ -1,7 +1,7 @@
 #ifndef __WX_LOG_VISITOR_HPP__
 #define __WX_LOG_VISITOR_HPP__
 
-#include "rjmcmc/ostream_visitor.hpp"
+#include "visitor/ostream_visitor.hpp"
 
 template<typename Sampler>
 class wx_log_visitor

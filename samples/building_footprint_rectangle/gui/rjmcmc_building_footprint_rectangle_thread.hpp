@@ -6,7 +6,7 @@
 #include "gui/rjmcmc_building_footprint_rectangle_frame.hpp"
 
 #include "core/building_footprint_rectangle.hpp" // defines configuration & sampler
-#include "rjmcmc/ostream_visitor.hpp"
+#include "visitor/ostream_visitor.hpp"
 
 class rjmcmc_building_footprint_rectangle_thread : public wxThread
 {
