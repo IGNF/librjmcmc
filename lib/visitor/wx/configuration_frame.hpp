@@ -1,5 +1,5 @@
-#ifndef RJMCMC_BUILDINGSDETECTIONFRAME_HPP_
-#define RJMCMC_BUILDINGSDETECTIONFRAME_HPP_
+#ifndef CONFIGURATION_FRAME_HPP
+#define CONFIGURATION_FRAME_HPP
 
 #include <wx/wx.h>
 #include <wx/statusbr.h>
@@ -8,7 +8,7 @@
 #include <GilViewer/gui/BasicViewerFrame.h>
 #include <GilViewer/convenient/MacrosGilViewer.hpp>
 
-#include "controler.hpp"
+#include "visitor/controler.hpp"
 #include "rjmcmc/variant.hpp"
 #include "core/geometry.h"
 
@@ -134,4 +134,4 @@ private:
 	Layer::ptrLayerType m_vlayer;
 };
 
-#endif /* RJMCMC_BUILDINGSDETECTIONFRAME_HPP_ */
+#endif /* CONFIGURATION_FRAME_HPP */

@@ -1,10 +1,12 @@
 #include "param/wx_parameter_traits.hpp"
-#include "param/wx_parameter_frame.hpp"
-#include "param/wx_parameter_frame.cpp"
+#include "visitor/wx/wx_parameter_frame.hpp"
+#include "visitor/wx/wx_parameter_frame.cpp"
 #include "core/building_footprint_extraction_parameters_inc.hpp"
-#include "rjmcmc_building_footprint_extraction_frame.hpp"
-#include "chart_frame.hpp"
-#include "wx_log_visitor.hpp"
+#include "visitor/wx/configuration_frame.hpp"
+#include "visitor/wx/configuration_frame.cpp"
+#include "visitor/wx/chart_frame.hpp"
+#include "visitor/wx/chart_frame.cpp"
+#include "visitor/wx/wx_log_visitor.hpp"
 #include <boost/thread.hpp>
 
 #include <GilViewer/layers/ImageLayer.hpp>
