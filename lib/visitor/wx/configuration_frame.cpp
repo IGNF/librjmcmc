@@ -12,7 +12,6 @@
 #include <GilViewer/gui/define_id.hpp>
 
 #include "param/wx_parameter_traits.hpp"
-//#include "core/building_footprint_extraction_parameters_inc.hpp"
 
 #include "configuration_frame.hpp"
 
@@ -26,17 +25,17 @@ enum
 
 using namespace std;
 
-BEGIN_EVENT_TABLE(rjmcmc_2d_viewer_frame,BasicViewerFrame)
-    EVT_BUTTON(ID_BUTTON_GO,rjmcmc_2d_viewer_frame::OnGoButton)
-    EVT_BUTTON(ID_BUTTON_STOP,rjmcmc_2d_viewer_frame::OnStopButton)
-    EVT_BUTTON(ID_BUTTON_CHART,rjmcmc_2d_viewer_frame::OnChartButton)
-    EVT_BUTTON(ID_BUTTON_PARAM,rjmcmc_2d_viewer_frame::OnParamButton)
-    ADD_GILVIEWER_EVENTS_TO_TABLE(rjmcmc_2d_viewer_frame)
+BEGIN_EVENT_TABLE(configuration_frame,BasicViewerFrame)
+    EVT_BUTTON(ID_BUTTON_GO,configuration_frame::OnGoButton)
+    EVT_BUTTON(ID_BUTTON_STOP,configuration_frame::OnStopButton)
+    EVT_BUTTON(ID_BUTTON_CHART,configuration_frame::OnChartButton)
+    EVT_BUTTON(ID_BUTTON_PARAM,configuration_frame::OnParamButton)
+    ADD_GILVIEWER_EVENTS_TO_TABLE(configuration_frame)
 END_EVENT_TABLE();
 
-IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(rjmcmc_2d_viewer_frame,m_panel)
+IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(configuration_frame,m_panel)
 
-        rjmcmc_2d_viewer_frame::rjmcmc_2d_viewer_frame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos , const wxSize& size , long style , const wxString& name ):
+        configuration_frame::configuration_frame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos , const wxSize& size , long style , const wxString& name ):
     BasicViewerFrame(parent, id, title, pos, size, style, name)
 {
 #if defined(__WXMSW__)
@@ -83,8 +82,8 @@ IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(rjmcmc_2d_viewer_frame,m_panel)
     wxToolBar *librjmcmctoolbar = new wxToolBar(this,wxID_ANY);
     m_buttonGo = new wxBitmapButton(librjmcmctoolbar, ID_BUTTON_GO, wxArtProvider::GetBitmap(wxART_TICK_MARK, wxART_BUTTON, wxSize(22,22)) );
     m_buttonStop = new wxBitmapButton(librjmcmctoolbar, ID_BUTTON_STOP, wxArtProvider::GetBitmap(wxART_CROSS_MARK, wxART_BUTTON, wxSize(22,22)) );
-    wxButton *button_param = new wxBitmapButton(librjmcmctoolbar, ID_BUTTON_PARAM, wxArtProvider::GetBitmap(wxART_REPORT_VIEW, wxART_BUTTON, wxSize(22,22)) );
-    wxButton *button_chart = new wxBitmapButton(librjmcmctoolbar, ID_BUTTON_CHART, wxArtProvider::GetBitmap(wxART_HELP_BOOK, wxART_BUTTON, wxSize(22,22)) );
+    wxButton *button_param = new wxBitmapButton(librjmcmctoolbar, ID_BUTTON_PARAM, wxArtProvider::GetBitmap(wxART_HELP_SETTINGS, wxART_BUTTON, wxSize(22,22)) );
+    wxButton *button_chart = new wxBitmapButton(librjmcmctoolbar, ID_BUTTON_CHART, wxArtProvider::GetBitmap(wxART_EXECUTABLE_FILE, wxART_BUTTON, wxSize(22,22)) );
     m_buttonStop->Disable();
     librjmcmctoolbar->AddControl(m_buttonGo);
     librjmcmctoolbar->AddControl(m_buttonStop);
@@ -95,22 +94,22 @@ IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(rjmcmc_2d_viewer_frame,m_panel)
     m_dockManager.Update();
 }
 
-void rjmcmc_2d_viewer_frame::OnStopButton(wxCommandEvent&)
+void configuration_frame::OnStopButton(wxCommandEvent&)
 {
     m_controler->stop();
 }
 
-void rjmcmc_2d_viewer_frame::OnParamButton(wxCommandEvent&)
+void configuration_frame::OnParamButton(wxCommandEvent&)
 {
     m_controler->toggle_param_visibility();
 }
 
-void rjmcmc_2d_viewer_frame::OnChartButton(wxCommandEvent&)
+void configuration_frame::OnChartButton(wxCommandEvent&)
 {
     m_controler->toggle_chart_visibility();
 }
 
-void rjmcmc_2d_viewer_frame::OnGoButton(wxCommandEvent&)
+void configuration_frame::OnGoButton(wxCommandEvent&)
 {
     param::Instance()->update_values();
 
@@ -150,7 +149,7 @@ void rjmcmc_2d_viewer_frame::OnGoButton(wxCommandEvent&)
     }
     try
     {
-       boost::shared_ptr<Layer> vlayer = boost::shared_ptr<Layer>(new simple_vector_layer("Buildings"));
+       boost::shared_ptr<Layer> vlayer = boost::shared_ptr<Layer>(new simple_vector_layer("Extracted elements"));
         Layer::ptrLayerType clayer = ilayer->crop(p0.x,p0.y,p1.x,p1.y);
         if(!clayer) {
             std::ostringstream oss;
@@ -195,7 +194,7 @@ void rjmcmc_2d_viewer_frame::OnGoButton(wxCommandEvent&)
     }
 }
 
-wxAboutDialogInfo rjmcmc_2d_viewer_frame::getAboutInfo() const
+wxAboutDialogInfo configuration_frame::getAboutInfo() const
 {
     wxAboutDialogInfo info;
     info.AddDeveloper(_("Olivier Tournaire"));

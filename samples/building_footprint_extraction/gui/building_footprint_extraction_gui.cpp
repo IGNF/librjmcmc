@@ -63,7 +63,7 @@ public:
 
 	wx_visitor()
 	{
-		m_confg_frame = new rjmcmc_2d_viewer_frame((wxFrame *)NULL, wxID_ANY, _("RJMCMC building footprint extraction") );
+		m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, _("RJMCMC building footprint extraction") );
 		m_param_frame = new parameters_frame(m_confg_frame);
 		m_chart_frame = new chart_frame(m_confg_frame);
 
@@ -80,7 +80,7 @@ public:
 		m_chart_frame->Destroy();
 	}
 private:
-        rjmcmc_2d_viewer_frame  *m_confg_frame;
+        configuration_frame  *m_confg_frame;
         parameters_frame        *m_param_frame;
         chart_frame             *m_chart_frame;
         wx_log_visitor<Sampler> m_wx_log_visitor;
@@ -97,7 +97,7 @@ public:
 		m_visitor.stop();
 		if(m_thread) m_thread->join();
 		Layer::ptrLayerType *l = (Layer::ptrLayerType *)layer;
-		ImageLayer *i = dynamic_cast<ImageLayer*>(&**l); // not so nice...
+                boost::shared_ptr<ImageLayer> i = boost::dynamic_pointer_cast<ImageLayer>(*l);
 		m_thread = new boost::thread(
 			building_footprint_extraction<visitor_type,any_view_type>,
 			boost::ref(m_visitor),

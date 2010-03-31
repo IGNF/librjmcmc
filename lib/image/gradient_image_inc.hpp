@@ -146,6 +146,14 @@ template<typename View> double integrated_flux(const View& view, int x0, int y0,
 		+ std::max(0.,integrated_flux(view,x0,y0,r.segment(2)))
 		+ std::max(0.,integrated_flux(view,x0,y0,r.segment(3)));
 }
+
+template<typename View> double inverted_integrated_flux(const View& view, int x0, int y0, const Rectangle_2& r)
+{
+        return 	  std::max(0.,-integrated_flux(view,x0,y0,r.segment(0)))
+                + std::max(0.,-integrated_flux(view,x0,y0,r.segment(1)))
+                + std::max(0.,-integrated_flux(view,x0,y0,r.segment(2)))
+                + std::max(0.,-integrated_flux(view,x0,y0,r.segment(3)));
+}
 #endif // GEOMETRY_RECTANGLE_2_H
 
 #endif // GRADIENT_IMAGE_INC_HPP
