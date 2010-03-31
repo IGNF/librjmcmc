@@ -1,12 +1,15 @@
 #include "param/wx_parameter_traits.hpp"
 #include "visitor/wx/wx_parameter_frame.hpp"
-#include "visitor/wx/wx_parameter_frame.cpp"
 #include "core/building_footprint_extraction_parameters_inc.hpp"
+
+#include "geometry/wx/Circle_2_paint.h"
+#include "geometry/wx/Rectangle_2_paint.h"
 #include "visitor/wx/configuration_frame.hpp"
-#include "visitor/wx/configuration_frame.cpp"
+
 #include "visitor/wx/chart_frame.hpp"
-#include "visitor/wx/chart_frame.cpp"
+
 #include "visitor/wx/wx_log_visitor.hpp"
+
 #include <boost/thread.hpp>
 
 #include <GilViewer/layers/ImageLayer.hpp>
@@ -14,7 +17,7 @@
 
 #include "core/building_footprint_extraction.hpp"
 
-// member function instanciations
+// includes for template instanciations
 #include "energy/image_gradient_unary_energy_inc.hpp"
 #include "core/global_reconstruction_unary_energy_inc.hpp"
 #include "image/gradient_image_inc.hpp"
@@ -119,7 +122,6 @@ private:
 	boost::thread *m_thread;
 };
 
-#include "core/building_footprint_extraction.hpp"
 #include <wx/app.h>
 
 class building_footprint_extraction_gui : public wxApp

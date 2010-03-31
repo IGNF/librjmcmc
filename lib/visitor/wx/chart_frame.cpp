@@ -4,10 +4,9 @@
 
 #include <wx/sizer.h>
 #include "wx/chartpanel.h"
+#include "wx/xy/vectordataset.h"
 #include "wx/xy/xylinerenderer.h"
 #include "wx/xy/xyplot.h"
-
-#include <iostream>
 
 BEGIN_EVENT_TABLE(chart_frame, wxFrame)
     EVT_CLOSE(chart_frame::OnCloseWindow)
@@ -65,4 +64,26 @@ chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& chartt
 	test_sizer->Add(wnd, 1, wxEXPAND | wxALL, 5);
 	SetSizer(test_sizer);
 }
+
+
+void chart_frame::clear()
+{
+	wxMutexGuiEnter();
+	for(unsigned int i=0; i<2; ++i) {
+		m_dataset[i]->SetX0(0.);
+		m_dataset[i]->SetScaleX(m_dump);
+		m_dataset[i]->Clear();
+	}
+	wxMutexGuiLeave();
+}
+
+void chart_frame::add(double e, double t)
+{
+	wxMutexGuiEnter();
+	m_dataset[0]->Add(e);
+	m_dataset[1]->Add(t);
+	wxMutexGuiLeave();
+}
+
+
 

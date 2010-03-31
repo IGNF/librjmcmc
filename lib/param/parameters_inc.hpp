@@ -94,17 +94,6 @@ void parameters<T>::insert(const std::string& name, char c, const V& v, const st
 	m_index[name]=--it;
 }
 
-struct value_updater {
-	typedef void result_type;
-	template<typename T> void operator()(T& t) const { t.update_value(); }
-};
-
-template<typename T>
-void parameters<T>::update_values() {
-	for(iterator it = begin(); it!=end(); ++it)
-		boost::apply_visitor(value_updater(),*it);
-}
-
 #endif // PARAMETERS_INC_HPP
 
 

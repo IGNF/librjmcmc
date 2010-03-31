@@ -1,11 +1,11 @@
 #include "param/wx_parameter_traits.hpp"
 #include "visitor/wx/wx_parameter_frame.hpp"
-#include "visitor/wx/wx_parameter_frame.cpp"
 #include "core/building_footprint_rectangle_parameters_inc.hpp"
+
+#include "geometry/wx/Rectangle_2_paint.h"
 #include "visitor/wx/configuration_frame.hpp"
-#include "visitor/wx/configuration_frame.cpp"
 #include "visitor/wx/chart_frame.hpp"
-#include "visitor/wx/chart_frame.cpp"
+
 #include "visitor/wx/wx_log_visitor.hpp"
 #include <boost/thread.hpp>
 
@@ -14,10 +14,9 @@
 
 #include "core/building_footprint_rectangle.hpp"
 
-// member function instanciations
+// includes for template instanciations
 #include "energy/image_gradient_unary_energy_inc.hpp"
 #include "image/gradient_image_inc.hpp"
-#include "image/image_inc.hpp"
 
 template<typename Configuration, typename Sampler>
 class wx_visitor
@@ -79,9 +78,9 @@ public:
         m_chart_frame->Destroy();
     }
 private:
-    configuration_frame  *m_confg_frame;
-    parameters_frame        *m_param_frame;
-    chart_frame             *m_chart_frame;
+    configuration_frame    *m_confg_frame;
+    parameters_frame       *m_param_frame;
+    chart_frame            *m_chart_frame;
     wx_log_visitor<Sampler> m_wx_log_visitor;
     bool                    m_stopping;
 };
@@ -94,7 +93,7 @@ public:
 
     virtual void go(void *layer) {
         m_visitor.stop();
-        if(m_thread) m_thread->join();
+        if(m_thread) { m_thread->join(); m_thread=NULL; }
         Layer::ptrLayerType *l = (Layer::ptrLayerType *)layer;
         boost::shared_ptr<ImageLayer> i = boost::dynamic_pointer_cast<ImageLayer>(*l);
         m_thread = new boost::thread(
@@ -118,7 +117,6 @@ private:
     boost::thread *m_thread;
 };
 
-#include "core/building_footprint_rectangle.hpp"
 #include <wx/app.h>
 
 class building_footprint_rectangle_gui : public wxApp

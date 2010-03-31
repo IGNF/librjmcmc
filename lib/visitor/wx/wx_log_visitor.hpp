@@ -31,9 +31,7 @@ private:
 	void log() {
 		if(m_out.str().empty()) return;
 		wxMutexGuiEnter();
-		{
-			wxLogMessage( wxString( m_out.str().c_str(),*wxConvCurrent ).GetData());
-		}
+		wxLogMessage( wxString( m_out.str().c_str(),*wxConvCurrent ).GetData());
 		wxMutexGuiLeave();
 		m_out.str("");
 	}

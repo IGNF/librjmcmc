@@ -5,7 +5,6 @@
 
 #include "image/image_types.hpp"
 #include "image/gradient_image_inc.hpp"
-#include "image/image_inc.hpp"
 
 #include "core/building_footprint_rectangle.hpp"
 #include "visitor/ostream_visitor.hpp"

@@ -10,42 +10,24 @@
 
 #include "visitor/controler.hpp"
 #include "rjmcmc/variant.hpp"
-#include "core/geometry.h"
 
-struct layer_visitor {
+// to be specialized by each object type (-> files lib/geometry/*_paint.h)
+template<typename T> void paint(Layer::ptrLayerType&, const std::string& s, const T&);
+
+struct layer_painter {
 public:
-  layer_visitor( Layer::ptrLayerType& layer) : m_layer(layer) {}
+  layer_painter( Layer::ptrLayerType& layer) : m_layer(layer) {}
 
   void energy(double e) { m_energy=e; }
-  typedef void result_type;
-#ifdef GEOMETRY_RECTANGLE_2_H
-  void operator()(const Rectangle_2& r) const {
-    std::vector<double> vectx, vecty;
-    for (unsigned int i=0; i<4;++i)
-    {
-      vectx.push_back(geometry::to_double(r[i].x()));
-      vecty.push_back(geometry::to_double(r[i].y()));
-    }
-    m_layer->AddPolygon(vectx, vecty );
-    std::ostringstream oss;
-    oss << m_energy;
-    double x = geometry::to_double(r.center().x());
-    double y = geometry::to_double(r.center().y());
-    m_layer->AddText(x, y, oss.str() , wxColour(255,0,0) );
-  }
-#endif // GEOMETRY_RECTANGLE_2_H
 
-#ifdef GEOMETRY_CIRCLE_2_H
-  void operator()(const Circle_2& c) const {
-    double x = geometry::to_double(c.center().x());
-    double y = geometry::to_double(c.center().y());
-    double r = geometry::to_double(geometry::radius(c));
-    m_layer->AddCircle(x,y,r);
+  typedef void result_type;
+
+  template<typename T> void operator()(const T& t) const {
     std::ostringstream oss;
     oss << m_energy;
-    m_layer->AddText(x, y, oss.str() , wxColour(255,0,0) );
+    paint(m_layer,oss.str(),t);
   }
-#endif // GEOMETRY_CIRCLE_2_H
+
 private:
   Layer::ptrLayerType& m_layer;
   double m_energy;
@@ -56,11 +38,11 @@ template<typename Config>
 Layer::ptrLayerType& operator<<(Layer::ptrLayerType& layer, const Config& config)
 {
 	typename Config::const_iterator it = config.begin(), end = config.end();
-	layer_visitor visitor(layer);
+	layer_painter painter(layer);
 	for (; it != end; ++it)
 	{
-		visitor.energy(config.energy(it));
-		rjmcmc::apply_visitor(visitor,config[it]);
+		painter.energy(config.energy(it));
+		rjmcmc::apply_visitor(painter,config[it]);
 	}
 	return layer;
 }
@@ -69,11 +51,19 @@ Layer::ptrLayerType& operator<<(Layer::ptrLayerType& layer, const Config& config
 class configuration_frame: public BasicViewerFrame
 {
 public:
-        configuration_frame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE, const wxString& name = _("frame"));
+        configuration_frame(
+		wxWindow* parent,
+		wxWindowID id,
+		const wxString& title,
+		const wxPoint& pos = wxDefaultPosition,
+		const wxSize& size = wxDefaultSize,
+		long style = wxDEFAULT_FRAME_STYLE,
+		const wxString& name = _("frame"));
+
         ~configuration_frame() {}
 
-	void OnGoButton(wxCommandEvent&);
-	void OnStopButton(wxCommandEvent&);
+	void OnGoButton   (wxCommandEvent&);
+	void OnStopButton (wxCommandEvent&);
 	void OnChartButton(wxCommandEvent&);
 	void OnParamButton(wxCommandEvent&);
 
@@ -81,7 +71,7 @@ public:
 	void begin(unsigned int dump, unsigned int save, double t, const Config& config) {
 		m_dump = dump;
 		m_save = save;
-		m_buttonGo->Disable();
+		m_buttonGo  ->Disable();
 		m_buttonStop->Enable();
 	}
 
@@ -99,11 +89,9 @@ public:
 		if (m_dump && (i % m_dump == 0))
 		{
 			wxMutexGuiEnter();
-			{
-				m_vlayer->Clear();
-				m_vlayer << config;
-				Refresh();
-			}
+			m_vlayer->Clear();
+			m_vlayer << config;
+			Refresh();
 			wxMutexGuiLeave();
 		}
 		return true;
@@ -113,7 +101,7 @@ public:
 	void end(const Config&)
 	{
 		m_buttonStop->Disable();
-		m_buttonGo->Enable();
+		m_buttonGo  ->Enable();
 	}
 
 	wxAboutDialogInfo getAboutInfo() const;
@@ -124,9 +112,9 @@ public:
 	DECLARE_EVENT_TABLE() ;
 
 private:
-	Controler *m_controler;
-	wxButton *m_buttonGo;
-	wxButton *m_buttonStop;
+	Controler   *m_controler;
+	wxButton    *m_buttonGo;
+	wxButton    *m_buttonStop;
 	PanelViewer *m_panel;
 
 	int m_dump;

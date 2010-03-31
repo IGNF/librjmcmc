@@ -101,4 +101,15 @@ private:
 	parameters(const parameters &);
 };
 
+struct value_updater {
+	typedef void result_type;
+	template<typename T> void operator()(T& t) const { t.update_value(); }
+};
+
+template<typename T>
+void parameters<T>::update_values() {
+	for(iterator it = begin(); it!=end(); ++it)
+		boost::apply_visitor(value_updater(),*it);
+}
+
 #endif // PARAMETERS_HPP
