@@ -60,18 +60,16 @@ struct sizer_adder {
 	}
 
 	void operator()(parameter<wx_parameter_traits,boost::filesystem::path>& p) {
-		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 		wxString s(p.value().string().c_str(), *wxConvCurrent);
 		wxTextCtrl   *ctrl = new wxTextCtrl(m_wnd, wxID_ANY, s);
 		p.control(ctrl);
 		long id = wxNewId();
-		wxButton *browse_button = new wxButton(m_wnd,id,wxT("..."),wxDefaultPosition,wxSize(25,25));
+		wxString desc((p.description()+" ...").c_str(), *wxConvCurrent);
+		wxButton *browse_button = new wxButton(m_wnd,id,desc);
 		browse_button->Connect(id, wxEVT_COMMAND_BUTTON_CLICKED,
 	wxCommandEventHandler(parameters_frame::on_file_parameter), NULL, m_frame);
 		m_name[id]=p.name();
-		sizer->Add(browse_button);
-		AddText(sizer,p);
-		m_sizer->Add(sizer,0,wxALL);
+		m_sizer->Add(browse_button, 0,wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
 		m_sizer->Add(ctrl ,0,wxEXPAND);
 	}
 };

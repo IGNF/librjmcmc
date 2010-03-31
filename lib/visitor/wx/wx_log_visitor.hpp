@@ -28,7 +28,7 @@ public:
 	}
 
 private:
-	void log() {
+	void log() { // this may go in a "visitor/ostream_visitor.cpp" file
 		if(m_out.str().empty()) return;
 		wxMutexGuiEnter();
 		wxLogMessage( wxString( m_out.str().c_str(),*wxConvCurrent ).GetData());
