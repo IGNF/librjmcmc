@@ -63,7 +63,7 @@ public:
 
 	wx_visitor()
 	{
-		m_confg_frame = new rjmcmc_building_footprint_extraction_frame((wxFrame *)NULL, wxID_ANY, _("RJMCMC building footprint extraction") );
+		m_confg_frame = new rjmcmc_2d_viewer_frame((wxFrame *)NULL, wxID_ANY, _("RJMCMC building footprint extraction") );
 		m_param_frame = new parameters_frame(m_confg_frame);
 		m_chart_frame = new chart_frame(m_confg_frame);
 
@@ -80,11 +80,11 @@ public:
 		m_chart_frame->Destroy();
 	}
 private:
-	rjmcmc_building_footprint_extraction_frame *m_confg_frame;
-	parameters_frame                           *m_param_frame;
-	chart_frame                                *m_chart_frame;
-	wx_log_visitor<Sampler>                     m_wx_log_visitor;
-	bool m_stopping;
+        rjmcmc_2d_viewer_frame  *m_confg_frame;
+        parameters_frame        *m_param_frame;
+        chart_frame             *m_chart_frame;
+        wx_log_visitor<Sampler> m_wx_log_visitor;
+        bool                    m_stopping;
 };
 
 template<typename Configuration, typename Sampler>

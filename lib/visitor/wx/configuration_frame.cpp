@@ -12,7 +12,7 @@
 #include <GilViewer/gui/define_id.hpp>
 
 #include "param/wx_parameter_traits.hpp"
-#include "core/building_footprint_extraction_parameters_inc.hpp"
+//#include "core/building_footprint_extraction_parameters_inc.hpp"
 
 #include "configuration_frame.hpp"
 
@@ -26,20 +26,19 @@ enum
 
 using namespace std;
 
-BEGIN_EVENT_TABLE(rjmcmc_building_footprint_extraction_frame,BasicViewerFrame)
-    EVT_BUTTON(ID_BUTTON_GO,rjmcmc_building_footprint_extraction_frame::OnGoButton)
-    EVT_BUTTON(ID_BUTTON_STOP,rjmcmc_building_footprint_extraction_frame::OnStopButton)
-    EVT_BUTTON(ID_BUTTON_CHART,rjmcmc_building_footprint_extraction_frame::OnChartButton)
-    EVT_BUTTON(ID_BUTTON_PARAM,rjmcmc_building_footprint_extraction_frame::OnParamButton)
-    ADD_GILVIEWER_EVENTS_TO_TABLE(rjmcmc_building_footprint_extraction_frame)
+BEGIN_EVENT_TABLE(rjmcmc_2d_viewer_frame,BasicViewerFrame)
+    EVT_BUTTON(ID_BUTTON_GO,rjmcmc_2d_viewer_frame::OnGoButton)
+    EVT_BUTTON(ID_BUTTON_STOP,rjmcmc_2d_viewer_frame::OnStopButton)
+    EVT_BUTTON(ID_BUTTON_CHART,rjmcmc_2d_viewer_frame::OnChartButton)
+    EVT_BUTTON(ID_BUTTON_PARAM,rjmcmc_2d_viewer_frame::OnParamButton)
+    ADD_GILVIEWER_EVENTS_TO_TABLE(rjmcmc_2d_viewer_frame)
 END_EVENT_TABLE();
 
-IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(rjmcmc_building_footprint_extraction_frame,m_panel)
+IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(rjmcmc_2d_viewer_frame,m_panel)
 
-        rjmcmc_building_footprint_extraction_frame::rjmcmc_building_footprint_extraction_frame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos , const wxSize& size , long style , const wxString& name ):
+        rjmcmc_2d_viewer_frame::rjmcmc_2d_viewer_frame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos , const wxSize& size , long style , const wxString& name ):
     BasicViewerFrame(parent, id, title, pos, size, style, name)
 {
-
 #if defined(__WXMSW__)
     wxIcon icon("logo_matis_small");
     SetIcon (icon);
@@ -96,26 +95,22 @@ IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(rjmcmc_building_footprint_extracti
     m_dockManager.Update();
 }
 
-rjmcmc_building_footprint_extraction_frame::~rjmcmc_building_footprint_extraction_frame()
-{
-}
-
-void rjmcmc_building_footprint_extraction_frame::OnStopButton(wxCommandEvent&)
+void rjmcmc_2d_viewer_frame::OnStopButton(wxCommandEvent&)
 {
     m_controler->stop();
 }
 
-void rjmcmc_building_footprint_extraction_frame::OnParamButton(wxCommandEvent&)
+void rjmcmc_2d_viewer_frame::OnParamButton(wxCommandEvent&)
 {
     m_controler->toggle_param_visibility();
 }
 
-void rjmcmc_building_footprint_extraction_frame::OnChartButton(wxCommandEvent&)
+void rjmcmc_2d_viewer_frame::OnChartButton(wxCommandEvent&)
 {
     m_controler->toggle_chart_visibility();
 }
 
-void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent&)
+void rjmcmc_2d_viewer_frame::OnGoButton(wxCommandEvent&)
 {
     param::Instance()->update_values();
 
@@ -200,7 +195,7 @@ void rjmcmc_building_footprint_extraction_frame::OnGoButton(wxCommandEvent&)
     }
 }
 
-wxAboutDialogInfo rjmcmc_building_footprint_extraction_frame::getAboutInfo() const
+wxAboutDialogInfo rjmcmc_2d_viewer_frame::getAboutInfo() const
 {
     wxAboutDialogInfo info;
     info.AddDeveloper(_("Olivier Tournaire"));

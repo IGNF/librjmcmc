@@ -23,7 +23,7 @@ int main(int argc , char** argv)
         std::string dem(p->get<boost::filesystem::path>("dem").string());
 	tiff_read_image(dem, img);
 
-	building_footprint_extraction(visitor,const_view(img));
+        building_footprint_rectangle(visitor,const_view(img));
 	return 0;
 }
 

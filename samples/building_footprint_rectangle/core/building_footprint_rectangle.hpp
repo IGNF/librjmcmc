@@ -42,7 +42,7 @@ typedef rjmcmc::sampler<birth_death_kernel,modification_kernel> sampler;
 /************** main ****************/
 
 template<typename Visitor, typename View>
-void building_footprint_extraction(Visitor& visitor, const View& view) {
+void building_footprint_rectangle(Visitor& visitor, const View& view) {
 	param *p = param::Instance();
 
 	Iso_rectangle_2 bbox(

@@ -66,11 +66,11 @@ Layer::ptrLayerType& operator<<(Layer::ptrLayerType& layer, const Config& config
 }
 
 
-class rjmcmc_building_footprint_extraction_frame: public BasicViewerFrame
+class rjmcmc_2d_viewer_frame: public BasicViewerFrame
 {
 public:
-	rjmcmc_building_footprint_extraction_frame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE, const wxString& name = _("frame"));
-	~rjmcmc_building_footprint_extraction_frame();
+        rjmcmc_2d_viewer_frame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_FRAME_STYLE, const wxString& name = _("frame"));
+        ~rjmcmc_2d_viewer_frame() {}
 
 	void OnGoButton(wxCommandEvent&);
 	void OnStopButton(wxCommandEvent&);
