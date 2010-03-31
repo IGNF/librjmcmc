@@ -134,8 +134,10 @@ private:
 			wxString mystr(argv[i]);
 			my_argv[i] = new char[mystr.size()+1];
 			strcpy(my_argv[i], mystr.To8BitData());
-		}
-		if(!param::Instance()->parse(argc,my_argv)) return false;
+                }
+                param *p = param::Instance();
+                initialize_parameters(p);
+                if(!p->parse(argc,my_argv)) return false;
 		m_controler = new controler_type();
 		return true;
 	}
