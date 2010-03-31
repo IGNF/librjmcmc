@@ -17,6 +17,7 @@
 int main(int argc , char** argv)
 {
 	param *p = param::Instance();
+        initialize_parameters(p);
 	if (!p->parse(argc, argv)) return -1;
 	rjmcmc::ostream_visitor<sampler> visitor(std::cout);
 

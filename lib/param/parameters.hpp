@@ -97,7 +97,7 @@ private:
 	std::map<std::string,iterator> m_index;
 	std::string m_caption;
 	container m_parameter;
-	parameters();
+        parameters() {}
 	parameters(const parameters &);
 };
 
