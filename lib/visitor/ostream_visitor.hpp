@@ -22,10 +22,14 @@ private:
 public:
 	ostream_visitor(std::ostream& out) : m_out(out) {}
 
-	template<typename Config>
-	void begin(int dump, int save, double t, const Config& config) {
+	void init(int dump, int save) {
 		m_dump = dump;
 		m_save = save;
+	}
+
+	template<typename Configuration>
+        void begin(const Configuration& config, const Sampler& sampler, double t)
+	{
 		for (unsigned int i=0; i<kernel_size; ++i) m_accepted[i] = m_proposed[i] = 0;
 	
 		m_out.fill(' ');
@@ -41,9 +45,21 @@ public:
 	
 		m_clock_begin = m_clock = clock();
 	}
+	template<typename Configuration>
+        void end(const Configuration& config, const Sampler&, double)
+	{
+		clock_t clock_end = clock();
+		m_out << "Iterations finished" << std::endl;
+		m_out << "Total elapsed time (s) :  " << double(clock_end - m_clock_begin) / CLOCKS_PER_SEC << std::endl;
+		m_out << "Graph Data energy integrity : " << config.audit_unary_energy() - config.unary_energy() << std::endl;
+		m_out << "Graph Prior energy integrity: " << config.audit_binary_energy() - config.binary_energy()<< std::endl;
+		m_out << "Graph Structure integrity : " << config.audit_structure() << std::endl;
+		m_out << config;
+		m_out << std::endl << std::flush;
+	}
 
-	template <typename Config> bool iterate(unsigned int i, double t,
-			const Config& config, const Sampler& sampler) {
+	template<typename Configuration>
+	bool iterate(const Configuration& config, const Sampler& sampler, double t, unsigned int i) {
 		m_proposed[sampler.kernel_id()]++;
 		if( sampler.accepted() ) m_accepted[sampler.kernel_id()]++;
 
@@ -53,12 +69,12 @@ public:
 			m_out << std::setw(w) << config.size();
 			
 			unsigned int total_accepted =0;
-			for(unsigned int i=0; i<kernel_size; ++i)
+			for(unsigned int k=0; k<kernel_size; ++k)
 			{
-				m_out << std::setw(w) << 100.* m_proposed[i] / m_dump;
-				m_out << std::setw(w) << (m_proposed[i]?(100.* m_accepted[i]) / m_proposed[i]:100.);
-				total_accepted += m_accepted[i];
-				m_accepted[i] = m_proposed[i] = 0;
+				m_out << std::setw(w) << 100.* m_proposed[k] / m_dump;
+				m_out << std::setw(w) << (m_proposed[k]?(100.* m_accepted[k]) / m_proposed[k]:100.);
+				total_accepted += m_accepted[k];
+				m_accepted[k] = m_proposed[k] = 0;
 			}
 			m_out << std::setw(w) << (100.*total_accepted) / m_dump;
 			clock_t clock_temp = clock();
@@ -72,18 +88,6 @@ public:
 		}
 		return true;
 	}
-
-	template <typename Config> void end(const Config& config) {
-		clock_t clock_end = clock();
-		m_out << "Iterations finished" << std::endl;
-		m_out << "Total elapsed time (s) :  " << double(clock_end - m_clock_begin) / CLOCKS_PER_SEC << std::endl;
-		m_out << "Graph Data energy integrity : " << config.audit_unary_energy() - config.unary_energy() << std::endl;
-		m_out << "Graph Prior energy integrity: " << config.audit_binary_energy() - config.binary_energy()<< std::endl;
-		m_out << "Graph Structure integrity : " << config.audit_structure() << std::endl;
-		m_out << config;
-		m_out << std::endl << std::flush;
-	}
-
 };
 
 }; // namespace rjmcmc

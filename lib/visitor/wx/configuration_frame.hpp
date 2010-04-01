@@ -7,6 +7,7 @@
 #include <GilViewer/gui/LayerControl.hpp>
 #include <GilViewer/gui/BasicViewerFrame.h>
 #include <GilViewer/convenient/MacrosGilViewer.hpp>
+#include <GilViewer/layers/image_types.hpp>
 
 #include "visitor/controler.hpp"
 #include "rjmcmc/variant.hpp"
@@ -67,16 +68,27 @@ public:
 	void OnChartButton(wxCommandEvent&);
 	void OnParamButton(wxCommandEvent&);
 
-	template<typename Config>
-	void begin(unsigned int dump, unsigned int save, double t, const Config& config) {
+	void init(int dump, int save)
+	{
 		m_dump = dump;
 		m_save = save;
+	}
+
+	template<typename Configuration, typename Sampler>
+        void begin(const Configuration& config, const Sampler& sample, double t)
+	{
 		m_buttonGo  ->Disable();
 		m_buttonStop->Enable();
 	}
+	template<typename Configuration, typename Sampler>
+        void end(const Configuration& config, const Sampler& sample, double t)
+	{
+		m_buttonStop->Disable();
+		m_buttonGo  ->Enable();
+	}
 
-	template<typename Config, typename Sampler>
-	bool iterate(unsigned int i, double t, const Config& config, const Sampler&)
+	template<typename Configuration, typename Sampler>
+	bool iterate(const Configuration& config, const Sampler&, double, unsigned int i)
 	{
 		if ( m_save && (i%m_save == 0) )
 		{
@@ -97,22 +109,16 @@ public:
 		return true;
 	}
 
-	template<typename Config>
-	void end(const Config&)
-	{
-		m_buttonStop->Disable();
-		m_buttonGo  ->Enable();
-	}
-
 	wxAboutDialogInfo getAboutInfo() const;
 
-	void controler(Controler *c) { m_controler=c; } 
+	typedef Controler<any_view_type> controler_type;
+	void controler(controler_type *c) { m_controler=c; } 
 
 	DECLARE_GILVIEWER_METHODS_FOR_EVENTS_TABLE() ;
 	DECLARE_EVENT_TABLE() ;
 
 private:
-	Controler   *m_controler;
+	controler_type *m_controler;
 	wxButton    *m_buttonGo;
 	wxButton    *m_buttonStop;
 	PanelViewer *m_panel;

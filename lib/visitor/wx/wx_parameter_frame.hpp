@@ -26,28 +26,29 @@ public:
 
 	virtual ~parameters_frame() {}
 
-	template<typename Config>
-	void begin(unsigned int dump, unsigned int save, double t, const Config& config) {
+	void init(int dump, int save) {}
+
+	template<typename Configuration, typename Sampler>
+        void begin(const Configuration& config, const Sampler& sampler, double t)
+	{
 		wxMutexGuiEnter();
 		Refresh();
 		Disable();
 		wxMutexGuiLeave();
 	}
-
-	template<typename Config, typename Sampler>
-	bool iterate(unsigned int i, double t, const Config& config, const Sampler&)
-	{
-		return true;
-	}
-
-	template<typename Config>
-	void end(const Config&)
+	template<typename Configuration, typename Sampler>
+        void end(const Configuration& config, const Sampler& sampler, double t)
 	{
 		wxMutexGuiEnter();
 		Enable();
 		Refresh();
 		Show();
 		wxMutexGuiLeave();
+	}
+
+	template<typename Configuration, typename Sampler>
+	bool iterate(const Configuration& config, const Sampler& sampler, double, unsigned int i) {
+		return true;
 	}
 
 	void on_file_parameter(wxCommandEvent& event);

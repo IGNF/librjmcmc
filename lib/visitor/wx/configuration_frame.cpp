@@ -185,7 +185,8 @@ void configuration_frame::OnGoButton(wxCommandEvent&)
         param::Instance()->set("ymax",p1.y-p0.y);
         
         m_vlayer = vlayer;
-        m_controler->go((void *)&clayer); // todo
+        boost::shared_ptr<ImageLayer> iclayer = boost::dynamic_pointer_cast<ImageLayer>(clayer);
+        m_controler->go(iclayer->View()->value); // todo
     }
     catch( const exception &e )
     {

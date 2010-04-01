@@ -15,22 +15,27 @@ public:
 		const wxPoint& pos = wxDefaultPosition,
 		const wxSize& size = wxDefaultSize);
 
-	template<typename Config>
-	void begin(unsigned int dump, unsigned int save, double t, const Config& config) {
+	void init(int dump, int save)
+	{
 		m_dump = dump;
+	}
+
+	template<typename Configuration, typename Sampler>
+        void begin(const Configuration& config, const Sampler& sampler, double t)
+	{
 		clear();
 		add(config.energy(),t);
 	}
-
-	template<typename Config, typename Sampler>
-	bool iterate(unsigned int i, double t, const Config& config, const Sampler&) {
-		if(i%m_dump == 0) add(config.energy(),t);
-		return true;
+	template<typename Configuration, typename Sampler>
+        void end(const Configuration& config, const Sampler& sampler, double t)
+	{
+		add(config.energy(),t);
 	}
 
-	template<typename Config>
-	void end(const Config&)
-	{
+	template<typename Configuration, typename Sampler>
+	bool iterate(const Configuration& config, const Sampler& sampler, double t, unsigned int i) {
+		if(i%m_dump == 0) add(config.energy(),t);
+		return true;
 	}
 
 	void OnCloseWindow(wxCloseEvent&) { Hide(); }

@@ -5,15 +5,11 @@
 
 #include "core/geometry.h"
 #include <boost/variant.hpp>
-//typedef Rectangle_2 object;
-//typedef boost::variant<Rectangle_2> object;
 typedef boost::variant<Rectangle_2,Circle_2> object;
 
 #include "energy/box_is_valid.hpp"
 typedef box_is_valid                         is_valid;
 
-//#include "energy/image_gradient_unary_energy.hpp"
-//typedef image_gradient_unary_energy          unary_energy;
 #include "core/global_reconstruction_unary_energy.hpp"
 typedef global_reconstruction_unary_energy          unary_energy;
 
@@ -28,6 +24,9 @@ typedef modifier <is_valid>          modifier_;
 
 #include "rjmcmc/temperature.hpp"
 typedef rjmcmc::geometric_temperature                    temperature;
+
+#include "rjmcmc/max_iteration_end_test.hpp"
+typedef max_iteration_end_test                           end_test;
 
 #include "rjmcmc/configuration.hpp"
 typedef rjmcmc::graph_configuration
@@ -44,10 +43,8 @@ typedef rjmcmc::sampler<birth_death_kernel,modification_kernel> sampler;
 
 /************** main ****************/
 
-template<typename Visitor, typename View>
-void building_footprint_extraction(Visitor& visitor, const View& view) {
-	param *p = param::Instance();
-
+template<typename Param, typename View, typename Configuration>
+void create_configuration(Param *p, const View& view, Configuration *&c) {
 	Iso_rectangle_2 bbox(
 		p->get<int>("xmin"),
 		p->get<int>("ymin"),
@@ -70,8 +67,17 @@ void building_footprint_extraction(Visitor& visitor, const View& view) {
 	);
 
 	// empty initial configuration
-	configuration config(e1,e2);
+	c = new configuration(e1,e2);
+}
 
+template<typename Param, typename Sampler>
+void create_sampler(Param *p, Sampler *&s) {
+	Iso_rectangle_2 bbox(
+		p->get<int>("xmin"),
+		p->get<int>("ymin"),
+		p->get<int>("xmax"),
+		p->get<int>("ymax")
+	);
 	// sampler objects
 	is_valid valid(bbox,
 		p->get<double>("minsize"),
@@ -91,29 +97,31 @@ void building_footprint_extraction(Visitor& visitor, const View& view) {
 		p->get<double>("pdeath")
 	);
 
-	sampler sample( kbirthdeath, kmodif );
-
-	// simulated annealing
-	temperature temp(
+	s = new sampler( kbirthdeath, kmodif );
+}
+template<typename Param, typename Temperature>
+void create_temperature(Param *p, Temperature *&t)
+{
+	t = new temperature(
 		p->get<double>("temp"),
 		p->get<double>("deccoef")
 	);
-	// visitation initialization
-	visitor.begin(
-		p->get<int>("nbdump"),
-		p->get<int>("nbsave"),
-		*temp,
-		config
-	);
+}
 
-	// main loop
-	unsigned int iterations = p->get<int>("nbiter");
-	for (unsigned int i=1; i<=iterations; ++i, ++temp)
-	{
-		sample(config,*temp);
-		if(!visitor.iterate(i,*temp,config,sample)) break;
-	}
-	visitor.end(config);
+template<typename Param, typename EndTest>
+void create_end_test(Param *p, EndTest *&e)
+{
+	e = new end_test(
+		p->get<int>("nbiter")
+	);
+}
+
+template<typename Param, typename Visitor>
+void init_visitor(Param *p, Visitor& v)
+{
+	v.init( p->get<int>("nbdump"),
+		p->get<int>("nbsave")
+	);
 }
 
 #endif // __BUILDING_FOOTPRINT_EXTRACTION_HPP__

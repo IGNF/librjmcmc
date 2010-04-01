@@ -17,4 +17,4 @@ typedef geometry::Circle_2<K> Circle_2;
 #include "geometry/Circle_2_intersection.h"
 #include "geometry/Circle_2_rectangle_2_intersection.h"
 
-#endif //#ifndef GEOMETRY_H
+#endif // GEOMETRY_H
