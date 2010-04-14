@@ -95,12 +95,6 @@ template<typename View> double integrated_flux(const View& view, int x0, int y0,
 	if(w==0) return 0.;
 	return (res * geometry::perimeter(c)) / w;
 }
-
-template<typename View> double inverted_integrated_flux(const View& view, int x0, int y0, const Circle_2& c)
-{
-    // BEURK!!!!!
-    return 0.;
-}
 #endif // GEOMETRY_CIRCLE_2_H
 
 

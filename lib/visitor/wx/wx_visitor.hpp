@@ -57,7 +57,7 @@ public:
 
     wx_visitor(const std::string& title)
     {
-        m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, _(title.c_str()) );
+        m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, wxString(title.c_str(), *wxConvCurrent) );
         m_param_frame = new parameters_frame(m_confg_frame);
         m_chart_frame = new chart_frame(m_confg_frame);
 

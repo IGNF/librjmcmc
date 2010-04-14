@@ -5,7 +5,6 @@
 #include <boost/gil/extension/matis/float_images.hpp>
 
 namespace rjmcmc {
-//template<typename EnergyComputer>
 class gradient_image
 {
 public:
@@ -14,7 +13,7 @@ public:
 
 	typedef double result_type;
         template<typename T> double operator()(const T&t) const {
-                return inverted_integrated_flux(boost::gil::const_view(m_gradients),x0,y0,t);
+                return integrated_flux(boost::gil::const_view(m_gradients),x0,y0,t);
         }
 
 	template<typename IsoRectangle>
