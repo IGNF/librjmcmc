@@ -5,16 +5,17 @@
 #include <boost/gil/extension/matis/float_images.hpp>
 
 namespace rjmcmc {
+//template<typename EnergyComputer>
 class gradient_image
 {
 public:
-	typedef boost::gil::dev2n32F_image_t image_t;
+        typedef boost::gil::dev2n32F_image_t image_t;
 	typedef boost::gil::dev2n32F_pixel_t pixel_t;
 
 	typedef double result_type;
-	template<typename T> double operator()(const T&t) const {
-                return integrated_flux(boost::gil::const_view(m_gradients),x0,y0,t);
-	}
+        template<typename T> double operator()(const T&t) const {
+                return inverted_integrated_flux(boost::gil::const_view(m_gradients),x0,y0,t);
+        }
 
 	template<typename IsoRectangle>
 	void load(const std::string &file, const IsoRectangle& bbox, double sigmaD=1, unsigned int step=0);

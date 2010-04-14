@@ -13,7 +13,7 @@ void image_gradient_unary_energy::gradient(const View& view, const IsoRectangle&
 template<typename T>
 double image_gradient_unary_energy::operator()(const T &t) const
 {
-	return m_defaultEnergy - m_ponderation_gradient*(*m_image)(t);
+        return m_defaultEnergy - m_ponderation_gradient*(*m_image)(t);
 }
 
 #endif

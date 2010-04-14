@@ -22,7 +22,7 @@ template<typename T>
 double global_reconstruction_unary_energy::operator()(const T &t) const
 {
 	return m_defaultEnergy
-	- m_ponderation_gradient*(*m_gradient)(t)
+        - m_ponderation_gradient*(*m_gradient)(t)
 	+ m_ponderation_ndvi*m_ndvi->error(t);
 }
 
