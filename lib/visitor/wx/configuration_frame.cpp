@@ -3,9 +3,15 @@
 
 #include <wx/artprov.h>
 
+#include <GilViewer/config/config.hpp>
+#if GILVIEWER_USE_GDAL
+#   include <GilViewer/layers/ogr_vector_layer.hpp>
+#else // GILVIEWER_USE_GDAL
+#   include <GilViewer/layers/simple_vector_layer.hpp>
+#endif // GILVIEWER_USE_GDAL
+
 #include <GilViewer/layers/VectorLayerGhost.h>
 #include <GilViewer/layers/ImageLayer.hpp>
-#include <GilViewer/layers/simple_vector_layer.hpp>
 #include <GilViewer/gui/LayerControl.hpp>
 #include <GilViewer/gui/ApplicationSettings.hpp>
 #include <GilViewer/gui/PanelManager.h>
@@ -149,7 +155,12 @@ void configuration_frame::OnGoButton(wxCommandEvent&)
     }
     try
     {
-       boost::shared_ptr<Layer> vlayer = boost::shared_ptr<Layer>(new simple_vector_layer("Extracted elements"));
+        boost::shared_ptr<Layer> vlayer;
+#if GILVIEWER_USE_GDAL
+        vlayer = boost::shared_ptr<Layer>(new ogr_vector_layer("Extracted elements"));
+#else // GILVIEWER_USE_GDAL
+        vlayer = boost::shared_ptr<Layer>(new simple_vector_layer("Extracted elements"));
+#endif // GILVIEWER_USE_GDAL
         Layer::ptrLayerType clayer = ilayer->crop(p0.x,p0.y,p1.x,p1.y);
         if(!clayer) {
             std::ostringstream oss;

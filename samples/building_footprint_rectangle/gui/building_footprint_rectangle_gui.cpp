@@ -12,6 +12,12 @@
 #include "energy/image_gradient_unary_energy_inc.hpp"
 #include "image/gradient_image_inc.hpp"
 
+#include "GilViewer/io/gilviewer_io_factory.hpp"
+#include "GilViewer/config/config.hpp"
+#if GILVIEWER_USE_GDAL
+#   include <gdal/ogrsf_frmts.h>
+#endif // GILVIEWER_USE_GDAL
+
 
 class building_footprint_rectangle_gui : public wxApp
 {
@@ -21,6 +27,12 @@ private:
 
     bool OnInit()
     {
+        // GilViewer formats factory initialization
+        register_all_file_formats();
+#if GILVIEWER_USE_GDAL
+        OGRRegisterAll();
+#endif // GILVIEWER_USE_GDAL
+
         char **my_argv = new char*[argc];
         for (int i=0;i<argc;++i)
         {

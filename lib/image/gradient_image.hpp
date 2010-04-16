@@ -13,7 +13,7 @@ public:
 
 	typedef double result_type;
         template<typename T> double operator()(const T&t) const {
-                return integrated_flux(boost::gil::const_view(m_gradients),x0,y0,t);
+                return /*inverted_*/integrated_flux(boost::gil::const_view(m_gradients),x0,y0,t);
         }
 
 	template<typename IsoRectangle>
