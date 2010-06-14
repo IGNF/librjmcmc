@@ -41,9 +41,8 @@ option(BUILD_SHARED_LIBS "Dynamic libraries" ON)
 option(BUILD_SHARED_EXE  "Dynamic executables" ON)
 
 # Find BOOST
-find_package( Boost 1.37 COMPONENTS thread program_options system )
-set( Boost_ADDITIONAL_VERSIONS "1.39.0" "1.39" "1.40.0" "1.40" )
-find_package( Boost 1.37 COMPONENTS thread program_options system )
+set( Boost_ADDITIONAL_VERSIONS "1.39.0" "1.39" "1.40.0" "1.40" "1.41.0" "1.41" "1.42.0" "1.42" )
+find_package( Boost 1.37 COMPONENTS thread program_options system filesystem )
 if( NOT Boost_FOUND )
 	message(FATAL_ERROR "Boost not found ! Please set Boost path ...")
 else()

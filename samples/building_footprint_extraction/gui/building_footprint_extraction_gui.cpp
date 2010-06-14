@@ -43,7 +43,7 @@ private:
         param *p = param::Instance();
         initialize_parameters(p);
         if(!p->parse(argc,my_argv)) return false;
-        m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, "librjmcmc: building/tree footprint extraction" );
+        m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, _("librjmcmc: building/tree footprint extraction") );
         m_param_frame = new parameters_frame(m_confg_frame);
         m_chart_frame = new chart_frame(m_confg_frame);
         m_visitor = new visitor(&m_wx_log_visitor,m_confg_frame,m_param_frame,m_chart_frame);

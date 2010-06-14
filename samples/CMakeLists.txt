@@ -6,5 +6,5 @@ add_subdirectory(building_footprint_rectangle)
 
 option(BUILD_FACADE_ELEMENTS "build facade_elements sample" OFF)
 if(BUILD_FACADE_ELEMENTS)
-	add_subdirectory(facade_elements_rectangle)
+        add_subdirectory(facade_elements_rectangle)
 endif(BUILD_FACADE_ELEMENTS)

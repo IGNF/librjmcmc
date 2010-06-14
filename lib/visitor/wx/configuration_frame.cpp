@@ -1,3 +1,5 @@
+#include <boost/filesystem.hpp>
+
 #include <fstream>
 #include <sstream>
 
@@ -10,6 +12,9 @@
 #include <GilViewer/gui/ApplicationSettings.hpp>
 #include <GilViewer/gui/PanelManager.h>
 #include <GilViewer/gui/define_id.hpp>
+#include <GilViewer/io/gilviewer_file_io.hpp>
+#include <GilViewer/io/gilviewer_io_factory.hpp>
+
 
 #include "configuration_frame.hpp"
 
@@ -44,7 +49,7 @@ IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(configuration_frame,m_panel)
 #endif
 
     PanelViewer::Register(this);
-    m_panel = PanelManager::Instance()->createObject("PanelViewer");
+    m_panel = PanelManager::instance()->create_object("PanelViewer");
 
     m_statusBar->SetStatusText(_("librjmcmc"));
 
@@ -54,7 +59,7 @@ IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(configuration_frame,m_panel)
     toolbarInfo.Top();
     toolbarInfo.CloseButton(false);
     toolbarInfo.CaptionVisible(false);
-    m_dockManager.AddPane( m_panel->GetMainToolBar(this), toolbarInfo );
+    m_dockManager.AddPane( m_panel->main_toolbar(this), toolbarInfo );
 
     wxAuiPaneInfo paneInfoDrawPane;
     paneInfoDrawPane.Caption( _("viewer panel") );
@@ -69,7 +74,7 @@ IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(configuration_frame,m_panel)
     modeAndGeometryToolbarInfo.Top();
     modeAndGeometryToolbarInfo.CloseButton(false);
     modeAndGeometryToolbarInfo.CaptionVisible(false);
-    m_dockManager.AddPane( m_panel->GetModeAndGeometryToolBar(this), modeAndGeometryToolbarInfo );
+    m_dockManager.AddPane( m_panel->mode_and_geometry_toolbar(this), modeAndGeometryToolbarInfo );
 
     wxAuiPaneInfo applicationToolBarInfo;
     applicationToolBarInfo.Caption( _("librjmcmc toolbar") );
@@ -134,34 +139,34 @@ void configuration_frame::init(int dump, int save)
 		m_save = save;
 
         m_vlayer = Layer::ptrLayerType(new simple_vector_layer("Extracted elements"));
-        m_panel->AddLayer(m_vlayer);
+        m_panel->add_layer(m_vlayer);
 
-		boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
+                boost::shared_ptr<VectorLayerGhost> ghost = m_panel->vectorlayerghost();
 
-        m_vlayer->TranslationX(/*p0.x+*/ghost->TranslationX());
-        m_vlayer->TranslationY(/*p0.y+*/ghost->TranslationY());
-        m_vlayer->ZoomFactor  (     ghost->ZoomFactor  ());
+        m_vlayer->translation_x(/*p0.x+*/ghost->translation_x());
+        m_vlayer->translation_y(/*p0.y+*/ghost->translation_y());
+        m_vlayer->zoom_factor  (     ghost->zoom_factor  ());
 	
-		m_vlayer->set_line_color(*wxRED);
-        m_vlayer->set_line_style(wxSOLID);
-        m_vlayer->set_line_width(3);
-        m_vlayer->set_polygon_border_color(*wxBLUE);
-        m_vlayer->set_polygon_border_style(wxSOLID);
-        m_vlayer->set_polygon_border_width(3);
-        m_vlayer->set_polygon_inner_color(*wxRED);
-        m_vlayer->set_polygon_inner_style(wxTRANSPARENT);
+        m_vlayer->line_color(*wxRED);
+        m_vlayer->line_style(wxSOLID);
+        m_vlayer->line_width(3);
+        m_vlayer->polygon_border_color(*wxBLUE);
+        m_vlayer->polygon_border_style(wxSOLID);
+        m_vlayer->polygon_border_width(3);
+        m_vlayer->polygon_inner_color(*wxRED);
+        m_vlayer->polygon_inner_style(wxTRANSPARENT);
         m_vlayer->text_visibility(false);      
 }
 
 
 	wxRect configuration_frame::get_bbox() const {
-	    boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
+            boost::shared_ptr<VectorLayerGhost> ghost = m_panel->vectorlayerghost();
     	if(!ghost->m_drawRectangleSelection) return wxRect();
 		return wxRect(ghost->m_rectangleSelection.first,ghost->m_rectangleSelection.second);
 	}
 
 	void configuration_frame::set_bbox(const wxRect& r) {
-	    boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
+            boost::shared_ptr<VectorLayerGhost> ghost = m_panel->vectorlayerghost();
 		ghost->m_rectangleSelection.first  = r.GetTopLeft    ();
 		ghost->m_rectangleSelection.second = r.GetBottomRight();	
     	ghost->m_drawRectangleSelection = true;
@@ -170,9 +175,27 @@ void configuration_frame::init(int dump, int save)
 	}
 
 	void configuration_frame::add_layer(const std::string& file) {
-	    boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
-		
-    	Layer::ptrLayerType ilayer = ImageLayer::CreateImageLayer(file);
+            boost::shared_ptr<VectorLayerGhost> ghost = m_panel->vectorlayerghost();
+
+            std::string extension(boost::filesystem::extension(file));
+            layer::ptrLayerType ilayer;
+            try
+            {
+                boost::shared_ptr<gilviewer_file_io> file_io = gilviewer_io_factory::instance()->create_object(extension.substr(1,extension.size()-1));
+                ilayer = file_io->load(file);
+                m_panel->add_layer( ilayer );
+            }
+            catch (const std::exception &err)
+            {
+                std::ostringstream oss;
+                oss << "File " << file << " does not exist !";
+                wxString message( oss.str().c_str() , *wxConvCurrent );
+                ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
+                return;
+            }
+
+            /*
+        layer::ptrLayerType ilayer = image_layer::create_image_layer(file);
         if ( !ilayer )
         {
           std::ostringstream oss;
@@ -181,9 +204,10 @@ void configuration_frame::init(int dump, int save)
           ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
           return;
         }
-        m_panel->AddLayer(ilayer);
-        ilayer->TranslationX(/*p0.x+*/ghost->TranslationX());
-        ilayer->TranslationY(/*p0.y+*/ghost->TranslationY());
-        ilayer->ZoomFactor  (     ghost->ZoomFactor  ());
+        m_panel->add_layer(ilayer);
+        */
+        ilayer->translation_x(/*p0.x+*/ghost->translation_x());
+        ilayer->translation_y(/*p0.y+*/ghost->translation_y());
+        ilayer->zoom_factor  (     ghost->zoom_factor  ());
 	}
 

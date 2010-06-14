@@ -93,7 +93,7 @@ public:
 			out.width(8);
 			out.fill('0');
 			out << i;
-			m_vlayer->Save( out.str() + ".shp" );
+                        m_vlayer->save( out.str() + ".shp" );
 		}
 		if (m_dump && (i % m_dump == 0))
 		{
@@ -118,14 +118,14 @@ public:
 	DECLARE_EVENT_TABLE() ;
 
 private:
-	Controler   *m_controler;
-	wxButton    *m_buttonGo;
-	wxButton    *m_buttonStop;
-	PanelViewer *m_panel;
+        Controler    *m_controler;
+        wxButton     *m_buttonGo;
+        wxButton     *m_buttonStop;
+        panel_viewer *m_panel;
 
 	int m_dump;
 	int m_save;
-	Layer::ptrLayerType m_vlayer;
+        layer::ptrLayerType m_vlayer;
 };
 
 #endif /* CONFIGURATION_FRAME_HPP */

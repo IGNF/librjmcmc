@@ -18,8 +18,8 @@ template<typename K> void paint(
   }
   double x = geometry::to_double(r.center().x());
   double y = geometry::to_double(r.center().y());
-  l->AddPolygon(vectx, vecty );
-  l->AddText(x, y, s , wxColour(255,0,0) );
+  l->add_polygon(vectx, vecty );
+  l->add_text(x, y, s , wxColour(255,0,0) );
 }
 
 #endif // RECTANGLE_2_PAINT_H
