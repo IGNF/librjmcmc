@@ -10,7 +10,7 @@
 
 /**
  * @brief Class for application parameters handling
- * @author O. Tournaire
+ * @author O. Tournaire, M. Bredif
  */
 
 struct parameter {

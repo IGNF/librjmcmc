@@ -1,12 +1,10 @@
 // parameters
-#include "param/wx_parameter_traits.hpp"
+#include "param/wx_parameter.hpp"
 typedef parameters< wx_parameter > param;
 #include "core/building_footprint_extraction_parameters_inc.hpp"
 
 // images
 #include "image/image_types.hpp"
-#include "image/image.hpp"
-#include "image/gradient_image.hpp"
 
 // optimization
 #include "core/building_footprint_extraction.hpp"
@@ -17,7 +15,7 @@ typedef parameters< wx_parameter > param;
 #include "visitor/wx/configuration_frame.hpp"
 #include "visitor/wx/chart_frame.hpp"
 #include "visitor/wx/wx_parameter_frame.hpp"
-#include "visitor/wx/wx_visitor.hpp"
+#include "visitor/composite_visitor.hpp"
 
 // template instanciations
 #include "core/global_reconstruction_unary_energy_inc.hpp"

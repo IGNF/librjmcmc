@@ -12,9 +12,8 @@
 #include <wx/scrolwin.h>
 #include <wx/button.h>
 
-#include "param/wx_parameter_traits.hpp"
+#include "param/wx_parameter.hpp"
 #include "wx_parameter_frame.hpp"
-#include "image/gradient_image.hpp"
 typedef parameters< wx_parameter > param;
 
 BEGIN_EVENT_TABLE(parameters_frame, wxFrame)

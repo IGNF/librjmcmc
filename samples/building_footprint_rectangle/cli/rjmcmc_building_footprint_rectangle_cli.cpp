@@ -1,12 +1,10 @@
 // parameters
-#include "param/console_parameter_traits.hpp"
+#include "param/parameters.hpp"
 typedef parameters< parameter > param;
 #include "core/building_footprint_rectangle_parameters_inc.hpp"
 
 // images
 #include "image/image_types.hpp"
-#include "image/gradient_image.hpp"
-
 
 // optimization
 #include "core/building_footprint_rectangle.hpp"

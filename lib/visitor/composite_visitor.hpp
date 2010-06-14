@@ -1,5 +1,5 @@
-#ifndef WX_VISITOR_HPP
-#define WX_VISITOR_HPP
+#ifndef COMPOSITE_VISITOR_HPP
+#define COMPOSITE_VISITOR_HPP
 
 #include <boost/tuple/tuple.hpp>
 
@@ -120,4 +120,4 @@ private:
 	Visitors m_visitors;
 };
 
-#endif // WX_VISITOR_HPP
+#endif // COMPOSITE_VISITOR_HPP

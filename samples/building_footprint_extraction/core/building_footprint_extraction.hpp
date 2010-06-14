@@ -13,6 +13,7 @@ typedef box_is_valid                         is_valid;
 
 #include "core/global_reconstruction_unary_energy.hpp"
 #include "image/gradient_image.hpp"
+#include "image/image.hpp"
 typedef oriented<gradient_view_t> oriented_dsm_view;
 typedef oriented<ndvi_view_t>     oriented_ndvi_view;
 typedef global_reconstruction_unary_energy<oriented_dsm_view,oriented_ndvi_view> unary_energy;
