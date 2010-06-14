@@ -1,39 +1,51 @@
+// parameters
 #include "param/console_parameter_traits.hpp"
+typedef parameters< parameter > param;
 #include "core/building_footprint_extraction_parameters_inc.hpp"
 
-#include "visitor/ostream_visitor.hpp"
+// images
+#include "image/image_types.hpp"
+#include "image/image.hpp"
+#include "image/gradient_image.hpp"
 
+// optimization
 #include "core/building_footprint_extraction.hpp"
 #include "rjmcmc/simulated_annealing.hpp"
 
-#include <boost/gil/extension/io/tiff_dynamic_io.hpp>
-#include "image/image_types.hpp"
+// visitors
+#include "visitor/ostream_visitor.hpp"
 
 // template instanciations
 #include "image/gradient_image_inc.hpp"
 #include "image/image_inc.hpp"
-#include "energy/image_gradient_unary_energy_inc.hpp"
 #include "core/global_reconstruction_unary_energy_inc.hpp"
 
 int main(int argc , char** argv)
 {
 	param *p = param::Instance();
-        initialize_parameters(p);
+    initialize_parameters(p);
 	if (!p->parse(argc, argv)) return -1;
 
-	rjmcmc::ostream_visitor<sampler> visitor(std::cout);
+	rjmcmc::ostream_visitor visitor;
 	init_visitor(p,visitor);
 
-	rjmcmc::any_image_t img;
-        std::string dem(p->get<boost::filesystem::path>("dem").string());
-	tiff_read_image(dem, img);
+	Iso_rectangle_2 bbox = get_bbox(p);
+	int x0, y0;
+
+	gradient_image_t grad;
+	gradient_image(grad,x0,y0,p->get<boost::filesystem::path>("dsm").string(),bbox);
+	oriented_dsm_view dsm_view(view(grad),x0,y0);
+
+	ndvi_image_t ndvi;
+	ndvi_image(ndvi,x0,y0,p->get<boost::filesystem::path>("ndvi").string(),bbox);
+	oriented_ndvi_view ndvi_view(view(ndvi),x0,y0);
 
 	configuration *conf;
 	sampler       *samp;
 	temperature   *temp;
 	end_test      *end ;
 
-	create_configuration(p,const_view(img),conf);
+	create_configuration(p,dsm_view,ndvi_view,conf);
 	create_sampler      (p,samp);
 	create_temperature  (p,temp);
 	create_end_test     (p,end);

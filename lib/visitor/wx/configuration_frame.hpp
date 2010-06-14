@@ -11,6 +11,7 @@
 
 #include "visitor/controler.hpp"
 #include "rjmcmc/variant.hpp"
+#include "geometry/wx/paint.h"
 
 // to be specialized by each object type (-> files lib/geometry/*_paint.h)
 template<typename T> void paint(Layer::ptrLayerType&, const std::string& s, const T&);
@@ -68,11 +69,7 @@ public:
 	void OnChartButton(wxCommandEvent&);
 	void OnParamButton(wxCommandEvent&);
 
-	void init(int dump, int save)
-	{
-		m_dump = dump;
-		m_save = save;
-	}
+	void init(int dump, int save);
 
 	template<typename Configuration, typename Sampler>
         void begin(const Configuration& config, const Sampler& sample, double t)
@@ -111,14 +108,17 @@ public:
 
 	wxAboutDialogInfo getAboutInfo() const;
 
-	typedef Controler<any_view_type> controler_type;
-	void controler(controler_type *c) { m_controler=c; } 
+	void controler(Controler *c) { m_controler=c; } 
+
+	void add_layer(const std::string& file);
+	wxRect get_bbox() const;
+	void set_bbox(const wxRect& r);
 
 	DECLARE_GILVIEWER_METHODS_FOR_EVENTS_TABLE() ;
 	DECLARE_EVENT_TABLE() ;
 
 private:
-	controler_type *m_controler;
+	Controler   *m_controler;
 	wxButton    *m_buttonGo;
 	wxButton    *m_buttonStop;
 	PanelViewer *m_panel;

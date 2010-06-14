@@ -2,33 +2,16 @@
 #define RJMCMC_IMAGE_HPP_
 
 #include <boost/gil/image.hpp>
-#include <boost/gil/extension/matis/float_images.hpp>
+typedef boost::gil::gray16s_image_t ndvi_image_t;
+typedef boost::gil::gray16s_view_t  ndvi_view_t;
+typedef const boost::gil::gray16s_view_t  ndvi_const_view_t;
 
-namespace rjmcmc {
-class image
-{
-public:
-	typedef boost::gil::gray16s_image_t image_t;
-	typedef boost::gil::gray16s_pixel_t pixel_t;
+template<typename View, typename IsoRectangle>
+void ndvi_image(ndvi_image_t& img,  int& x0, int& y0,
+	const View& view, IsoRectangle& bbox, unsigned int step=0);
 
-#ifdef GEOMETRY_RECTANGLE_2_H
-	double error(const Rectangle_2 &s) const;
-#endif // GEOMETRY_RECTANGLE_2_H
+template<typename IsoRectangle>
+void ndvi_image(ndvi_image_t& img,  int& x0, int& y0,
+	const std::string &file, IsoRectangle& bbox, unsigned int step=0);
 
-#ifdef GEOMETRY_CIRCLE_2_H
-	double error(const Circle_2  &c) const;
-#endif // GEOMETRY_CIRCLE_2_H
-
-	template<typename IsoRectangle>
-	void load(const std::string &file, const IsoRectangle& bbox, unsigned int step=0);
-
-	template<typename View, typename IsoRectangle>
-	void load(const View& view, const IsoRectangle& bbox, unsigned int step=0);
-
-private:
-	image_t m_image;
-	int x0, y0;
-};
-};
-
-#endif // IMAGE_HPP_
+#endif // RJMCMC_IMAGE_HPP_

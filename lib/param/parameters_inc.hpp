@@ -7,22 +7,21 @@ namespace po = boost::program_options;
 
 #include "param/parameters.hpp"
 
-template<typename T, typename V>
-parameter<T,V>::parameter(const std::string& n, char c, const V& v, const std::string& d)
-		: m_name(n), m_shortcut(c), m_value(v), m_description(d), m_control(NULL) {}
-
+template<typename T>
 struct option_adder {
 	po::options_description& m_desc;
-	option_adder(po::options_description& desc) : m_desc(desc) {}
+	const T& m_p;
+
+	option_adder(po::options_description& desc, const T& p) : m_desc(desc), m_p(p) {}
 	typedef void result_type;
-	template<typename T,typename V> void operator()(parameter<T,V>& p) const {
-		std::string name(p.name());
-		char s = p.shortcut();
+	template<typename V> void operator()(V& t) const {
+		std::string name(m_p.name());
+		char s = m_p.shortcut();
 		if(s!='\0') name = (name + ",")+ s;
 		m_desc.add_options()(
 			name.c_str(),
-			po::value<V>(&(p.value()))->default_value(p.value()),
-			p.description().c_str()
+			po::value<V>(&t)->default_value(t),
+			m_p.description().c_str()
 		);
 	}
 };
@@ -34,9 +33,8 @@ void init_description(po::options_description& desc, parameters<T>& param) {
 		("config,c",po::value<std::string>(), "Fichier de configuration");
 
 	typedef typename parameters<T>::iterator iterator;
-	option_adder adder(desc);
 	for(iterator it=param.begin(); it!=param.end();++it)
-		boost::apply_visitor(adder,*it);
+		boost::apply_visitor(option_adder<T>(desc,*it),it->value());
 }
 
 template<typename T>
@@ -80,18 +78,20 @@ bool parameters<T>::parse(int argc, char **argv)
 
 template<typename T>
 void parameters<T>::erase(const std::string& name) {
-	typename std::map<std::string,iterator>::iterator it = m_index.find(name);
-	if(it==m_index.end()) return;
-	m_parameter.erase(it->second);
-	m_index.erase(it);
+	iterator it = find(name);
+	if (it==end()) throw unknown_parameter_name();
+	m_parameter.erase(it);
 }
 
 
 template<typename T> template<typename V>
 void parameters<T>::insert(const std::string& name, char c, const V& v, const std::string& desc) {
-	m_parameter.push_back(parameter<T,V>(name,c,v,desc));
-	iterator it=end();
-	m_index[name]=--it;
+	m_parameter.push_back(T(name,c,v,desc));
+}
+
+template<typename T> template<typename V>
+void parameters<T>::insert(const std::string& name) {
+	m_parameter.push_back(T(name,'\0',V(),""));
 }
 
 #endif // PARAMETERS_INC_HPP

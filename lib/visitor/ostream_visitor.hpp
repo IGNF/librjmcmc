@@ -8,11 +8,10 @@
 
 namespace rjmcmc {
 
-template<typename Sampler> class ostream_visitor {
+class ostream_visitor {
 private:
-	enum { kernel_size =  kernel_traits<typename Sampler::Kernels>::size };
-	unsigned int m_proposed[kernel_size];
-	unsigned int m_accepted[kernel_size];
+	unsigned int *m_proposed;
+	unsigned int *m_accepted;
 	clock_t m_clock_begin, m_clock;
 	unsigned int m_dump;
 	unsigned int m_save;
@@ -20,16 +19,25 @@ private:
 	std::ostream& m_out;
 
 public:
-	ostream_visitor(std::ostream& out) : m_out(out) {}
+	ostream_visitor(std::ostream& out=std::cout) : m_proposed(NULL), m_accepted(NULL), m_out(out) {}
+	~ostream_visitor() {
+		if(m_accepted) delete m_accepted;
+		if(m_proposed) delete m_proposed;
+	}
 
 	void init(int dump, int save) {
 		m_dump = dump;
 		m_save = save;
 	}
 
-	template<typename Configuration>
+	template<typename Configuration, typename Sampler>
         void begin(const Configuration& config, const Sampler& sampler, double t)
 	{
+		enum { kernel_size =  kernel_traits<typename Sampler::Kernels>::size };
+		if(m_accepted) delete m_accepted;
+		if(m_proposed) delete m_proposed;
+		m_accepted = new unsigned int[kernel_size];
+		m_proposed = new unsigned int[kernel_size];
 		for (unsigned int i=0; i<kernel_size; ++i) m_accepted[i] = m_proposed[i] = 0;
 	
 		m_out.fill(' ');
@@ -45,7 +53,7 @@ public:
 	
 		m_clock_begin = m_clock = clock();
 	}
-	template<typename Configuration>
+	template<typename Configuration, typename Sampler>
         void end(const Configuration& config, const Sampler&, double)
 	{
 		clock_t clock_end = clock();
@@ -58,8 +66,10 @@ public:
 		m_out << std::endl << std::flush;
 	}
 
-	template<typename Configuration>
+	template<typename Configuration, typename Sampler>
 	bool iterate(const Configuration& config, const Sampler& sampler, double t, unsigned int i) {
+		enum { kernel_size =  kernel_traits<typename Sampler::Kernels>::size };
+
 		m_proposed[sampler.kernel_id()]++;
 		if( sampler.accepted() ) m_accepted[sampler.kernel_id()]++;
 

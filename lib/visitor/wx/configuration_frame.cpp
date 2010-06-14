@@ -3,21 +3,13 @@
 
 #include <wx/artprov.h>
 
-#include <GilViewer/config/config.hpp>
-#if GILVIEWER_USE_GDAL
-#   include <GilViewer/layers/ogr_vector_layer.hpp>
-#else // GILVIEWER_USE_GDAL
-#   include <GilViewer/layers/simple_vector_layer.hpp>
-#endif // GILVIEWER_USE_GDAL
-
 #include <GilViewer/layers/VectorLayerGhost.h>
 #include <GilViewer/layers/ImageLayer.hpp>
+#include <GilViewer/layers/simple_vector_layer.hpp>
 #include <GilViewer/gui/LayerControl.hpp>
 #include <GilViewer/gui/ApplicationSettings.hpp>
 #include <GilViewer/gui/PanelManager.h>
 #include <GilViewer/gui/define_id.hpp>
-
-#include "param/wx_parameter_traits.hpp"
 
 #include "configuration_frame.hpp"
 
@@ -98,6 +90,12 @@ IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(configuration_frame,m_panel)
 
     m_dockManager.AddPane( librjmcmctoolbar , applicationToolBarInfo );
     m_dockManager.Update();
+	Show();
+}
+
+void configuration_frame::OnGoButton(wxCommandEvent&)
+{
+    m_controler->go(); 
 }
 
 void configuration_frame::OnStopButton(wxCommandEvent&)
@@ -107,103 +105,12 @@ void configuration_frame::OnStopButton(wxCommandEvent&)
 
 void configuration_frame::OnParamButton(wxCommandEvent&)
 {
-    m_controler->toggle_param_visibility();
+    m_controler->param_visibility(!m_controler->param_visibility());
 }
 
 void configuration_frame::OnChartButton(wxCommandEvent&)
 {
-    m_controler->toggle_chart_visibility();
-}
-
-void configuration_frame::OnGoButton(wxCommandEvent&)
-{
-    param::Instance()->update_values();
-
-    LayerControl::const_iterator it  = m_panel->GetLayerControl()->begin();
-    LayerControl::const_iterator end = m_panel->GetLayerControl()->end();
-    Layer::ptrLayerType ilayer;
-    for(;it!=end && !ilayer;++it) {
-         if(boost::dynamic_pointer_cast<ImageLayer>(*it)) ilayer=*it; //use dem tag??
-    }
-    if(!ilayer) {
-        boost::filesystem::path file;
-        param::Instance()->get("dem",file);
-        ilayer = ImageLayer::CreateImageLayer(file.string());
-        if ( !ilayer )
-        {
-          std::ostringstream oss;
-          oss << "File " << file << " does not exist !";
-          wxString message( oss.str().c_str() , *wxConvCurrent );
-          ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
-          return;
-        }
-    }
-
-    wxPoint p0,p1;
-    boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
-    if(ghost->m_drawRectangleSelection) {
-        wxRect rect = ghost->GetRectangle();
-        p0 = ilayer->ToLocal(rect.GetTopLeft    ());
-        p1 = ilayer->ToLocal(rect.GetBottomRight());
-    } else {
-        p0.x = param::Instance()->get<int>("xmin");
-        p0.y = param::Instance()->get<int>("ymin");
-        p1.x = param::Instance()->get<int>("xmax");
-        p1.y = param::Instance()->get<int>("ymax");
-        if(p0.x>p1.x) std::swap(p0.x,p1.x);
-        if(p0.y>p1.y) std::swap(p0.y,p1.y);
-    }
-    try
-    {
-        boost::shared_ptr<Layer> vlayer;
-#if GILVIEWER_USE_GDAL
-        vlayer = boost::shared_ptr<Layer>(new ogr_vector_layer("Extracted elements"));
-#else // GILVIEWER_USE_GDAL
-        vlayer = boost::shared_ptr<Layer>(new simple_vector_layer("Extracted elements"));
-#endif // GILVIEWER_USE_GDAL
-        Layer::ptrLayerType clayer = ilayer->crop(p0.x,p0.y,p1.x,p1.y);
-        if(!clayer) {
-            std::ostringstream oss;
-            oss << "Cropping outside the bounds of " << ilayer->Filename() << " !";
-            wxString message( oss.str().c_str() , *wxConvCurrent );
-            ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
-            return;
-        }
-        m_panel->AddLayer(clayer);
-        m_panel->AddLayer(vlayer);
-        vlayer->TranslationX(p0.x+ilayer->TranslationX());
-        vlayer->TranslationY(p0.y+ilayer->TranslationY());
-        vlayer->ZoomFactor  (     ilayer->ZoomFactor  ());
-        clayer->TranslationX(p0.x+ilayer->TranslationX());
-        clayer->TranslationY(p0.y+ilayer->TranslationY());
-        clayer->ZoomFactor  (     ilayer->ZoomFactor  ());
-	
-	vlayer->set_line_color(*wxRED);
-        vlayer->set_line_style(wxSOLID);
-        vlayer->set_line_width(3);
-        vlayer->set_polygon_border_color(*wxBLUE);
-        vlayer->set_polygon_border_style(wxSOLID);
-        vlayer->set_polygon_border_width(3);
-        vlayer->set_polygon_inner_color(*wxRED);
-        vlayer->set_polygon_inner_style(wxTRANSPARENT);
-        vlayer->text_visibility(false);
-        
-        boost::filesystem::path file(clayer->Filename());
-        param::Instance()->set("dem",file);
-        param::Instance()->set("xmin",0);
-        param::Instance()->set("ymin",0);
-        param::Instance()->set("xmax",p1.x-p0.x);
-        param::Instance()->set("ymax",p1.y-p0.y);
-        
-        m_vlayer = vlayer;
-        boost::shared_ptr<ImageLayer> iclayer = boost::dynamic_pointer_cast<ImageLayer>(clayer);
-        m_controler->go(iclayer->View()->value); // todo
-    }
-    catch( const exception &e )
-    {
-        wxString message( e.what() , *wxConvCurrent );
-        ::wxMessageBox( message , _("Exception!") , wxICON_ERROR );
-    }
+    m_controler->chart_visibility(!m_controler->chart_visibility());
 }
 
 wxAboutDialogInfo configuration_frame::getAboutInfo() const
@@ -219,3 +126,64 @@ wxAboutDialogInfo configuration_frame::getAboutInfo() const
     info.SetCopyright(_T("olivier.tournaire@ign.fr\nmathieu.bredif@ign.fr"));
     return info;
 }
+
+
+void configuration_frame::init(int dump, int save)
+{
+		m_dump = dump;
+		m_save = save;
+
+        m_vlayer = Layer::ptrLayerType(new simple_vector_layer("Extracted elements"));
+        m_panel->AddLayer(m_vlayer);
+
+		boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
+
+        m_vlayer->TranslationX(/*p0.x+*/ghost->TranslationX());
+        m_vlayer->TranslationY(/*p0.y+*/ghost->TranslationY());
+        m_vlayer->ZoomFactor  (     ghost->ZoomFactor  ());
+	
+		m_vlayer->set_line_color(*wxRED);
+        m_vlayer->set_line_style(wxSOLID);
+        m_vlayer->set_line_width(3);
+        m_vlayer->set_polygon_border_color(*wxBLUE);
+        m_vlayer->set_polygon_border_style(wxSOLID);
+        m_vlayer->set_polygon_border_width(3);
+        m_vlayer->set_polygon_inner_color(*wxRED);
+        m_vlayer->set_polygon_inner_style(wxTRANSPARENT);
+        m_vlayer->text_visibility(false);      
+}
+
+
+	wxRect configuration_frame::get_bbox() const {
+	    boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
+    	if(!ghost->m_drawRectangleSelection) return wxRect();
+		return wxRect(ghost->m_rectangleSelection.first,ghost->m_rectangleSelection.second);
+	}
+
+	void configuration_frame::set_bbox(const wxRect& r) {
+	    boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
+		ghost->m_rectangleSelection.first  = r.GetTopLeft    ();
+		ghost->m_rectangleSelection.second = r.GetBottomRight();	
+    	ghost->m_drawRectangleSelection = true;
+		ghost->m_penRectangle = wxPen(*wxRED, 2, wxDOT);
+		ghost->m_brushRectangle = wxBrush(*wxRED, wxTRANSPARENT);
+	}
+
+	void configuration_frame::add_layer(const std::string& file) {
+	    boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
+		
+    	Layer::ptrLayerType ilayer = ImageLayer::CreateImageLayer(file);
+        if ( !ilayer )
+        {
+          std::ostringstream oss;
+          oss << "File " << file << " does not exist !";
+          wxString message( oss.str().c_str() , *wxConvCurrent );
+          ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
+          return;
+        }
+        m_panel->AddLayer(ilayer);
+        ilayer->TranslationX(/*p0.x+*/ghost->TranslationX());
+        ilayer->TranslationY(/*p0.y+*/ghost->TranslationY());
+        ilayer->ZoomFactor  (     ghost->ZoomFactor  ());
+	}
+

@@ -3,29 +3,30 @@
 
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
+typedef boost::gil::dev2n32F_image_t gradient_image_t;
+typedef boost::gil::dev2n32F_view_t  gradient_view_t;
+typedef const boost::gil::dev2n32F_view_t  gradient_const_view_t;
 
-namespace rjmcmc {
-class gradient_image
-{
+template<typename View>
+class oriented {
 public:
-        typedef boost::gil::dev2n32F_image_t image_t;
-	typedef boost::gil::dev2n32F_pixel_t pixel_t;
-
-	typedef double result_type;
-        template<typename T> double operator()(const T&t) const {
-                return /*inverted_*/integrated_flux(boost::gil::const_view(m_gradients),x0,y0,t);
-        }
-
-	template<typename IsoRectangle>
-	void load(const std::string &file, const IsoRectangle& bbox, double sigmaD=1, unsigned int step=0);
-
-	template<typename View, typename IsoRectangle>
-	void load(const View& view, const IsoRectangle& bbox, double sigmaD=1, unsigned int step=0);
-
+	typedef View view_t;
+	oriented(const view_t& view, int x0, int y0) : m_view(view), m_x0(x0), m_y0(y0) {}
+	oriented() : m_view(), m_x0(0), m_y0(0) {}
+	inline int x0() const { return m_x0; }
+	inline int y0() const { return m_y0; }
+	inline const view_t& view() const { return m_view; }
 private:
-	image_t m_gradients;
-	int x0, y0;
+	view_t m_view;
+	int m_x0, m_y0;
 };
-};
+
+template<typename View, typename IsoRectangle>
+void gradient_image(gradient_image_t& img,  int& x0, int& y0,
+	const View& view, IsoRectangle& bbox, double sigmaD=1, unsigned int step=0);
+
+template<typename IsoRectangle>
+void gradient_image(gradient_image_t& img,  int& x0, int& y0,
+	const std::string &file, IsoRectangle& bbox, double sigmaD=1, unsigned int step=0);
 
 #endif // GRADIENT_IMAGE_HPP

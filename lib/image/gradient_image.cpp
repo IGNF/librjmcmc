@@ -46,7 +46,7 @@ void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 	for (i=kernel.begin(); i!=kernel.end(); ++i) *i /= sum;
 }
 
-void init(rjmcmc::gradient_image::image_t& g, const boost::gil::gray32F_image_t::const_view_t& v, double sigmaD) {
+void init(gradient_image_t& g, const boost::gil::gray32F_image_t::const_view_t& v, double sigmaD) {
 	using namespace boost::gil;
 	g.recreate(v.dimensions());
 

@@ -1,81 +1,123 @@
 #ifndef WX_VISITOR_HPP
 #define WX_VISITOR_HPP
 
-#include "visitor/wx/wx_log_visitor.hpp"
+#include <boost/tuple/tuple.hpp>
 
-#include "visitor/wx/configuration_frame.hpp"
+namespace internal {
 
-#include "visitor/wx/chart_frame.hpp"
-
-#include "param/wx_parameter_traits.hpp"
-#include "visitor/wx/wx_parameter_frame.hpp"
+inline void init(const boost::tuples::null_type&, int dump, int save) {}
+template <class H, class T>
+inline void init(boost::tuples::cons<H, T>& v, int dump, int save) {
+	v.get_head().init(dump,save);
+	internal::init(v.get_tail(),dump,save);
+}
+template <class H, class T>
+inline void init(boost::tuples::cons<H*, T>& v, int dump, int save) {
+	v.get_head()->init(dump,save);
+	internal::init(v.get_tail(),dump,save);
+}
 
 template<typename Configuration, typename Sampler>
-class wx_visitor
+inline bool iterate(const boost::tuples::null_type&, const Configuration& config, const Sampler& sample, double t, unsigned int i) {}
+template <typename Configuration, typename Sampler, typename H, typename T>
+inline bool iterate(boost::tuples::cons<H, T>& v, const Configuration& config, const Sampler& sample, double t, unsigned int i) {
+	bool b = v.get_head().iterate(config,sample,t,i);
+	return internal::iterate(v.get_tail(),config,sample,t,i) && b;
+}
+template <typename Configuration, typename Sampler, typename H, typename T>
+inline bool iterate(boost::tuples::cons<H*, T>& v, const Configuration& config, const Sampler& sample, double t, unsigned int i) {
+	bool b = v.get_head()->iterate(config,sample,t,i);
+	return internal::iterate(v.get_tail(),config,sample,t,i) && b;
+}
+
+template<typename Configuration, typename Sampler>
+inline void begin(const boost::tuples::null_type&, const Configuration& config, const Sampler& sample, double t) {}
+template <typename Configuration, typename Sampler, typename H, typename T>
+inline void begin(boost::tuples::cons<H, T>& v, const Configuration& config, const Sampler& sample, double t) {
+	v.get_head().begin(config,sample,t);
+	internal::begin(v.get_tail(),config,sample,t);
+}
+template <typename Configuration, typename Sampler, typename H, typename T>
+inline void begin(boost::tuples::cons<H*, T>& v, const Configuration& config, const Sampler& sample, double t) {
+	v.get_head()->begin(config,sample,t);
+	return internal::begin(v.get_tail(),config,sample,t);
+}
+
+
+template<typename Configuration, typename Sampler>
+inline void end(const boost::tuples::null_type&, const Configuration& config, const Sampler& sample, double t) {}
+template <typename Configuration, typename Sampler, typename H, typename T>
+inline void end(boost::tuples::cons<H, T>& v, const Configuration& config, const Sampler& sample, double t) {
+	v.get_head().end(config,sample,t);
+	internal::end(v.get_tail(),config,sample,t);
+}
+template <typename Configuration, typename Sampler, typename H, typename T>
+inline void end(boost::tuples::cons<H*, T>& v, const Configuration& config, const Sampler& sample, double t) {
+	v.get_head()->end(config,sample,t);
+	return internal::end(v.get_tail(),config,sample,t);
+}
+
+
+} // namespace internal
+
+
+#if USE_VARIADIC_TEMPLATES
+template<typename V...>
+class composite_visitor
 {
 public:
-    void init(int dump, int save)
+	typedef std::tuple<V...> Visitors;
+	composite_visitor(const V&... v) : m_visitors(v...) {}
+
+#else
+
+#include <boost/preprocessor/repetition/enum.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
+#ifndef RJMCMC_COMPOSITE_VISITOR_LIMIT_TYPES
+	#define RJMCMC_COMPOSITE_VISITOR_LIMIT_TYPES 5
+#endif
+#define RJMCMC_COMPOSITE_VISITOR_ENUM_PARAMS(x) \
+	BOOST_PP_ENUM_PARAMS(RJMCMC_COMPOSITE_VISITOR_LIMIT_TYPES,x)
+#define RJMCMC_COMPOSITE_VISITOR_ENUM_BINARY_PARAMS(x,y) \
+	BOOST_PP_ENUM_BINARY_PARAMS(RJMCMC_COMPOSITE_VISITOR_LIMIT_TYPES,x,y)
+#define RJMCMC_COMPOSITE_VISITOR_ENUM_PARAMS_WITH_A_DEFAULT(x,y) \
+	BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(RJMCMC_COMPOSITE_VISITOR_LIMIT_TYPES,x,y)
+#define RJMCMC_COMPOSITE_VISITOR_ENUM(x) \
+	BOOST_PP_ENUM(RJMCMC_COMPOSITE_VISITOR_LIMIT_TYPES,x,nil)
+#define RJMCMC_COMPOSITE_VISITOR_ARG(z,n,_) const V##n& v##n = V##n()
+
+template<RJMCMC_COMPOSITE_VISITOR_ENUM_PARAMS_WITH_A_DEFAULT(typename V,boost::tuples::null_type)>
+class composite_visitor
+{
+public:
+	typedef boost::tuple<RJMCMC_COMPOSITE_VISITOR_ENUM_PARAMS(V)> Visitors;
+	composite_visitor(RJMCMC_COMPOSITE_VISITOR_ENUM(RJMCMC_COMPOSITE_VISITOR_ARG)) :
+		m_visitors(RJMCMC_COMPOSITE_VISITOR_ENUM_PARAMS(v)) {}
+
+#endif
+
+    void init(int dump, int save) { internal::init(m_visitors,dump,save); }
+
+    template<typename Configuration, typename Sampler>
+	void begin(const Configuration& config, const Sampler& sample, double t)
     {
-        m_wx_log_visitor.init(dump,save);
-        m_confg_frame->init(dump,save);
-        m_chart_frame->init(dump,save);
-        m_param_frame->init(dump,save);
+       internal::begin(m_visitors,config,sample,t);
     }
 
-    void begin(const Configuration& config, const Sampler& sample, double t)
-    {
-        m_wx_log_visitor.begin(config,sample,t);
-        m_confg_frame->begin(config,sample,t);
-        m_chart_frame->begin(config,sample,t);
-        m_param_frame->begin(config,sample,t);
-    }
-
+    template<typename Configuration, typename Sampler>
     bool iterate(const Configuration& config, const Sampler& sample, double t, unsigned int i)
     {
-        bool b = true;
-        b = m_wx_log_visitor.iterate(config,sample,t,i) && b;
-        b = m_confg_frame->iterate(config,sample,t,i) && b;
-        b = m_chart_frame->iterate(config,sample,t,i) && b;
-        b = m_param_frame->iterate(config,sample,t,i) && b;
-        return b;
+        return internal::iterate(m_visitors,config,sample,t,i);
     }
 
+    template<typename Configuration, typename Sampler>
     void end(const Configuration& config, const Sampler& sample, double t)
     {
-        m_wx_log_visitor.end(config,sample,t);
-        m_confg_frame->end(config,sample,t);
-        m_chart_frame->end(config,sample,t);
-        m_param_frame->end(config,sample,t);
-    }
-
-    void toggle_param_visibility() { m_param_frame->Show(!m_param_frame->IsShown()); }
-    void toggle_chart_visibility() { m_chart_frame->Show(!m_chart_frame->IsShown()); }
-
-    template<typename View> void controler(Controler<View> *c) {
-        m_confg_frame->controler(c);
-    }
-
-    wx_visitor(const std::string& title)
-    {
-        m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, wxString(title.c_str(), *wxConvCurrent) );
-        m_param_frame = new parameters_frame(m_confg_frame);
-        m_chart_frame = new chart_frame(m_confg_frame);
-
-        m_confg_frame->Show();
-        m_param_frame->Show();
-        m_chart_frame->Show();
-    }
-
-    ~wx_visitor() {
-        m_confg_frame->Destroy();
-        m_param_frame->Destroy();
-        m_chart_frame->Destroy();
+        internal::end(m_visitors,config,sample,t);
     }
 private:
-    configuration_frame    *m_confg_frame;
-    parameters_frame       *m_param_frame;
-    chart_frame            *m_chart_frame;
-    wx_log_visitor<Sampler> m_wx_log_visitor;
+	Visitors m_visitors;
 };
 
 #endif // WX_VISITOR_HPP

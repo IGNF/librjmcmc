@@ -14,61 +14,64 @@
 
 #include "param/wx_parameter_traits.hpp"
 #include "wx_parameter_frame.hpp"
+#include "image/gradient_image.hpp"
+typedef parameters< wx_parameter > param;
 
 BEGIN_EVENT_TABLE(parameters_frame, wxFrame)
     EVT_CLOSE(parameters_frame::OnCloseWindow)
 END_EVENT_TABLE()
 
+template<typename P>
 struct sizer_adder {
 	typedef void result_type;
 	wxSizer *m_sizer;
 	wxWindow *m_wnd;
 	parameters_frame *m_frame;
 	std::map<long,std::string>& m_name;
+	P& m_p;
 	
-	sizer_adder(parameters_frame *frame, wxSizer  *sizer, wxWindow* wnd, std::map<long,std::string>& name)
-		: m_frame(frame), m_sizer(sizer), m_wnd(wnd), m_name(name) {}
+	sizer_adder(parameters_frame *frame, wxSizer  *sizer, wxWindow* wnd, std::map<long,std::string>& name, P& p)
+		: m_frame(frame), m_sizer(sizer), m_wnd(wnd), m_name(name), m_p(p) {}
 
-	template<typename T>
-	void AddText(wxSizer *sizer, const parameter<wx_parameter_traits,T>& p) {
-		wxString s(p.description().c_str(), *wxConvCurrent);
+	void AddText(wxSizer *sizer) {
+		wxString s(m_p.description().c_str(), *wxConvCurrent);
 		wxStaticText *text = new wxStaticText(m_wnd, wxID_ANY, s);
 		sizer->Add(text, 0,wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
 	}
 
 	template<typename T>
-	void operator()(parameter<wx_parameter_traits,T>& p) {
-		AddText(m_sizer,p);
+	void operator()(const T& t) {
+		AddText(m_sizer);
 		std::ostringstream oss;
-		oss << p.value();
+		oss << t;
 		wxString s(oss.str().c_str(), *wxConvCurrent);
 		wxTextCtrl   *ctrl = new wxTextCtrl(m_wnd, wxID_ANY, s);
-		p.control(ctrl);
+		m_p.control(ctrl);
 		m_sizer->Add(ctrl,0,wxEXPAND);
 	}
 
-	void operator()(parameter<wx_parameter_traits,bool>& p) {
-		AddText(m_sizer,p);
+	void operator()(bool b) {
+		AddText(m_sizer);
 		long id = wxNewId();
 		wxCheckBox *checkbox = new wxCheckBox(m_wnd, id, wxEmptyString);
-		p.control(checkbox);
-		checkbox->SetValue(p.value());
+		m_p.control(checkbox);
+		checkbox->SetValue(b);
 		m_sizer->Add(checkbox);
 		checkbox->Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED,
 	wxCommandEventHandler(parameters_frame::on_bool_parameter), NULL, m_frame);
-		m_name[id]=p.name();
+		m_name[id]=m_p.name();
 	}
 
-	void operator()(parameter<wx_parameter_traits,boost::filesystem::path>& p) {
-		wxString s(p.value().string().c_str(), *wxConvCurrent);
+	void operator()(const boost::filesystem::path& p) {
+		wxString s(p.string().c_str(), *wxConvCurrent);
 		wxTextCtrl   *ctrl = new wxTextCtrl(m_wnd, wxID_ANY, s);
-		p.control(ctrl);
+		m_p.control(ctrl);
 		long id = wxNewId();
-		wxString desc((p.description()+" ...").c_str(), *wxConvCurrent);
+		wxString desc((m_p.description()+" ...").c_str(), *wxConvCurrent);
 		wxButton *browse_button = new wxButton(m_wnd,id,desc);
 		browse_button->Connect(id, wxEVT_COMMAND_BUTTON_CLICKED,
 	wxCommandEventHandler(parameters_frame::on_file_parameter), NULL, m_frame);
-		m_name[id]=p.name();
+		m_name[id]=m_p.name();
 		m_sizer->Add(browse_button, 0,wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
 		m_sizer->Add(ctrl ,0,wxEXPAND);
 	}
@@ -82,12 +85,14 @@ parameters_frame::parameters_frame(wxWindow *parent, wxWindowID id, const wxStri
 	sizer->AddGrowableCol(1);
 	sizer->AddSpacer(10);
 	sizer->AddSpacer(10);
-	sizer_adder adder(this,sizer,this,m_name_for_id);
-	for(param::iterator it=p->begin(); it!=p->end(); ++it)
-		boost::apply_visitor(adder,*it);
+	for(param::iterator it=p->begin(); it!=p->end(); ++it) {
+		sizer_adder<param::parameter_t> adder(this,sizer,this,m_name_for_id,*it);
+		boost::apply_visitor(adder,it->value());
+	}
 	SetSizer(sizer);
 	SetAutoLayout(true);
 	Refresh();
+	Show();
 }
 
 void parameters_frame::on_file_parameter(wxCommandEvent& event)

@@ -18,7 +18,10 @@ public:
 
 
 #ifdef GEOMETRY_RECTANGLE_2_H
-	result_type operator()(Rectangle_2 &r) const {
+    template<typename K> result_type operator()(geometry::Rectangle_2<K> &r) const
+    {
+		typedef typename K::Point_2 Point_2;
+		typedef typename K::Vector_2 Vector_2;
 		const Iso_rectangle_2& bbox = m_is_valid.bbox();
 		float x0 = bbox.min().x();
 		float y0 = bbox.min().y();
@@ -27,14 +30,16 @@ public:
 		do {
 			Point_2 p(x0+dx*m_die(), y0+dy*m_die());
 			Vector_2 v(0.5*dx*m_die(), 0.5*dy*m_die());
-			r = Rectangle_2(p, v, m_die());
+			r = geometry::Rectangle_2<K>(p, v, m_die());
 		} while (!m_is_valid(r));
 		return 1.;
 	}
 #endif
 
 #ifdef GEOMETRY_CIRCLE_2_H
-	result_type operator()(Circle_2 &c) const {
+    template<typename K> result_type operator()(geometry::Circle_2<K> &c) const
+    {
+		typedef typename K::Point_2 Point_2;
 		const Iso_rectangle_2& bbox = m_is_valid.bbox();
 		float x0 = bbox.min().x();
 		float y0 = bbox.min().y();
@@ -43,7 +48,7 @@ public:
 		double radius = 0.5*geometry::min(dx,dy);
 		do {
 			Point_2 p(x0+dx*m_die(), y0+dy*m_die());
-			c = Circle_2(p, m_die()*radius);
+			c = geometry::Circle_2<K>(p, m_die()*radius);
 		} while (!m_is_valid(c));
 		return 1.;
 	}
@@ -53,10 +58,12 @@ public:
 		typedef double result_type;
 
 #ifdef GEOMETRY_RECTANGLE_2_H
-		result_type operator()(const Rectangle_2 &r) const { return 1.; }
+    template<typename K> result_type operator()(const geometry::Rectangle_2<K> &r) const 
+    { return 1.; }
 #endif
 #ifdef GEOMETRY_CIRCLE_2_H
-		result_type operator()(const Circle_2 &c) const { return 1.; }
+    template<typename K> result_type operator()(const geometry::Circle_2<K> &r) const
+    { return 1.; }
 #endif
 	};
 	inline pdf_visitor pdf() const { return pdf_visitor(); }
@@ -86,7 +93,12 @@ public:
 	}
 
 #ifdef GEOMETRY_RECTANGLE_2_H
-	double operator()(const Rectangle_2 &r, Rectangle_2 &res) const {
+    template<typename K> result_type operator()(
+		const geometry::Rectangle_2<K> &r,
+		geometry::Rectangle_2<K> &res
+	) const
+	{
+		typedef typename K::Vector_2 Vector_2;
 		if(m_dief()<m_p_translation) {
 			res = r.scaled_edge(m_die4(),exp(0.5-m_dief()));
 		} else {
@@ -97,7 +109,11 @@ public:
 		return 1.; // TODO
 	}
 
-	double operator()(const Rectangle_2 &r, std::pair<Rectangle_2,Rectangle_2> &res) const {
+    template<typename K> result_type operator()(
+		const geometry::Rectangle_2<K> &r,
+		std::pair<geometry::Rectangle_2<K>,geometry::Rectangle_2<K> > &res
+	) const
+	{
 		int i = m_die4();
 		float f = m_dief();
 		float g = m_dief()*(1-f);
@@ -107,50 +123,71 @@ public:
 		return 1.; // TODO
 	}
 
-	double operator()(const std::pair<Rectangle_2,Rectangle_2> &r, Rectangle_2 &res) const {
+    template<typename K> result_type operator()(
+		const std::pair<geometry::Rectangle_2<K>,geometry::Rectangle_2<K> > &r,
+		geometry::Rectangle_2<K> &res
+	) const
+	{
 		res = r.first.rotate(m_die4()).merge(r.second.rotate(m_die4()));
 		if (!(m_is_valid(res))) return 0;
 		return 1.; // TODO
 	}
-#endif
+#endif // GEOMETRY_RECTANGLE_2_H
 
 #ifdef GEOMETRY_CIRCLE_2_H
-	double operator()(const Circle_2 &c, Circle_2 &res) const {
+    template<typename K> result_type operator()(
+		const geometry::Circle_2<K> &c,
+		geometry::Circle_2<K> &res
+	) const
+	{
+		typedef typename K::Vector_2 Vector_2;
 		if(m_dief()<m_p_translation) {
 			Vector_2 v(m_dx*(m_dief()-0.5),m_dy*(m_dief()-0.5));
 			double d2 = v.squared_length();
 			double d = sqrt(d2);
 			if (m_die4()%2 && c.squared_radius()>d2) d = -d;
-			res = Circle_2(c.center()+v,geometry::radius(c)+d);
+			res = geometry::Circle_2<K>(c.center()+v,geometry::radius(c)+d);
 		} else {
-			res = Circle_2(c.center(),geometry::radius(c)*exp(0.5-m_dief()));
+			res = geometry::Circle_2<K>(c.center(),geometry::radius(c)*exp(0.5-m_dief()));
 		}
 		if(!m_is_valid(res)) return 0.;
 		return 1.; // TODO
 	}
-#endif
+#endif // GEOMETRY_CIRCLE_2_H
 
-#ifdef GEOMETRY_CIRCLE_2_H
-#ifdef GEOMETRY_RECTANGLE_2_H
+#if defined(GEOMETRY_CIRCLE_2_H) && defined(GEOMETRY_RECTANGLE_2_H)
 
-	double operator()(const Rectangle_2 &r, Circle_2 &c) const {
+    template<typename K> result_type operator()(
+		const geometry::Rectangle_2<K> &r,
+		geometry::Circle_2<K> &c
+	) const
+	{
 		double radius = sqrt(r.normal().squared_length());
 		double ratio  = std::abs(r.ratio());
 		if(ratio<1) radius *= ratio;
-		c = Circle_2(r.center(),radius);
+		c = geometry::Circle_2<K>(r.center(),radius);
 		if(!m_is_valid(c)) return 0.;
 		return 1.; // TODO
 	}
 
-	double operator()(const Circle_2 &c, Rectangle_2 &r) const {
+    template<typename K> result_type operator()(
+		const geometry::Circle_2<K> &c,
+		geometry::Rectangle_2<K> &r
+	) const
+	{
 		Vector_2 v((2*m_dief()-1),(2*m_dief()-1));
 		v = v*(geometry::radius(c)/sqrt(v.squared_length()));
-		r = Rectangle_2(c.center(),v,1);
+		r = geometry::Rectangle_2<K>(c.center(),v,1);
 		if (!m_is_valid(r)) return 0;
 		return 1.; // TODO
 	}
 
-	double operator()(const Rectangle_2 &r, std::pair<Rectangle_2,Circle_2> &res) const {
+    template<typename K> result_type operator()(
+		const geometry::Rectangle_2<K> &r,
+		std::pair<geometry::Rectangle_2<K>,geometry::Circle_2<K> > &res
+	) const
+	{
+		typedef typename K::Vector_2 Vector_2;
 		// todo: verifier que ca fait pas n'importe quoi...
 		int i = m_die4();
 		float f = m_dief();
@@ -160,12 +197,11 @@ public:
 		if(i%2) n = n*(1./r.ratio());
 		Vector_2 v(-n.x()+n.y(),-n.y()-n.x());
 		res.first  = r.scaled_edge(i,f).scaled_edge(i+1,g);
-		res.second = Circle_2(r[i+3]+v*h,h*std::sqrt(n.squared_length()));
+		res.second = geometry::Circle_2<K>(r[i+3]+v*h,h*std::sqrt(n.squared_length()));
 		if (!(m_is_valid(res.first) && m_is_valid(res.second) )) return 0;
 		return 1.; // TODO
 	}
-#endif
-#endif
+#endif // defined(GEOMETRY_CIRCLE_2_H) && defined(GEOMETRY_RECTANGLE_2_H)
 
 };
 

@@ -7,9 +7,6 @@
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/insert_range.hpp>
 #include <boost/mpl/pop_front.hpp>
-#include <boost/preprocessor/repetition/enum.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
 
 namespace rjmcmc {
 
@@ -290,10 +287,8 @@ public:
 	}
 };
 
-// variadic template support
-#if 0
+#if USE_VARIADIC_TEMPLATES
 
-#define RJMCMC_SAMPLER_LIMIT_TYPES 10000000000 
 template<typename K...>
 class sampler
 {
@@ -304,7 +299,12 @@ public:
 
 #else
 
-#define RJMCMC_SAMPLER_LIMIT_TYPES 10
+#include <boost/preprocessor/repetition/enum.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
+#ifndef RJMCMC_SAMPLER_LIMIT_TYPES
+	#define RJMCMC_SAMPLER_LIMIT_TYPES 2
+#endif
 #define RJMCMC_SAMPLER_ENUM_PARAMS(x) \
 	BOOST_PP_ENUM_PARAMS(RJMCMC_SAMPLER_LIMIT_TYPES,x)
 #define RJMCMC_SAMPLER_ENUM_BINARY_PARAMS(x,y) \

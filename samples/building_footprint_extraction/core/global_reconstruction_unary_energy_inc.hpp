@@ -2,28 +2,26 @@
 #define GLOBAL_RECONSTRUCTION_UNARY_ENERGY_INC_HPP_
 
 #include "core/global_reconstruction_unary_energy.hpp"
-#include "image/gradient_image.hpp"
-#include "image/image.hpp"
+#include "geometry/integrated_flux.h"
+#include "geometry/image_error.h"
 
-template<typename View, typename IsoRectangle>
-void global_reconstruction_unary_energy::gradient(const View& view, const IsoRectangle& bbox, double sigmaD, unsigned int step)
+template<typename DSM, typename NDVI>
+global_reconstruction_unary_energy<DSM,NDVI>::global_reconstruction_unary_energy(const DSM& dsm, const NDVI& ndvi, double default_energy, double ponderation_dsm, double ponderation_ndvi) :
+	m_dsm(dsm),
+	m_ndvi(ndvi),
+	m_defaultEnergy(default_energy), 
+	m_ponderation_dsm(ponderation_dsm),
+	m_ponderation_ndvi(ponderation_ndvi)
 {
-	m_gradient->load(view,bbox,sigmaD,step);
 }
 
-
-template<typename View, typename IsoRectangle>
-void global_reconstruction_unary_energy::ndvi(const View& view, const IsoRectangle& bbox, unsigned int step)
-{
-	m_ndvi->load(view,bbox,step);
-}
-
+template<typename DSM, typename NDVI>
 template<typename T>
-double global_reconstruction_unary_energy::operator()(const T &t) const
+double global_reconstruction_unary_energy<DSM,NDVI>::operator()(const T &t) const
 {
 	return m_defaultEnergy
-        - m_ponderation_gradient*(*m_gradient)(t)
-	+ m_ponderation_ndvi*m_ndvi->error(t);
+	- m_ponderation_dsm  * integrated_flux(m_dsm,t)
+    + m_ponderation_ndvi * image_error(m_ndvi,t);
 }
 
 #endif

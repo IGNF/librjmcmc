@@ -14,7 +14,8 @@ struct static_cast_color_converter
 };
 
 template<typename View, typename IsoRectangle>
-void rjmcmc::image::load(const View& view, const IsoRectangle& bbox, unsigned int step)
+void ndvi_image(ndvi_image_t& ndvi,  int& x0, int& y0,
+	const View& view, IsoRectangle& bbox, unsigned int step)
 {
 	x0 = 0;
 	y0 = 0;
@@ -28,22 +29,22 @@ void rjmcmc::image::load(const View& view, const IsoRectangle& bbox, unsigned in
 	}
 
 	if(step>1) {
-            //    resize_view(any_color_converted_view<gray32F_pixel_t>(v, dummy_color_converter()), boost::gil::view(m_image),  bilinear_sampler());
+            //    resize_view(any_color_converted_view<gray32F_pixel_t>(v, dummy_color_converter()), boost::gil::view(ndvi),  bilinear_sampler());
 	} else {
-		m_image.recreate(v.dimensions());
-		boost::gil::copy_and_convert_pixels(v,boost::gil::view(m_image), static_cast_color_converter());
+		ndvi.recreate(v.dimensions());
+		boost::gil::copy_and_convert_pixels(v,boost::gil::view(ndvi), static_cast_color_converter());
 	}
 }
 
 #include <boost/gil/extension/io/tiff_dynamic_io.hpp>
-template<typename IsoRectangle>
-void rjmcmc::image::load(const std::string &file, const IsoRectangle& bbox, unsigned int step)
-{
-	image_t img;
-	tiff_read_image(file.c_str(), img);
-	load(const_view(img), bbox, step);
-}
 
-#include "image/image.cpp"
+template<typename IsoRectangle>
+void ndvi_image(ndvi_image_t& ndvi,  int& x0, int& y0,
+	const std::string &file, IsoRectangle& bbox, unsigned int step)
+{
+	rjmcmc::any_image_t img;
+	tiff_read_image(file.c_str(), img);
+	ndvi_image(ndvi, x0, y0, const_view(img), bbox, step);
+}
 
 #endif // IMAGE_INC_HPP

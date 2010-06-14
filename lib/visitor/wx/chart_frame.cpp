@@ -1,5 +1,3 @@
-#include "param/wx_parameter_traits.hpp"
-
 #include "chart_frame.hpp"
 
 #include <wx/sizer.h>
@@ -63,6 +61,7 @@ chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& chartt
 
 	test_sizer->Add(wnd, 1, wxEXPAND | wxALL, 5);
 	SetSizer(test_sizer);
+	Show();
 }
 
 
