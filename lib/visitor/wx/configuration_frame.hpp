@@ -98,7 +98,7 @@ public:
 		if (m_dump && (i % m_dump == 0))
 		{
 			wxMutexGuiEnter();
-			m_vlayer->Clear();
+			m_vlayer->clear();
 			m_vlayer << config;
 			Refresh();
 			wxMutexGuiLeave();

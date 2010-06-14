@@ -47,4 +47,15 @@ void ndvi_image(ndvi_image_t& ndvi,  int& x0, int& y0,
 	ndvi_image(ndvi, x0, y0, const_view(img), bbox, step);
 }
 
+/*
+    image_read_info< tiff_tag > info = read_image_info( filename
+                                                    , tiff_tag()
+                                                    );
+
+    read_image( filename
+              , img
+              , image_read_settings< tiff_tag >( point_t( 0, 0 ), point_t( 50, 50 ) )
+              );
+*/
+
 #endif // IMAGE_INC_HPP

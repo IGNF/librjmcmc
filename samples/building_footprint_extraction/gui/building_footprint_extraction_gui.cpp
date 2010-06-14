@@ -57,9 +57,7 @@ public:
         param *p = param::Instance();
 		update_values(p);
 
-		wxRect r = m_confg_frame->get_bbox();
-		Iso_rectangle_2 bbox(r.GetLeft(),r.GetTop(),r.GetRight(),r.GetBottom());
-		if(r==wxRect()) bbox = get_bbox(p);
+		Iso_rectangle_2 bbox = get_bbox(p);
 		int x0, y0;
 
 		boost::filesystem::path dsm_path(p->get<boost::filesystem::path>("dsm"));
@@ -76,9 +74,7 @@ public:
 		set_bbox(p,bbox);
 		wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));
 		wxPoint p1(wxCoord(bbox.max().x()),wxCoord(bbox.max().y()));
-		r = wxRect(p0,p1);
-		m_confg_frame->set_bbox(r);
-		update_controls(p);
+		m_confg_frame->set_bbox(wxRect(p0,p1));
 
         init_visitor        (p,*m_visitor);
         create_configuration(p,grad_view,ndvi_view,m_config);

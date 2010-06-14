@@ -6,11 +6,11 @@
 #include "Circle_2.h"
 
 template<typename OrientedView, typename K>
-double image_error(const OrientedView& v, const geometry::Circle_2<K> &c) {
+double image_error(const OrientedView& view, const geometry::Circle_2<K> &c) {
 	typedef typename OrientedView::view_t view_t;
-    view_t v(v.view());
-	int x0 = v.x0();
-	int y0 = v.y0();
+    view_t v(view.view());
+	int x0 = view.x0();
+	int y0 = view.y0();
 
 	double r = geometry::radius(c);
 	double x = c.center().x()-x0;

@@ -15,6 +15,47 @@
 #include <GilViewer/io/gilviewer_file_io.hpp>
 #include <GilViewer/io/gilviewer_io_factory.hpp>
 
+#include "param/wx_parameter.hpp"
+#include "wx_parameter_frame.hpp"
+typedef parameters< wx_parameter > param;
+
+class rjmcmc_panel_viewer : public panel_viewer {
+ public:
+    virtual ~rjmcmc_panel_viewer() {}
+    virtual void execute_mode_capture() { update_bbox(); }
+    virtual void execute_mode_geometry_moving() { update_bbox(); }
+	static void Register(wxFrame* parent);
+
+protected:
+    rjmcmc_panel_viewer(wxFrame *parent) : panel_viewer(parent) {}
+    friend rjmcmc_panel_viewer* create_rjmcmc_panel_viewer(wxFrame* parent);
+
+private:
+	void update_bbox() {
+        boost::shared_ptr<VectorLayerGhost> ghost = vectorlayerghost();
+		if (!ghost->m_drawRectangleSelection) return;
+		param *p = param::instance();
+		wxPoint p0 = ghost->m_rectangleSelection.first;
+		wxPoint p1 = ghost->m_rectangleSelection.second;
+		if(p0.x>p1.x) std::swap(p0.x,p1.x);
+		if(p0.y>p1.y) std::swap(p0.y,p1.y);
+		p->set("xmin",p0.x);
+		p->set("ymin",p0.y);
+		p->set("xmax",p1.x);
+		p->set("ymax",p1.y);
+	}
+};
+
+rjmcmc_panel_viewer* create_rjmcmc_panel_viewer(wxFrame* parent)
+{
+        return new rjmcmc_panel_viewer(parent);
+}
+
+void rjmcmc_panel_viewer::Register(wxFrame* parent)
+{
+	panel_manager::instance()->Register("rjmcmc_panel_viewer", boost::bind(create_rjmcmc_panel_viewer, parent));
+}
+
 
 #include "configuration_frame.hpp"
 
@@ -49,7 +90,8 @@ IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(configuration_frame,m_panel)
 #endif
 
     PanelViewer::Register(this);
-    m_panel = PanelManager::instance()->create_object("PanelViewer");
+	rjmcmc_panel_viewer::Register(this);
+    m_panel = panel_manager::instance()->create_object("rjmcmc_panel_viewer");
 
     m_statusBar->SetStatusText(_("librjmcmc"));
 

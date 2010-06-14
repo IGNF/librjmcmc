@@ -175,6 +175,7 @@ public:
 		geometry::Rectangle_2<K> &r
 	) const
 	{
+		typedef typename K::Vector_2 Vector_2; 
 		Vector_2 v((2*m_dief()-1),(2*m_dief()-1));
 		v = v*(geometry::radius(c)/sqrt(v.squared_length()));
 		r = geometry::Rectangle_2<K>(c.center(),v,1);

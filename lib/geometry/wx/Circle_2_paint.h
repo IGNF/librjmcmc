@@ -13,8 +13,8 @@ template<typename K> void paint(
   double x = geometry::to_double(c.center().x());
   double y = geometry::to_double(c.center().y());
   double r = geometry::to_double(geometry::radius(c));
-  l->AddCircle(x,y,r);
-  l->AddText(x, y, s , wxColour(255,0,0) );
+  l->add_circle(x,y,r);
+  l->add_text(x, y, s , wxColour(255,0,0) );
 }
 
 #endif // CIRCLE_2_PAINT_H

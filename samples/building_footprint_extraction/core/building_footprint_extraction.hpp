@@ -4,9 +4,9 @@
 /************** application-specific types ****************/
 
 #include "core/geometry.h"
-//#include <boost/variant.hpp>
-//typedef boost::variant<Rectangle_2,Circle_2> object;
-typedef Rectangle_2 object;
+#include <boost/variant.hpp>
+typedef boost::variant<Rectangle_2,Circle_2> object;
+//typedef Rectangle_2 object;
 
 #include "energy/box_is_valid.hpp"
 typedef box_is_valid                         is_valid;
