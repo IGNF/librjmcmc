@@ -20,6 +20,12 @@ project( libMPP CXX)
 set( ROOT_DIR ${PROJECT_SOURCE_DIR})
 # SET classical path for the MATIS library
 
+option(VARIADIC_TEMPLATES "Enable variadic template implementation" OFF)
+if(VARIADIC_TEMPLATES)
+  add_definitions("-DUSE_VARIADIC_TEMPLATES=1")
+  add_definitions("-std=c++0x")
+endif(VARIADIC_TEMPLATES)
+
 #########################################################
 # INSTALL DEFAULT CONFIGURATION and CMAKE_PREFIX_PATH ###
 #########################################################

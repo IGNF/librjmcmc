@@ -15,7 +15,8 @@ void simulated_annealing(
 	for (unsigned int i=1; end_test(config,sampler,*temp,i); ++i, ++temp)
 	{
 		sampler(config,*temp);
-		if(!visitor.iterate(config,sampler,*temp,i)) break;
+                bool result = visitor.iterate(config,sampler,*temp,i);
+                if(!result) break;
 	}
 	visitor.end(config,sampler,*temp);
 }

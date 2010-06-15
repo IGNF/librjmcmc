@@ -18,7 +18,9 @@ inline void init(boost::tuples::cons<H*, T>& v, int dump, int save) {
 }
 
 template<typename Configuration, typename Sampler>
-inline bool iterate(const boost::tuples::null_type&, const Configuration& config, const Sampler& sample, double t, unsigned int i) {}
+inline bool iterate(const boost::tuples::null_type&, const Configuration& config, const Sampler& sample, double t, unsigned int i) {
+    return true;
+}
 template <typename Configuration, typename Sampler, typename H, typename T>
 inline bool iterate(boost::tuples::cons<H, T>& v, const Configuration& config, const Sampler& sample, double t, unsigned int i) {
 	bool b = v.get_head().iterate(config,sample,t,i);
@@ -40,7 +42,7 @@ inline void begin(boost::tuples::cons<H, T>& v, const Configuration& config, con
 template <typename Configuration, typename Sampler, typename H, typename T>
 inline void begin(boost::tuples::cons<H*, T>& v, const Configuration& config, const Sampler& sample, double t) {
 	v.get_head()->begin(config,sample,t);
-	return internal::begin(v.get_tail(),config,sample,t);
+        internal::begin(v.get_tail(),config,sample,t);
 }
 
 
@@ -62,7 +64,7 @@ inline void end(boost::tuples::cons<H*, T>& v, const Configuration& config, cons
 
 
 #if USE_VARIADIC_TEMPLATES
-template<typename V...>
+template<typename... V>
 class composite_visitor
 {
 public:

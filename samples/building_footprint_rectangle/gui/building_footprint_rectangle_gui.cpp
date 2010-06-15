@@ -27,7 +27,8 @@ typedef parameters< wx_parameter > param;
 
 class building_footprint_rectangle_gui : public wxApp, public Controler
 { 
-    typedef composite_visitor<wx_log_visitor*,configuration_frame*,parameters_frame*,chart_frame*> visitor;
+    typedef composite_visitor<wx_log_visitor*,configuration_frame*,parameters_frame*,chart_frame*
+            > visitor;
 
 private:
     bool OnInit()
@@ -98,9 +99,11 @@ public:
 
     virtual ~building_footprint_rectangle_gui() {
         release();
-        if(m_confg_frame) { m_confg_frame->Destroy(); delete m_confg_frame; }
-        if(m_param_frame) { m_param_frame->Destroy(); delete m_param_frame; }
-        if(m_chart_frame) { m_chart_frame->Destroy(); delete m_chart_frame; }
+        /*
+        if(m_confg_frame) { m_confg_frame->Close(); }
+        if(m_param_frame) { m_param_frame->Close(); }
+        if(m_chart_frame) { m_chart_frame->Close(); }
+        */
         if(m_visitor    ) { delete m_visitor; }
     }
 private:
@@ -125,7 +128,7 @@ private:
     parameters_frame    *m_param_frame;
     chart_frame         *m_chart_frame;
     wx_log_visitor       m_wx_log_visitor;
-	gradient_image_t     m_grad;
+    gradient_image_t     m_grad;
 };
 
 IMPLEMENT_APP(building_footprint_rectangle_gui);
