@@ -40,7 +40,7 @@ private:
             my_argv[i] = new char[mystr.size()+1];
             strcpy(my_argv[i], mystr.To8BitData());
         }
-        param *p = param::Instance();
+        param *p = param::instance();
         initialize_parameters(p);
         if(!p->parse(argc,my_argv)) return false;
         m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, _("librjmcmc: building/tree footprint extraction") );
@@ -54,7 +54,7 @@ private:
 public:
     virtual void go() {
         release();
-        param *p = param::Instance();
+        param *p = param::instance();
 		update_values(p);
 
 		Iso_rectangle_2 bbox = get_bbox(p);

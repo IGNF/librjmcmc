@@ -20,7 +20,7 @@ typedef parameters< parameter > param;
 
 int main(int argc , char** argv)
 {
-	param *p = param::Instance();
+        param *p = param::instance();
     initialize_parameters(p);
 	if (!p->parse(argc, argv)) return -1;
 

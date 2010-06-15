@@ -11,55 +11,54 @@
 #include <map>
 #include <string>
 
-#include <wx/frame.h>
+#include <wx/dialog.h>
 
-class parameters_frame: public wxFrame
+class parameters_frame: public wxDialog
 {
 public:
-	parameters_frame(
-		wxWindow *parent = (wxWindow *) NULL,
-		wxWindowID id = wxID_ANY,
-		const wxString& title = _("librjmcmc parameters"),
-		long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL,
-		const wxPoint& pos = wxDefaultPosition,
-		const wxSize& size = wxDefaultSize);
+    parameters_frame(
+            wxWindow *parent = (wxWindow *) NULL,
+            wxWindowID id = wxID_ANY,
+            const wxString& title = _("librjmcmc parameters"),
+            long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL,
+            const wxPoint& pos = wxDefaultPosition,
+            const wxSize& size = wxSize(600,400));
 
-	virtual ~parameters_frame() {}
+    virtual ~parameters_frame() {}
 
-	void init(int dump, int save) {}
+    void init(int dump, int save) {}
 
-	template<typename Configuration, typename Sampler>
-        void begin(const Configuration& config, const Sampler& sampler, double t)
-	{
-		wxMutexGuiEnter();
-		Refresh();
-		Disable();
-		wxMutexGuiLeave();
-	}
-	template<typename Configuration, typename Sampler>
-        void end(const Configuration& config, const Sampler& sampler, double t)
-	{
-		wxMutexGuiEnter();
-		Enable();
-		Refresh();
-		Show();
-		wxMutexGuiLeave();
-	}
+    template<typename Configuration, typename Sampler>
+    void begin(const Configuration& config, const Sampler& sampler, double t)
+    {
+        wxMutexGuiEnter();
+        Refresh();
+        Disable();
+        wxMutexGuiLeave();
+    }
 
-	template<typename Configuration, typename Sampler>
-	bool iterate(const Configuration& config, const Sampler& sampler, double, unsigned int i) {
-		return true;
-	}
+    template<typename Configuration, typename Sampler>
+    void end(const Configuration& config, const Sampler& sampler, double t)
+    {
+        wxMutexGuiEnter();
+        Enable();
+        Refresh();
+        Show();
+        wxMutexGuiLeave();
+    }
 
-	void on_file_parameter(wxCommandEvent& event);
-	void on_bool_parameter(wxCommandEvent& event);
+    template<typename Configuration, typename Sampler>
+    bool iterate(const Configuration& config, const Sampler& sampler, double, unsigned int i) { return true; }
 
-	void OnCloseWindow(wxCloseEvent&) { Hide(); }
+    void on_file_parameter(wxCommandEvent& event);
+    void on_bool_parameter(wxCommandEvent& event);
+
+    void OnCloseWindow(wxCloseEvent&) { Hide(); }
 
 private:
-	std::map<long,std::string> m_name_for_id;
+    std::map<long,std::string> m_name_for_id;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 #endif /* PARAMETERSFRAME_H_ */

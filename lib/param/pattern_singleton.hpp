@@ -33,7 +33,7 @@ protected:
 
 public:
 	/// This is tha main method 
-	static T* Instance()
+        static T* instance()
 	{
 		if (!m_singleton)
 		{
