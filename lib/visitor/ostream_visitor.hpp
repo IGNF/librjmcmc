@@ -17,9 +17,10 @@ private:
 	unsigned int m_save;
 	int w;
 	std::ostream& m_out;
+        bool m_add_endline; // todo: compile time with mpl::true_/false_
 
 public:
-	ostream_visitor(std::ostream& out=std::cout) : m_proposed(NULL), m_accepted(NULL), m_out(out) {}
+        ostream_visitor(std::ostream& out=std::cout, bool add_endline=true) : m_proposed(NULL), m_accepted(NULL), m_out(out), m_add_endline(add_endline) {}
 	~ostream_visitor() {
 		if(m_accepted) delete m_accepted;
 		if(m_proposed) delete m_proposed;
@@ -49,7 +50,9 @@ public:
 		m_out << std::setw(w)<<"Accept"<< std::setw(w)<<"Time(ms)";
 		m_out << std::setw(w)<<"Temp"<< std::setw(w)<<"E_data";
 		m_out << std::setw(w)<<"E_priori"<< std::setw(w)<<"E_total";
-		m_out << std::endl << std::flush;
+                if(m_add_endline)
+                    m_out << std::endl;
+                m_out << std::flush;
 	
 		m_clock_begin = m_clock = clock();
 	}
@@ -94,7 +97,9 @@ public:
 			m_out << std::setw(w) << config.unary_energy();
 			m_out << std::setw(w) << config.binary_energy();
 			m_out << std::setw(w) << config.energy();
-			m_out << std::endl << std::flush;
+                        if(m_add_endline)
+                            m_out << std::endl;
+                        m_out << std::flush;
 		}
 		return true;
 	}
