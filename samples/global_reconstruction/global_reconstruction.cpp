@@ -1,5 +1,6 @@
 #include <boost/gil/gil_all.hpp>
-#include <boost/gil/extension/io/tiff_dynamic_io.hpp>
+#include <boost/gil/extension/io_new/tiff_read.hpp>
+#include <boost/gil/extension/io_new/tiff_write.hpp>
 
 typedef boost::gil::rgb16_image_t  image_rgb_t;
 typedef boost::gil::gray16_image_t image_pir_t;
@@ -46,20 +47,23 @@ boost::gil::at_c<2>(dst(x,y))=boost::gil::at_c<1>(dst(x,y));
 
 
 
-int main(int argc, char **argv) {
-	std::string file_rgb(argv[1]);
-	std::string file_pir(argv[2]);
-	std::string file_z  (argv[3]);
-	std::string file_out(argv[4]);
-	
-	image_rgb_t  img_rgb;
-	image_pir_t  img_pir;
-	image_z_t  img_z;
-	boost::gil::tiff_read_image(file_rgb, img_rgb);
-	boost::gil::tiff_read_image(file_pir, img_pir);
-	boost::gil::tiff_read_image(file_z  , img_z  );
-	image_ndvi_t img_out(img_rgb.dimensions());
+int main(int argc, char **argv)
+{
+    std::string file_rgb(argv[1]);
+    std::string file_pir(argv[2]);
+    std::string file_z  (argv[3]);
+    std::string file_out(argv[4]);
 
-	ndvi(const_view(img_rgb),const_view(img_pir),const_view(img_z),view(img_out));
-	boost::gil::tiff_write_view(file_out,const_view(img_out));
+    image_rgb_t  img_rgb;
+    image_pir_t  img_pir;
+    image_z_t  img_z;
+
+    using namespace boost::gil;
+    read_image( file_rgb, img_rgb, tiff_tag() );
+    read_image( file_pir, img_pir, tiff_tag() );
+    read_image( file_z  , img_z  , tiff_tag() );
+    image_ndvi_t img_out(img_rgb.dimensions());
+
+    ndvi(const_view(img_rgb),const_view(img_pir),const_view(img_z),view(img_out));
+    write_view( file_out, const_view(img_out), tiff_tag() );
 }
