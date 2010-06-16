@@ -1,5 +1,3 @@
-#
-#
 cmake_minimum_required(VERSION 2.6)
 
 file( GLOB ENERGY_HEADER_FILES ../lib/energy/*.h ../lib/energy/*.hpp )
