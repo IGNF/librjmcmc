@@ -8,10 +8,22 @@ class box_is_valid
 public:
 	typedef bool result_type;
 #ifdef GEOMETRY_RECTANGLE_2_H
-	result_type operator()(const Rectangle_2 &n) const;
+	template<typename K> result_type operator()(const geometry::Rectangle_2<K> &n) const
+{
+	if (!m_box.has_on_bounded_side (n.center())) return false;
+	if (n.squared_length(0) < m_squared_min_size || n.squared_length(1) < m_squared_min_size)
+		return false;
+
+	float ratio = std::abs(n.ratio());
+	return (ratio <= m_max_ratio && 1 <= m_max_ratio*ratio );
+}
 #endif
 #ifdef GEOMETRY_CIRCLE_2_H
-	result_type operator()(const Circle_2 &n) const;
+	template<typename K> result_type operator()(const geometry::Circle_2<K> &n) const
+{
+	if (!m_box.has_on_bounded_side (n.center())) return false;
+	return 	n.squared_radius() >= m_squared_min_size;
+}
 #endif
 
 	box_is_valid(const Iso_rectangle_2 &box, double min_size, double max_ratio)

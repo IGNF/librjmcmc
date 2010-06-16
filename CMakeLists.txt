@@ -20,6 +20,12 @@ project( libMPP CXX)
 set( ROOT_DIR ${PROJECT_SOURCE_DIR})
 # SET classical path for the MATIS library
 
+option(VARIADIC_TEMPLATES "Enable variadic template implementation" OFF)
+if(VARIADIC_TEMPLATES)
+  add_definitions("-DUSE_VARIADIC_TEMPLATES=1")
+  add_definitions("-std=c++0x")
+endif(VARIADIC_TEMPLATES)
+
 #########################################################
 # INSTALL DEFAULT CONFIGURATION and CMAKE_PREFIX_PATH ###
 #########################################################
@@ -41,9 +47,8 @@ option(BUILD_SHARED_LIBS "Dynamic libraries" ON)
 option(BUILD_SHARED_EXE  "Dynamic executables" ON)
 
 # Find BOOST
-find_package( Boost 1.37 COMPONENTS thread program_options system )
-set( Boost_ADDITIONAL_VERSIONS "1.39.0" "1.39" "1.40.0" "1.40" )
-find_package( Boost 1.37 COMPONENTS thread program_options system )
+set( Boost_ADDITIONAL_VERSIONS "1.39.0" "1.39" "1.40.0" "1.40" "1.41.0" "1.41" "1.42.0" "1.42" )
+find_package( Boost 1.37 COMPONENTS thread program_options system filesystem )
 if( NOT Boost_FOUND )
 	message(FATAL_ERROR "Boost not found ! Please set Boost path ...")
 else()

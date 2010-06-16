@@ -5,17 +5,20 @@
 
 #include "core/geometry.h"
 #include <boost/variant.hpp>
-//typedef Rectangle_2 object;
-//typedef boost::variant<Rectangle_2> object;
 typedef boost::variant<Rectangle_2,Circle_2> object;
+//typedef Rectangle_2 object;
 
 #include "energy/box_is_valid.hpp"
 typedef box_is_valid                         is_valid;
 
-//#include "energy/image_gradient_unary_energy.hpp"
-//typedef image_gradient_unary_energy          unary_energy;
 #include "core/global_reconstruction_unary_energy.hpp"
-typedef global_reconstruction_unary_energy          unary_energy;
+#include "image/gradient_image.hpp"
+#include "image/image.hpp"
+typedef oriented<gradient_view_t> oriented_gradient_view;
+typedef boost::gil::gray16s_image_t ndvi_image_t;  // TODO passer en any
+typedef boost::gil::gray16s_view_t  ndvi_view_t;
+typedef oriented<ndvi_view_t>     oriented_ndvi_view;
+typedef global_reconstruction_unary_energy<oriented_gradient_view,oriented_ndvi_view> unary_energy;
 
 #include "energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy      binary_energy;
@@ -28,6 +31,9 @@ typedef modifier <is_valid>          modifier_;
 
 #include "rjmcmc/temperature.hpp"
 typedef rjmcmc::geometric_temperature                    temperature;
+
+#include "rjmcmc/max_iteration_end_test.hpp"
+typedef max_iteration_end_test                           end_test;
 
 #include "rjmcmc/configuration.hpp"
 typedef rjmcmc::graph_configuration
@@ -44,36 +50,43 @@ typedef rjmcmc::sampler<birth_death_kernel,modification_kernel> sampler;
 
 /************** main ****************/
 
-template<typename Visitor, typename View>
-void building_footprint_extraction(Visitor& visitor, const View& view) {
-	param *p = param::Instance();
+Iso_rectangle_2 get_bbox(const param *p) {
+    int x0 = p->get<int>("xmin");
+    int x1 = p->get<int>("xmax");
+    int y0 = p->get<int>("ymin");
+    int y1 = p->get<int>("ymax");
+	if(x0>x1) std::swap(x0,x1);
+    if(y0>y1) std::swap(y0,y1);
+	return Iso_rectangle_2(x0,y0,x1,y1);
+}
 
-	Iso_rectangle_2 bbox(
-		p->get<int>("xmin"),
-		p->get<int>("ymin"),
-		p->get<int>("xmax"),
-		p->get<int>("ymax")
-	);
+void set_bbox(param *p, const Iso_rectangle_2& r) {
+	p->set("xmin",(int) r.min().x());
+	p->set("ymin",(int) r.min().y());
+	p->set("xmax",(int) r.max().x());
+	p->set("ymax",(int) r.max().y());
+}
 
+void create_configuration(param *p, const oriented_gradient_view& grad, const oriented_ndvi_view& ndvi, configuration *&c) {
 	// energies
-	unary_energy e1(
+	unary_energy e1( grad, ndvi,
 		p->get<double>("energy"),
-		p->get<double>("ponderation_gradient"), 
+		p->get<double>("ponderation_grad"), 
 		p->get<double>("ponderation_ndvi")
 	);
-	
-	e1.gradient(view,bbox); 
-	e1.ndvi(p->get<boost::filesystem::path>("ndvi").string(),bbox);
-	
+
 	binary_energy e2(
 		p->get<double>("surface")
 	);
 
 	// empty initial configuration
-	configuration config(e1,e2);
+	c = new configuration(e1,e2);
+}
 
+void create_sampler(param *p, sampler *&s) {
 	// sampler objects
-	is_valid valid(bbox,
+	is_valid valid(
+		get_bbox(p),
 		p->get<double>("minsize"),
 		p->get<double>("maxratio")
 	);
@@ -91,29 +104,31 @@ void building_footprint_extraction(Visitor& visitor, const View& view) {
 		p->get<double>("pdeath")
 	);
 
-	sampler sample( kbirthdeath, kmodif );
+	s = new sampler( kbirthdeath, kmodif );
+}
 
-	// simulated annealing
-	temperature temp(
+void create_temperature(param *p, temperature *&t)
+{
+	t = new temperature(
 		p->get<double>("temp"),
 		p->get<double>("deccoef")
 	);
-	// visitation initialization
-	visitor.begin(
-		p->get<int>("nbdump"),
-		p->get<int>("nbsave"),
-		*temp,
-		config
-	);
+}
 
-	// main loop
-	unsigned int iterations = p->get<int>("nbiter");
-	for (unsigned int i=1; i<=iterations; ++i, ++temp)
-	{
-		sample(config,*temp);
-		if(!visitor.iterate(i,*temp,config,sample)) break;
-	}
-	visitor.end(config);
+void create_end_test(param *p, end_test *&e)
+{
+	e = new end_test(
+		p->get<int>("nbiter")
+	);
+}
+
+template<typename Visitor>
+void init_visitor(param *p, Visitor& v)
+{
+	v.init(
+		p->get<int>("nbdump"),
+		p->get<int>("nbsave")
+	);
 }
 
 #endif // __BUILDING_FOOTPRINT_EXTRACTION_HPP__

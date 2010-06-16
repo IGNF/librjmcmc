@@ -529,11 +529,11 @@ template <class T, class U> inline typename T::R::FT intersection_area(const T &
 */
 
 /****************************************************/
-/* do_intersect_interior free functions             */
+/* do_intersect free functions             */
 /* return  intersection_area(a,b)>0;                */
 /****************************************************/
 
-template <class K> inline bool do_intersect_interior(const Rectangle_2<K> &a, const Rectangle_2<K> &b)
+template <class K> inline bool do_intersect(const Rectangle_2<K> &a, const Rectangle_2<K> &b)
 {
     typedef typename K::Vector_2 Vector_2;
     typedef typename K::FT FT;
@@ -566,7 +566,7 @@ template <class K> inline bool do_intersect_interior(const Rectangle_2<K> &a, co
 }
 
 /*
-template <class K> inline bool do_intersect_interior(const Rectangle_2<K> &r, const typename K::Iso_rectangle_2 &b)
+template <class K> inline bool do_intersect(const Rectangle_2<K> &r, const typename K::Iso_rectangle_2 &b)
 {
     typedef typename K::Vector_2 Vector_2;
     typedef typename K::Point_2 Point_2;
@@ -593,7 +593,7 @@ template <class K> inline bool do_intersect_interior(const Rectangle_2<K> &r, co
     FT day = det*bn.x()+dot*bn.y()+ar*n2;
     return (ay0*ay0<day*day);
 }
-template <class K> inline bool do_intersect_interior(const Rectangle_2<K> &r, const typename K::Triangle_2 &t)
+template <class K> inline bool do_intersect(const Rectangle_2<K> &r, const typename K::Triangle_2 &t)
 {
     typedef typename K::Vector_2 Vector_2;
     typedef typename K::Point_2 Point_2;
@@ -630,19 +630,19 @@ template <class K> inline bool do_intersect_interior(const Rectangle_2<K> &r, co
         return (tdet*tc>0 || abs(tc)<abs(n2*ta)+abs(m2*tb));
 }
 
-template <class K> inline bool do_intersect_interior(const typename K::Triangle_2 &t1, const typename K::Triangle_2 &t2)
+template <class K> inline bool do_intersect(const typename K::Triangle_2 &t1, const typename K::Triangle_2 &t2)
 {
   if(t1.is_degenerate() || t2.is_degenerate()) return false;
   return do_intersect(t1,t2); // TODO fix overdetection : returns true if boundaries intersect and not the interior
 }
 
-template <class K> inline bool do_intersect_interior(const typename K::Triangle_2 &t, const Rectangle_2<K> &r)
+template <class K> inline bool do_intersect(const typename K::Triangle_2 &t, const Rectangle_2<K> &r)
 {
-  return do_intersect_interior(r,t);
+  return do_intersect(r,t);
 }
-template <class K> inline bool do_intersect_interior(const typename K::Iso_rectangle_2 &i, const Rectangle_2<K> &r)
+template <class K> inline bool do_intersect(const typename K::Iso_rectangle_2 &i, const Rectangle_2<K> &r)
 {
-  return do_intersect_interior(r,i);
+  return do_intersect(r,i);
 }
 */
 

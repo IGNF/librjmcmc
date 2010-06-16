@@ -2,33 +2,43 @@
 #define RJMCMC_IMAGE_HPP_
 
 #include <boost/gil/image.hpp>
-#include <boost/gil/extension/matis/float_images.hpp>
 
-namespace rjmcmc {
-class image
-{
+template<typename View>
+class oriented {
 public:
-	typedef boost::gil::gray16s_image_t image_t;
-	typedef boost::gil::gray16s_pixel_t pixel_t;
-
-#ifdef GEOMETRY_RECTANGLE_2_H
-	double error(const Rectangle_2 &s) const;
-#endif // GEOMETRY_RECTANGLE_2_H
-
-#ifdef GEOMETRY_CIRCLE_2_H
-	double error(const Circle_2  &c) const;
-#endif // GEOMETRY_CIRCLE_2_H
-
-	template<typename IsoRectangle>
-	void load(const std::string &file, const IsoRectangle& bbox, unsigned int step=0);
-
-	template<typename View, typename IsoRectangle>
-	void load(const View& view, const IsoRectangle& bbox, unsigned int step=0);
-
+	typedef View view_t;
+	oriented(const view_t& view, int x0, int y0) : m_view(view), m_x0(x0), m_y0(y0) {}
+	oriented() : m_view(), m_x0(0), m_y0(0) {}
+	inline int x0() const { return m_x0; }
+	inline int y0() const { return m_y0; }
+	inline const view_t& view() const { return m_view; }
 private:
-	image_t m_image;
-	int x0, y0;
-};
+	view_t m_view;
+	int m_x0, m_y0;
 };
 
-#endif // IMAGE_HPP_
+template<typename IsoRectangle>
+void clip_bbox(IsoRectangle& bbox, const std::string &file);
+
+template<typename IsoRectangle, typename View>
+void clip_bbox(IsoRectangle& bbox, const oriented<View>& v);
+
+template<typename View, typename IsoRectangle>
+void load_view(oriented<View>& out, const oriented<View>& in, const IsoRectangle& bbox);
+
+template<typename View, typename Image, typename IsoRectangle>
+void load_view(oriented<View>& out, Image& img, const std::string &file, const IsoRectangle& bbox);
+
+
+struct static_cast_color_converter
+{
+	template<class Src, class Dst>
+	void operator()(const Src &src, Dst &dst) const
+	{
+		typedef typename boost::gil::channel_type<Dst>::type type;
+		boost::gil::at_c<0>(dst) = static_cast<type>(boost::gil::at_c<0>(src));
+	}
+};
+
+
+#endif // RJMCMC_IMAGE_HPP_

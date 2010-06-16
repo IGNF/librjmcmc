@@ -12,69 +12,81 @@ typedef Rectangle_2 object;
 typedef box_is_valid                         is_valid;
 
 #include "energy/image_gradient_unary_energy.hpp"
-typedef image_gradient_unary_energy          unary_energy;
+#include "image/gradient_image.hpp"
+#include "image/image.hpp"
+typedef oriented<gradient_view_t> oriented_gradient_view;
+typedef image_gradient_unary_energy<oriented_gradient_view> unary_energy;
 
 #include "energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy      binary_energy;
 
 #include "energy/kernels.hpp"
-typedef generator<is_valid>          generator_;
-typedef modifier <is_valid>          modifier_;
+typedef generator<is_valid>          generator_kernel;
+typedef modifier <is_valid>          modifier_kernel;
 
 /************** rjmcmc library types ****************/
 
 #include "rjmcmc/temperature.hpp"
 typedef rjmcmc::geometric_temperature                    temperature;
 
+#include "rjmcmc/max_iteration_end_test.hpp"
+typedef max_iteration_end_test                           end_test;
+
 #include "rjmcmc/configuration.hpp"
 typedef rjmcmc::graph_configuration
 //typedef rjmcmc::vector_configuration
-	<object, unary_energy, binary_energy>            configuration;
+	<object, unary_energy, binary_energy>                configuration;
 
 #include "rjmcmc/sampler.hpp"
-typedef rjmcmc::uniform_birth_kernel<generator_>         birth_kernel;
-typedef rjmcmc::uniform_death_kernel                     death_kernel;
-typedef rjmcmc::binary_kernel<birth_kernel,death_kernel> birth_death_kernel;
-typedef rjmcmc::modification_kernel<modifier_>           modification_kernel;
+typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
+typedef rjmcmc::uniform_death_kernel                            death_kernel;
+typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
+typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
 typedef rjmcmc::sampler<birth_death_kernel,modification_kernel> sampler;
-
 
 /************** main ****************/
 
-template<typename Visitor, typename View>
-void building_footprint_extraction(Visitor& visitor, const View& view) {
-	param *p = param::Instance();
+Iso_rectangle_2 get_bbox(const param *p) {
+    int x0 = p->get<int>("xmin");
+    int x1 = p->get<int>("xmax");
+    int y0 = p->get<int>("ymin");
+    int y1 = p->get<int>("ymax");
+	if(x0>x1) std::swap(x0,x1);
+    if(y0>y1) std::swap(y0,y1);
+	return Iso_rectangle_2(x0,y0,x1,y1);
+}
 
-	Iso_rectangle_2 bbox(
-		p->get<int>("xmin"),
-		p->get<int>("ymin"),
-		p->get<int>("xmax"),
-		p->get<int>("ymax")
-	);
+void set_bbox(param *p, const Iso_rectangle_2& r) {
+	p->set("xmin",(int) r.min().x());
+	p->set("ymin",(int) r.min().y());
+	p->set("xmax",(int) r.max().x());
+	p->set("ymax",(int) r.max().y());
+}
 
+void create_configuration(const param *p, const oriented_gradient_view& grad, configuration *&c) {
 	// energies
-	unary_energy e1(
+	unary_energy e1( grad,
 		p->get<double>("energy"),
-                p->get<double>("ponderation_gradient")
+        p->get<double>("ponderation_grad")
 	);
-	
-        e1.gradient(view,bbox);
-	
+
 	binary_energy e2(
 		p->get<double>("surface")
 	);
 
 	// empty initial configuration
-	configuration config(e1,e2);
+	c = new configuration(e1,e2);
+}
 
-	// sampler objects
-	is_valid valid(bbox,
+void create_sampler(const param *p, sampler *&s) {
+	is_valid valid(
+		get_bbox(p),
 		p->get<double>("minsize"),
 		p->get<double>("maxratio")
 	);
 
-	generator_ birth(valid);
-	modifier_  modif(valid);
+	generator_kernel birth(valid);
+	modifier_kernel  modif(valid);
 
 	birth_kernel        kbirth(birth);
 	death_kernel        kdeath(      p->get<double>("poisson"));
@@ -86,29 +98,31 @@ void building_footprint_extraction(Visitor& visitor, const View& view) {
 		p->get<double>("pdeath")
 	);
 
-	sampler sample( kbirthdeath, kmodif );
+	s = new sampler( kbirthdeath, kmodif );
+}
 
-	// simulated annealing
-	temperature temp(
+void create_temperature(const param *p, temperature *&t)
+{
+	t = new temperature(
 		p->get<double>("temp"),
 		p->get<double>("deccoef")
 	);
-	// visitation initialization
-	visitor.begin(
-		p->get<int>("nbdump"),
-		p->get<int>("nbsave"),
-		*temp,
-		config
-	);
+}
 
-	// main loop
-	unsigned int iterations = p->get<int>("nbiter");
-	for (unsigned int i=1; i<=iterations; ++i, ++temp)
-	{
-		sample(config,*temp);
-		if(!visitor.iterate(i,*temp,config,sample)) break;
-	}
-	visitor.end(config);
+void create_end_test(const param *p, end_test *&e)
+{
+	e = new end_test(
+		p->get<int>("nbiter")
+	);
+}
+
+template<typename Visitor>
+void init_visitor(const param *p, Visitor& v)
+{
+	v.init(
+		p->get<int>("nbdump"),
+		p->get<int>("nbsave")
+	);
 }
 
 #endif // __BUILDING_FOOTPRINT_RECTANGLE_HPP__

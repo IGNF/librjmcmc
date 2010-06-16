@@ -2,18 +2,26 @@
 #define IMAGE_GRADIENT_UNARY_ENERGY_INC_HPP_
 
 #include "energy/image_gradient_unary_energy.hpp"
-#include "image/gradient_image.hpp"
+#include "geometry/integrated_flux.h"
 
-template<typename View, typename IsoRectangle>
-void image_gradient_unary_energy::gradient(const View& view, const IsoRectangle& bbox, double sigmaD, unsigned int step)
+template<typename DSM>
+template<typename T>
+double image_gradient_unary_energy<DSM>::operator()(const T &t) const
 {
-	m_image->load(view,bbox,sigmaD,step);
+	return m_defaultEnergy
+	- m_ponderation_dsm*integrated_flux(m_dsm,t);
 }
 
-template<typename T>
-double image_gradient_unary_energy::operator()(const T &t) const
+
+
+template<typename DSM>
+image_gradient_unary_energy<DSM>::image_gradient_unary_energy(
+		const DSM& dsm,
+		double default_energy, double ponderation_dsm) :
+	m_defaultEnergy(default_energy), 
+	m_ponderation_dsm(ponderation_dsm),
+	m_dsm(dsm)
 {
-	return m_defaultEnergy - m_ponderation_gradient*(*m_image)(t);
 }
 
 #endif

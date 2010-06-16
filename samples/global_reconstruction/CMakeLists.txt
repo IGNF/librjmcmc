@@ -24,7 +24,7 @@ if(BUILD_GLOBAL_RECONSTRUCTION)
   aux_source_directory( ${ROOT_DIR} ALL_SRC )
   set( SRC  ${ALL_HEADER_FILES} ${ALL_SRC} )
 
-  add_executable( global_reconstruction ${SRC} )
+  add_executable( global_reconstruction ${SRC} ${ALL_LIBRJMCMC_HEADERS_FILES} )
   target_link_libraries(global_reconstruction ${TIFF_LIBRARIES} )
 endif(BUILD_GLOBAL_RECONSTRUCTION)
 

@@ -1,0 +1,78 @@
+// Author(s)     : Mathieu Bredif
+
+#ifndef GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_H
+#define GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_H
+
+#include "Rectangle_2.h"
+#include "geometry/Segment_2_iterator.h"
+#include "geometry/Iso_rectangle_2_Segment_2_clip.h"
+#include <boost/gil/image.hpp>
+#include <boost/gil/extension/matis/float_images.hpp>
+
+template<typename K, typename OrientedView, typename Segment>
+double integrated_flux(const OrientedView& v, const Segment& s0)
+{
+	typedef typename OrientedView::view_t view_t;
+	typedef typename view_t::xy_locator xy_locator;
+
+	view_t view = v.view();
+	int x0 = v.x0();
+	int y0 = v.y0();
+
+//    typedef view_t::pixel_t pixel_t;
+    typedef boost::gil::dev2n32F_pixel_t pixel_t;
+
+	int x1 = x0+view.width();
+	int y1 = y0+view.height();
+	Segment s(s0);
+	typename K::Iso_rectangle_2 bbox(x0,y0,x1,y1);
+	if(!clip(bbox,s)) return 0;
+	geometry::Segment_2_iterator<K> it(s);
+
+	xy_locator loc_grad = view.xy_at(
+		(typename xy_locator::x_coord_t) (it.x()-x0),
+		(typename xy_locator::y_coord_t) (it.y()-y0)
+	);
+
+	boost::gil::point2<std::ptrdiff_t> movement[2] = {
+		boost::gil::point2<std::ptrdiff_t> (it.step(0), 0),
+		boost::gil::point2<std::ptrdiff_t> (0, it.step(1))
+	};
+	float gradient_sum[2] =	{ 0., 0. };
+	for (; !it.end() ; ++it)
+	{
+		if(it.x()>=x0 && it.x()<x1 && it.y()>=y0 && it.y()<y1) {
+			float length = it.length();
+			const pixel_t& grad = *loc_grad;
+			gradient_sum[0] += length * boost::gil::at_c<0> (grad);
+			gradient_sum[1] += length * boost::gil::at_c<1> (grad);
+		}
+		loc_grad += movement[it.axis()];
+	}
+
+	typename K::Vector_2 arete(s.target()-s.source());
+	typename K::Vector_2 normale = arete.perpendicular(geometry::NEGATIVE);
+	typename K::Vector_2 sum(gradient_sum[0], gradient_sum[1]);
+	return geometry::to_double(normale * sum);
+}
+
+template<typename OrientedView, typename K>
+double integrated_flux(const OrientedView& view, const geometry::Rectangle_2<K>& r)
+{
+	return std::max(0.,integrated_flux<K>(view,r.segment(0)))
+		 + std::max(0.,integrated_flux<K>(view,r.segment(1)))
+		 + std::max(0.,integrated_flux<K>(view,r.segment(2)))
+		 + std::max(0.,integrated_flux<K>(view,r.segment(3)));
+}
+
+/*
+template<typename View, typename K> double inverted_integrated_flux(const View& view, int x0, int y0, const geometry::Rectangle_2<K>& r)
+{
+        return 	  std::max(0.,-integrated_flux(view,x0,y0,r.segment(0)))
+                + std::max(0.,-integrated_flux(view,x0,y0,r.segment(1)))
+                + std::max(0.,-integrated_flux(view,x0,y0,r.segment(2)))
+                + std::max(0.,-integrated_flux(view,x0,y0,r.segment(3)));
+}
+*/
+
+#endif // GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_H
