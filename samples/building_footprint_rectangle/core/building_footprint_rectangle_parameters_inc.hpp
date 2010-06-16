@@ -12,7 +12,6 @@ void initialize_parameters(T* params)
     params->template insert<int>("nbdump",'d',10000,"Nombre d'iterations entre chaque affichage");
     params->template insert<int>("nbsave",'S',10000,"Nombre d'iterations entre chaque sauvegarde");
     params->template insert<bool>("dosave",'b',false, "Sauvegarde des resultats intermediaires");
-    params->template insert<bool>("test",'b',true, "test");
     params->template insert<double>("deccoef",'C',0.999999,"Coefficient de decroissance");
     params->template insert<double>("pbirth",'B',0.1, "Probabilite de naissance");
     params->template insert<double>("pdeath",'D',0.1, "Probabilite de mort");
@@ -27,7 +26,7 @@ void initialize_parameters(T* params)
     params->template insert<double>("minsize",'m',5, "Taille minimale d'un rectangle");
     params->template insert<double>("maxratio",'M',5, "Rapport longueur/largeur maximal d'un rectangle");
     params->template insert<double>("surface",'s',10, "Ponderation de la surface d'intersection");
-    params->template insert<double>("ponderation_dsm",'\0',1, "Ponderation de l'energie sur le gradient du DSM");
+    params->template insert<double>("ponderation_grad",'\0',1, "Ponderation de l'energie sur le gradient du gradient");
     params->template insert<double>("energy",'e',250, "Energie d'existence d'un objet");
     params->template insert<double>("poisson",'p',200, "Parametre du processus de Poisson");
 }

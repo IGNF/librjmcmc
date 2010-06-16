@@ -12,6 +12,8 @@ double image_error(const OrientedView& view, const geometry::Circle_2<K> &c) {
 	int x0 = view.x0();
 	int y0 = view.y0();
 
+// TODO: optimize with locators
+
 	double r = geometry::radius(c);
 	double x = c.center().x()-x0;
 	double y = c.center().y()-y0;
@@ -29,7 +31,7 @@ double image_error(const OrientedView& view, const geometry::Circle_2<K> &c) {
 			res +=(140-ndvi) ;
 		}
 	}
-		
+
 	return res;
 }
 

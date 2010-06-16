@@ -14,9 +14,11 @@ typedef box_is_valid                         is_valid;
 #include "core/global_reconstruction_unary_energy.hpp"
 #include "image/gradient_image.hpp"
 #include "image/image.hpp"
-typedef oriented<gradient_view_t> oriented_dsm_view;
+typedef oriented<gradient_view_t> oriented_gradient_view;
+typedef boost::gil::gray16s_image_t ndvi_image_t;  // TODO passer en any
+typedef boost::gil::gray16s_view_t  ndvi_view_t;
 typedef oriented<ndvi_view_t>     oriented_ndvi_view;
-typedef global_reconstruction_unary_energy<oriented_dsm_view,oriented_ndvi_view> unary_energy;
+typedef global_reconstruction_unary_energy<oriented_gradient_view,oriented_ndvi_view> unary_energy;
 
 #include "energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy      binary_energy;
@@ -65,11 +67,11 @@ void set_bbox(param *p, const Iso_rectangle_2& r) {
 	p->set("ymax",(int) r.max().y());
 }
 
-void create_configuration(param *p, const oriented_dsm_view& dsm, const oriented_ndvi_view& ndvi, configuration *&c) {
+void create_configuration(param *p, const oriented_gradient_view& grad, const oriented_ndvi_view& ndvi, configuration *&c) {
 	// energies
-	unary_energy e1( dsm, ndvi,
+	unary_energy e1( grad, ndvi,
 		p->get<double>("energy"),
-		p->get<double>("ponderation_dsm"), 
+		p->get<double>("ponderation_grad"), 
 		p->get<double>("ponderation_ndvi")
 	);
 

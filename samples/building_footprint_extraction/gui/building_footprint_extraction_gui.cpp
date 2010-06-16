@@ -57,20 +57,20 @@ public:
         param *p = param::instance();
 		update_values(p);
 
-		Iso_rectangle_2 bbox = get_bbox(p);
-		int x0, y0;
+	Iso_rectangle_2 bbox = get_bbox(p);
+	std::string  dsm_file = p->get<boost::filesystem::path>("dsm" ).string();
+	std::string ndvi_file = p->get<boost::filesystem::path>("ndvi").string();
+	clip_bbox(bbox,dsm_file );
+	clip_bbox(bbox,ndvi_file);
 
-		boost::filesystem::path dsm_path(p->get<boost::filesystem::path>("dsm"));
-		gradient_image(m_grad,x0,y0,dsm_path.string(),bbox);
-		oriented_dsm_view grad_view(view(m_grad),x0,y0);
+	oriented_gradient_view grad_view;
+	gradient_view(grad_view, m_grad, dsm_file, bbox, p->get<double>("sigmaD"));
 
-		boost::filesystem::path ndvi_path(p->get<boost::filesystem::path>("ndvi"));
-		ndvi_image(m_ndvi,x0,y0,ndvi_path.string(),bbox);
-		oriented_ndvi_view ndvi_view(view(m_ndvi),x0,y0);
+	oriented_ndvi_view ndvi_view;
+	load_view(ndvi_view, m_ndvi, ndvi_file, bbox);
 
-
-		m_confg_frame->add_layer(dsm_path.string());
-		m_confg_frame->add_layer(dsm_path.string());
+		m_confg_frame->add_layer(dsm_file);
+		m_confg_frame->add_layer(ndvi_file);
 		set_bbox(p,bbox);
 		wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));
 		wxPoint p1(wxCoord(bbox.max().x()),wxCoord(bbox.max().y()));
@@ -105,9 +105,11 @@ public:
 
     virtual ~building_footprint_rectangle_gui() {
         release();
-        if(m_confg_frame) { m_confg_frame->Destroy(); delete m_confg_frame; }
-        if(m_param_frame) { m_param_frame->Destroy(); delete m_param_frame; }
-        if(m_chart_frame) { m_chart_frame->Destroy(); delete m_chart_frame; }
+        /*
+        if(m_confg_frame) { m_confg_frame->Close(); }
+        if(m_param_frame) { m_param_frame->Close(); }
+        if(m_chart_frame) { m_chart_frame->Close(); }
+        */
         if(m_visitor    ) { delete m_visitor; }
     }
 private:

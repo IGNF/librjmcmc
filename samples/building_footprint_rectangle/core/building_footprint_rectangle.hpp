@@ -13,8 +13,9 @@ typedef box_is_valid                         is_valid;
 
 #include "energy/image_gradient_unary_energy.hpp"
 #include "image/gradient_image.hpp"
-typedef oriented<gradient_view_t> oriented_view;
-typedef image_gradient_unary_energy<oriented_view> unary_energy;
+#include "image/image.hpp"
+typedef oriented<gradient_view_t> oriented_gradient_view;
+typedef image_gradient_unary_energy<oriented_gradient_view> unary_energy;
 
 #include "energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy      binary_energy;
@@ -62,11 +63,11 @@ void set_bbox(param *p, const Iso_rectangle_2& r) {
 	p->set("ymax",(int) r.max().y());
 }
 
-void create_configuration(const param *p, const oriented_view& dsm, configuration *&c) {
+void create_configuration(const param *p, const oriented_gradient_view& grad, configuration *&c) {
 	// energies
-	unary_energy e1( dsm,
+	unary_energy e1( grad,
 		p->get<double>("energy"),
-        p->get<double>("ponderation_dsm")
+        p->get<double>("ponderation_grad")
 	);
 
 	binary_energy e2(

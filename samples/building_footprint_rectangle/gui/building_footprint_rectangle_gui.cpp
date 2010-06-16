@@ -57,14 +57,14 @@ public:
         param *p = param::instance();
 		update_values(p);
 
-		Iso_rectangle_2 bbox = get_bbox(p);
-		int x0, y0;
+	Iso_rectangle_2 bbox = get_bbox(p);
+	std::string  dsm_file = p->get<boost::filesystem::path>("dsm" ).string();
+	clip_bbox(bbox,dsm_file );
 
-		boost::filesystem::path dem_path(p->get<boost::filesystem::path>("dsm"));
-		gradient_image(m_grad,x0,y0,dem_path.string(),bbox);
-		oriented_view grad_view(view(m_grad),x0,y0);
+	oriented_gradient_view grad_view;
+	gradient_view(grad_view, m_grad, dsm_file, bbox, p->get<double>("sigmaD"));
 
-		m_confg_frame->add_layer(dem_path.string());
+		m_confg_frame->add_layer(dsm_file);
 		set_bbox(p,bbox);
 		wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));
 		wxPoint p1(wxCoord(bbox.max().x()),wxCoord(bbox.max().y()));

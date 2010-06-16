@@ -28,22 +28,25 @@ int main(int argc , char** argv)
 	init_visitor(p,visitor);
 
 	Iso_rectangle_2 bbox = get_bbox(p);
-	int x0, y0;
+	std::string  dsm_file = p->get<boost::filesystem::path>("dsm" ).string();
+	std::string ndvi_file = p->get<boost::filesystem::path>("ndvi").string();
+	clip_bbox(bbox,dsm_file );
+	clip_bbox(bbox,ndvi_file);
 
-	gradient_image_t grad;
-	gradient_image(grad,x0,y0,p->get<boost::filesystem::path>("dsm").string(),bbox);
-	oriented_dsm_view dsm_view(view(grad),x0,y0);
+	oriented_gradient_view grad_view;
+	gradient_image_t       grad_image;
+	gradient_view(grad_view, grad_image, dsm_file, bbox, p->get<double>("sigmaD"));
 
-	ndvi_image_t ndvi;
-	ndvi_image(ndvi,x0,y0,p->get<boost::filesystem::path>("ndvi").string(),bbox);
-	oriented_ndvi_view ndvi_view(view(ndvi),x0,y0);
+	oriented_ndvi_view ndvi_view;
+	ndvi_image_t       ndvi_image;
+	load_view(ndvi_view, ndvi_image, ndvi_file, bbox);
 
 	configuration *conf;
 	sampler       *samp;
 	temperature   *temp;
 	end_test      *end ;
 
-	create_configuration(p,dsm_view,ndvi_view,conf);
+	create_configuration(p,grad_view,ndvi_view,conf);
 	create_sampler      (p,samp);
 	create_temperature  (p,temp);
 	create_end_test     (p,end);
