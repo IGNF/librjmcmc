@@ -7,7 +7,7 @@
 class wx_log_visitor
 {
 public:
-	wx_log_visitor() : m_out(""), m_visitor(m_out) {}
+        wx_log_visitor() : m_out(""), m_visitor(m_out, false) {}
 
 	void init(int dump, int save)
 	{
