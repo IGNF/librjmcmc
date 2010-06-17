@@ -63,8 +63,10 @@ public:
 	std::string  dsm_file = p->get<boost::filesystem::path>("dsm" ).string();
 	clip_bbox(bbox,dsm_file );
 
-	oriented_gradient_view grad_view;
-	gradient_view(grad_view, m_grad, dsm_file, bbox, p->get<double>("sigmaD"));
+
+    gradient_functor gf(p->get<double>("sigmaD"));
+    oriented_gradient_view grad_view(dsm_file,  bbox, gf);
+    m_grad = grad_view.img();
 
 		m_confg_frame->add_layer(dsm_file);
 		set_bbox(p,bbox);
@@ -130,7 +132,7 @@ private:
     parameters_frame    *m_param_frame;
     chart_frame         *m_chart_frame;
     wx_log_visitor       m_wx_log_visitor;
-    gradient_image_t     m_grad;
+    boost::shared_ptr<gradient_image_t>     m_grad;
 };
 
 IMPLEMENT_APP(building_footprint_rectangle_gui);

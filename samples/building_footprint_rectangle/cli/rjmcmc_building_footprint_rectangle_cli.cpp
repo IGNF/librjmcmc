@@ -29,11 +29,10 @@ int main(int argc , char** argv)
   
   Iso_rectangle_2 bbox = get_bbox(p);
   std::string  dsm_file = p->get<boost::filesystem::path>("dsm" ).string();
-  clip_bbox(bbox,dsm_file );
+  clip_bbox(bbox, dsm_file);
   
-  oriented_gradient_view grad_view;
-  gradient_image_t       grad_image;
-  gradient_view(grad_view, grad_image, dsm_file, bbox, p->get<double>("sigmaD"));
+  gradient_functor gf(p->get<double>("sigmaD"));
+  oriented_gradient_view grad_view(dsm_file, bbox, gf);
   
   configuration *conf;
   sampler       *samp;

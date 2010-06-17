@@ -14,7 +14,7 @@ typedef box_is_valid                         is_valid;
 #include "energy/image_gradient_unary_energy.hpp"
 #include "image/gradient_image.hpp"
 #include "image/image.hpp"
-typedef oriented<gradient_view_t> oriented_gradient_view;
+typedef oriented<gradient_image_t> oriented_gradient_view;
 typedef image_gradient_unary_energy<oriented_gradient_view> unary_energy;
 
 #include "energy/intersection_area_binary_energy.hpp"

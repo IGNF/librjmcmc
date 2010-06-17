@@ -3,62 +3,122 @@
 
 #include "image/image.hpp"
 
-template<typename T, typename U> T my_min(const T& t, const U& u) { return std::min(t,T(u)); }
-template<typename T, typename U> T my_max(const T& t, const U& u) { return std::max(t,T(u)); }
+namespace internal {
+
+template<typename T, typename U> T min(const T& t, const U& u) { return std::min(t,T(u)); }
+template<typename T, typename U> T max(const T& t, const U& u) { return std::max(t,T(u)); }
 
 template<typename IsoRectangle, typename T, typename U>
-void clip_bbox(IsoRectangle& bbox, T x0, T y0, U x1, U y1)
+  void clip_bbox(IsoRectangle& bbox, T x0, T y0, U x1, U y1)
 {
-	if(bbox.is_degenerate ()) {
-		bbox = IsoRectangle(x0,y0,x1,y1);
-	} else {
-		bbox = IsoRectangle(
-			my_max(bbox.min().x(),x0),
-			my_max(bbox.min().y(),y0),
-			my_min(bbox.max().x(),x1),
-			my_min(bbox.max().y(),y1)
-		);
-	}
+  if(bbox.is_degenerate ()) {
+    bbox = IsoRectangle(x0,y0,x1,y1);
+  } else {
+    bbox = IsoRectangle(
+                         max(bbox.min().x(),x0),
+                         max(bbox.min().y(),y0),
+                         min(bbox.max().x(),x1),
+                         min(bbox.max().y(),y1)
+                       );
+  }
 }
 
-
-template<typename IsoRectangle, typename View>
-void clip_bbox(IsoRectangle& bbox, const oriented<View>& v)
-{
-	clip_bbox(v.x0(), v.y0(), v.x0()+v.view().width(), v.y0()+v.view().height());
 }
 
-template<typename View, typename IsoRectangle>
-void load_view(oriented<View>& out, const oriented<View>& in, const IsoRectangle& bbox)
+template<typename IsoRectangle, typename Image>
+void clip_bbox(IsoRectangle& bbox, const oriented<Image>& v)
 {
-	using namespace boost::gil;
-	int x0 = (int) bbox.min().x();
-	int y0 = (int) bbox.min().y();
-	int x1 = (int) bbox.max().x();
-	int y1 = (int) bbox.max().y();
-	out = oriented<View>(subimage_view(in.view(),x0-in.x0(),y0-in.y0(),x1-x0,y1-y0),x0,y0);
+  internal::clip_bbox(v.x0(), v.y0(), v.x0()+v.view().width(), v.y0()+v.view().height());
 }
 
 #include <boost/gil/extension/io_new/tiff_read.hpp>
 template<typename IsoRectangle>
 void clip_bbox(IsoRectangle& bbox, const std::string &file)
 {
-	using namespace boost::gil;
-    image_read_info<tiff_tag> info = read_image_info(file, tiff_tag());
-	clip_bbox(bbox,0,0,info._width,info._height);
+  using namespace boost::gil;
+  image_read_info<tiff_tag> info = read_image_info(file, tiff_tag());
+  internal::clip_bbox(bbox,0,0,info._width,info._height);
 }
 
-template<typename View, typename Image, typename IsoRectangle>
-void load_view(oriented<View>& out, Image& img, const std::string &file, const IsoRectangle& bbox)
-{
-	int x0 = (int) bbox.min().x();
-	int y0 = (int) bbox.min().y();
-	int x1 = (int) bbox.max().x();
-	int y1 = (int) bbox.max().y();
 
-	using namespace boost::gil;
-    read_image( file, img, image_read_settings<tiff_tag>( point_t(x0,y0), point_t(x1-x0,y1-y0) ) );
-	out = oriented<View>(view(img),x0,y0);
+template<typename Image>
+template<typename ImageIn, typename IsoRectangle>
+oriented<Image>::oriented(const oriented<ImageIn>& img, const IsoRectangle& bbox)
+: m_img(img.m_img)
+{
+  using namespace boost::gil;
+  int x0 = (int) bbox.min().x();
+  int y0 = (int) bbox.min().y();
+  int x1 = (int) bbox.max().x();
+  int y1 = (int) bbox.max().y();
+  if(m_img) m_view = subimage_view(img.view(),x0-img.x0(),y0-img.y0(),x1-x0,y1-y0);
+  m_x0 = x0;
+  m_y0 = y0;
+}
+
+template<typename Image>
+template<typename ImageIn, typename IsoRectangle, typename Fun>
+oriented<Image>::oriented(const oriented<ImageIn>& img, const IsoRectangle& bbox, const Fun& fun)
+{
+  oriented<ImageIn> crop(img,bbox);
+  if(crop.img())
+  {
+    m_img.reset(new Image);
+    fun( *m_img, crop.view() );
+    m_view = boost::gil::view(*m_img);
+  }
+  m_x0   = crop.x0();
+  m_y0   = crop.y0();
+}
+
+template<typename Image>
+    template<typename Types, typename IsoRectangle, typename Fun>
+    oriented<Image>::oriented(const oriented<boost::gil::any_image<Types> >& img, const IsoRectangle& bbox, const Fun& fun)
+{
+  oriented<boost::gil::any_image<Types> > crop(img,bbox);
+  if(crop.img())
+  {
+    m_img.reset(new Image);
+    boost::gil::apply_operation( crop.view(), boost::bind(fun,boost::ref(*m_img),_1) );
+    m_view = boost::gil::view(*m_img);
+  }
+  m_x0   = crop.x0();
+  m_y0   = crop.y0();
+}
+
+template<typename Image>
+template<typename IsoRectangle>
+oriented<Image>::oriented(const std::string &file, const IsoRectangle& bbox)
+{
+  using namespace boost::gil;
+  int x0 = (int) bbox.min().x();
+  int y0 = (int) bbox.min().y();
+  int x1 = (int) bbox.max().x();
+  int y1 = (int) bbox.max().y();
+  // if(file exists) //TODO
+  {
+    m_img.reset(new Image);
+    image_read_settings<tiff_tag> irs( point_t(x0,y0), point_t(x1-x0,y1-y0) );
+    read_image( file, *m_img, irs );
+    m_view = boost::gil::view(*m_img);
+  }
+  m_x0 = x0;
+  m_y0 = y0;
+}
+
+template<typename Image>
+template<typename IsoRectangle, typename Fun>
+oriented<Image>::oriented(const std::string &file, const IsoRectangle& bbox, const Fun& fun)
+{
+  oriented<rjmcmc::any_image_t> crop(file,bbox);
+  if(crop.img())
+  {
+    m_img.reset(new Image);
+    boost::gil::apply_operation( crop.view(), boost::bind(fun,boost::ref(*m_img),_1) );
+    m_view = boost::gil::view(*m_img);
+  }
+  m_x0   = crop.x0();
+  m_y0   = crop.y0();
 }
 
 #endif // IMAGE_INC_HPP
