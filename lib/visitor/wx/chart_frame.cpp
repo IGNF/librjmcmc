@@ -6,6 +6,8 @@
 #include "wx/xy/xylinerenderer.h"
 #include "wx/xy/xyplot.h"
 
+#include "resources/IGN.xpm"
+
 BEGIN_EVENT_TABLE(chart_frame, wxFrame)
     EVT_CLOSE(chart_frame::OnCloseWindow)
 END_EVENT_TABLE()
@@ -14,6 +16,8 @@ END_EVENT_TABLE()
 chart_frame::chart_frame(wxWindow *parent, wxWindowID id, const wxString& charttitle, long style, const wxPoint& pos, const wxSize& size) :
 	wxFrame(parent, id, charttitle, pos, size, style)
 {
+    SetIcon(wxICON(IGN));
+
 	wxBoxSizer *test_sizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer* inner_sizer = new wxBoxSizer(wxVERTICAL);
 

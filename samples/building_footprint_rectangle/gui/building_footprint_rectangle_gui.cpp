@@ -24,6 +24,7 @@ typedef parameters< wx_parameter > param;
 // threading and wx
 #include <boost/thread.hpp>
 #include <wx/app.h>
+#include "resources/IGN.xpm"
 
 class building_footprint_rectangle_gui : public wxApp, public Controler
 { 
@@ -44,6 +45,7 @@ private:
         initialize_parameters(p);
         if(!p->parse(argc,my_argv)) return false;
         m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, _("librjmcmc: rectangular building footprint extraction") );
+        m_confg_frame->SetIcon(wxICON(IGN));
         m_param_frame = new parameters_frame(m_confg_frame);
         m_chart_frame = new chart_frame(m_confg_frame);
         m_visitor = new visitor(&m_wx_log_visitor,m_confg_frame,m_param_frame,m_chart_frame);

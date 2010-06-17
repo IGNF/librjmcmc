@@ -11,10 +11,13 @@
 #include <wx/filedlg.h>
 #include <wx/scrolwin.h>
 #include <wx/button.h>
+#include <wx/icon.h>
 
 #include "param/wx_parameter.hpp"
 #include "wx_parameter_frame.hpp"
 typedef parameters< wx_parameter > param;
+
+#include "resources/IGN.xpm"
 
 BEGIN_EVENT_TABLE(parameters_frame, wxFrame)
     EVT_CLOSE(parameters_frame::OnCloseWindow)
@@ -84,6 +87,7 @@ struct sizer_adder
 parameters_frame::parameters_frame(wxWindow *parent, wxWindowID id, const wxString& title, long style, const wxPoint& pos, const wxSize& size) :
         wxFrame(parent, id, title, pos, size, style)
 {
+    SetIcon(wxICON(IGN));
     param *p = param::instance();
 
     wxBoxSizer* inner_sizer = new wxBoxSizer(wxVERTICAL);
