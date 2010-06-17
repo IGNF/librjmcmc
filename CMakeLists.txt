@@ -15,7 +15,7 @@ cmake_minimum_required(VERSION 2.6)
 #cmake_policy(SET CMP0014 OLD)
 
 # Project name
-project( libMPP CXX)
+project( librjmcmc CXX)
 
 set( ROOT_DIR ${PROJECT_SOURCE_DIR})
 # SET classical path for the MATIS library

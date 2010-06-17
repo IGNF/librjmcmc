@@ -47,19 +47,25 @@ void initKernelGaussianDeriv1D(Kernel1D& kernel, double sigma)
 }
 
 template<typename ImageType>
-struct template_compute_gradient_functor
+struct gradient_functor
 {
     typedef void result_type;
-    ImageType g;
+    ImageType& g;
     double sigma;
 
-    template_compute_gradient_functor(double sigma_, ImageType &result_) : sigma(sigma_), g(result_) {}
+    gradient_functor(double sigma_, ImageType &result_) : sigma(sigma_), g(result_) {}
 
     template<typename ViewType>
     result_type operator()(const ViewType& v)
     {
         using namespace boost::gil;
-        typedef typename get_pixel_type< ViewType >::type pixel_t;
+
+        typedef typename ImageType::view_t g_view_t;
+        typedef typename get_pixel_type<g_view_t>::type g_pixel_t;
+        typedef typename kth_element_type<g_pixel_t,0>::type element_0_t;
+        typedef typename kth_element_type<g_pixel_t,1>::type element_1_t;
+        typedef pixel<element_0_t, gray_layout_t > g0_pixel_t;
+        typedef pixel<element_1_t, gray_layout_t > g1_pixel_t;
 
         g.recreate(v.dimensions());
 
@@ -78,91 +84,20 @@ struct template_compute_gradient_functor
         std::cout << g.dimensions().y << std::endl;
 
         // todo: remove debug cout
-        convolve_cols<pixel_t> (v, ksmooth, kth_channel_view<0> (view(g)), convolve_option_extend_constant);
-        std::cout << at_c<0>((view(g))(10,10)) << std::endl;
-        convolve_rows<pixel_t> (kth_channel_view<0> (view(g)), kderiv, kth_channel_view<0> (view(g)), convolve_option_extend_constant);
-        std::cout << at_c<0>((view(g))(10,10)) << std::endl;
+        convolve_cols<g0_pixel_t> (v, ksmooth, kth_channel_view<0> (view(g)), convolve_option_extend_constant);
+        convolve_rows<g0_pixel_t> (kth_channel_view<0> (view(g)), kderiv, kth_channel_view<0> (view(g)), convolve_option_extend_constant);
 
-        convolve_rows<pixel_t> (v, ksmooth, kth_channel_view<1> (view(g)), convolve_option_extend_constant);
-        std::cout << at_c<0>((view(g))(10,10)) << std::endl;
-        convolve_cols<pixel_t> (kth_channel_view<1> (view(g)), kderiv, kth_channel_view<1> (view(g)), convolve_option_extend_constant);
-        std::cout << at_c<0>((view(g))(10,10)) << std::endl;
-
-        std::cout << at_c<0>(v(10,10)) << std::endl;
-        std::cout << at_c<0>((view(g))(10,10)) << std::endl;
+        convolve_rows<g1_pixel_t> (v, ksmooth, kth_channel_view<1> (view(g)), convolve_option_extend_constant);
+        convolve_cols<g1_pixel_t> (kth_channel_view<1> (view(g)), kderiv, kth_channel_view<1> (view(g)), convolve_option_extend_constant);
     }
 };
-
-struct compute_gradient_functor
-{
-    typedef void result_type;
-
-    template<typename ImageType, typename ViewType>
-    result_type operator()(ImageType& result, double sigma, const ViewType& src) const
-    {
-        using namespace boost::gil;
-        typedef typename get_pixel_type< ViewType >::type pixel_t;
-
-        result.recreate(src.dimensions());
-
-        unsigned int half_size = (unsigned int) (3* sigma) ;
-        const size_t kws = 2 * half_size + 1;
-        kernel_1d<float> ksmooth(kws, kws / 2);
-        kernel_1d<float> kderiv(kws, kws / 2);
-        initKernelGaussian1D(ksmooth, sigma);
-        initKernelGaussianDeriv1D(kderiv, sigma);
-
-        convolve_cols<pixel_t> (src, ksmooth, kth_channel_view<0> (view(result)), convolve_option_extend_constant);
-        convolve_rows<pixel_t> (kth_channel_view<0> (view(result)), kderiv, kth_channel_view<0> (view(result)), convolve_option_extend_constant);
-
-        convolve_rows<pixel_t> (src, ksmooth, kth_channel_view<1> (view(result)), convolve_option_extend_constant);
-        convolve_cols<pixel_t> (kth_channel_view<1> (view(result)), kderiv, kth_channel_view<1> (view(result)), convolve_option_extend_constant);
-    }
-};
-
-template<typename Image, typename View>
-void gradient_image(Image& g, const View& v, double sigmaD)
-{
-        using namespace boost::gil;
-        typedef typename get_pixel_type< View >::type pixel_t;
-
-	g.recreate(v.dimensions());
-
-	unsigned int half_size = (unsigned int) (3* sigmaD) ;
-	const size_t kws = 2 * half_size + 1;
-	kernel_1d<float> ksmooth(kws, kws / 2);
-	kernel_1d<float> kderiv(kws, kws / 2);
-	initKernelGaussian1D(ksmooth, sigmaD);
-	initKernelGaussianDeriv1D(kderiv, sigmaD);
-
-        convolve_cols<pixel_t> (v, ksmooth, kth_channel_view<0> (view(g)), convolve_option_extend_constant);
-        convolve_rows<pixel_t> (kth_channel_view<0> (view(g)), kderiv, kth_channel_view<0> (view(g)), convolve_option_extend_constant);
-
-        convolve_rows<pixel_t> (v, ksmooth, kth_channel_view<1> (view(g)), convolve_option_extend_constant);
-        convolve_cols<pixel_t> (kth_channel_view<1> (view(g)), kderiv, kth_channel_view<1> (view(g)), convolve_option_extend_constant);
-}
-
-// extra copy due to convolve_rows seeming incompatible with an input any_view // TODO : OT
-template<typename Image, typename T>
-void gradient_image(Image& g, const boost::gil::any_image_view<T>& v, double sigmaD)
-{
-	using namespace boost::gil;
-	gray32F_image_t img(v.dimensions());
-	copy_and_convert_pixels(v,view(img), static_cast_color_converter());
-	gradient_image(g,view(img),sigmaD);
-}
-
 
 template<typename GradView, typename Image, typename View, typename IsoRectangle>
 void gradient_view(oriented<GradView>& grad, Image& img, const oriented<View>& v_in, const IsoRectangle& bbox, double sigmaD)
 {
 	oriented<View> v;
 	load_view(v, v_in, bbox);
-        // TODO
-        //boost::gil::apply_operation( v_in.view(), compute_gradient_functor(img, sigmaD) );
-        //gradient_image(img, v.view(), sigmaD);
         grad = oriented<GradView>(view(img),v.x0(),v.y0());
-        std::cout << "gradient computed (from view)..." << std::endl;
 }
 
 template<typename View, typename Image, typename IsoRectangle>
@@ -171,12 +106,9 @@ void gradient_view(oriented<View>& grad, Image& img, const std::string &file, co
         rjmcmc::any_image_t           any_img;
 	oriented<rjmcmc::any_view_t>  any_view;
         load_view(any_view, any_img, file, bbox);
-        template_compute_gradient_functor<Image> tcgf(sigmaD, boost::ref(img));
-        boost::gil::apply_operation( any_view.view(), tcgf );
-        //boost::gil::apply_operation( boost::gil::view(any_img), boost::bind(&compute_gradient_functor, _1) () (any_img, sigmaD) );
-        //gradient_image(img, any_view.view(), sigmaD);
-        grad = oriented<View>(view(tcgf.g),any_view.x0(),any_view.y0());
-        std::cout << "gradient computed (from file)..." << std::endl;
+        gradient_functor<Image> gradient_f(sigmaD, img);
+        boost::gil::apply_operation( any_view.view(), gradient_f );
+        grad = oriented<View>(view(img),any_view.x0(),any_view.y0());
 }
 
 #endif // GRADIENT_IMAGE_INC_HPP
