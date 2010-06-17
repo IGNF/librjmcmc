@@ -14,8 +14,8 @@ typedef parameters< parameter > param;
 #include "visitor/ostream_visitor.hpp"
 
 // template instanciations
-#include "image/gradient_image_inc.hpp"
-#include "image/image_inc.hpp"
+#include "image/oriented_inc.hpp"
+#include "image/gradient_functor_inc.hpp"
 #include "core/global_reconstruction_unary_energy_inc.hpp"
 
 int main(int argc , char** argv)

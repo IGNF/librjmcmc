@@ -1,5 +1,5 @@
-#ifndef RJMCMC_IMAGE_HPP_
-#define RJMCMC_IMAGE_HPP_
+#ifndef ORIENTED_HPP_
+#define ORIENTED_HPP_
 
 #include <boost/gil/image.hpp>
 #include <boost/shared_ptr.hpp>
@@ -59,4 +59,4 @@ struct static_cast_color_converter
 };
 
 
-#endif // RJMCMC_IMAGE_HPP_
+#endif // ORIENTED_HPP_

@@ -12,8 +12,8 @@ typedef Rectangle_2 object;
 typedef box_is_valid                         is_valid;
 
 #include "energy/image_gradient_unary_energy.hpp"
-#include "image/gradient_image.hpp"
-#include "image/image.hpp"
+#include "image/gradient_functor.hpp"
+#include "image/oriented.hpp"
 typedef oriented<gradient_image_t> oriented_gradient_view;
 typedef image_gradient_unary_energy<oriented_gradient_view> unary_energy;
 

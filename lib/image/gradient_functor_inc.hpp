@@ -1,8 +1,7 @@
-#ifndef GRADIENT_IMAGE_INC_HPP
-#define GRADIENT_IMAGE_INC_HPP
+#ifndef GRADIENT_FUNCTOR_INC_HPP
+#define GRADIENT_FUNCTOR_INC_HPP
 
-#include "image/gradient_image.hpp"
-#include "image/image_inc.hpp"
+#include "image/gradient_functor.hpp"
 
 #include <boost/bind.hpp>
 #include <boost/gil/extension/numeric/kernel.hpp>
@@ -80,4 +79,4 @@ typename gradient_functor::result_type gradient_functor::operator()(Image& g, co
   convolve_cols<g1_pixel_t> (kth_channel_view<1> (view(g)), kderiv, kth_channel_view<1> (view(g)), convolve_option_extend_constant);
 }
 
-#endif // GRADIENT_IMAGE_INC_HPP
+#endif // GRADIENT_FUNCTOR_INC_HPP

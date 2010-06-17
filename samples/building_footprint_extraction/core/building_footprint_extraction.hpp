@@ -12,8 +12,8 @@ typedef boost::variant<Rectangle_2,Circle_2> object;
 typedef box_is_valid                         is_valid;
 
 #include "core/global_reconstruction_unary_energy.hpp"
-#include "image/gradient_image.hpp"
-#include "image/image.hpp"
+#include "image/gradient_functor.hpp"
+#include "image/oriented.hpp"
 typedef oriented<gradient_image_t> oriented_gradient_view;
 typedef boost::gil::gray16s_image_t ndvi_image_t;  // TODO passer en any
 typedef boost::gil::gray16s_view_t  ndvi_view_t;

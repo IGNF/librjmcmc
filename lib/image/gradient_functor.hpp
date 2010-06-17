@@ -1,11 +1,10 @@
-#ifndef GRADIENT_IMAGE_HPP
-#define GRADIENT_IMAGE_HPP
+#ifndef GRADIENT_FUNCTOR_HPP
+#define GRADIENT_FUNCTOR_HPP
 
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
 typedef boost::gil::dev2n32F_image_t gradient_image_t;
 typedef boost::gil::dev2n32F_view_t  gradient_view_t;
-#include "image.hpp"
 
 class gradient_functor
 {
@@ -21,4 +20,4 @@ private:
   double m_sigma;
 };
 
-#endif // GRADIENT_IMAGE_HPP
+#endif // GRADIENT_FUNCTOR_HPP

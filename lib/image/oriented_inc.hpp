@@ -1,7 +1,7 @@
-#ifndef IMAGE_INC_HPP
-#define IMAGE_INC_HPP
+#ifndef ORIENTED_INC_HPP
+#define ORIENTED_INC_HPP
 
-#include "image/image.hpp"
+#include "image/oriented.hpp"
 
 namespace internal {
 
@@ -121,4 +121,4 @@ oriented<Image>::oriented(const std::string &file, const IsoRectangle& bbox, con
   m_y0   = crop.y0();
 }
 
-#endif // IMAGE_INC_HPP
+#endif // ORIENTED_INC_HPP

@@ -18,9 +18,9 @@ typedef parameters< wx_parameter > param;
 #include "visitor/composite_visitor.hpp"
 
 // template instanciations
+#include "image/oriented_inc.hpp"
+#include "image/gradient_functor_inc.hpp"
 #include "core/global_reconstruction_unary_energy_inc.hpp"
-#include "image/gradient_image_inc.hpp"
-#include "image/image_inc.hpp"
 
 // threading and wx
 #include <boost/thread.hpp>
