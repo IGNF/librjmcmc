@@ -76,13 +76,6 @@ struct gradient_functor
         initKernelGaussian1D(ksmooth, sigma);
         initKernelGaussianDeriv1D(kderiv, sigma);
 
-        std::cout << ksmooth.front() << std::endl;
-        std::cout << kderiv.front() << std::endl;
-        std::cout << ksmooth.back() << std::endl;
-        std::cout << kderiv.back() << std::endl;
-        std::cout << g.dimensions().x << std::endl;
-        std::cout << g.dimensions().y << std::endl;
-
         // todo: remove debug cout
         convolve_cols<g0_pixel_t> (v, ksmooth, kth_channel_view<0> (view(g)), convolve_option_extend_constant);
         convolve_rows<g0_pixel_t> (kth_channel_view<0> (view(g)), kderiv, kth_channel_view<0> (view(g)), convolve_option_extend_constant);
