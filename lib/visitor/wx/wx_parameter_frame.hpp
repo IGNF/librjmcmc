@@ -11,9 +11,9 @@
 #include <map>
 #include <string>
 
-#include <wx/dialog.h>
+#include <wx/frame.h>
 
-class parameters_frame: public wxDialog
+class parameters_frame: public wxFrame
 {
 public:
     parameters_frame(

@@ -16,7 +16,7 @@
 #include "wx_parameter_frame.hpp"
 typedef parameters< wx_parameter > param;
 
-BEGIN_EVENT_TABLE(parameters_frame, wxDialog)
+BEGIN_EVENT_TABLE(parameters_frame, wxFrame)
     EVT_CLOSE(parameters_frame::OnCloseWindow)
 END_EVENT_TABLE()
 
@@ -82,13 +82,13 @@ struct sizer_adder
 };
 
 parameters_frame::parameters_frame(wxWindow *parent, wxWindowID id, const wxString& title, long style, const wxPoint& pos, const wxSize& size) :
-        wxDialog(parent, id, title, pos, size, style)
+        wxFrame(parent, id, title, pos, size, style)
 {
     param *p = param::instance();
 
     wxBoxSizer* inner_sizer = new wxBoxSizer(wxVERTICAL);
 
-    wxScrolledWindow* scroll = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxT("scroll"));
+    wxScrolledWindow* scroll = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE|wxScrolledWindowStyle|wxTAB_TRAVERSAL, wxT("scroll"));
     scroll->SetScrollbars(20,20,50,50);
 
     wxFlexGridSizer* sizer = new wxFlexGridSizer(2);
