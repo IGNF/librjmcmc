@@ -50,18 +50,18 @@ template<typename ImageType>
 struct template_compute_gradient_functor
 {
     typedef void result_type;
-    ImageType result;
+    ImageType g;
     double sigma;
 
-    template_compute_gradient_functor(double sigma_, ImageType &result_) : sigma(sigma_), result(result_) {}
+    template_compute_gradient_functor(double sigma_, ImageType &result_) : sigma(sigma_), g(result_) {}
 
     template<typename ViewType>
-    result_type operator()(const ViewType& src)
+    result_type operator()(const ViewType& v)
     {
         using namespace boost::gil;
         typedef typename get_pixel_type< ViewType >::type pixel_t;
 
-        result.recreate(src.dimensions());
+        g.recreate(v.dimensions());
 
         unsigned int half_size = (unsigned int) (3* sigma) ;
         const size_t kws = 2 * half_size + 1;
@@ -74,22 +74,22 @@ struct template_compute_gradient_functor
         std::cout << kderiv.front() << std::endl;
         std::cout << ksmooth.back() << std::endl;
         std::cout << kderiv.back() << std::endl;
-        std::cout << result.dimensions().x << std::endl;
-        std::cout << result.dimensions().y << std::endl;
+        std::cout << g.dimensions().x << std::endl;
+        std::cout << g.dimensions().y << std::endl;
 
         // todo: remove debug cout
-        convolve_cols<pixel_t> (src, ksmooth, kth_channel_view<0> (view(result)), convolve_option_extend_constant);
-        std::cout << at_c<0>((view(result))(10,10)) << std::endl;
-        convolve_rows<pixel_t> (kth_channel_view<0> (view(result)), kderiv, kth_channel_view<0> (view(result)), convolve_option_extend_constant);
-        std::cout << at_c<0>((view(result))(10,10)) << std::endl;
+        convolve_cols<pixel_t> (v, ksmooth, kth_channel_view<0> (view(g)), convolve_option_extend_constant);
+        std::cout << at_c<0>((view(g))(10,10)) << std::endl;
+        convolve_rows<pixel_t> (kth_channel_view<0> (view(g)), kderiv, kth_channel_view<0> (view(g)), convolve_option_extend_constant);
+        std::cout << at_c<0>((view(g))(10,10)) << std::endl;
 
-        convolve_rows<pixel_t> (src, ksmooth, kth_channel_view<1> (view(result)), convolve_option_extend_constant);
-        std::cout << at_c<0>((view(result))(10,10)) << std::endl;
-        convolve_cols<pixel_t> (kth_channel_view<1> (view(result)), kderiv, kth_channel_view<1> (view(result)), convolve_option_extend_constant);
-        std::cout << at_c<0>((view(result))(10,10)) << std::endl;
+        convolve_rows<pixel_t> (v, ksmooth, kth_channel_view<1> (view(g)), convolve_option_extend_constant);
+        std::cout << at_c<0>((view(g))(10,10)) << std::endl;
+        convolve_cols<pixel_t> (kth_channel_view<1> (view(g)), kderiv, kth_channel_view<1> (view(g)), convolve_option_extend_constant);
+        std::cout << at_c<0>((view(g))(10,10)) << std::endl;
 
-        std::cout << at_c<0>(src(10,10)) << std::endl;
-        std::cout << at_c<0>((view(result))(10,10)) << std::endl;
+        std::cout << at_c<0>(v(10,10)) << std::endl;
+        std::cout << at_c<0>((view(g))(10,10)) << std::endl;
     }
 };
 
@@ -175,7 +175,7 @@ void gradient_view(oriented<View>& grad, Image& img, const std::string &file, co
         boost::gil::apply_operation( any_view.view(), tcgf );
         //boost::gil::apply_operation( boost::gil::view(any_img), boost::bind(&compute_gradient_functor, _1) () (any_img, sigmaD) );
         //gradient_image(img, any_view.view(), sigmaD);
-        grad = oriented<View>(view(tcgf.result),any_view.x0(),any_view.y0());
+        grad = oriented<View>(view(tcgf.g),any_view.x0(),any_view.y0());
         std::cout << "gradient computed (from file)..." << std::endl;
 }
 
