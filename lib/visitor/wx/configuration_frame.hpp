@@ -110,6 +110,7 @@ public:
 
 	void controler(Controler *c) { m_controler=c; } 
 
+        panel_viewer* panelviewer() const;
 	void add_layer(const std::string& file);
 	wxRect get_bbox() const;
 	void set_bbox(const wxRect& r);

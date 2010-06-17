@@ -216,6 +216,9 @@ void configuration_frame::init(int dump, int save)
 		ghost->m_brushRectangle = wxBrush(*wxRED, wxTRANSPARENT);
 	}
 
+
+        panel_viewer* configuration_frame::panelviewer() const { return m_panel; }
+
 	void configuration_frame::add_layer(const std::string& file) {
             boost::shared_ptr<VectorLayerGhost> ghost = m_panel->vectorlayerghost();
 

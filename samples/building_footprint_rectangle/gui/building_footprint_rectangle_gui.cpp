@@ -22,6 +22,12 @@ typedef parameters< wx_parameter > param;
 #include <wx/app.h>
 #include "resources/IGN.xpm"
 
+// gilviewer
+#include <GilViewer/gui/PanelViewer.hpp>
+
+// boost
+#include <boost/filesystem.hpp>
+
 class building_footprint_rectangle_gui : public wxApp, public Controler
 { 
     typedef composite_visitor<wx_log_visitor*,configuration_frame*,parameters_frame*,chart_frame*
@@ -50,10 +56,11 @@ private:
     }
 
 public:
-    virtual void go() {
+    virtual void go()
+    {
         release();
         param *p = param::instance();
-		update_values(p);
+        update_values(p);
 
 	Iso_rectangle_2 bbox = get_bbox(p);
 	std::string  dsm_file = p->get<boost::filesystem::path>("dsm" ).string();
@@ -62,11 +69,25 @@ public:
 	oriented_gradient_view grad_view;
 	gradient_view(grad_view, m_grad, dsm_file, bbox, p->get<double>("sigmaD"));
 
-		m_confg_frame->add_layer(dsm_file);
-		set_bbox(p,bbox);
-		wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));
-		wxPoint p1(wxCoord(bbox.max().x()),wxCoord(bbox.max().y()));
-		m_confg_frame->set_bbox(wxRect(p0,p1));
+        // Checks if the file is already loaded. If not load it.
+        bool already_loaded = false;
+        layer_control::const_iterator it  = m_confg_frame->panelviewer()->layercontrol()->begin();
+        layer_control::const_iterator end = m_confg_frame->panelviewer()->layercontrol()->end();
+        for(;it!=end;++it)
+        {
+            using namespace boost::filesystem;
+            if((*it)->filename()==path(system_complete(dsm_file)).string())
+            {
+                already_loaded = true;
+                break;
+            }
+        }
+        if(!already_loaded)
+            m_confg_frame->add_layer(dsm_file);
+        set_bbox(p,bbox);
+        wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));
+        wxPoint p1(wxCoord(bbox.max().x()),wxCoord(bbox.max().y()));
+        m_confg_frame->set_bbox(wxRect(p0,p1));
 
         init_visitor        (p,*m_visitor);
         create_configuration(p,grad_view,m_config);
@@ -89,13 +110,12 @@ public:
     virtual bool chart_visibility() const { return m_chart_frame->IsShown(); }
 
     building_footprint_rectangle_gui() :
-        m_config(NULL), m_sampler(NULL), m_temp(NULL), m_end_test(NULL), 
-        m_visitor(NULL), m_thread(NULL),
-		m_confg_frame(NULL), m_param_frame(NULL), m_chart_frame(NULL)
-    {
-    }
+            m_config(NULL), m_sampler(NULL), m_temp(NULL), m_end_test(NULL),
+            m_visitor(NULL), m_thread(NULL),
+            m_confg_frame(NULL), m_param_frame(NULL), m_chart_frame(NULL) {}
 
-    virtual ~building_footprint_rectangle_gui() {
+    virtual ~building_footprint_rectangle_gui()
+    {
         release();
         /*
         if(m_confg_frame) { m_confg_frame->Close(); }
