@@ -160,7 +160,7 @@ void configuration_frame::OnChartButton(wxCommandEvent&)
     m_controler->chart_visibility(!m_controler->chart_visibility());
 }
 
-wxAboutDialogInfo configuration_frame::getAboutInfo() const
+wxAboutDialogInfo configuration_frame::about_info() const
 {
     wxAboutDialogInfo info;
     info.AddDeveloper(_("Olivier Tournaire"));

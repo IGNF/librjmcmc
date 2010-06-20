@@ -106,7 +106,7 @@ public:
 		return true;
 	}
 
-	wxAboutDialogInfo getAboutInfo() const;
+        virtual wxAboutDialogInfo about_info() const;
 
 	void controler(Controler *c) { m_controler=c; } 
 
