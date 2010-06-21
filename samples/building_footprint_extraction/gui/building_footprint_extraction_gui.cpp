@@ -11,16 +11,12 @@ typedef parameters< wx_parameter > param;
 #include "rjmcmc/simulated_annealing.hpp"
 
 // visitors
-#include "visitor/wx/wx_log_visitor.hpp"
-#include "visitor/wx/configuration_frame.hpp"
-#include "visitor/wx/chart_frame.hpp"
-#include "visitor/wx/wx_parameter_frame.hpp"
-#include "visitor/composite_visitor.hpp"
+#include "visitor/all_standard_and_wx_visitors.hpp"
 
 // template instanciations
+#include "core/global_reconstruction_unary_energy_inc.hpp"
 #include "image/oriented_inc.hpp"
 #include "image/gradient_functor_inc.hpp"
-#include "core/global_reconstruction_unary_energy_inc.hpp"
 
 // threading and wx
 #include <boost/thread.hpp>

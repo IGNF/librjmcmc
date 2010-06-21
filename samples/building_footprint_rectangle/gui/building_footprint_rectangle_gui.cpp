@@ -27,6 +27,12 @@ typedef parameters< wx_parameter > param;
 #include <wx/app.h>
 #include "resources/IGN.xpm"
 
+// gilviewer
+#include <GilViewer/gui/PanelViewer.hpp>
+
+// boost
+#include <boost/filesystem.hpp>
+
 class building_footprint_rectangle_gui : public wxApp, public Controler
 { 
   typedef composite_visitor<wx_log_visitor*,configuration_frame*,parameters_frame*,chart_frame*
@@ -68,8 +74,23 @@ public:
     gradient_functor gf(p->get<double>("sigmaD"));
     oriented_gradient_view grad_view(dsm_file,  bbox, gf);
     m_grad = grad_view.img();
+
+        // Checks if the file is already loaded. If not load it.
+        bool already_loaded = false;
+        layer_control::const_iterator it  = m_confg_frame->panelviewer()->layercontrol()->begin();
+        layer_control::const_iterator end = m_confg_frame->panelviewer()->layercontrol()->end();
+        for(;it!=end;++it)
+        {
+            using namespace boost::filesystem;
+            if((*it)->filename()==path(system_complete(dsm_file)).string())
+            {
+                already_loaded = true;
+                break;
+            }
+        }
+        if(!already_loaded)
+            m_confg_frame->add_layer(dsm_file);
     
-    m_confg_frame->add_layer(dsm_file);
     set_bbox(p,bbox);
     wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));
     wxPoint p1(wxCoord(bbox.max().x()),wxCoord(bbox.max().y()));

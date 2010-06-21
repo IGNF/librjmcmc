@@ -160,7 +160,7 @@ void configuration_frame::OnChartButton(wxCommandEvent&)
     m_controler->chart_visibility(!m_controler->chart_visibility());
 }
 
-wxAboutDialogInfo configuration_frame::getAboutInfo() const
+wxAboutDialogInfo configuration_frame::about_info() const
 {
     wxAboutDialogInfo info;
     info.AddDeveloper(_("Olivier Tournaire"));
@@ -215,6 +215,9 @@ void configuration_frame::init(int dump, int save)
 		ghost->m_penRectangle = wxPen(*wxRED, 2, wxDOT);
 		ghost->m_brushRectangle = wxBrush(*wxRED, wxTRANSPARENT);
 	}
+
+
+        panel_viewer* configuration_frame::panelviewer() const { return m_panel; }
 
 	void configuration_frame::add_layer(const std::string& file) {
             boost::shared_ptr<VectorLayerGhost> ghost = m_panel->vectorlayerghost();
