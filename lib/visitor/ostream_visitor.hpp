@@ -4,7 +4,6 @@
 #include <ostream>
 #include <iomanip>
 #include <time.h>
-#include "rjmcmc/sampler.hpp" // pour kernel_traits<>
 
 namespace rjmcmc {
 
@@ -34,7 +33,7 @@ public:
 	template<typename Configuration, typename Sampler>
         void begin(const Configuration& config, const Sampler& sampler, double t)
 	{
-		enum { kernel_size =  kernel_traits<typename Sampler::Kernels>::size };
+		enum { kernel_size =  Sampler::kernel_size };
 		if(m_accepted) delete m_accepted;
 		if(m_proposed) delete m_proposed;
 		m_accepted = new unsigned int[kernel_size];
@@ -71,7 +70,7 @@ public:
 
 	template<typename Configuration, typename Sampler>
 	bool iterate(const Configuration& config, const Sampler& sampler, double t, unsigned int i) {
-		enum { kernel_size =  kernel_traits<typename Sampler::Kernels>::size };
+		enum { kernel_size = Sampler::kernel_size };
 
 		m_proposed[sampler.kernel_id()]++;
 		if( sampler.accepted() ) m_accepted[sampler.kernel_id()]++;

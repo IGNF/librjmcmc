@@ -16,7 +16,6 @@ public:
 
 	typedef double result_type;
 
-
 #ifdef GEOMETRY_RECTANGLE_2_H
     template<typename K> result_type operator()(geometry::Rectangle_2<K> &r) const
     {

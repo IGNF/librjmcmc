@@ -3,6 +3,7 @@
 
 #include "rjmcmc/variant.hpp"
 #include "rjmcmc/random.hpp"
+#include "rjmcmc/random_variant_init.hpp"
 #include <boost/tuple/tuple.hpp>
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/insert_range.hpp>
@@ -87,30 +88,6 @@ template<typename T> struct kernel_traits {
 #endif
 
 
-template<typename Variant> 
-inline int uniform_random_type_init(Variant &v)
-{
-	return 1;
-}
-
-#include <boost/preprocessor/iteration/local.hpp>
-template<BOOST_VARIANT_ENUM_PARAMS(typename T)> 
-inline int uniform_random_type_init(boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &v)
-{
-	typedef boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> T;
-	typedef typename T::types types;
-	typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_smallint<> > die_type;
-	const int N = variant_size<T>::value;
-	die_type vdie(random(), boost::uniform_smallint<>(0,N-1));
-	switch(vdie())        { 
-#define BOOST_PP_LOCAL_LIMITS (0,BOOST_VARIANT_LIMIT_TYPES-1)
-#define BOOST_PP_LOCAL_MACRO(n) case n : v = typename boost::mpl::at_c<types,n%N>::type(); return (n*(n+1)<N)?1:2;
-#include BOOST_PP_LOCAL_ITERATE()
-		default : return 1; // should not get here
-	}
-}
-
-
 template <typename T,typename U>
 struct std_pair { typedef std::pair<T,U> type; };
 
@@ -137,19 +114,6 @@ template<BOOST_VARIANT_ENUM_PARAMS(typename T)>
 struct variant_pairs<boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> > {
 	typedef boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> T;
 	typedef typename T::types types;
-
-/* // boost::variant<Rectangle_2,Circle_2> should return :
-	typedef boost::variant<Rectangle_2,Circle_2,
-		std::pair<Rectangle_2,Rectangle_2>,
-		std::pair<Circle_2,Circle_2> > type;
-*/
-/*
-	typedef typename boost::mpl::transform<types, pair_type<boost::mpl::_1> >::type pair_types;
-	typedef typename boost::mpl::end<types>::type types_end;
-	typedef typename boost::mpl::insert_range<types,types_end,pair_types>::type variant_types;
-	//typedef types variant_types;
-	//typedef typename boost::make_variant_over<variant_types>::type type;
-*/
 
 /* // boost::variant<Rectangle_2,Circle_2> should return :
 	typedef boost::variant<Rectangle_2,Circle_2,
@@ -256,7 +220,7 @@ public:
 	{
 		typedef typename Configuration::value_type T;
 		T res;
-		uniform_random_type_init(res);
+		random_variant_init(res);
 		double p = rjmcmc::apply_visitor(m_generator,res);
 		modif.insert_birth(res);
 		return p;
@@ -321,11 +285,11 @@ public:
 			in = rjmcmc::apply_visitor(vmp,c[it],c[it2]);
 		}
 
-		int    num_births  = uniform_random_type_init(out);
+		random_variant_init(out);
 		double green_ratio = rjmcmc::apply_visitor(m_modifier,in,out);
 		rjmcmc::apply_visitor(modif.birth_inserter(),out);
 
-		switch(num_births-num_deaths) {
+		switch(modif.birth_size()-num_deaths) {
 		case -1 : return green_ratio * m_poisson /n;
 		case  0 : return green_ratio;
 		case  1 : 
@@ -392,6 +356,7 @@ public:
 	inline double green_ratio() const { return m_green_ratio; }
 	inline int kernel_id() const { return m_kernel_id; }
 	inline bool accepted() const { return m_accepted; }
+        enum { kernel_size = kernel_traits<Kernels>::size };
 
 protected:
 	Kernels m_kernel;

@@ -24,8 +24,8 @@ typedef global_reconstruction_unary_energy<oriented_gradient_view,oriented_ndvi_
 typedef intersection_area_binary_energy      binary_energy;
 
 #include "energy/kernels.hpp"
-typedef generator<is_valid>          generator_;
-typedef modifier <is_valid>          modifier_;
+typedef generator<is_valid>          generator_kernel;
+typedef modifier <is_valid>          modifier_kernel;
 
 /************** rjmcmc library types ****************/
 
@@ -40,14 +40,17 @@ typedef rjmcmc::graph_configuration
 //typedef rjmcmc::vector_configuration
 	<object, unary_energy, binary_energy>            configuration;
 
-#include "rjmcmc/sampler.hpp"
 #include "rjmcmc/sampler_metropolis.hpp"
-typedef rjmcmc::uniform_birth_kernel<generator_>         birth_kernel;
-typedef rjmcmc::uniform_death_kernel                     death_kernel;
-typedef rjmcmc::binary_kernel<birth_kernel,death_kernel> birth_death_kernel;
-typedef rjmcmc::modification_kernel<modifier_>           modification_kernel;
-typedef rjmcmc::sampler_metropolis<birth_death_kernel,modification_kernel> sampler;
+typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
+typedef rjmcmc::uniform_death_kernel                            death_kernel;
+typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
+typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
+typedef rjmcmc::sampler<birth_death_kernel,modification_kernel> sampler;
 
+/*
+#include "rjmcmc/direct_poisson_sampler.hpp"
+typedef direct_poisson_sampler<generator_kernel> sampler;
+*/
 
 /************** main ****************/
 
@@ -92,8 +95,8 @@ void create_sampler(param *p, sampler *&s) {
 		p->get<double>("maxratio")
 	);
 
-	generator_ birth(valid);
-	modifier_  modif(valid);
+	generator_kernel birth(valid);
+	modifier_kernel  modif(valid);
 
 	birth_kernel        kbirth(birth);
 	death_kernel        kdeath(      p->get<double>("poisson"));
@@ -105,7 +108,8 @@ void create_sampler(param *p, sampler *&s) {
 		p->get<double>("pdeath")
 	);
 
-        s = new sampler( kbirthdeath, kmodif );
+	s = new sampler( kbirthdeath, kmodif );
+//	s = new sampler( p->get<double>("poisson"), birth );
 }
 
 void create_temperature(param *p, temperature *&t)

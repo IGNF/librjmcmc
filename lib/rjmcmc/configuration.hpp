@@ -169,6 +169,8 @@ public:
 		for(bci bit=bbeg; bit!=bend; ++bit) insert(*bit);
 	}
 
+	inline void clear() { m_container.clear(); }
+
 	void insert(const value_type &obj) { 
 		m_container.push_back(obj);
 	}
@@ -367,6 +369,8 @@ public:
 		clear_vertex ( *v , m_graph);
 		remove_vertex( *v , m_graph);
 	}
+
+	inline void clear() { m_graph.clear(); m_unary=m_binary=0; }
 
 	// audit
 	double audit_unary_energy() const
