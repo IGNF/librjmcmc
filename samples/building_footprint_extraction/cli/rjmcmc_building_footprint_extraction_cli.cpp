@@ -5,7 +5,6 @@ typedef parameters< parameter > param;
 
 // images
 #include "image/image_types.hpp"
-#include "image/conversion_functor.hpp"
 
 // optimization
 #include "core/building_footprint_extraction.hpp"
@@ -37,7 +36,7 @@ int main(int argc , char** argv)
   
   gradient_functor gf(p->get<double>("sigmaD"));
   oriented_gradient_view grad_view(dsm_file,  bbox, gf);
-  oriented_ndvi_view     ndvi_view(ndvi_file, bbox, conversion_functor());
+  oriented_ndvi_view     ndvi_view(ndvi_file, bbox);
   
   configuration *conf;
   sampler       *samp;

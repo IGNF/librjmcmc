@@ -5,7 +5,6 @@ typedef parameters< wx_parameter > param;
 
 // images
 #include "image/image_types.hpp"
-#include "image/conversion_functor.hpp"
 
 // optimization
 #include "core/building_footprint_extraction.hpp"
@@ -64,7 +63,7 @@ public:
     
     gradient_functor gf(p->get<double>("sigmaD"));
     oriented_gradient_view grad_view(dsm_file,  bbox, gf);
-    oriented_ndvi_view     ndvi_view(ndvi_file, bbox, conversion_functor());
+    oriented_ndvi_view     ndvi_view(ndvi_file, bbox);
     
     m_confg_frame->add_layer(dsm_file);
     m_confg_frame->add_layer(ndvi_file);

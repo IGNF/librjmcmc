@@ -15,8 +15,9 @@ typedef box_is_valid                         is_valid;
 #include "image/gradient_functor.hpp"
 #include "image/oriented.hpp"
 typedef oriented<gradient_image_t> oriented_gradient_view;
-typedef boost::gil::gray16s_image_t ndvi_image_t;  // TODO passer en any
-typedef boost::gil::gray16s_view_t  ndvi_view_t;
+
+//typedef boost::gil::gray16s_image_t ndvi_image_t;
+typedef rjmcmc::any_image_t ndvi_image_t;
 typedef oriented<ndvi_image_t>     oriented_ndvi_view;
 typedef global_reconstruction_unary_energy<oriented_gradient_view,oriented_ndvi_view> unary_energy;
 
@@ -45,7 +46,7 @@ typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
-typedef rjmcmc::sampler<birth_death_kernel,modification_kernel> sampler;
+typedef rjmcmc::sampler_metropolis<birth_death_kernel,modification_kernel> sampler;
 
 /*
 #include "rjmcmc/direct_poisson_sampler.hpp"

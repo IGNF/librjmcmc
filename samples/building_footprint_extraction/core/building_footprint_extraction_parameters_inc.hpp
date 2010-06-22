@@ -15,8 +15,8 @@ void initialize_parameters(T* params)
     params->template insert<double>("deccoef",'C',0.999999,"Coefficient de decroissance");
     params->template insert<double>("pbirth",'B',0.1, "Probabilite de naissance");
     params->template insert<double>("pdeath",'D',0.1, "Probabilite de mort");
-    params->template insert<boost::filesystem::path>("dsm",'i',"../data/ZTerrain_c3.tif", "Image DSM");
-    params->template insert<boost::filesystem::path>("ndvi",'n',"../data/ZTerrain_c3.tif", "Image NDVI");
+    params->template insert<boost::filesystem::path>("dsm",'i',"../data/test.tif", "Image DSM");
+    params->template insert<boost::filesystem::path>("ndvi",'n',"../data/test_ndvi.tif", "Image NDVI");
     params->template insert<int>("xmin",'x',0, "Xmin)");
     params->template insert<int>("ymin",'y',0, "Ymin)");
     params->template insert<int>("xmax",'X',1000000, "Xmax");
