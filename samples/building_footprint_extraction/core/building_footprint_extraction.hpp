@@ -41,6 +41,7 @@ typedef rjmcmc::graph_configuration
 	<object, unary_energy, binary_energy>            configuration;
 
 #include "rjmcmc/sampler.hpp"
+#include "rjmcmc/sampler_metropolis.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_>         birth_kernel;
 typedef rjmcmc::uniform_death_kernel                     death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel> birth_death_kernel;
