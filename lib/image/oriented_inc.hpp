@@ -95,12 +95,15 @@ oriented<Image>::oriented(const std::string &file, const IsoRectangle& bbox)
   int y0 = (int) bbox.min().y();
   int x1 = (int) bbox.max().x();
   int y1 = (int) bbox.max().y();
-  // if(file exists) //TODO
+  try
   {
-    m_img.reset(new Image);
-    image_read_settings<tiff_tag> irs( point_t(x0,y0), point_t(x1-x0,y1-y0) );
-    read_image( file, *m_img, irs );
-    m_view = boost::gil::view(*m_img);
+      m_img.reset(new Image);
+      image_read_settings<tiff_tag> irs( point_t(x0,y0), point_t(x1-x0,y1-y0) );
+      read_image( file, *m_img, irs );
+      m_view = boost::gil::view(*m_img);
+  }
+  catch(const std::ios_base::failure&) {
+      m_img.reset();
   }
   m_x0 = x0;
   m_y0 = y0;

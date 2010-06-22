@@ -5,6 +5,7 @@ typedef parameters< wx_parameter > param;
 
 // images
 #include "image/image_types.hpp"
+#include "image/conversion_functor.hpp"
 
 // optimization
 #include "core/building_footprint_extraction.hpp"
@@ -63,9 +64,7 @@ public:
     
     gradient_functor gf(p->get<double>("sigmaD"));
     oriented_gradient_view grad_view(dsm_file,  bbox, gf);
-    oriented_ndvi_view     ndvi_view(ndvi_file, bbox);
-    m_grad = grad_view.img();
-    m_ndvi = ndvi_view.img();
+    oriented_ndvi_view     ndvi_view(ndvi_file, bbox, conversion_functor());
     
     m_confg_frame->add_layer(dsm_file);
     m_confg_frame->add_layer(ndvi_file);
@@ -132,8 +131,6 @@ private:
   parameters_frame    *m_param_frame;
   chart_frame         *m_chart_frame;
   wx_log_visitor       m_wx_log_visitor;
-  boost::shared_ptr<gradient_image_t> m_grad;
-  boost::shared_ptr<ndvi_image_t>     m_ndvi;
 };
 
 IMPLEMENT_APP(building_footprint_rectangle_gui);

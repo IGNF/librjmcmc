@@ -48,15 +48,5 @@ void clip_bbox(IsoRectangle& bbox, const std::string &file);
 template<typename IsoRectangle, typename Image>
 void clip_bbox(IsoRectangle& bbox, const oriented<Image>& img);
 
-struct static_cast_color_converter
-{
-  template<class Src, class Dst>
-    void operator()(const Src &src, Dst &dst) const
-  {
-    typedef typename boost::gil::channel_type<Dst>::type type;
-    boost::gil::at_c<0>(dst) = static_cast<type>(boost::gil::at_c<0>(src));
-  }
-};
-
 
 #endif // ORIENTED_HPP_
