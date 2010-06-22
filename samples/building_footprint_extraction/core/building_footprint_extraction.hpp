@@ -45,7 +45,7 @@ typedef rjmcmc::uniform_birth_kernel<generator_>         birth_kernel;
 typedef rjmcmc::uniform_death_kernel                     death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel> birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_>           modification_kernel;
-typedef rjmcmc::sampler<birth_death_kernel,modification_kernel> sampler;
+typedef rjmcmc::sampler_metropolis<birth_death_kernel,modification_kernel> sampler;
 
 
 /************** main ****************/
@@ -104,7 +104,7 @@ void create_sampler(param *p, sampler *&s) {
 		p->get<double>("pdeath")
 	);
 
-	s = new sampler( kbirthdeath, kmodif );
+        s = new sampler( kbirthdeath, kmodif );
 }
 
 void create_temperature(param *p, temperature *&t)

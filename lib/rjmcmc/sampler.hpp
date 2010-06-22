@@ -364,11 +364,11 @@ public:
 #define RJMCMC_SAMPLER_ARG(z,n,_) const T##n& t##n = T##n()
 
 template<RJMCMC_SAMPLER_ENUM_PARAMS_WITH_A_DEFAULT(typename T,boost::tuples::null_type)>
-class sampler
+class sampler_base
 {
 public:
         typedef boost::tuple<RJMCMC_SAMPLER_ENUM_PARAMS(T)> Kernels;
-	sampler(RJMCMC_SAMPLER_ENUM(RJMCMC_SAMPLER_ARG)) :
+        sampler_base(RJMCMC_SAMPLER_ENUM(RJMCMC_SAMPLER_ARG)) :
                 m_kernel(RJMCMC_SAMPLER_ENUM_PARAMS(t)),
 		m_die(random(), boost::uniform_real<>(0,1)) {}
 
@@ -393,24 +393,7 @@ public:
 	inline int kernel_id() const { return m_kernel_id; }
 	inline bool accepted() const { return m_accepted; }
 
-// main sampling function
-	template<typename Configuration> void operator()(Configuration &c, double temp)
-        {
-            typename Configuration::modification modif;
-            m_temperature = temp;
-            m_kernel_id   = internal::random_apply(m_die(),m_kernel,c,modif,m_green_ratio);
-            if(m_green_ratio<=0) {
-                    m_delta   =0;
-                    m_accepted=false;
-                    return;
-            }
-            m_delta       = c.delta_energy(modif);
-            m_green_ratio*= exp(-m_delta/m_temperature);
-            m_accepted    = ( m_die() < m_green_ratio );
-            if (m_accepted) c.apply(modif);
-	}
-
-private:
+protected:
 	Kernels m_kernel;
 	boost::variate_generator<rjmcmc::generator&, boost::uniform_real<> > m_die;
 	int     m_kernel_id;
@@ -418,6 +401,33 @@ private:
 	double  m_delta;
 	double  m_green_ratio;
 	bool    m_accepted;
+};
+
+template<RJMCMC_SAMPLER_ENUM_PARAMS_WITH_A_DEFAULT(typename T,boost::tuples::null_type)>
+class sampler_metropolis : public sampler_base<RJMCMC_SAMPLER_ENUM_PARAMS(T)>
+{
+private:
+    typedef sampler_base<RJMCMC_SAMPLER_ENUM_PARAMS(T)> base;
+
+public:
+    sampler_metropolis(RJMCMC_SAMPLER_ENUM(RJMCMC_SAMPLER_ARG)) : base(RJMCMC_SAMPLER_ENUM_PARAMS(t)) {}
+    // main sampling function
+    template<typename Configuration>
+    void operator()(Configuration &c, double temp)
+    {
+        typename Configuration::modification modif;
+        base::m_temperature = temp;
+        base::m_kernel_id   = internal::random_apply(base::m_die(),base::m_kernel,c,modif,base::m_green_ratio);
+        if(base::m_green_ratio<=0) {
+            base::m_delta   =0;
+            base::m_accepted=false;
+            return;
+        }
+        base::m_delta       = c.delta_energy(modif);
+        base::m_green_ratio*= exp(-base::m_delta/base::m_temperature);
+        base::m_accepted    = ( base::m_die() < base::m_green_ratio );
+        if (base::m_accepted) c.apply(modif);
+    }
 };
 
 }; // namespace rjmcmc

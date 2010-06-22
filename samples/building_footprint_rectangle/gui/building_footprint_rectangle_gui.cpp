@@ -51,7 +51,7 @@ private:
     param *p = param::instance();
     initialize_parameters(p);
     if(!p->parse(argc,my_argv)) return false;
-    m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, _("librjmcmc: rectangular building footprint extraction") );
+    m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, _("librjmcmc: rectangular building footprint extraction"), wxDefaultPosition, wxSize(600,600) );
     m_confg_frame->SetIcon(wxICON(IGN));
     m_param_frame = new parameters_frame(m_confg_frame);
     m_chart_frame = new chart_frame(m_confg_frame);
