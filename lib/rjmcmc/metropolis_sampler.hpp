@@ -1,5 +1,5 @@
-#ifndef SAMPLER_METROPOLIS_HPP
-#define SAMPLER_METROPOLIS_HPP
+#ifndef METROPOLIS_SAMPLER_HPP
+#define METROPOLIS_SAMPLER_HPP
 
 #include "sampler.hpp"
 
@@ -7,13 +7,13 @@ namespace rjmcmc
 {
 
 template<RJMCMC_SAMPLER_ENUM_PARAMS_WITH_A_DEFAULT(typename T,boost::tuples::null_type)>
-class sampler_metropolis : public sampler_base<RJMCMC_SAMPLER_ENUM_PARAMS(T)>
+class metropolis_sampler : public sampler_base<RJMCMC_SAMPLER_ENUM_PARAMS(T)>
 {
 private:
     typedef sampler_base<RJMCMC_SAMPLER_ENUM_PARAMS(T)> base;
 
 public:
-    sampler_metropolis(RJMCMC_SAMPLER_ENUM(RJMCMC_SAMPLER_ARG)) : base(RJMCMC_SAMPLER_ENUM_PARAMS(t)) {}
+    metropolis_sampler(RJMCMC_SAMPLER_ENUM(RJMCMC_SAMPLER_ARG)) : base(RJMCMC_SAMPLER_ENUM_PARAMS(t)) {}
     // main sampling function
     template<typename Configuration>
     void operator()(Configuration &c, double temp)
@@ -35,4 +35,4 @@ public:
 
 } // namespace rjmcmc
 
-#endif // SAMPLER_METROPOLIS_HPP
+#endif // METROPOLIS_SAMPLER_HPP

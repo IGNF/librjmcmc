@@ -32,22 +32,19 @@ typedef rjmcmc::geometric_temperature                    temperature;
 #include "rjmcmc/max_iteration_end_test.hpp"
 typedef max_iteration_end_test                           end_test;
 
-#include "rjmcmc/configuration.hpp"
-typedef rjmcmc::graph_configuration
-//typedef rjmcmc::vector_configuration
-	<object, unary_energy, binary_energy>                configuration;
+//#include "rjmcmc/vector_configuration.hpp"
+//typedef rjmcmc::vector_configuration<object, unary_energy, binary_energy> configuration;
+#include "rjmcmc/graph_configuration.hpp"
+typedef rjmcmc::graph_configuration<object, unary_energy, binary_energy> configuration;
 
-#include "rjmcmc/sampler_metropolis.hpp"
+//#include "rjmcmc/direct_poisson_sampler.hpp"
+//typedef direct_poisson_sampler<generator_kernel> sampler;
+#include "rjmcmc/metropolis_sampler.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
-typedef rjmcmc::sampler_metropolis<birth_death_kernel,modification_kernel> sampler;
-
-/*
-#include "rjmcmc/direct_poisson_sampler.hpp"
-typedef direct_poisson_sampler<generator_kernel> sampler;
-*/
+typedef rjmcmc::metropolis_sampler<birth_death_kernel,modification_kernel> sampler;
 
 /************** main ****************/
 
