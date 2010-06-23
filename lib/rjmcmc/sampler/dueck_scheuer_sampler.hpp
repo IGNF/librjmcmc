@@ -1,7 +1,7 @@
-#ifndef SAMPLER_DUECK_SCHEUER_HPP
-#define SAMPLER_DUECK_SCHEUER_HPP
+#ifndef DUECK_SCHEUER_SAMPLER_HPP
+#define DUECK_SCHEUER_SAMPLER_HPP
 
-#include "sampler.hpp"
+#include "sampler_base.hpp"
 
 namespace rjmcmc
 {
@@ -35,4 +35,4 @@ namespace rjmcmc
 
 } // namespace rjmcmc
 
-#endif // SAMPLER_DUECK_SCHEUER_HPP
+#endif // DUECK_SCHEUER_SAMPLER_HPP

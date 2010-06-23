@@ -29,20 +29,20 @@ typedef modifier <is_valid>          modifier_kernel;
 //#include "rjmcmc/logarithmic_temperature.hpp"
 //#include "rjmcmc/step_temperature.hpp"
 //typedef rjmcmc::step_temperature<rjmcmc::logarithmic_temperature>                  temperature;
-#include "rjmcmc/geometric_temperature.hpp"
+#include "rjmcmc/temperature/geometric_temperature.hpp"
 typedef rjmcmc::geometric_temperature                  temperature;
 
-#include "rjmcmc/max_iteration_end_test.hpp"
+#include "rjmcmc/end_test/max_iteration_end_test.hpp"
 typedef max_iteration_end_test                           end_test;
 
-//#include "rjmcmc/vector_configuration.hpp"
+//#include "rjmcmc/configuration/vector_configuration.hpp"
 //typedef rjmcmc::vector_configuration<object, unary_energy, binary_energy> configuration;
-#include "rjmcmc/graph_configuration.hpp"
+#include "rjmcmc/configuration/graph_configuration.hpp"
 typedef rjmcmc::graph_configuration<object, unary_energy, binary_energy> configuration;
 
-//#include "rjmcmc/direct_poisson_sampler.hpp"
+//#include "rjmcmc/sampler/direct_poisson_sampler.hpp"
 //typedef direct_poisson_sampler<generator_kernel> sampler;
-#include "rjmcmc/metropolis_sampler.hpp"
+#include "rjmcmc/sampler/metropolis_sampler.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;

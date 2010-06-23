@@ -1,7 +1,7 @@
-#ifndef SAMPLER_SZU_HARTLEY_HPP
-#define SAMPLER_SZU_HARTLEY_HPP
+#ifndef SZU_HARTLEY_SAMPLER_HPP
+#define SZU_HARTLEY_SAMPLER_HPP
 
-#include "sampler.hpp"
+#include "sampler_base.hpp"
 
 namespace rjmcmc
 {
@@ -35,4 +35,4 @@ public:
 
 } // namespace rjmcmc
 
-#endif // SAMPLER_SZU_HARTLEY_HPP
+#endif // SZU_HARTLEY_SAMPLER_HPP

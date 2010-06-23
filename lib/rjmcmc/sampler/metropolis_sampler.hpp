@@ -1,7 +1,7 @@
 #ifndef METROPOLIS_SAMPLER_HPP
 #define METROPOLIS_SAMPLER_HPP
 
-#include "sampler.hpp"
+#include "sampler_base.hpp"
 
 namespace rjmcmc
 {
