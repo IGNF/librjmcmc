@@ -7,23 +7,23 @@ namespace rjmcmc
 {
 
 template<RJMCMC_SAMPLER_TYPENAMES>
-class franz_hoffmann_sampler : public sampler_base<franz_hoffmann_sampler<RJMCMC_SAMPLER_TYPES>, RJMCMC_SAMPLER_TYPES>
+  class franz_hoffmann_sampler : public sampler_base<franz_hoffmann_sampler<RJMCMC_SAMPLER_TYPES>, RJMCMC_SAMPLER_TYPES>
 {
 private:
-    typedef franz_hoffmann_sampler<RJMCMC_SAMPLER_TYPES> self;
-    typedef sampler_base<self, RJMCMC_SAMPLER_TYPES> base;
-
+  typedef franz_hoffmann_sampler<RJMCMC_SAMPLER_TYPES> self;
+  typedef sampler_base<self, RJMCMC_SAMPLER_TYPES> base;
+  
     double  m_q, m_inv_1_less_q, m_factor;
-
+  
 public:
-    franz_hoffmann_sampler(double q, RJMCMC_SAMPLER_ARGS)
-        : base(RJMCMC_SAMPLER_PARAMS)
-        , m_q(q)
+  franz_hoffmann_sampler(double q, RJMCMC_SAMPLER_ARGS)
+    : base(RJMCMC_SAMPLER_PARAMS)
+    , m_q(q)
         , m_inv_1_less_q(1./(1.-q))
         , m_factor((1.-q)/(2.-q)) {}
-
-    inline double acceptance_probability() const
-    {
+  
+  inline double acceptance_probability() const
+  {
         double v = 1. - m_factor*base::m_delta/base::m_temperature;
         if(v<=0.) return 0.;
         return base::m_green_ratio*std::pow(v, m_inv_1_less_q);
