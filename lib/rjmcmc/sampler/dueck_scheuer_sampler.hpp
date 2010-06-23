@@ -17,7 +17,7 @@ public:
     dueck_scheuer_sampler(RJMCMC_SAMPLER_ARGS) : base(RJMCMC_SAMPLER_PARAMS) {}
 
     inline double acceptance_probability() const {
-        return (base::m_delta <= base::m_temperature) ? /*1.**/base::m_green_ratio : 0.;
+        return (base::m_delta <= base::m_temperature*(1+log(1+base::m_green_ratio))) ? 1. : 0.;
     }
 };
 

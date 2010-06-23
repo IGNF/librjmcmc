@@ -8,6 +8,7 @@ void initialize_parameters(T* params)
 {
     params->caption("Building footprint extraction parameters");
     params->template insert<double>("temp",'t',150,"Temperature initiale");
+    params->template insert<double>("qtemp",'q',0.5,"q du sampler [0;1]");
     params->template insert<int>("nbiter",'I',15000000,"Nombre d'iterations");
     params->template insert<int>("nbdump",'d',10000,"Nombre d'iterations entre chaque affichage");
     params->template insert<int>("nbsave",'S',10000,"Nombre d'iterations entre chaque sauvegarde");

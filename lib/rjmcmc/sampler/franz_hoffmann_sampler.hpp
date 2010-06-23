@@ -1,7 +1,7 @@
 #ifndef FRANZ_HOFFMANN_SAMPLER_HPP
 #define FRANZ_HOFFMANN_SAMPLER_HPP
 
-#include "sampler.hpp"
+#include "sampler_base.hpp"
 
 namespace rjmcmc
 {
@@ -13,20 +13,20 @@ private:
     typedef franz_hoffmann_sampler<RJMCMC_SAMPLER_TYPES> self;
     typedef sampler_base<self, RJMCMC_SAMPLER_TYPES> base;
 
-    double  m_q, m_one_less_q;
+    double  m_q, m_inv_1_less_q, m_factor;
 
 public:
-    franz_hoffmann_sampler(double q, RJMCMC_SAMPLER_ARGS) : base(RJMCMC_SAMPLER_PARAMS) , m_q(q), m_one_less_q(1.-q) {}
+    franz_hoffmann_sampler(double q, RJMCMC_SAMPLER_ARGS)
+        : base(RJMCMC_SAMPLER_PARAMS)
+        , m_q(q)
+        , m_inv_1_less_q(1./(1.-q))
+        , m_factor((1.-q)/(2.-q)) {}
 
     inline double acceptance_probability() const
     {
-        if(base::m_delta<=0.) return 1.;
-        else
-        {
-            double v = m_one_less_q*base::m_delta/base::m_temperature;
-            if(v<=1.) return std::pow((1.-v), 1./m_one_less_q);
-            else return 0.;
-        }
+        double v = 1. - m_factor*base::m_delta/base::m_temperature;
+        if(v<=0.) return 0.;
+        return base::m_green_ratio*std::pow(v, m_inv_1_less_q);
     }
 };
 
