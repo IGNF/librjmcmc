@@ -6,32 +6,21 @@
 namespace rjmcmc
 {
 
-    template<RJMCMC_SAMPLER_ENUM_PARAMS_WITH_A_DEFAULT(typename T,boost::tuples::null_type)>
-    class dueck_scheuer_sampler : public sampler_base<RJMCMC_SAMPLER_ENUM_PARAMS(T)>
-    {
-    private:
-        typedef sampler_base<RJMCMC_SAMPLER_ENUM_PARAMS(T)> base;
-
-    public:
-        dueck_scheuer_sampler(RJMCMC_SAMPLER_ENUM(RJMCMC_SAMPLER_ARG)) : base(RJMCMC_SAMPLER_ENUM_PARAMS(t)) {}
-        // main sampling function
-        template<typename Configuration>
-        void operator()(Configuration &c, double temp)
-        {
-            typename Configuration::modification modif;
-            base::m_temperature = temp;
-            base::m_kernel_id   = internal::random_apply(base::m_die(),base::m_kernel,c,modif,base::m_green_ratio);
-            if(base::m_green_ratio<=0) {
-                base::m_delta   =0;
-                base::m_accepted=false;
-                return;
-            }
-            base::m_delta       = c.delta_energy(modif);
-            base::m_green_ratio*= 1./(1.+exp(base::m_delta/base::m_temperature));
-            base::m_accepted    = ( base::m_delta < base::m_green_ratio );
-            if (base::m_accepted) c.apply(modif);
-        }
-    };
+template<RJMCMC_SAMPLER_TYPENAMES>
+  class dueck_scheuer_sampler
+  : public sampler_base<dueck_scheuer_sampler<RJMCMC_SAMPLER_TYPES>, RJMCMC_SAMPLER_TYPES>
+{
+private:
+  typedef dueck_scheuer_sampler<RJMCMC_SAMPLER_TYPES> self;
+  typedef sampler_base<self, RJMCMC_SAMPLER_TYPES> base;
+  
+public:
+  dueck_scheuer_sampler(RJMCMC_SAMPLER_ARGS) : base(RJMCMC_SAMPLER_PARAMS) {}
+  
+  inline double acceptance_probability() const {
+    return base::m_green_ratio/(1.+exp(base::m_delta/base::m_temperature));
+  }
+};
 
 } // namespace rjmcmc
 

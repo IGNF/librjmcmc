@@ -300,12 +300,13 @@ public:
 
 #if USE_VARIADIC_TEMPLATES
 
-template<typename... T>
+// Derived: Curiously recurring template pattern
+template<typename Derived, typename... K>
 class sampler
 {
 public:
-        typedef std::tuple<T...> Kernels;
-        sampler(const T&... t) : m_kernel(t...),
+        typedef std::tuple<K...> Kernels;
+        sampler(const K&... k) : m_kernel(k...),
 		m_die(random(), boost::uniform_real<>(0,1)) {}
 
         enum { size = std::tuple_size<Kernels>::value };
@@ -321,36 +322,51 @@ public:
 	BOOST_PP_ENUM_PARAMS(RJMCMC_SAMPLER_LIMIT_TYPES,x)
 #define RJMCMC_SAMPLER_ENUM_BINARY_PARAMS(x,y) \
 	BOOST_PP_ENUM_BINARY_PARAMS(RJMCMC_SAMPLER_LIMIT_TYPES,x,y)
-#define RJMCMC_SAMPLER_ENUM_PARAMS_WITH_A_DEFAULT(x,y) \
-	BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(RJMCMC_SAMPLER_LIMIT_TYPES,x,y)
+#define RJMCMC_SAMPLER_ENUM_PARAMS_WITH_A_DEFAULT(x) \
+	BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(RJMCMC_SAMPLER_LIMIT_TYPES,x,boost::tuples::null_type)
 #define RJMCMC_SAMPLER_ENUM(x) \
 	BOOST_PP_ENUM(RJMCMC_SAMPLER_LIMIT_TYPES,x,nil)
-#define RJMCMC_SAMPLER_ARG(z,n,_) const T##n& t##n = T##n()
+#define RJMCMC_SAMPLER_ARG(z,n,_) const K##n& k##n = K##n()
 
-template<RJMCMC_SAMPLER_ENUM_PARAMS_WITH_A_DEFAULT(typename T,boost::tuples::null_type)>
+#define RJMCMC_SAMPLER_ARGS RJMCMC_SAMPLER_ENUM(RJMCMC_SAMPLER_ARG)
+#define RJMCMC_SAMPLER_TYPENAMES RJMCMC_SAMPLER_ENUM_PARAMS_WITH_A_DEFAULT(typename K)
+#define RJMCMC_SAMPLER_TYPES RJMCMC_SAMPLER_ENUM_PARAMS(K)
+#define RJMCMC_SAMPLER_PARAMS RJMCMC_SAMPLER_ENUM_PARAMS(k)
+
+// Derived: Curiously recurring template pattern
+template<typename Derived, RJMCMC_SAMPLER_TYPENAMES >
 class sampler_base
 {
 public:
-        typedef boost::tuple<RJMCMC_SAMPLER_ENUM_PARAMS(T)> Kernels;
-        sampler_base(RJMCMC_SAMPLER_ENUM(RJMCMC_SAMPLER_ARG)) :
-                m_kernel(RJMCMC_SAMPLER_ENUM_PARAMS(t)),
+        typedef boost::tuple<RJMCMC_SAMPLER_TYPES> Kernels;
+        sampler_base(RJMCMC_SAMPLER_ARGS) :
+                m_kernel(RJMCMC_SAMPLER_PARAMS),
 		m_die(random(), boost::uniform_real<>(0,1)) {}
 
         enum { size = boost::tuples::length<Kernels>::value };
 #endif
+        typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_real<> > die_t;
 
-// kernel accessors
-
-	template<unsigned int N>
-	inline const typename boost::tuples::element<N, Kernels>::type& kernel() const {
-		return boost::tuples::get<N>(m_kernel);
-	}
-	template<unsigned int N>
-	inline typename boost::tuples::element<N, Kernels>::type& kernel() {
-		return boost::tuples::get<N>(m_kernel);
-	}
+    // main sampling function
+    template<typename Configuration>
+    void operator()(Configuration &c, double temp)
+    {
+        typename Configuration::modification modif;
+        m_temperature = temp;
+        m_kernel_id   = internal::random_apply(m_die(),m_kernel,c,modif,m_green_ratio);
+        if(m_green_ratio<=0) {
+            m_delta   =0;
+            m_accepted=false;
+            return;
+        }
+        m_delta       = c.delta_energy(modif);
+        m_acceptance  = static_cast<Derived*>(this)->acceptance_probability();
+        m_accepted    = ( m_die() < m_acceptance );
+        if (m_accepted) c.apply(modif);
+    }
 
 // statistics accessors
+	inline double acceptance () const { return m_acceptance; }
 	inline double temperature() const { return m_temperature; }
 	inline double delta() const { return m_delta; }
 	inline double green_ratio() const { return m_green_ratio; }
@@ -360,8 +376,9 @@ public:
 
 protected:
 	Kernels m_kernel;
-	boost::variate_generator<rjmcmc::generator&, boost::uniform_real<> > m_die;
+	die_t   m_die;
 	int     m_kernel_id;
+	double m_acceptance;
 	double  m_temperature;
 	double  m_delta;
 	double  m_green_ratio;
