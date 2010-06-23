@@ -30,8 +30,11 @@ typedef modifier <is_valid>          modifier_kernel;
 
 /************** rjmcmc library types ****************/
 
-#include "rjmcmc/temperature.hpp"
-typedef rjmcmc::geometric_temperature                    temperature;
+//#include "rjmcmc/logarithmic_temperature.hpp"
+//#include "rjmcmc/step_temperature.hpp"
+//typedef rjmcmc::step_temperature<rjmcmc::logarithmic_temperature>                  temperature;
+#include "rjmcmc/geometric_temperature.hpp"
+typedef rjmcmc::geometric_temperature                  temperature;
 
 #include "rjmcmc/max_iteration_end_test.hpp"
 typedef max_iteration_end_test                           end_test;
@@ -116,6 +119,7 @@ void create_temperature(param *p, temperature *&t)
 		p->get<double>("temp"),
 		p->get<double>("deccoef")
 	);
+  //  t = new temperature( 1000, rjmcmc::logarithmic_temperature(p->get<double>("temp")) );
 }
 
 void create_end_test(param *p, end_test *&e)
