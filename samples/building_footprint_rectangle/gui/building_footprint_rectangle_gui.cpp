@@ -98,6 +98,7 @@ public:
     
     init_visitor        (p,*m_visitor);
     create_configuration(p,grad_view,m_config);
+//    estimate_initial_temperature(p,100,*m_config);
     create_sampler      (p,m_sampler);
     create_schedule     (p,m_schedule);
     create_end_test     (p,m_end_test);

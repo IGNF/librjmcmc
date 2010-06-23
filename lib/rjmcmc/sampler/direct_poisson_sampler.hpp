@@ -1,7 +1,7 @@
 #ifndef DIRECT_POISSON_SAMPLER_HPP_
 #define DIRECT_POISSON_SAMPLER_HPP_
 
-#include "random_variant_init.hpp"
+#include "rjmcmc/random_variant_init.hpp"
 
 template<typename CountSampler, typename ObjectSampler>
 class direct_sampler
@@ -33,7 +33,7 @@ private:
   ObjectSampler m_object_sampler;
 };
 
-#include "random.hpp"
+#include "rjmcmc/random.hpp"
 #include <boost/random/poisson_distribution.hpp>
 
 template<typename ObjectSampler>

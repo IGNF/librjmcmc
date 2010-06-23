@@ -29,10 +29,10 @@ typedef modifier <is_valid>          modifier_kernel;
 //#include "rjmcmc/logarithmic_schedule.hpp"
 //#include "rjmcmc/step_schedule.hpp"
 //typedef rjmcmc::step_schedule<rjmcmc::logarithmic_schedule>                  schedule;
-//#include "rjmcmc/schedule/geometric_schedule.hpp"
-//typedef rjmcmc::geometric_schedule                  schedule;
-#include "rjmcmc/schedule/inverse_linear_schedule.hpp"
-typedef rjmcmc::inverse_linear_schedule                  schedule;
+#include "rjmcmc/schedule/geometric_schedule.hpp"
+typedef rjmcmc::geometric_schedule                  schedule;
+//#include "rjmcmc/schedule/inverse_linear_schedule.hpp"
+//typedef rjmcmc::inverse_linear_schedule                  schedule;
 
 
 #include "rjmcmc/end_test/delta_energy_end_test.hpp"
@@ -141,5 +141,32 @@ void init_visitor(const param *p, Visitor& v)
           p->get<int>("nbsave")
         );
 }
+
+/*
+// Salamon
+#include "rjmcmc/sampler/direct_poisson_sampler.hpp"
+double estimate_initial_temperature(param *p, unsigned int n, configuration& c)
+{
+  is_valid valid(
+                  get_bbox(p),
+                  p->get<double>("minsize"),
+                  p->get<double>("maxratio")
+                );
+  generator_kernel generator(valid);
+  direct_poisson_sampler<generator_kernel> dps(p->get<double>("poisson"),generator);
+  double e1 = 0;
+  double e2 = 0;
+  double invn = 1./n;
+  for(unsigned int i=0; i<n; ++i) {
+    dps(c);
+    double e = c.energy();
+    double invne = invn*e;
+    e1 += invne;
+    e2 += invne*e;
+  }
+  double std_dev = sqrt(e2-e1*e1);
+  p->set("temp",2*std_dev);
+}
+*/
 
 #endif // __BUILDING_FOOTPRINT_RECTANGLE_HPP__

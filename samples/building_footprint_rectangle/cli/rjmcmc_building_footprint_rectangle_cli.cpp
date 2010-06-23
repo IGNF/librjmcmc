@@ -18,7 +18,6 @@ typedef parameters< parameter > param;
 #include "image/gradient_functor_inc.hpp"
 #include "energy/image_gradient_unary_energy_inc.hpp"
 
-
 int main(int argc , char** argv)
 {
   param *p = param::instance();
@@ -41,6 +40,7 @@ int main(int argc , char** argv)
   end_test      *end ;
   
   create_configuration(p,grad_view,conf);
+//  estimate_initial_temperature(p,100,*conf);
   create_sampler      (p,samp);
   create_schedule     (p,sch);
   create_end_test     (p,end);
