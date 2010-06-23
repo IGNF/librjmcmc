@@ -26,14 +26,19 @@ typedef modifier <is_valid>          modifier_kernel;
 
 /************** rjmcmc library types ****************/
 
-//#include "rjmcmc/logarithmic_temperature.hpp"
-//#include "rjmcmc/step_temperature.hpp"
-//typedef rjmcmc::step_temperature<rjmcmc::logarithmic_temperature>                  temperature;
-#include "rjmcmc/temperature/geometric_temperature.hpp"
-typedef rjmcmc::geometric_temperature                  temperature;
+//#include "rjmcmc/logarithmic_schedule.hpp"
+//#include "rjmcmc/step_schedule.hpp"
+//typedef rjmcmc::step_schedule<rjmcmc::logarithmic_schedule>                  schedule;
+//#include "rjmcmc/schedule/geometric_schedule.hpp"
+//typedef rjmcmc::geometric_schedule                  schedule;
+#include "rjmcmc/schedule/inverse_linear_schedule.hpp"
+typedef rjmcmc::inverse_linear_schedule                  schedule;
 
-#include "rjmcmc/end_test/max_iteration_end_test.hpp"
-typedef max_iteration_end_test                           end_test;
+
+#include "rjmcmc/end_test/delta_energy_end_test.hpp"
+typedef delta_energy_end_test                           end_test;
+//#include "rjmcmc/end_test/max_iteration_end_test.hpp"
+//typedef max_iteration_end_test                           end_test;
 
 //#include "rjmcmc/configuration/vector_configuration.hpp"
 //typedef rjmcmc::vector_configuration<object, unary_energy, binary_energy> configuration;
@@ -112,13 +117,13 @@ void create_sampler(const param *p, sampler *&s) {
 //	s = new sampler( p->get<double>("poisson"), birth );
 }
 
-void create_temperature(const param *p, temperature *&t)
+void create_schedule(const param *p, schedule *&t)
 {
-	t = new temperature(
+	t = new schedule(
 		p->get<double>("temp"),
 		p->get<double>("deccoef")
 	);
-  //  t = new temperature( 1000, rjmcmc::logarithmic_temperature(p->get<double>("temp")) );
+  //  t = new schedule( 1000, rjmcmc::logarithmic_schedule(p->get<double>("temp")) );
 }
 
 void create_end_test(const param *p, end_test *&e)

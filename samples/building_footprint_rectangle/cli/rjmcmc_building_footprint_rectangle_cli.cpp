@@ -37,15 +37,15 @@ int main(int argc , char** argv)
   
   configuration *conf;
   sampler       *samp;
-  temperature   *temp;
+  schedule      *sch;
   end_test      *end ;
   
   create_configuration(p,grad_view,conf);
   create_sampler      (p,samp);
-  create_temperature  (p,temp);
+  create_schedule     (p,sch);
   create_end_test     (p,end);
   
-  simulated_annealing(*conf,*samp,*temp,*end,visitor);
+  simulated_annealing(*conf,*samp,*sch,*end,visitor);
   
   return 0;
 }

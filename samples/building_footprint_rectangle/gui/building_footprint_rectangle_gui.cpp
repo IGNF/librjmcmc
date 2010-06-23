@@ -99,13 +99,13 @@ public:
     init_visitor        (p,*m_visitor);
     create_configuration(p,grad_view,m_config);
     create_sampler      (p,m_sampler);
-    create_temperature  (p,m_temp);
+    create_schedule     (p,m_schedule);
     create_end_test     (p,m_end_test);
     
     m_thread = new boost::thread(
-                                  simulated_annealing<configuration,sampler,temperature,end_test,visitor>,
+                                  simulated_annealing<configuration,sampler,schedule,end_test,visitor>,
                                   boost::ref(*m_config), boost::ref(*m_sampler),
-                                  boost::ref(*m_temp),   boost::ref(*m_end_test),
+                                  boost::ref(*m_schedule),   boost::ref(*m_end_test),
                                   boost::ref(*m_visitor) );
   }
   
@@ -117,7 +117,7 @@ public:
   virtual bool chart_visibility() const { return m_chart_frame->IsShown(); }
   
   building_footprint_rectangle_gui() :
-    m_config(NULL), m_sampler(NULL), m_temp(NULL), m_end_test(NULL), 
+    m_config(NULL), m_sampler(NULL), m_schedule(NULL), m_end_test(NULL), 
     m_visitor(NULL), m_thread(NULL),
     m_confg_frame(NULL), m_param_frame(NULL), m_chart_frame(NULL)
   {
@@ -138,14 +138,14 @@ private:
     if(m_end_test){ m_end_test->stop(); }
     if(m_thread)  { m_thread->join(); delete m_thread; m_thread=NULL; }
     if(m_end_test){ delete m_end_test;m_end_test=NULL; }
-    if(m_config)  { delete m_config;  m_config =NULL; }
-    if(m_temp)    { delete m_temp;    m_temp   =NULL; }
-    if(m_sampler) { delete m_sampler; m_sampler=NULL; }
+    if(m_config)  { delete m_config;  m_config  =NULL; }
+    if(m_schedule){ delete m_schedule;m_schedule=NULL; }
+    if(m_sampler) { delete m_sampler; m_sampler =NULL; }
   }
   
   configuration *m_config;
   sampler *m_sampler;
-  temperature *m_temp;
+  schedule *m_schedule;
   end_test *m_end_test;
   visitor *m_visitor;
   boost::thread *m_thread;

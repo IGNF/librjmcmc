@@ -30,11 +30,11 @@ typedef modifier <is_valid>          modifier_kernel;
 
 /************** rjmcmc library types ****************/
 
-//#include "rjmcmc/temperature/logarithmic_temperature.hpp"
-//#include "rjmcmc/temperature/step_temperature.hpp"
-//typedef rjmcmc::step_temperature<rjmcmc::logarithmic_temperature>                  temperature;
-#include "rjmcmc/temperature/geometric_temperature.hpp"
-typedef rjmcmc::geometric_temperature                  temperature;
+//#include "rjmcmc/schedule/logarithmic_schedule.hpp"
+//#include "rjmcmc/schedule/step_schedule.hpp"
+//typedef rjmcmc::step_schedule<rjmcmc::logarithmic_schedule>                  schedule;
+#include "rjmcmc/schedule/geometric_schedule.hpp"
+typedef rjmcmc::geometric_schedule                  schedule;
 
 #include "rjmcmc/end_test/max_iteration_end_test.hpp"
 typedef max_iteration_end_test                           end_test;
@@ -113,13 +113,13 @@ void create_sampler(param *p, sampler *&s) {
 //	s = new sampler( p->get<double>("poisson"), birth );
 }
 
-void create_temperature(param *p, temperature *&t)
+void create_schedule(param *p, schedule *&t)
 {
-	t = new temperature(
+	t = new schedule(
 		p->get<double>("temp"),
 		p->get<double>("deccoef")
 	);
-  //  t = new temperature( 1000, rjmcmc::logarithmic_temperature(p->get<double>("temp")) );
+  //  t = new schedule( 1000, rjmcmc::logarithmic_schedule(p->get<double>("temp")) );
 }
 
 void create_end_test(param *p, end_test *&e)

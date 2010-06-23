@@ -3,22 +3,22 @@
 
 template<
 	typename Configuration, typename Sampler,
-	typename Temperature, typename EndTest,
+	typename Schedule, typename EndTest,
 	typename Visitor
 >
 void simulated_annealing(
 	Configuration& config, Sampler& sampler,
-	Temperature& temp, EndTest& end_test,
+	Schedule& schedule, EndTest& end_test,
 	Visitor& visitor )
 {
-	visitor.begin(config,sampler,*temp);
-	for (unsigned int i=1; end_test(config,sampler,*temp,i); ++i, ++temp)
+	visitor.begin(config,sampler,*schedule);
+	for (unsigned int i=1; end_test(config,sampler,*schedule,i); ++i, ++schedule)
 	{
-		sampler(config,*temp);
-                bool result = visitor.iterate(config,sampler,*temp,i);
+		sampler(config,*schedule);
+                bool result = visitor.iterate(config,sampler,*schedule,i);
                 if(!result) break;
 	}
-	visitor.end(config,sampler,*temp);
+	visitor.end(config,sampler,*schedule);
 }
 
 #endif
