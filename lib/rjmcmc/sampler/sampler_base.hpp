@@ -338,7 +338,7 @@ template<typename Derived, RJMCMC_SAMPLER_TYPENAMES >
 class sampler_base
 {
 public:
-        typedef boost::tuple<RJMCMC_SAMPLER_TYPES> Kernels;
+       typedef boost::tuple<RJMCMC_SAMPLER_TYPES> Kernels;
         sampler_base(RJMCMC_SAMPLER_ARGS) :
                 m_kernel(RJMCMC_SAMPLER_PARAMS),
 		m_die(random(), boost::uniform_real<>(0,1)) {}
@@ -364,6 +364,15 @@ public:
         m_accepted    = ( m_die() < m_acceptance );
         if (m_accepted) c.apply(modif);
     }
+
+	template<unsigned int N>
+	inline const typename boost::tuples::element<N, Kernels>::type& kernel() const {
+		return boost::tuples::get<N>(m_kernel);
+	}
+	template<unsigned int N>
+	inline typename boost::tuples::element<N, Kernels>::type& kernel() {
+		return boost::tuples::get<N>(m_kernel);
+	}
 
 // statistics accessors
 	inline double acceptance () const { return m_acceptance; }
