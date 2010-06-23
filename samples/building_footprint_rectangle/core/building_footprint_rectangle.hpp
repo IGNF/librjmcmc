@@ -42,12 +42,14 @@ typedef rjmcmc::graph_configuration<object, unary_energy, binary_energy> configu
 
 //#include "rjmcmc/sampler/direct_poisson_sampler.hpp"
 //typedef direct_poisson_sampler<generator_kernel> sampler;
-#include "rjmcmc/sampler/metropolis_sampler.hpp"
+//#include "rjmcmc/sampler/metropolis_sampler.hpp"
+#include "rjmcmc/sampler/dueck_scheuer_sampler.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
-typedef rjmcmc::metropolis_sampler<birth_death_kernel,modification_kernel> sampler;
+//typedef rjmcmc::metropolis_sampler<birth_death_kernel,modification_kernel> sampler;
+typedef rjmcmc::dueck_scheuer_sampler<birth_death_kernel,modification_kernel> sampler;
 
 /************** main ****************/
 

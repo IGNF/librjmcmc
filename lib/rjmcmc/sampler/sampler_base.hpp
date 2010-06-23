@@ -331,6 +331,7 @@ public:
   
 #endif
 
+// Derived: Curiously recurring template pattern
 template<typename Derived, RJMCMC_SAMPLER_TYPENAMES > class sampler_base
 {
 public:
