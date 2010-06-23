@@ -29,26 +29,8 @@ public:
   inline bool accepted() const { return true; }
   enum { kernel_size = 1 };
 private:
-  mutable CountSampler  m_count_sampler;
+  CountSampler  m_count_sampler;
   ObjectSampler m_object_sampler;
-};
-
-#include "rjmcmc/random.hpp"
-#include <boost/random/poisson_distribution.hpp>
-
-template<typename ObjectSampler>
-class direct_poisson_sampler :
-public direct_sampler<boost::variate_generator<rjmcmc::generator&, boost::poisson_distribution<> >, ObjectSampler>
-{
-  typedef boost::variate_generator<rjmcmc::generator&, boost::poisson_distribution<> > count_sampler;
-  typedef direct_sampler<count_sampler,ObjectSampler> base;
-  
-public:
-  direct_poisson_sampler(double poisson,
-                         const ObjectSampler& object_sampler) :
-    base(count_sampler(rjmcmc::random(), boost::poisson_distribution<>(poisson)),
-                   object_sampler) 
-  {}
 };
 
 #endif // DIRECT_POISSON_SAMPLER_HPP_

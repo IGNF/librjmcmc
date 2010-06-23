@@ -188,25 +188,23 @@ public:
 class uniform_death_kernel
 {
   typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_smallint<> > die_type;
-  double m_poisson;
 public:
-  uniform_death_kernel(double poisson) : m_poisson(poisson) {}
   template<typename Configuration, typename Modification>
     double operator()(Configuration& c, Modification& modif) const
   {
     modif.clear();
-    if(c.empty()) return 1.;
+    if(c.empty()) return 0.;
     typename Configuration::iterator it = c.begin();
     die_type die(random(), boost::uniform_smallint<>(0,c.size()-1));
     std::advance(it, die());
     modif.insert_death(it);
-    return m_poisson/c.size();
+    return 1./c.size();
   }
   template<typename Configuration, typename Modification>
     double pdf(const Configuration& c, const Modification& modif) const
   {
     if(modif.birth_size()!=1 || modif.death_size()!=0) return 0.;
-    return m_poisson/(c.size()+1);
+    return 1./(c.size()+1);
   }
 };
 
@@ -253,10 +251,9 @@ public:
 template<typename Modifier> class modification_kernel : public unary_kernel
 {
   typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_smallint<> > die_type;
-  double   m_poisson;
   Modifier m_modifier;
 public:
-  modification_kernel(const Modifier& m, double poisson, double p=1) : unary_kernel(p), m_poisson(poisson), m_modifier(m) {}
+  modification_kernel(const Modifier& m, double p=1) : unary_kernel(p), m_modifier(m) {}
   
   template<typename Configuration, typename Modification>
     double operator()(double p, Configuration& c, Modification& modif) const
@@ -291,13 +288,7 @@ public:
     random_variant_init(out);
     double green_ratio = rjmcmc::apply_visitor(m_modifier,in,out);
     rjmcmc::apply_visitor(modif.birth_inserter(),out);
-    
-    switch(modif.birth_size()-num_deaths) {
-    case -1 : return green_ratio * m_poisson /n;
-    case  0 : return green_ratio;
-    case  1 : 
-    default : return green_ratio *(n+1)/m_poisson;
-    }
+    return green_ratio;
   }
 };
 
@@ -332,12 +323,15 @@ public:
 #endif
 
 // Derived: Curiously recurring template pattern
-template<typename Derived, RJMCMC_SAMPLER_TYPENAMES > class sampler_base
+template<typename Derived, typename CountSampler, RJMCMC_SAMPLER_TYPENAMES >
+  class sampler_base
 {
 public:
-  sampler_base(RJMCMC_SAMPLER_ARGS) :
+  sampler_base(const CountSampler& cs, RJMCMC_SAMPLER_ARGS) :
     m_kernel(RJMCMC_SAMPLER_PARAMS),
-    m_die(random(), boost::uniform_real<>(0,1)) {}
+    m_die(random(), boost::uniform_real<>(0,1)),
+    m_count_sampler(cs)
+  {}
   
 #if USE_VARIADIC_TEMPLATES
   typedef std::tuple<RJMCMC_SAMPLER_TYPES> Kernels;
@@ -357,6 +351,7 @@ public:
     typename Configuration::modification modif;
     m_temperature = temp;
     m_kernel_id   = internal::random_apply(m_die(),m_kernel,c,modif,m_green_ratio);
+    m_green_ratio *= m_count_sampler.green_ratio(c.size(), modif.birth_size()-modif.death_size());
     if(m_green_ratio<=0) {
       m_delta   =0;
       m_accepted=false;
@@ -377,14 +372,64 @@ public:
   inline bool accepted() const { return m_accepted; }
   
 protected:
-  Kernels m_kernel;
-  die_t   m_die;
-  int     m_kernel_id;
-  double  m_acceptance;
   double  m_temperature;
   double  m_delta;
   double  m_green_ratio;
+  
+private:
+  double  m_acceptance;
   bool    m_accepted;
+  int     m_kernel_id;
+  Kernels m_kernel;
+  die_t   m_die;
+  CountSampler m_count_sampler;
+};
+
+#include "rjmcmc/random.hpp"
+#include <boost/random/poisson_distribution.hpp>
+
+class poisson_count_sampler {
+public:
+  typedef boost::variate_generator<rjmcmc::generator&, boost::poisson_distribution<> > count_sampler;
+  poisson_count_sampler(double poisson) 
+    : m_poisson(poisson)
+    , m_die(rjmcmc::random(), boost::poisson_distribution<>(poisson)) {}
+  
+  double green_ratio(unsigned int n, int dn) const
+  {
+    // returns (m_poisson^-dn) * (n+dn)! / n!
+    double res = 1.;
+    for(   ;dn>0;--dn) res *= (n+dn)/m_poisson;
+    for(++n;dn<0;++dn) res *= m_poisson/(n+dn);
+    return res;
+  }
+  inline unsigned int operator()() const { return m_die(); }
+  
+private:
+  double m_poisson;
+  mutable count_sampler m_die;
+};
+
+class uniform_count_sampler {
+public:
+  typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_smallint<> > count_sampler;
+  uniform_count_sampler(unsigned int a, unsigned int b)
+    : m_min(a), m_max(b)
+    , m_die(random(), boost::uniform_smallint<>(a,b)) {}
+  
+  uniform_count_sampler(unsigned int b)
+    : m_min(0), m_max(b)
+    , m_die(random(), boost::uniform_smallint<>(0,b)) {}
+  
+  double green_ratio(unsigned int n, int dn) const
+  {
+    unsigned int m(n+dn);
+    return (n<m_min || m<m_min || n>m_max || m>m_max)? 0. : 1.;
+  }
+  inline unsigned int operator()() const { return m_die(); }
+private:
+  unsigned int m_min, m_max;
+  mutable count_sampler m_die;
 };
 
 }; // namespace rjmcmc

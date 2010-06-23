@@ -35,28 +35,31 @@ typedef rjmcmc::geometric_schedule                  schedule;
 //typedef rjmcmc::inverse_linear_schedule                  schedule;
 
 
-#include "rjmcmc/end_test/delta_energy_end_test.hpp"
-typedef delta_energy_end_test                           end_test;
-//#include "rjmcmc/end_test/max_iteration_end_test.hpp"
-//typedef max_iteration_end_test                           end_test;
+//#include "rjmcmc/end_test/delta_energy_end_test.hpp"
+//typedef delta_energy_end_test                           end_test;
+#include "rjmcmc/end_test/max_iteration_end_test.hpp"
+typedef max_iteration_end_test                           end_test;
 
 //#include "rjmcmc/configuration/vector_configuration.hpp"
 //typedef rjmcmc::vector_configuration<object, unary_energy, binary_energy> configuration;
 #include "rjmcmc/configuration/graph_configuration.hpp"
 typedef rjmcmc::graph_configuration<object, unary_energy, binary_energy> configuration;
 
-//#include "rjmcmc/sampler/direct_poisson_sampler.hpp"
-//typedef direct_poisson_sampler<generator_kernel> sampler;
-//#include "rjmcmc/sampler/metropolis_sampler.hpp"
-//#include "rjmcmc/sampler/dueck_scheuer_sampler.hpp"
-#include "rjmcmc/sampler/franz_hoffmann_sampler.hpp"
+#include "rjmcmc/sampler/sampler_base.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
-//typedef rjmcmc::metropolis_sampler<birth_death_kernel,modification_kernel> sampler;
-//typedef rjmcmc::dueck_scheuer_sampler<birth_death_kernel,modification_kernel> sampler;
-typedef rjmcmc::franz_hoffmann_sampler<birth_death_kernel,modification_kernel> sampler;
+typedef rjmcmc::poisson_count_sampler                           count_sampler;
+#include "rjmcmc/sampler/metropolis_sampler.hpp"
+typedef rjmcmc::metropolis_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+//typedef rjmcmc::dueck_scheuer_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+//#include "rjmcmc/sampler/dueck_scheuer_sampler.hpp"
+//typedef rjmcmc::dueck_scheuer_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+//#include "rjmcmc/sampler/franz_hoffmann_sampler.hpp"
+//typedef rjmcmc::franz_hoffmann_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+//#include "rjmcmc/sampler/direct_sampler.hpp"
+//typedef direct_sampler<count_sampler,generator_kernel> sampler;
 
 /************** main ****************/
 
@@ -103,18 +106,19 @@ void create_sampler(const param *p, sampler *&s) {
   modifier_kernel  modif(valid);
   
   birth_kernel        kbirth(birth);
-  death_kernel        kdeath(      p->get<double>("poisson"));
-  modification_kernel kmodif(modif,p->get<double>("poisson"));
+  death_kernel        kdeath;
+  modification_kernel kmodif(modif);
   
   birth_death_kernel kbirthdeath(
                                   kbirth, kdeath,
                                   p->get<double>("pbirth"),
                                   p->get<double>("pdeath")
                                 );
+  count_sampler cs(p->get<double>("poisson"));
   
-  //s = new sampler( kbirthdeath, kmodif );
-  s = new sampler( p->get<double>("qtemp"), kbirthdeath, kmodif );
-//	s = new sampler( p->get<double>("poisson"), birth );
+  //s = new sampler( cs, kbirthdeath, kmodif );
+  //s = new sampler( p->get<double>("qtemp"), cs, kbirthdeath, kmodif );
+  s = new sampler( cs, birth );
 }
 
 void create_schedule(const param *p, schedule *&t)

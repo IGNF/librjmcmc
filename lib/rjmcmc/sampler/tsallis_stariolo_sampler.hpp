@@ -6,18 +6,18 @@
 namespace rjmcmc
 {
 
-template<RJMCMC_SAMPLER_TYPENAMES>
-class tsallis_tsariolo_sampler : public sampler_base<tsallis_tsariolo_sampler<RJMCMC_SAMPLER_TYPES>, RJMCMC_SAMPLER_TYPES>
+template<typename CountSampler, RJMCMC_SAMPLER_TYPENAMES>
+class tsallis_tsariolo_sampler : public sampler_base<tsallis_tsariolo_sampler<CountSampler,RJMCMC_SAMPLER_TYPES>, CountSampler, RJMCMC_SAMPLER_TYPES>
 {
 private:
-    typedef tsallis_tsariolo_sampler<RJMCMC_SAMPLER_TYPES> self;
-    typedef sampler_base<self, RJMCMC_SAMPLER_TYPES> base;
+    typedef tsallis_tsariolo_sampler<CountSampler, RJMCMC_SAMPLER_TYPES> self;
+    typedef sampler_base<self, CountSampler, RJMCMC_SAMPLER_TYPES> base;
 
     double  m_q, m_inv_1_less_q;
 
 public:
-    tsallis_tsariolo_sampler(double q, RJMCMC_SAMPLER_ARGS)
-        : base(RJMCMC_SAMPLER_PARAMS)
+    tsallis_tsariolo_sampler(double q, const CountSampler& cs, RJMCMC_SAMPLER_ARGS)
+        : base(cs,RJMCMC_SAMPLER_PARAMS)
         , m_q(q)
         , m_inv_1_less_q(1./(1.-q)) {}
 

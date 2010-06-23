@@ -51,7 +51,8 @@ typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
-typedef rjmcmc::metropolis_sampler<birth_death_kernel,modification_kernel> sampler;
+typedef rjmcmc::poisson_count_sampler                           count_sampler;
+typedef rjmcmc::metropolis_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
 
 /************** main ****************/
 
@@ -100,16 +101,17 @@ void create_sampler(param *p, sampler *&s) {
 	modifier_kernel  modif(valid);
 
 	birth_kernel        kbirth(birth);
-	death_kernel        kdeath(      p->get<double>("poisson"));
-	modification_kernel kmodif(modif,p->get<double>("poisson"));
+	death_kernel        kdeath;
+	modification_kernel kmodif(modif);
 
 	birth_death_kernel kbirthdeath(
 		kbirth, kdeath,
 		p->get<double>("pbirth"),
 		p->get<double>("pdeath")
 	);
+        count_sampler cs(p->get<double>("poisson"));
 
-	s = new sampler( kbirthdeath, kmodif );
+	s = new sampler( cs, kbirthdeath, kmodif );
 //	s = new sampler( p->get<double>("poisson"), birth );
 }
 
