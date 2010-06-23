@@ -36,10 +36,10 @@ typedef rjmcmc::geometric_temperature                    temperature;
 #include "rjmcmc/max_iteration_end_test.hpp"
 typedef max_iteration_end_test                           end_test;
 
-//#include "rjmcmc/vector_configuration.hpp"
-//typedef rjmcmc::vector_configuration<object, unary_energy, binary_energy> configuration;
-#include "rjmcmc/graph_configuration.hpp"
-typedef rjmcmc::graph_configuration<object, unary_energy, binary_energy> configuration;
+#include "rjmcmc/vector_configuration.hpp"
+typedef rjmcmc::vector_configuration<object, unary_energy, binary_energy> configuration;
+//#include "rjmcmc/graph_configuration.hpp"
+//typedef rjmcmc::graph_configuration<object, unary_energy, binary_energy> configuration;
 
 //#include "rjmcmc/direct_poisson_sampler.hpp"
 //typedef direct_poisson_sampler<generator_kernel> sampler;
