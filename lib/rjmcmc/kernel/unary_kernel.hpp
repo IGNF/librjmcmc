@@ -26,8 +26,10 @@ template<typename Modifier>
 public:
   modification_kernel(const Modifier& m, double p=1) : unary_kernel(p), m_modifier(m) {}
   
+  inline const char* name(unsigned int) const { return "modif"; } //m_modifier.name(); }
+
   template<typename Configuration, typename Modification>
-    double operator()(Configuration& c, Modification& modif) const
+    double operator()(double, Configuration& c, Modification& modif) const
   {
     modif.clear();
     if(c.empty()) return 1.;

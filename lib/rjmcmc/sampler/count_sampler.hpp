@@ -15,7 +15,7 @@ public:
     : m_poisson(poisson)
     , m_die(rjmcmc::random(), boost::poisson_distribution<>(poisson)) {}
   
-  // (m_poisson^-dn) * (n+dn)! / n!
+  // old/new : (m_poisson^-dn) * (n+dn)! / n!
   double pdf_ratio(unsigned int n, int dn) const
   {
     double res = 1.;

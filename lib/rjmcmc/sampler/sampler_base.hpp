@@ -33,8 +33,10 @@ public:
     Configuration& m_c;
     Modification& m_m;
     typedef double result_type;
-    kernel_functor(Configuration &c, Modification &m) : m_c(c), m_m(m) {}
-    template<typename T> inline result_type operator()(const T& t) { return t(m_c,m_m); }
+    kernel_functor(Configuration &c, Modification &m) :m_c(c), m_m(m) {}
+    template<typename T> inline result_type operator()(double x, const T& t) {
+      return t(x,m_c,m_m);
+    }
   };
   
     // main sampling function
@@ -45,7 +47,7 @@ public:
     Modification modif;
     m_temperature = temp;
     kernel_functor<Configuration,Modification> kf(c,modif);
-    m_green_ratio  = random_apply(m_die(),m_kernel,kf);
+    m_green_ratio  = random_apply(m_kernel_id,m_die(),m_kernel,kf);
     m_green_ratio *= m_count_sampler.pdf_ratio(c.size(), modif.birth_size()-modif.death_size());
     if(m_green_ratio<=0) {
       m_delta   =0;
@@ -59,12 +61,37 @@ public:
   }
   
 // statistics accessors
+private: // helpers
+  template<unsigned int I, unsigned int N> struct get_name {
+    inline const char *operator()(unsigned int i, const Kernels& k) const {
+      enum { ks = tuple_element<I,Kernels>::type::size };
+      if(i<ks) return get<I>(k).name(i);
+      return get_name<I+1,N>()(i-ks,k);
+    }
+  };
+  template<unsigned int N> struct get_name<N,N> { 
+    inline const char *operator()(unsigned int i, const Kernels& k) const { return ""; }
+  };
+  
+  template<unsigned int I, unsigned int N> struct get_kernel_id {
+    inline unsigned int operator()(unsigned int i, const Kernels& k) const {
+      enum { ks = tuple_element<I,Kernels>::type::size };
+      if(i==I) return get<I>(k).kernel_id();
+      return ks+get_kernel_id<I+1,N>()(i,k);
+    }
+  };
+  template<unsigned int N> struct get_kernel_id<N,N> { 
+    inline unsigned int operator()(unsigned int i, const Kernels& k) const { return 0; }
+  };
+  
+public:
   inline double acceptance () const { return m_acceptance; }
   inline double temperature() const { return m_temperature; }
   inline double delta() const { return m_delta; }
   inline double green_ratio() const { return m_green_ratio; }
-  inline int kernel_id() const { return m_kernel_id; }
   inline bool accepted() const { return m_accepted; }
+  inline const char * kernel_name(unsigned int i) const { return get_name     <0,size>()(i,m_kernel); }
+  inline unsigned int kernel_id  () const { return get_kernel_id<0,size>()(m_kernel_id,m_kernel); }
   
 protected:
   double  m_temperature;
@@ -74,7 +101,7 @@ protected:
 private:
   double  m_acceptance;
   bool    m_accepted;
-  int     m_kernel_id;
+  unsigned int m_kernel_id;
   Kernels m_kernel;
   die_t   m_die;
   CountSampler m_count_sampler;

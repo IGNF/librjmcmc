@@ -13,7 +13,8 @@
 namespace rjmcmc {
 using std::tuple;
 using std::get;
-template<typename T> struct tuple_size : public std::tuple_size<T> {};
+using std::tuple_size;
+using std::tuple_element;
 };
 
 #else // USE_VARIADIC_TEMPLATES
@@ -43,6 +44,7 @@ namespace rjmcmc {
 using boost::tuple;
 using boost::get;
 template<typename T> struct tuple_size : public  boost::tuples::length<T> {};
+template<unsigned int N, typename T> struct tuple_element : public  boost::tuples::element<N,T> {};
 };
 
 #endif // USE_VARIADIC_TEMPLATES

@@ -14,20 +14,22 @@ namespace rjmcmc {
 
 namespace internal {
 
-template <int I, int N> struct random_apply_impl
+template <unsigned int I, unsigned int N> struct random_apply_impl
 {
   template <typename T, typename F>
-    inline typename F::result_type operator()(double x, T& t, F &f) {
-      double xt = x - get<I>(t).probability();
-      if(xt<0) return f(get<I>(t));
-      return random_apply_impl<I+1,N>()(xt,t,f);
+    inline typename F::result_type operator()(unsigned int& i, double x, T& t, F &f) {
+      double y = x - get<I>(t).probability();
+      if(y>0) return random_apply_impl<I+1,N>()(i,y,t,f);
+      i = I;
+      return f(x,get<I>(t));
     }
 };
 
-template <int N> struct random_apply_impl<N,N>
+template <unsigned int N> struct random_apply_impl<N,N>
 {
   template <typename T, typename F>
-    inline typename F::result_type operator()(double x, T& t, F &f) {
+    inline typename F::result_type operator()(unsigned int& i, double x, T& t, F &f) {
+      i = N;
       return typename F::result_type();
     }
 };
@@ -35,8 +37,8 @@ template <int N> struct random_apply_impl<N,N>
 };
 
 template <typename T, typename F>
-  inline typename F::result_type random_apply(double x, T& t, F &f) {
-    return internal::random_apply_impl<0,tuple_size<T>::value>()(x,t,f);
+  inline typename F::result_type random_apply(unsigned int& i, double x, T& t, F &f) {
+    return internal::random_apply_impl<0,tuple_size<T>::value>()(i,x,t,f);
   }
 
 }; // namespace rjmcmc

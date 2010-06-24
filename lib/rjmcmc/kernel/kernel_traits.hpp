@@ -4,6 +4,7 @@
 namespace rjmcmc {
 
 #if USE_VARIADIC_TEMPLATES
+
 template<typename T> struct kernel_traits {
   enum { size = 0 };
 };
@@ -11,7 +12,7 @@ template <class H, class... T> struct kernel_traits < std::tuple<H, T...> > {
   enum { size = H::size + kernel_traits<std::tuple<T...> >::size };
 };
 
-#else
+#else // USE_VARIADIC_TEMPLATES
 
 namespace internal {
 
@@ -31,7 +32,7 @@ template<typename T> struct kernel_traits {
   enum { size = internal::kernel_traits_impl<typename T::inherited>::size };
 };
 
-#endif
+#endif // USE_VARIADIC_TEMPLATES
 
 }; //namespace rjmcmc
 
