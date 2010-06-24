@@ -6,18 +6,18 @@
 namespace rjmcmc
 {
 
-template<typename CountSampler, RJMCMC_SAMPLER_TYPENAMES>
-  class franz_hoffmann_sampler : public sampler_base<franz_hoffmann_sampler<CountSampler,RJMCMC_SAMPLER_TYPES>, CountSampler, RJMCMC_SAMPLER_TYPES>
+template<typename CountSampler, RJMCMC_TUPLE_TYPENAMES>
+  class franz_hoffmann_sampler : public sampler_base<franz_hoffmann_sampler<CountSampler,RJMCMC_TUPLE_TYPES>, CountSampler, RJMCMC_TUPLE_TYPES>
 {
 private:
-  typedef franz_hoffmann_sampler<CountSampler, RJMCMC_SAMPLER_TYPES> self;
-  typedef sampler_base<self, CountSampler, RJMCMC_SAMPLER_TYPES> base;
+  typedef franz_hoffmann_sampler<CountSampler, RJMCMC_TUPLE_TYPES> self;
+  typedef sampler_base<self, CountSampler, RJMCMC_TUPLE_TYPES> base;
   
     double  m_q, m_inv_1_less_q, m_factor;
   
 public:
-  franz_hoffmann_sampler(double q, const CountSampler& cs, RJMCMC_SAMPLER_ARGS)
-    : base(cs, RJMCMC_SAMPLER_PARAMS)
+  franz_hoffmann_sampler(double q, const CountSampler& cs, RJMCMC_TUPLE_ARGS)
+    : base(cs, RJMCMC_TUPLE_PARAMS)
     , m_q(q)
         , m_inv_1_less_q(1./(1.-q))
         , m_factor((1.-q)/(2.-q)) {}

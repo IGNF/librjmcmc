@@ -44,15 +44,24 @@ typedef max_iteration_end_test                           end_test;
 #include "rjmcmc/configuration/graph_configuration.hpp"
 typedef rjmcmc::graph_configuration<object, unary_energy, binary_energy> configuration;
 
-//#include "rjmcmc/sampler/direct_poisson_sampler.hpp"
-//typedef direct_poisson_sampler<generator_kernel> sampler;
-#include "rjmcmc/sampler/metropolis_sampler.hpp"
+#include "rjmcmc/sampler/count_sampler.hpp"
+typedef rjmcmc::poisson_count_sampler                           count_sampler;
+//typedef rjmcmc::uniform_count_sampler                           count_sampler;
+
+#include "rjmcmc/sampler/sampler_base.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
-typedef rjmcmc::poisson_count_sampler                           count_sampler;
+#include "rjmcmc/sampler/metropolis_sampler.hpp"
 typedef rjmcmc::metropolis_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+//typedef rjmcmc::dueck_scheuer_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+//#include "rjmcmc/sampler/dueck_scheuer_sampler.hpp"
+//typedef rjmcmc::dueck_scheuer_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+//#include "rjmcmc/sampler/franz_hoffmann_sampler.hpp"
+//typedef rjmcmc::franz_hoffmann_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+//#include "rjmcmc/sampler/direct_sampler.hpp"
+//typedef direct_sampler<count_sampler,generator_kernel> sampler;
 
 /************** main ****************/
 
@@ -112,7 +121,7 @@ void create_sampler(param *p, sampler *&s) {
         count_sampler cs(p->get<double>("poisson"));
 
 	s = new sampler( cs, kbirthdeath, kmodif );
-//	s = new sampler( p->get<double>("poisson"), birth );
+//	s = new sampler( cs, birth );
 }
 
 void create_schedule(param *p, schedule *&t)

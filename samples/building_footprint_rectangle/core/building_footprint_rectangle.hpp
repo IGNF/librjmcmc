@@ -45,12 +45,15 @@ typedef max_iteration_end_test                           end_test;
 #include "rjmcmc/configuration/graph_configuration.hpp"
 typedef rjmcmc::graph_configuration<object, unary_energy, binary_energy> configuration;
 
+#include "rjmcmc/sampler/count_sampler.hpp"
+typedef rjmcmc::poisson_count_sampler                           count_sampler;
+//typedef rjmcmc::uniform_count_sampler                           count_sampler;
+
 #include "rjmcmc/sampler/sampler_base.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
-typedef rjmcmc::poisson_count_sampler                           count_sampler;
 #include "rjmcmc/sampler/metropolis_sampler.hpp"
 typedef rjmcmc::metropolis_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
 //typedef rjmcmc::dueck_scheuer_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
@@ -101,24 +104,23 @@ void create_sampler(const param *p, sampler *&s) {
                   p->get<double>("minsize"),
                   p->get<double>("maxratio")
                 );
-  
-  generator_kernel birth(valid);
-  modifier_kernel  modif(valid);
+  generator_kernel    birth(valid);
+  count_sampler cs(p->get<double>("poisson"));
   
   birth_kernel        kbirth(birth);
   death_kernel        kdeath;
-  modification_kernel kmodif(modif);
-  
   birth_death_kernel kbirthdeath(
                                   kbirth, kdeath,
                                   p->get<double>("pbirth"),
                                   p->get<double>("pdeath")
                                 );
-  count_sampler cs(p->get<double>("poisson"));
   
-  //s = new sampler( cs, kbirthdeath, kmodif );
+  modifier_kernel     modif(valid);
+  modification_kernel kmodif(modif);
+  
+  s = new sampler( cs, kbirthdeath, kmodif );
   //s = new sampler( p->get<double>("qtemp"), cs, kbirthdeath, kmodif );
-  s = new sampler( cs, birth );
+  //s = new sampler( cs, birth );
 }
 
 void create_schedule(const param *p, schedule *&t)
