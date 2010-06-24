@@ -20,7 +20,7 @@ typedef image_gradient_unary_energy<oriented_gradient_view> unary_energy;
 #include "energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy      binary_energy;
 
-#include "energy/kernels.hpp"
+#include "rjmcmc/kernel/kernels.hpp"
 typedef generator<is_valid>          generator_kernel;
 typedef modifier <is_valid>          modifier_kernel;
 
