@@ -1,5 +1,5 @@
-#ifndef DIRECT_POISSON_SAMPLER_HPP_
-#define DIRECT_POISSON_SAMPLER_HPP_
+#ifndef DIRECT_SAMPLER_HPP_
+#define DIRECT_SAMPLER_HPP_
 
 #include "rjmcmc/random_variant_init.hpp"
 
@@ -25,6 +25,7 @@ public:
     }
   }
   
+  inline const char * kernel_name(unsigned int i) const { return "direct"; }
   inline int kernel_id() const { return 0; }
   inline bool accepted() const { return true; }
   enum { kernel_size = 1 };
@@ -33,4 +34,4 @@ private:
   ObjectSampler m_object_sampler;
 };
 
-#endif // DIRECT_POISSON_SAMPLER_HPP_
+#endif // DIRECT_SAMPLER_HPP_

@@ -62,7 +62,9 @@ typedef rjmcmc::metropolis_sampler<count_sampler,birth_death_kernel,modification
 //#include "rjmcmc/sampler/franz_hoffmann_sampler.hpp"
 //typedef rjmcmc::franz_hoffmann_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
 //#include "rjmcmc/sampler/direct_sampler.hpp"
-//typedef direct_sampler<count_sampler,generator_kernel> sampler;
+//typedef direct_sampler<count_sampler,generator_kernel> d_sampler;
+//#include "rjmcmc/sampler/rejection_sampler.hpp"
+//typedef rejection_sampler<d_sampler,null_binary_energy_predicate> sampler;
 
 /************** main ****************/
 
@@ -121,6 +123,7 @@ void create_sampler(const param *p, sampler *&s) {
   s = new sampler( cs, kbirthdeath, kmodif );
   //s = new sampler( p->get<double>("qtemp"), cs, kbirthdeath, kmodif );
   //s = new sampler( cs, birth );
+  //d_sampler ds( cs, birth ); s = new sampler( ds );
 }
 
 void create_schedule(const param *p, schedule *&t)
