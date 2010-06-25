@@ -31,7 +31,7 @@ public:
       Vector_2 v(0.5*dx*m_die(), 0.5*dy*m_die());
       r = geometry::Rectangle_2<K>(p, v, m_die());
     } while (!m_is_valid(r));
-    return 1./(dx*dy*dx*dy);
+    return 1.;
   }
 #endif
   
@@ -59,13 +59,8 @@ public:
     pdf_visitor(const IsValid& is_valid) : m_is_valid(is_valid) {}
 #ifdef GEOMETRY_RECTANGLE_2_H
     template<typename K> result_type operator()(const geometry::Rectangle_2<K> &r) const 
-    { 
-      const Iso_rectangle_2& bbox = m_is_valid.bbox();
-      float x0 = bbox.min().x();
-      float y0 = bbox.min().y();
-      float dx = bbox.max().x()-x0;
-      float dy = bbox.max().y()-y0;
-      return 1./(dx*dy*dx*dy);
+    {
+      return 1.;
     }
 #endif
 #ifdef GEOMETRY_CIRCLE_2_H
