@@ -17,7 +17,10 @@ public:
   dueck_scheuer_sampler(const CountSampler& cs, RJMCMC_TUPLE_ARGS) : base(cs,RJMCMC_TUPLE_PARAMS) {}
   
   inline double acceptance_probability() const {
-    return (base::m_delta <= base::m_temperature*(1+log(1+base::m_green_ratio))) ? 1. : 0.;
+    // return (metropolis_acceptance_probability()>=exp(-1)) ? 1 : 0;
+    // return (R.exp(-E/T)>=exp(-1)) ? 1 : 0;
+    // return (T.log(R)-E>=-T) ? 1 : 0;
+    return (base::m_delta <= base::m_temperature*(1+log(base::m_green_ratio))) ? 1. : 0.;
   }
 };
 
