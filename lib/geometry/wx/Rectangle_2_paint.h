@@ -6,7 +6,7 @@
 #include "geometry/Rectangle_2.h"
 
 template<typename K> void paint(
-	Layer::ptrLayerType& l,
+        layer::ptrLayerType& l,
 	const std::string& s,
 	const geometry::Rectangle_2<K>& r)
 {

@@ -32,7 +32,7 @@ protected:
 
 private:
 	void update_bbox() {
-        boost::shared_ptr<VectorLayerGhost> ghost = vectorlayerghost();
+        boost::shared_ptr<vector_layer_ghost> ghost = vectorlayerghost();
 		if (!ghost->m_drawRectangleSelection) return;
 		param *p = param::instance();
 		wxPoint p0 = ghost->m_rectangleSelection.first;
@@ -69,7 +69,7 @@ enum
 
 using namespace std;
 
-BEGIN_EVENT_TABLE(configuration_frame,BasicViewerFrame)
+BEGIN_EVENT_TABLE(configuration_frame,basic_viewer_frame)
     EVT_BUTTON(ID_BUTTON_GO,configuration_frame::OnGoButton)
     EVT_BUTTON(ID_BUTTON_STOP,configuration_frame::OnStopButton)
     EVT_BUTTON(ID_BUTTON_CHART,configuration_frame::OnChartButton)
@@ -80,7 +80,7 @@ END_EVENT_TABLE();
 IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(configuration_frame,m_panel)
 
         configuration_frame::configuration_frame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos , const wxSize& size , long style , const wxString& name ):
-    BasicViewerFrame(parent, id, title, pos, size, style, name)
+    basic_viewer_frame(parent, id, title, pos, size, style, name)
 {
 #if defined(__WXMSW__)
     wxIcon icon("logo_matis_small");
@@ -89,7 +89,7 @@ IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(configuration_frame,m_panel)
     //SetIcon(wxICON(LOGO_MATIS_small));
 #endif
 
-    PanelViewer::Register(this);
+    panel_viewer::Register(this);
 	rjmcmc_panel_viewer::Register(this);
     m_panel = panel_manager::instance()->create_object("rjmcmc_panel_viewer");
 
@@ -180,10 +180,10 @@ void configuration_frame::init(int dump, int save)
 		m_dump = dump;
 		m_save = save;
 
-        m_vlayer = Layer::ptrLayerType(new simple_vector_layer("Extracted elements"));
+        m_vlayer = layer::ptrLayerType(new simple_vector_layer("Extracted elements"));
         m_panel->add_layer(m_vlayer);
 
-                boost::shared_ptr<VectorLayerGhost> ghost = m_panel->vectorlayerghost();
+                boost::shared_ptr<vector_layer_ghost> ghost = m_panel->vectorlayerghost();
 
         m_vlayer->translation_x(/*p0.x+*/ghost->translation_x());
         m_vlayer->translation_y(/*p0.y+*/ghost->translation_y());
@@ -202,13 +202,13 @@ void configuration_frame::init(int dump, int save)
 
 
 	wxRect configuration_frame::get_bbox() const {
-            boost::shared_ptr<VectorLayerGhost> ghost = m_panel->vectorlayerghost();
+            boost::shared_ptr<vector_layer_ghost> ghost = m_panel->vectorlayerghost();
     	if(!ghost->m_drawRectangleSelection) return wxRect();
 		return wxRect(ghost->m_rectangleSelection.first,ghost->m_rectangleSelection.second);
 	}
 
 	void configuration_frame::set_bbox(const wxRect& r) {
-            boost::shared_ptr<VectorLayerGhost> ghost = m_panel->vectorlayerghost();
+            boost::shared_ptr<vector_layer_ghost> ghost = m_panel->vectorlayerghost();
 		ghost->m_rectangleSelection.first  = r.GetTopLeft    ();
 		ghost->m_rectangleSelection.second = r.GetBottomRight();	
     	ghost->m_drawRectangleSelection = true;
@@ -220,7 +220,7 @@ void configuration_frame::init(int dump, int save)
         panel_viewer* configuration_frame::panelviewer() const { return m_panel; }
 
 	void configuration_frame::add_layer(const std::string& file) {
-            boost::shared_ptr<VectorLayerGhost> ghost = m_panel->vectorlayerghost();
+            boost::shared_ptr<vector_layer_ghost> ghost = m_panel->vectorlayerghost();
 
             std::string extension(boost::filesystem::extension(file));
             layer::ptrLayerType ilayer;

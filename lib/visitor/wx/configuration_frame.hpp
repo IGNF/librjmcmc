@@ -14,11 +14,11 @@
 #include "geometry/wx/paint.h"
 
 // to be specialized by each object type (-> files lib/geometry/*_paint.h)
-template<typename T> void paint(Layer::ptrLayerType&, const std::string& s, const T&);
+template<typename T> void paint(layer::ptrLayerType&, const std::string& s, const T&);
 
 struct layer_painter {
 public:
-  layer_painter( Layer::ptrLayerType& layer) : m_layer(layer) {}
+  layer_painter( layer::ptrLayerType& layer) : m_layer(layer) {}
 
   void energy(double e) { m_energy=e; }
 
@@ -31,13 +31,13 @@ public:
   }
 
 private:
-  Layer::ptrLayerType& m_layer;
+  layer::ptrLayerType& m_layer;
   double m_energy;
 };
 
 
 template<typename Config>
-Layer::ptrLayerType& operator<<(Layer::ptrLayerType& layer, const Config& config)
+layer::ptrLayerType& operator<<(layer::ptrLayerType& layer, const Config& config)
 {
 	typename Config::const_iterator it = config.begin(), end = config.end();
 	layer_painter painter(layer);
@@ -50,7 +50,7 @@ Layer::ptrLayerType& operator<<(Layer::ptrLayerType& layer, const Config& config
 }
 
 
-class configuration_frame: public BasicViewerFrame
+class configuration_frame: public basic_viewer_frame
 {
 public:
         configuration_frame(
