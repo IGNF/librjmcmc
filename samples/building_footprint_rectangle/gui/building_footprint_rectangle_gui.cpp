@@ -34,6 +34,8 @@ typedef parameters< wx_parameter > param;
 // boost
 #include <boost/filesystem.hpp>
 
+#include "resources/IGN.xpm"
+
 class building_footprint_rectangle_gui : public wxApp, public Controler
 { 
   typedef composite_visitor<wx_log_visitor*,configuration_frame*,parameters_frame*,chart_frame*

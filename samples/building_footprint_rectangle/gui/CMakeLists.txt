@@ -13,12 +13,11 @@ else()
 endif()
 
 # Find wxWidgets
-if(NOT WIN32)
+if(UNIX)
 	#Find wxWidgets
 	set(wxWidgets_EXCLUDE_COMMON_LIBRARIES TRUE)
-	find_package(wxWidgets REQUIRED adv base core xml aui xrc html expat)
+	find_package(wxWidgets REQUIRED adv base core xml aui xrc html)
 	if(wxWidgets_FOUND)
-		add_definitions(${wxWidgets_DEFINITIONS})
 		include(${wxWidgets_USE_FILE})
 	else()
 		message(FATAL_ERROR "wxWidgets not found ! Please set wxWidgets path ...")
@@ -51,7 +50,7 @@ if(wxWidgets_FOUND AND GilViewer_FOUND )
 
     include_directories(${CMAKE_SOURCE_DIR}/lib/wxfreechart/include)
     include(${wxWidgets_USE_FILE})
-    if(LINUX)
+    if(UNIX)
 		add_executable( building_footprint_rectangle_gui ${GUI_SRC} )
 	else()
 		add_executable( building_footprint_rectangle_gui WIN32 ${GUI_SRC} )

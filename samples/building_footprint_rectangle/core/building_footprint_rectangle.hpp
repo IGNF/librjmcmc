@@ -46,21 +46,21 @@ typedef max_iteration_end_test                           end_test;
 typedef rjmcmc::graph_configuration<object, unary_energy, binary_energy> configuration;
 
 #include "rjmcmc/sampler/count_sampler.hpp"
-typedef rjmcmc::poisson_count_sampler                           count_sampler;
-//typedef rjmcmc::uniform_count_sampler                           count_sampler;
+//typedef rjmcmc::poisson_count_sampler                           count_sampler;
+typedef rjmcmc::uniform_count_sampler                           count_sampler;
 
 #include "rjmcmc/sampler/sampler_base.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
-#include "rjmcmc/sampler/metropolis_sampler.hpp"
-typedef rjmcmc::metropolis_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
-//typedef rjmcmc::dueck_scheuer_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+//#include "rjmcmc/sampler/metropolis_sampler.hpp"
+//typedef rjmcmc::metropolis_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
 //#include "rjmcmc/sampler/dueck_scheuer_sampler.hpp"
 //typedef rjmcmc::dueck_scheuer_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
-//#include "rjmcmc/sampler/franz_hoffmann_sampler.hpp"
-//typedef rjmcmc::franz_hoffmann_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+//typedef rjmcmc::dueck_scheuer_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+#include "rjmcmc/sampler/franz_hoffmann_sampler.hpp"
+typedef rjmcmc::franz_hoffmann_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
 //#include "rjmcmc/sampler/direct_sampler.hpp"
 //typedef direct_sampler<count_sampler,generator_kernel> d_sampler;
 //#include "rjmcmc/sampler/rejection_sampler.hpp"
@@ -120,8 +120,8 @@ void create_sampler(const param *p, sampler *&s) {
   modifier_kernel     modif(valid);
   modification_kernel kmodif(modif);
   
-  s = new sampler( cs, kbirthdeath, kmodif );
-  //s = new sampler( p->get<double>("qtemp"), cs, kbirthdeath, kmodif );
+  //s = new sampler( cs, kbirthdeath, kmodif );
+  s = new sampler( p->get<double>("qtemp"), cs, kbirthdeath, kmodif );
   //s = new sampler( cs, birth );
   //d_sampler ds( cs, birth ); s = new sampler( ds );
 }

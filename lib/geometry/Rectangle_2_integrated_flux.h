@@ -42,7 +42,7 @@ double integrated_flux(const OrientedView& v, const Segment& s0)
 	for (; !it.end() ; ++it)
 	{
 		if(it.x()>=x0 && it.x()<x1 && it.y()>=y0 && it.y()<y1) {
-            K::RT length = it.length();
+            typename K::RT length = it.length();
 			const pixel_t& grad = *loc_grad;
 			gradient_sum[0] += length * boost::gil::at_c<0> (grad);
 			gradient_sum[1] += length * boost::gil::at_c<1> (grad);
