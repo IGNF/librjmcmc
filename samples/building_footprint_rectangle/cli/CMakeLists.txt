@@ -1,4 +1,9 @@
 find_package( TIFF REQUIRED )
+if(TIFF_FOUND)
+	include_directories(${TIFF_INCLUDE_DIR})
+else()
+	message(FATAL_ERROR "TIFF not found ! Please set TIFF path ...")
+endif()
 
 file( GLOB ALL_CLI_HEADER_FILES *.h *.hpp )
 aux_source_directory( ${CMAKE_CURRENT_SOURCE_DIR} ALL_CLI_SRC )

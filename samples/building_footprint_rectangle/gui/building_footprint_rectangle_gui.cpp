@@ -25,9 +25,10 @@ typedef parameters< wx_parameter > param;
 // threading and wx
 #include <boost/thread.hpp>
 #include <wx/app.h>
-#include "resources/IGN.xpm"
+#include <wx/gdicmn.h>
 
 // gilviewer
+#include <GilViewer/io/gilviewer_io_factory.hpp>
 #include <GilViewer/gui/PanelViewer.hpp>
 
 // boost
@@ -41,6 +42,7 @@ class building_footprint_rectangle_gui : public wxApp, public Controler
 private:
   bool OnInit()
   {
+    register_all_file_formats();
     char **my_argv = new char*[argc];
     for (int i=0;i<argc;++i)
     {
@@ -51,7 +53,10 @@ private:
     param *p = param::instance();
     initialize_parameters(p);
     if(!p->parse(argc,my_argv)) return false;
-    m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, _("librjmcmc: rectangular building footprint extraction"), wxDefaultPosition, wxSize(600,600) );
+    wxSize frame_size;(600,600);
+    frame_size.x = std::min(600, wxGetClientDisplayRect().GetWidth());
+    frame_size.y = std::min(600, wxGetClientDisplayRect().GetHeight());
+    m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, _("librjmcmc: rectangular building footprint extraction"), wxDefaultPosition, frame_size );
     m_confg_frame->SetIcon(wxICON(IGN));
     m_param_frame = new parameters_frame(m_confg_frame);
     m_chart_frame = new chart_frame(m_confg_frame);
