@@ -14,6 +14,7 @@
 #include <GilViewer/gui/define_id.hpp>
 #include <GilViewer/io/gilviewer_file_io.hpp>
 #include <GilViewer/io/gilviewer_io_factory.hpp>
+#include <GilViewer/convenient/macros_gilviewer.hpp>
 
 #include "param/wx_parameter.hpp"
 #include "wx_parameter_frame.hpp"
@@ -230,27 +231,14 @@ void configuration_frame::init(int dump, int save)
                 ilayer = file_io->load(file);
                 m_panel->add_layer( ilayer );
             }
-            catch (const std::exception &err)
+            catch (const std::exception &e)
             {
-                std::ostringstream oss;
-                oss << "File " << file << " does not exist !";
+                GILVIEWER_LOG_EXCEPTION("Read error: " + file);
                 wxString message( oss.str().c_str() , *wxConvCurrent );
                 ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
                 return;
             }
 
-            /*
-        layer::ptrLayerType ilayer = image_layer::create_image_layer(file);
-        if ( !ilayer )
-        {
-          std::ostringstream oss;
-          oss << "File " << file << " does not exist !";
-          wxString message( oss.str().c_str() , *wxConvCurrent );
-          ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
-          return;
-        }
-        m_panel->add_layer(ilayer);
-        */
         ilayer->translation_x(/*p0.x+*/ghost->translation_x());
         ilayer->translation_y(/*p0.y+*/ghost->translation_y());
         ilayer->zoom_factor  (     ghost->zoom_factor  ());

@@ -6,7 +6,7 @@
 
 #include <GilViewer/gui/LayerControl.hpp>
 #include <GilViewer/gui/BasicViewerFrame.h>
-#include <GilViewer/convenient/MacrosGilViewer.hpp>
+#include <GilViewer/convenient/macros_gilviewer.hpp>
 #include <GilViewer/layers/image_types.hpp>
 
 #include "visitor/controler.hpp"
