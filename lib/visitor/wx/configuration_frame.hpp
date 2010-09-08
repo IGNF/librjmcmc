@@ -4,8 +4,8 @@
 #include <wx/wx.h>
 #include <wx/statusbr.h>
 
-#include <GilViewer/gui/LayerControl.hpp>
-#include <GilViewer/gui/BasicViewerFrame.h>
+#include <GilViewer/gui/layer_control.hpp>
+#include <GilViewer/gui/basic_viewer_frame.hpp>
 #include <GilViewer/convenient/macros_gilviewer.hpp>
 #include <GilViewer/layers/image_types.hpp>
 

@@ -5,12 +5,12 @@
 
 #include <wx/artprov.h>
 
-#include <GilViewer/layers/VectorLayerGhost.h>
-#include <GilViewer/layers/ImageLayer.hpp>
+#include <GilViewer/layers/vector_layer_ghost.hpp>
+#include <GilViewer/layers/image_layer.hpp>
 #include <GilViewer/layers/simple_vector_layer.hpp>
-#include <GilViewer/gui/LayerControl.hpp>
-#include <GilViewer/gui/ApplicationSettings.hpp>
-#include <GilViewer/gui/PanelManager.h>
+#include <GilViewer/gui/layer_control.hpp>
+#include <GilViewer/gui/application_settings.hpp>
+#include <GilViewer/gui/panel_manager.hpp>
 #include <GilViewer/gui/define_id.hpp>
 #include <GilViewer/io/gilviewer_file_io.hpp>
 #include <GilViewer/io/gilviewer_io_factory.hpp>

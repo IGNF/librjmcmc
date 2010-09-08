@@ -29,7 +29,7 @@ typedef parameters< wx_parameter > param;
 
 // gilviewer
 #include <GilViewer/io/gilviewer_io_factory.hpp>
-#include <GilViewer/gui/PanelViewer.hpp>
+#include <GilViewer/gui/panel_viewer.hpp>
 
 // boost
 #include <boost/filesystem.hpp>

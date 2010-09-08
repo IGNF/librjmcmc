@@ -1,7 +1,7 @@
 #ifndef CIRCLE_2_PAINT_H
 #define CIRCLE_2_PAINT_H
 
-#include <GilViewer/layers/Layer.hpp>
+#include <GilViewer/layers/layer.hpp>
 #include "geometry/geometry.hpp"
 #include "geometry/Circle_2.h"
 

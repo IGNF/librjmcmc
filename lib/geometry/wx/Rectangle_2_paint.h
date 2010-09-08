@@ -1,7 +1,7 @@
 #ifndef RECTANGLE_2_PAINT_H
 #define RECTANGLE_2_PAINT_H
 
-#include <GilViewer/layers/Layer.hpp>
+#include <GilViewer/layers/layer.hpp>
 #include "geometry/geometry.hpp"
 #include "geometry/Rectangle_2.h"
 
