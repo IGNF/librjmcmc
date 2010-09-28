@@ -1,7 +1,7 @@
 #ifndef __GEOMETRIC_SCHEDULE_HPP__
 #define __GEOMETRIC_SCHEDULE_HPP__
 
-namespace rjmcmc {
+namespace simulated_annealing {
     /**
  * \ingroup GroupSchedule
  */
