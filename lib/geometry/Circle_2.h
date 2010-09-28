@@ -16,7 +16,9 @@ inline typename K::FT radius(const Circle_2<K>& c) {
 #else
 
 namespace geometry {
-
+/**
+ * \ingroup GroupGeometry
+ */
 template<class K_> class Circle_2
 {
 public:

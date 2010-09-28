@@ -1,9 +1,63 @@
+using quickbook ;
 
-boostbook quickbook_test 
-        : 
-        src/quickbook_libMPP.qbk 
-        :
-        <xsl:param>boost.root=./
+import set ;
+import doxygen ;
+
+
+local doxygen_params =
+        <doxygen:param>RECURSIVE=YES
+        <doxygen:param>ALPHABETICAL_INDEX=YES
+        <doxygen:param>REPEAT_BRIEF=YES
+        <doxygen:param>ALWAYS_DETAILED_SEC=YES
+        <doxygen:param>BRIEF_MEMBER_DESC=NO
+        <doxygen:param>ABBREVIATE_BRIEF=YES
+        <doxygen:param>INHERIT_DOCS=YES
+        <doxygen:param>HIDE_UNDOC_MEMBERS=YES
+        <doxygen:param>HIDE_UNDOC_CLASSES=YES
+        <doxygen:param>HIDE_SCOPE_NAMES=YES
+        <doxygen:param>EXTRACT_ALL=YES
+        <doxygen:param>EXTRACT_PRIVATE=YES
+        <doxygen:param>BUILTIN_STL_SUPPORT=YES
+        <doxygen:param>ENABLE_PREPROCESSING=YES
+        <doxygen:param>MACRO_EXPANSION=YES
+        <doxygen:param>TAB_SIZE=4
+        <doxygen:param>SOURCE_BROWSER=YES
+        <doxygen:param>VERBATIM_HEADERS=NO
+        ;
+
+
+local geometry_includes =
+    [ glob
+        ../lib/geometry/*.hpp
+        ../lib/geometry/*.h
+    ] ;
+
+
+local schedule_includes =
+    [ glob
+        ../lib/rjmcmc/schedule/*.hpp
+        ../lib/rjmcmc/schedule/geometry/*.h
+    ] ;
+
+doxygen geometry_reference
+    :
+        $(geometry_includes)
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Geometry"
+    ;
+
+doxygen schedule_reference
+    :
+        $(schedule_includes)
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Schedules"
+    ;
+
+boostbook librjmcmc 
+        : src/librjmcmc_quickbook.qbk 
+        : <xsl:param>boost.root=../..
         <xsl:param>boost.image.src=image/banniere_matis.png
         <xsl:param>boost.image.alt="\"Quickbook_test\""
         <xsl:param>boost.image.w=900
@@ -11,4 +65,6 @@ boostbook quickbook_test
         <xsl:param>html.stylesheet=css/boostbook.css
         <xsl:param>nav.layout=none
         <xsl:param>navig.graphics.path=css/images/
+        <dependency>geometry_reference
+        <dependency>schedule_reference
         ; 

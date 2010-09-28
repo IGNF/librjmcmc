@@ -2,9 +2,14 @@
 #define __INVERSE_LINEAR_SCHEDULE_HPP__
 
 namespace simulated_annealing {
-
-    // 1/temp(i+1) = 1/temp(i) + delta
-
+    /**
+ * \ingroup GroupSchedule
+ */
+    /**
+ * Inverse linear schedule class.
+ * This class implements a inverse linear schedule class:
+ * \f[\frac{1}{T_{i+1}}=\frac{1}{T_i}+\delta\f]
+ */
     template<typename T>
     class inverse_linear_schedule {
         typedef inverse_linear_schedule<T> self;

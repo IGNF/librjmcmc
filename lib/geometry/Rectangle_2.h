@@ -8,7 +8,9 @@
 #include "geometry.hpp"
 
 namespace geometry {
-
+/**
+ * \ingroup GroupGeometry
+ */
 template <class R_>
 class Rectangle_2
 {
