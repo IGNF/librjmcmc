@@ -5,17 +5,17 @@ template<typename DSM>
 class image_gradient_unary_energy
 {
 public:
-	typedef double result_type;
+    typedef double result_type;
 
-	template<typename T>
-	result_type operator()(const T &t) const;
+    template<typename T>
+    result_type operator()(const T &t) const;
 
-	image_gradient_unary_energy(const DSM& dsm,
-		double default_energy, double ponderation_dsm);
+    image_gradient_unary_energy(const DSM& dsm,
+                                double default_energy, double ponderation_dsm);
 
 private:
-	DSM m_dsm;
-	double m_defaultEnergy, m_ponderation_dsm;
+    DSM m_dsm;
+    double m_defaultEnergy, m_ponderation_dsm;
 };
 
 

@@ -41,7 +41,7 @@ BOOST_PP_ENUM_PARAMS(RJMCMC_TUPLE_LIMIT_TYPES,x)
 #define RJMCMC_TUPLE_TYPES     RJMCMC_TUPLE_ENUM_PARAMS(RJMCMC_TUPLE_T)
 #define RJMCMC_TUPLE_PARAMS    RJMCMC_TUPLE_ENUM_PARAMS(rjmcmc_tuple_t)
 
-namespace rjmcmc {
+        namespace rjmcmc {
     using boost::tuple;
     using boost::get;
     template<typename T> struct tuple_size : public  boost::tuples::length<T> {};

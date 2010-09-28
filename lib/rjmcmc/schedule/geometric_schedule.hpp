@@ -1,25 +1,37 @@
 #ifndef __GEOMETRIC_SCHEDULE_HPP__
 #define __GEOMETRIC_SCHEDULE_HPP__
 
-namespace rjmcmc {
+namespace simulated_annealing {
 
-// T(i) = T(0) * (coef ^ i)
+    // temp(i) = temp(0) * (coef ^ i)
 
-class geometric_schedule {
-public:
-	geometric_schedule(double temp, double coefficient) : m_temp(temp), m_coefficient(coefficient) {}
-	inline double  operator*() const { return m_temp; }
-	inline geometric_schedule  operator++()    { m_temp *= m_coefficient; return *this; }
-	inline geometric_schedule  operator++(int) { geometric_schedule t(*this); m_temp *= m_coefficient; return t; }
+    template<typename T>
+    class geometric_schedule {
+        typedef geometric_schedule<T> self;
 
-	inline double coefficient() const { return m_coefficient; }
-	inline void coefficient(double coef) { m_coefficient = coef; }
+    public:
+        typedef std::input_iterator_tag iterator_category;
+        typedef T              value_type;
+        typedef std::ptrdiff_t difference_type;
+        typedef T*             pointer;
+        typedef T&             reference;
 
-private:
-	double m_temp;
-	double m_coefficient;
-};
+        bool operator==(const self& s) const { return (m_temp==s.m_temp) && (m_coefficient==s.m_coefficient); }
+        bool operator!=(const self& s) const { return !(*this==s); }
 
-}; // namespace rjmcmc
+        geometric_schedule(value_type temp, value_type coefficient) : m_temp(temp), m_coefficient(coefficient) {}
+        inline value_type  operator*() const { return m_temp; }
+        inline self  operator++()    { m_temp *= m_coefficient; return *this; }
+        inline self  operator++(int) { self t(*this); m_temp *= m_coefficient; return t; }
+
+        inline value_type coefficient() const { return m_coefficient; }
+        inline void coefficient(value_type coef) { m_coefficient = coef; }
+
+    private:
+        value_type m_temp;
+        value_type m_coefficient;
+    };
+
+}; // namespace simulated_annealing
 
 #endif // __GEOMETRIC_SCHEDULE_HPP__

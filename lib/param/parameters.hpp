@@ -15,7 +15,7 @@
 
 struct parameter {
 public:
-	typedef boost::variant<boost::filesystem::path, std::string, int, double, bool> value_type;
+    typedef boost::variant<boost::filesystem::path, std::string, int, double, bool> value_type;
 
     inline const std::string&        name() const { return m_name; }
     inline const std::string& description() const { return m_description; }
@@ -30,32 +30,32 @@ public:
     template<typename T> inline       T& get()       { return boost::get<T>(m_value); }
 
     template<typename T>
-	parameter(const std::string& n, char c, const T& v, const std::string& d)
-		: m_name(n), m_shortcut(c), m_value(v), m_description(d) {}
+    parameter(const std::string& n, char c, const T& v, const std::string& d)
+        : m_name(n), m_shortcut(c), m_value(v), m_description(d) {}
 
-private:
-    std::string m_name;
-    char m_shortcut;
-    value_type m_value;
-    std::string m_description;
-};
+    private:
+        std::string m_name;
+        char m_shortcut;
+        value_type m_value;
+        std::string m_description;
+    };
 
 struct unknown_parameter_name{};
 
 struct name_equals {
-  std::string m_name;
-  name_equals(const std::string& name) : m_name(name) {}
-  template<typename T>
-  inline bool operator()(const T& t) const { return m_name==t.name(); }
+    std::string m_name;
+    name_equals(const std::string& name) : m_name(name) {}
+    template<typename T>
+    inline bool operator()(const T& t) const { return m_name==t.name(); }
 };
 
 template<typename T>
 class parameters
-  : public PatternSingleton< parameters<T> >
+    : public PatternSingleton< parameters<T> >
 {
 public:
     friend class PatternSingleton<parameters>;
-	typedef T parameter_t;
+    typedef T parameter_t;
     
     typedef std::list< T > parameter_list;
     typedef typename parameter_list::iterator iterator;
@@ -66,18 +66,18 @@ public:
 
     template<typename V> inline const V& get(const std::string& s) const { 
         const_iterator it = find(s);
-		if (it==end()) throw unknown_parameter_name();
-		return it->get<V>();
+        if (it==end()) throw unknown_parameter_name();
+        return it->get<V>();
     }
 
     template<typename V> inline void get(const std::string& s, V& v) const {
-		v = get<V>(s);
+        v = get<V>(s);
     }
 
     template<typename V> inline void set(const std::string& s, const V& v) { 
         iterator it = find(s);
-		if (it==end()) throw unknown_parameter_name();
-		it->set(v);
+        if (it==end()) throw unknown_parameter_name();
+        it->set(v);
     }
 
     bool parse(const std::string& filename);

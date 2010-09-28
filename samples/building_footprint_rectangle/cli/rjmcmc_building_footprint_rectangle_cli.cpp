@@ -45,7 +45,7 @@ int main(int argc , char** argv)
   create_schedule     (p,sch);
   create_end_test     (p,end);
   
-  simulated_annealing(*conf,*samp,*sch,*end,visitor);
+  simulated_annealing::optimize(*conf,*samp,*sch,*end,visitor);
   
   return 0;
 }

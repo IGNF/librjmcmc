@@ -8,16 +8,16 @@ template<typename DSM>
 template<typename T>
 double image_gradient_unary_energy<DSM>::operator()(const T &t) const
 {
-	return m_defaultEnergy
-	- m_ponderation_dsm*integrated_flux(m_dsm,t);
+    return m_defaultEnergy
+            - m_ponderation_dsm*integrated_flux(m_dsm,t);
 }
 
 
 
 template<typename DSM>
 image_gradient_unary_energy<DSM>::image_gradient_unary_energy(
-		const DSM& dsm,
-		double default_energy, double ponderation_dsm) :
+        const DSM& dsm,
+        double default_energy, double ponderation_dsm) :
 	m_defaultEnergy(default_energy), 
 	m_ponderation_dsm(ponderation_dsm),
 	m_dsm(dsm)

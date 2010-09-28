@@ -91,38 +91,38 @@
 
 struct wx_parameter : public parameter {
 
-struct updater {
-    typedef void result_type;
-    template<typename C, typename T> void operator()(C *, const T& t) const {}
-    template<typename T, typename C> void operator()(T& t, const C*) const {}
+    struct updater {
+        typedef void result_type;
+        template<typename C, typename T> void operator()(C *, const T& t) const {}
+        template<typename T, typename C> void operator()(T& t, const C*) const {}
 
-    template<typename T> void operator()(T& t, const wxTextCtrl *ctrl) const {
-		if(ctrl==NULL) return;
-        wxString ws(ctrl->GetLineText(0), *wxConvCurrent);
-        std::string s(ws.mb_str());
-        std::istringstream iss(s.c_str());
-		iss >> t;
+        template<typename T> void operator()(T& t, const wxTextCtrl *ctrl) const {
+            if(ctrl==NULL) return;
+            wxString ws(ctrl->GetLineText(0), *wxConvCurrent);
+            std::string s(ws.mb_str());
+            std::istringstream iss(s.c_str());
+            iss >> t;
 	}
 
-    template<typename T> void operator()(wxTextCtrl *ctrl, const T& t) const {
-		if(ctrl==NULL) return;
-		std::ostringstream oss;
-		oss << t;
-		ctrl->SetValue(wxString(oss.str().c_str(), *wxConvCurrent));
+        template<typename T> void operator()(wxTextCtrl *ctrl, const T& t) const {
+            if(ctrl==NULL) return;
+            std::ostringstream oss;
+            oss << t;
+            ctrl->SetValue(wxString(oss.str().c_str(), *wxConvCurrent));
 	}
 
-    template<typename T> void operator()(bool& t, const wxCheckBox *ctrl) const {
-		if(ctrl) t = ctrl->GetValue();
+        template<typename T> void operator()(bool& t, const wxCheckBox *ctrl) const {
+            if(ctrl) t = ctrl->GetValue();
 	}
 
-    template<typename T> void operator()(wxCheckBox *ctrl, bool t) const {
-		if(ctrl) ctrl->SetValue(t); 
+        template<typename T> void operator()(wxCheckBox *ctrl, bool t) const {
+            if(ctrl) ctrl->SetValue(t);
 	}
 
-};
+    };
 
 public:
-	typedef boost::variant<wxCheckBox*,wxTextCtrl*> control_type;
+    typedef boost::variant<wxCheckBox*,wxTextCtrl*> control_type;
 
     template<typename T> inline void set(const T& t) { parameter::value() = t; update_control(); }
 
@@ -130,25 +130,25 @@ public:
     inline void update_value  () { boost::apply_visitor(updater(),parameter::value(),m_control);}
 
     template<typename T>
-	wx_parameter(const std::string& n, char c, const T& v, const std::string& d)
-		: parameter(n,c,v,d) {}
+    wx_parameter(const std::string& n, char c, const T& v, const std::string& d)
+        : parameter(n,c,v,d) {}
 
     template<typename T> inline void control(T *c)    { m_control = c; }
     inline       control_type    control()        { return m_control; }
 private:
-	control_type m_control;
+    control_type m_control;
 };
 
 template<typename T>
 void update_values(parameters<T> *p) {
     for(typename parameters<T>::iterator it = p->begin(); it!=p->end(); ++it)
-		it->update_value();
+        it->update_value();
 }
 
 template<typename T>
 void update_controls(parameters<T> *p) {
     for(typename parameters<T>::iterator it = p->begin(); it!=p->end(); ++it)
-		it->update_control();
+        it->update_control();
 }
 
 #endif

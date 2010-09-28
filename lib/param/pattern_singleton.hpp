@@ -24,32 +24,32 @@
 template<typename T> class PatternSingleton
 {
 protected:
-	/// Empty constructor
-	PatternSingleton() {}
-	/// Copy constructor
-	PatternSingleton(const PatternSingleton&) {}
-	/// Destructor
-	~PatternSingleton() {}
+    /// Empty constructor
+    PatternSingleton() {}
+    /// Copy constructor
+    PatternSingleton(const PatternSingleton&) {}
+    /// Destructor
+    ~PatternSingleton() {}
 
 public:
-	/// This is tha main method 
-        static T* instance()
-	{
-		if (!m_singleton)
-		{
-			// Double-Checked Locking Pattern !
-			boost::mutex::scoped_lock lock(m_mutex);
-			if (!m_singleton)
-				m_singleton = new T;
-		}
-		return m_singleton;
-	}
+    /// This is tha main method
+    static T* instance()
+    {
+        if (!m_singleton)
+        {
+            // Double-Checked Locking Pattern !
+            boost::mutex::scoped_lock lock(m_mutex);
+            if (!m_singleton)
+                m_singleton = new T;
+        }
+        return m_singleton;
+    }
 
-	//private:
-	/// A pointer on the unique instance
-	static T* m_singleton;
-	/// Mutex used in the <i>Double-Checked Locking Pattern</i>
-	static boost::mutex m_mutex;
+    //private:
+    /// A pointer on the unique instance
+    static T* m_singleton;
+    /// Mutex used in the <i>Double-Checked Locking Pattern</i>
+    static boost::mutex m_mutex;
 };
 
 // Initialisation des variables statiques

@@ -6,17 +6,17 @@
 
 namespace rjmcmc {
 
-typedef boost::mpl::vector<
-	boost::gil::gray8_image_t, 
-	boost::gil::gray16_image_t,
-	boost::gil::gray16s_image_t,
-	boost::gil::gray32_image_t,
-	boost::gil::gray32F_image_t,
-	boost::gil::gray64F_image_t > image_types;
-typedef boost::gil::any_image<image_types> any_image_t;
+    typedef boost::mpl::vector<
+            boost::gil::gray8_image_t,
+            boost::gil::gray16_image_t,
+            boost::gil::gray16s_image_t,
+            boost::gil::gray32_image_t,
+            boost::gil::gray32F_image_t,
+            boost::gil::gray64F_image_t > image_types;
+    typedef boost::gil::any_image<image_types> any_image_t;
 
-typedef any_image_t::const_view_t any_const_view_t;
-typedef any_image_t::view_t       any_view_t;
+    typedef any_image_t::const_view_t any_const_view_t;
+    typedef any_image_t::view_t       any_view_t;
 };
 
 #endif

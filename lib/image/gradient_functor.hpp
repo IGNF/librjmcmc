@@ -9,15 +9,15 @@ typedef boost::gil::dev2n32F_view_t  gradient_view_t;
 class gradient_functor
 {
 public:
-  typedef void result_type;
-  gradient_functor(double sigma) : m_sigma(sigma) {}
-  double sigma() const { return m_sigma; }
-  void sigma(double s) { m_sigma = s; }
-  
-  template<typename Image, typename View>
+    typedef void result_type;
+    gradient_functor(double sigma) : m_sigma(sigma) {}
+    double sigma() const { return m_sigma; }
+    void sigma(double s) { m_sigma = s; }
+
+    template<typename Image, typename View>
     result_type operator()(Image& g, const View& v) const;
 private:
-  double m_sigma;
+    double m_sigma;
 };
 
 #endif // GRADIENT_FUNCTOR_HPP

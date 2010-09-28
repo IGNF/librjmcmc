@@ -7,39 +7,39 @@
 template<typename Image>
 class oriented {
 public:
-  typedef typename Image::view_t view_t;
-  typedef Image image_t;
-  
-  oriented(const boost::shared_ptr<Image>& img, const view_t& view, int x0=0, int y0=0)
-    : m_img(img), m_view(view), m_x0(x0), m_y0(y0) {}
-  oriented(const boost::shared_ptr<Image>& img, int x0=0, int y0=0)
-    : m_img(img), m_x0(x0), m_y0(y0) { if(img) m_view = view(*img); }
-  oriented() : m_img(), m_view(), m_x0(0), m_y0(0) {}
+    typedef typename Image::view_t view_t;
+    typedef Image image_t;
 
-  inline int x0() const { return m_x0; }
-  inline int y0() const { return m_y0; }
-  inline const view_t& view() const { return m_view; }
-  inline const boost::shared_ptr<Image>& img() const { return m_img; }
+    oriented(const boost::shared_ptr<Image>& img, const view_t& view, int x0=0, int y0=0)
+        : m_img(img), m_view(view), m_x0(x0), m_y0(y0) {}
+    oriented(const boost::shared_ptr<Image>& img, int x0=0, int y0=0)
+        : m_img(img), m_x0(x0), m_y0(y0) { if(img) m_view = view(*img); }
+    oriented() : m_img(), m_view(), m_x0(0), m_y0(0) {}
 
-  template<typename ImageIn, typename IsoRectangle>
+    inline int x0() const { return m_x0; }
+    inline int y0() const { return m_y0; }
+    inline const view_t& view() const { return m_view; }
+    inline const boost::shared_ptr<Image>& img() const { return m_img; }
+
+    template<typename ImageIn, typename IsoRectangle>
     oriented(const oriented<ImageIn>& img, const IsoRectangle& bbox);
-  
-  template<typename ImageIn, typename IsoRectangle, typename Fun>
+
+    template<typename ImageIn, typename IsoRectangle, typename Fun>
     oriented(const oriented<ImageIn>& img, const IsoRectangle& bbox, const Fun& f);
-  
-  template<typename Types, typename IsoRectangle, typename Fun>
+
+    template<typename Types, typename IsoRectangle, typename Fun>
     oriented(const oriented<boost::gil::any_image<Types> >& img, const IsoRectangle& bbox, const Fun& fun);
     
-  template<typename IsoRectangle>
+    template<typename IsoRectangle>
     oriented(const std::string &file, const IsoRectangle& bbox);
-  
-  template<typename IsoRectangle, typename Fun>
+
+    template<typename IsoRectangle, typename Fun>
     oriented(const std::string &file, const IsoRectangle& bbox, const Fun& f);
-  
+
 private:
-  boost::shared_ptr<Image> m_img;
-  view_t m_view;
-  int m_x0, m_y0;
+    boost::shared_ptr<Image> m_img;
+    view_t m_view;
+    int m_x0, m_y0;
 };
 
 template<typename IsoRectangle>

@@ -32,17 +32,17 @@ typedef modifier <is_valid>          modifier_kernel;
 
 //#include "rjmcmc/schedule/logarithmic_schedule.hpp"
 //#include "rjmcmc/schedule/step_schedule.hpp"
-//typedef rjmcmc::step_schedule<rjmcmc::logarithmic_schedule>                  schedule;
+//typedef simulated_annealing::step_schedule<rjmcmc::logarithmic_schedule<double> > schedule;
 #include "rjmcmc/schedule/geometric_schedule.hpp"
-typedef rjmcmc::geometric_schedule                  schedule;
+typedef simulated_annealing::geometric_schedule<double> schedule;
 
 #include "rjmcmc/end_test/max_iteration_end_test.hpp"
-typedef max_iteration_end_test                           end_test;
+typedef simulated_annealing::max_iteration_end_test                           end_test;
 
 //#include "rjmcmc/vector_configuration.hpp"
-//typedef rjmcmc::vector_configuration<object, unary_energy, binary_energy> configuration;
+//typedef marked_point_process::vector_configuration<object, unary_energy, binary_energy> configuration;
 #include "rjmcmc/configuration/graph_configuration.hpp"
-typedef rjmcmc::graph_configuration<object, unary_energy, binary_energy> configuration;
+typedef marked_point_process::graph_configuration<object, unary_energy, binary_energy> configuration;
 
 #include "rjmcmc/sampler/count_sampler.hpp"
 typedef rjmcmc::poisson_count_sampler                           count_sampler;
