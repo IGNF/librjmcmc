@@ -1,0 +1,22 @@
+[section Quickstart]
+
+Test paragraph 1 (quick start)
+
+
+[note This is a note]
+[tip This is a tip]
+[important This is important]
+[caution This is a caution]
+[warning This is a warning]
+
+
+
+
+[import test.cpp]
+[headers]
+[main]
+[step1]
+[step2]
+[main2]
+
+[endsect]

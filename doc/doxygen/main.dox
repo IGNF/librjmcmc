@@ -1,0 +1,7 @@
+/** @defgroup GroupGeometry Geometry
+ *  This module contains all geometric objects.
+ */
+
+/** @defgroup GroupSchedule Temperature schedules
+ *  This module contains all available temperature schedules.
+ */

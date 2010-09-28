@@ -1,0 +1,7 @@
+[section Reference]
+
+[xinclude ../geometry_reference.xml]
+
+[xinclude ../schedule_reference.xml]
+
+[endsect]
