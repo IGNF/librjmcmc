@@ -16,7 +16,7 @@ local doxygen_params =
         <doxygen:param>HIDE_UNDOC_CLASSES=YES
         <doxygen:param>HIDE_SCOPE_NAMES=YES
         <doxygen:param>EXTRACT_ALL=YES
-        <doxygen:param>EXTRACT_PRIVATE=YES
+        <doxygen:param>EXTRACT_PRIVATE=NO
         <doxygen:param>BUILTIN_STL_SUPPORT=YES
         <doxygen:param>ENABLE_PREPROCESSING=YES
         <doxygen:param>MACRO_EXPANSION=YES
@@ -32,12 +32,31 @@ local geometry_includes =
         ../lib/geometry/*.h
     ] ;
 
+local configuration_includes =
+    [ glob
+        ../lib/rjmcmc/configuration/*.hpp
+    ] ;
+
+local sampler_includes =
+    [ glob
+        ../lib/rjmcmc/sampler/*.hpp
+    ] ;
 
 local schedule_includes =
     [ glob
         ../lib/rjmcmc/schedule/*.hpp
-        ../lib/rjmcmc/schedule/geometry/*.h
     ] ;
+
+local end_test_includes =
+    [ glob
+        ../lib/rjmcmc/end_test/*.hpp
+    ] ;
+
+local visitor_includes =
+    [ glob
+        ../lib/visitor/*.hpp
+    ] ;
+
 
 doxygen geometry_reference
     :
@@ -47,12 +66,44 @@ doxygen geometry_reference
         <xsl:param>"boost.doxygen.reftitle=Geometry"
     ;
 
+doxygen configuration_reference
+    :
+        $(configuration_includes)
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Configurations"
+    ;
+
+doxygen sampler_reference
+    :
+        $(sampler_includes)
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Samplers"
+    ;
+
 doxygen schedule_reference
     :
         $(schedule_includes)
     :
         $(doxygen_params)
         <xsl:param>"boost.doxygen.reftitle=Schedules"
+    ;
+
+doxygen end_test_reference
+    :
+        $(end_test_includes)
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=End Tests"
+    ;
+
+doxygen visitor_reference
+    :
+        $(visitor_includes)
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Visitors"
     ;
 
 boostbook librjmcmc 
@@ -66,5 +117,9 @@ boostbook librjmcmc
         <xsl:param>nav.layout=none
         <xsl:param>navig.graphics.path=css/images/
         <dependency>geometry_reference
+        <dependency>configuration_reference
+        <dependency>sampler_reference
         <dependency>schedule_reference
+        <dependency>end_test_reference
+        <dependency>visitor_reference
         ; 

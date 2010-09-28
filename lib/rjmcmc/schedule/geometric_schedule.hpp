@@ -6,40 +6,39 @@ namespace simulated_annealing {
  * \ingroup GroupSchedule
  */
     /**
- * Geometric schedule class.
- * This class implements a simple geometric schedule class:
- * \f[T_i=T_0*m_coefficient^i\f]
+ * This class is a model of the Schedule concept and implements a geometric schedule :
+ * \f[T_i=T_0*\alpha^i\f]
+ * This schedule does not guarantee that the simulated annealing will converge to the global optimum.
+ * It is however the most commonly used schedule with a decrease coefficient close to 1 (e.g. 0.99999).
  */
     template<typename T>
     class geometric_schedule {
-        typedef geometric_schedule<T> self;
-
     public:
         typedef std::input_iterator_tag iterator_category;
-        typedef T              value_type;
-        typedef std::ptrdiff_t difference_type;
-        typedef T*             pointer;
-        typedef T&             reference;
+        typedef T                       value_type;
+        typedef std::ptrdiff_t          difference_type;
+        typedef value_type*             pointer;
+        typedef value_type&             reference;
 
-        bool operator==(const self& s) const { return (m_temp==s.m_temp) && (m_coefficient==s.m_coefficient); }
-        bool operator!=(const self& s) const { return !(*this==s); }
+        bool operator==(const geometric_schedule<T>& s) const { return (m_temp==s.m_temp) && (m_alpha==s.m_alpha); }
+        bool operator!=(const geometric_schedule<T>& s) const { return !(*this==s); }
 
-        /// Constructor
         /// @param temp Initial temperature
-        /// @param coefficient Geometric decrease coefficient
-        geometric_schedule(value_type temp, value_type coefficient) : m_temp(temp), m_coefficient(coefficient) {}
-        inline value_type  operator*() const { return m_temp; }
-        inline self  operator++()    { m_temp *= m_coefficient; return *this; }
-        inline self  operator++(int) { self t(*this); m_temp *= m_coefficient; return t; }
+        /// @param alpha Geometric decrease coefficient
+        geometric_schedule(value_type temp, value_type alpha) : m_temp(temp), m_alpha(alpha) {}
 
-        inline value_type coefficient() const { return m_coefficient; }
-        inline void coefficient(value_type coef) { m_coefficient = coef; }
+        inline value_type  operator*() const { return m_temp; }
+        inline geometric_schedule<T>& operator++()    { m_temp *= m_alpha; return *this; }
+        inline geometric_schedule<T>  operator++(int) { geometric_schedule<T> t(*this); m_temp *= m_alpha; return t; }
+
+        inline value_type alpha() const { return m_alpha; }
+        inline void alpha(value_type a) { m_alpha = a; }
 
     private:
-        /// Current temperature
+        // Current temperature
         value_type m_temp;
-        /// Geometric decrease coefficient
-        value_type m_coefficient;
+        // Geometric decrease coefficient
+        value_type m_alpha;
     };
 
 }; // namespace simulated_annealing

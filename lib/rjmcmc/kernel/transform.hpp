@@ -114,7 +114,7 @@ public:
             m_mat[i] = v[i];
             m_inv[i] = T(1)/v[i];
         }
-        m_abs_determinant = std::abs(m_determinant);
+        m_abs_determinant = std::fabs(m_determinant);
     }
 };
 

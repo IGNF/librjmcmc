@@ -8,7 +8,7 @@ namespace simulated_annealing
     public:
         delta_energy_end_test(unsigned int n) : m_i(0), m_n(n) {}
         template<typename Configuration, typename Sampler>
-        inline bool operator()(Configuration&, Sampler& s, double, unsigned int) {
+        inline bool operator()(const Configuration&, const Sampler& s, double, unsigned int) {
             m_i = (s.delta()==0)? (m_i+1) : 0;
             return m_i<m_n;
         }
