@@ -1,0 +1,52 @@
+[section:section_rjmcmc __RJMCMC__]
+
+[section:section_rjmcmc_intro Introduction]
+
+A __MCMC__ (MCMC) sampler provides a series of configuration samples according
+to a given unnormalized probability distribution function. __RJMCMC__ (RJMCMC) is an extension
+of MCMC that allows the configurations to be sampled in a union of spaces of varying dimensions.
+
+Elements of the sampled space are encoded in a [link librjmcmc.section_mpp.configuration_concept Configuration] object.
+[endsect]
+
+[section:sampler_concept Sampler concept]
+
+[todo []]
+
+Available models:
+
+* [classref rjmcmc::metropolis_sampler]
+* [classref rjmcmc::dueck_scheuer_sampler]
+* [classref rjmcmc::franz_hoffmann_sampler]
+* [classref rjmcmc::szu_hartley_sampler]
+* [classref rjmcmc::tsallis_tsariolo_sampler]
+* [classref rjmcmc::rejection_sampler]
+* ...
+
+[endsect]
+
+[section:kernel_concept Kernel concept]
+
+[todo []]
+
+Available models:
+
+[endsect]
+
+[section:transform_concept Transform concept]
+
+[todo []]
+
+Transformations encode a bijective differentiable mapping between spaces of equal dimensions. They provide apply, inverse and abs_jacobian functions
+
+Available models:
+
+* [classref rjmcmc::linear_transform]
+* [classref rjmcmc::affine_transform]
+* [classref rjmcmc::diagonal_linear_transform]
+* [classref rjmcmc::diagonal_affine_transform]
+* ...
+
+[endsect]
+
+[endsect]

@@ -1,0 +1,64 @@
+[section:section_simulated_annealing Simulated Annealing]
+
+[section:simulated_annealing_introduction Introduction]
+Simulated annealing is a physical process ...
+
+Coupled with the rjmcmc framework, it enables the global optimization of an extremely large class of energy functions
+over complex search spaces of varying dimensions. The goal of the simulated annealing process is to drive the initial rjmcmc sampler
+from an initial probability distribution function given by an energy-agnostic probabilisation of the search space (denoted as the reference
+process) to a final probability distribution function which support is exactly the set of global minima of the energy.
+Thus the final pdf reduces to a simple dirac at the global minimum if it is unique.
+To interpolate the pdf between the initial reference pdf and the final pdf a boltzmann distribution is usually used, parameterized
+by a temperature which decreases from +[infin] to zero.
+
+[endsect]
+
+[section:schedule_concept Schedule concept]
+Models of the Schedule concept are responsible for providing the evolution of the temperature throughout the simulated annealing process.
+This concept is a refinement of the [@http://www.sgi.com/tech/stl/InputIterator.html InputIterator] concept. The
+
+Available models:
+
+* [classref simulated_annealing::geometric_schedule]
+* [classref simulated_annealing::logarithmic_schedule]
+* [classref simulated_annealing::inverse_linear_schedule]
+* [classref simulated_annealing::step_schedule]
+
+[endsect]
+
+[section:endtest_concept EndTest concept]
+
+Models of the EndTest concept provide a simple predicate that informs the simulated annealing framework that the process has converged
+or whatever reason requiring to stop the simulated annealing iterations, such as a user-issued cancellation.
+
+The only requirements of this concept is to provide the following member functions:
+
+        template<typename Configuration, typename Sampler>
+        bool operator()(const Configuration& configuration, const Sampler& sampler, double temperature, unsigned int iteration);
+
+        void stop ()
+
+The former function is guaranteed to be called only once per iteration and states whether the iterative
+process should continue. The stop function asks the EndTest model to return false at the following iteration.
+
+Available models:
+
+* [classref simulated_annealing::delta_energy_end_test]
+* [classref simulated_annealing::max_iteration_end_test]
+
+[endsect]
+
+[section:visitor_concept Visitor concept]
+
+Visitors are highly customizable objects passed to the simulated annealing process to provide various vizualisations
+of the current state of the optimization.
+
+Available models:
+
+* [classref rjmcmc::ostream_visitor]
+* [classref rjmcmc::composite_visitor]
+* and wx visitors (requires the [@http://code.google.com/p/gilviewer/ GilViewer] library)...
+
+[endsect]
+
+[endsect]
