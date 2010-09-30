@@ -3,10 +3,11 @@
     [version 0.1]
     [authors [Brédif, Mathieu], [Tournaire, Olivier]]
     [copyright 2010 Mathieu Brédif, Olivier Tournaire]
-    [purpose A generic library for rjmcmc]
+    [purpose A generic library for rjmcmc and simulated annealing]
     [license
-        Distributed under the CeCCILL-B License, Version 1.0.
-        (See french (frencLicence_CeCILL-B_V1-fr.txt) or english (Licence_CeCILL-B_V1-en.txt) accompanying file or [@http://www.cecill.info/licences/Licence_CeCILL-B_V1-fr.html french] / [@http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html english] web copy.)
+        Distributed under the CeCILL-B License, Version 1.0.
+        ([@http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html english] / [@http://www.cecill.info/licences/Licence_CeCILL-B_V1-fr.html french] copy.)
+        [/See french (frencLicence_CeCILL-B_V1-fr.txt) or english (Licence_CeCILL-B_V1-en.txt) accompanying file or ]
     ]
     [id rjmcmc]
     [source-mode c++]
@@ -14,21 +15,17 @@
 
 [include HTML4_symbols.qbk]
 [def __librjmcmc__ librjmcmc]
-
-[c++]
-
-[section Disclaimer]
-
-This library is provided as is blah blah blah blah...
-
-[endsect]
-
-
+[def __MCMC__ Markov Chain Monte Carlo]
+[def __RJMCMC__ Reversible-Jump __MCMC__]
+[template todo[text]
+[warning *TODO:* [text]]
+]
 
 [include librjmcmc_introduction.qbk]
 [include librjmcmc_quickstart.qbk]
-[include librjmcmc_concepts.qbk]
+[include librjmcmc_mpp.qbk]
+[include librjmcmc_rjmcmc.qbk]
+[include librjmcmc_simulated_annealing.qbk]
 [include librjmcmc_tutorial.qbk]
 [include librjmcmc_samples.qbk]
 [include librjmcmc_reference.qbk]
-[include librjmcmc_todo.qbk]

@@ -5,7 +5,7 @@
 #include <boost/random/poisson_distribution.hpp>
 #include <boost/random/uniform_smallint.hpp>
 
-namespace rjmcmc {
+namespace marked_point_process {
 
     // exp(-poisson) * (poisson^n) / n!
     class poisson_count_sampler {
@@ -40,11 +40,11 @@ namespace rjmcmc {
         typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_smallint<> > count_sampler;
         uniform_count_sampler(unsigned int a, unsigned int b)
             : m_min(a), m_max(b)
-            , m_die(random(), boost::uniform_smallint<>(a,b)) {}
+            , m_die(rjmcmc::random(), boost::uniform_smallint<>(a,b)) {}
 
         uniform_count_sampler(unsigned int b)
             : m_min(0), m_max(b)
-            , m_die(random(), boost::uniform_smallint<>(0,b)) {}
+            , m_die(rjmcmc::random(), boost::uniform_smallint<>(0,b)) {}
 
         template<typename Configuration, typename Modification>
         double pdf_ratio(const Configuration &c, const Modification &m) const
@@ -59,6 +59,6 @@ namespace rjmcmc {
         mutable count_sampler m_die;
     };
 
-}; // namespace rjmcmc
+}; // namespace marked_point_process
 
 #endif // __COUNT_SAMPLER_HPP__

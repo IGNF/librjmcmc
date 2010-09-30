@@ -168,7 +168,7 @@ namespace rjmcmc {
     };
 */
 
-    // make convenience functions
+    // convenience make functions
 
     template<typename Generator>
     uniform_birth_kernel<Generator> make_uniform_birth_kernel(const Generator& g)

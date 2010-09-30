@@ -32,6 +32,11 @@ local geometry_includes =
         ../lib/geometry/*.h
     ] ;
 
+local transform_includes =
+    [ glob
+        ../lib/rjmcmc/kernel/transform.hpp
+    ] ;
+
 local configuration_includes =
     [ glob
         ../lib/rjmcmc/configuration/*.hpp
@@ -106,6 +111,14 @@ doxygen visitor_reference
         <xsl:param>"boost.doxygen.reftitle=Visitors"
     ;
 
+doxygen transform_reference
+    :
+        $(transform_includes)
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Transforms"
+    ;
+
 boostbook librjmcmc 
         : src/librjmcmc_quickbook.qbk 
         : <xsl:param>boost.root=../..
@@ -116,6 +129,7 @@ boostbook librjmcmc
         <xsl:param>html.stylesheet=css/boostbook.css
         <xsl:param>nav.layout=none
         <xsl:param>navig.graphics.path=css/images/
+        <dependency>transform_reference
         <dependency>geometry_reference
         <dependency>configuration_reference
         <dependency>sampler_reference

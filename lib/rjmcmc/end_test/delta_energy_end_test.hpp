@@ -3,6 +3,12 @@
 
 namespace simulated_annealing
 {
+    /**
+ * \ingroup GroupEndTest
+ */
+    /**
+ * This class is a model of the EndTest concept and stops the ... TODO
+ */
 
     class delta_energy_end_test {
     public:

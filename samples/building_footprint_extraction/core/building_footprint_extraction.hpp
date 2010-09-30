@@ -45,8 +45,8 @@ typedef simulated_annealing::max_iteration_end_test                           en
 typedef marked_point_process::graph_configuration<object, unary_energy, binary_energy> configuration;
 
 #include "rjmcmc/sampler/count_sampler.hpp"
-typedef rjmcmc::poisson_count_sampler                           count_sampler;
-//typedef rjmcmc::uniform_count_sampler                           count_sampler;
+typedef marked_point_process::poisson_count_sampler                           count_sampler;
+//typedef marked_point_process::uniform_count_sampler                           count_sampler;
 
 #include "rjmcmc/sampler/sampler_base.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;

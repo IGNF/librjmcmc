@@ -10,10 +10,35 @@ class generator {
     typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_real<> > die_type;
     mutable die_type m_die;
     IsValid m_is_valid;
+#ifdef GEOMETRY_RECTANGLE_2_H
+    rjmcmc::diagonal_affine_transform<5,float> m_rectangle_transform;
+#endif
+#ifdef GEOMETRY_CIRCLE_2_H
+    rjmcmc::diagonal_affine_transform<3,float> m_circle_transform;
+#endif
+
 public:
     generator(const IsValid& is_valid) :
             m_die(rjmcmc::random(), boost::uniform_real<>(0,1)),
-            m_is_valid(is_valid) {}
+            m_is_valid(is_valid)
+    {
+        const Iso_rectangle_2& bbox = m_is_valid.bbox();
+        float x0 = bbox.min().x();
+        float y0 = bbox.min().y();
+        float dx = bbox.max().x()-x0;
+        float dy = bbox.max().y()-y0;
+#ifdef GEOMETRY_RECTANGLE_2_H
+        float rect_m[5] = { dx, dy, 0.1*dx, 0.1*dy, 1 };
+        float rect_d[5] = { x0, y0, 0., 0., 0. };
+        m_rectangle_transform = rjmcmc::diagonal_affine_transform<5,float>(rect_m,rect_d);
+#endif
+#ifdef GEOMETRY_CIRCLE_2_H
+        float circ_m[3] = { dx, dy, 0.5*geometry::min(dx,dy) };
+        float circ_d[3] = { x0, y0, 0. };
+        m_circle_transform    = rjmcmc::diagonal_affine_transform<3,float>(circ_m,circ_d);
+#endif
+
+    }
 
     typedef double result_type;
 
@@ -22,22 +47,15 @@ public:
     {
         typedef typename K::Point_2 Point_2;
         typedef typename K::Vector_2 Vector_2;
-        const Iso_rectangle_2& bbox = m_is_valid.bbox();
-        float x0 = bbox.min().x();
-        float y0 = bbox.min().y();
-        float dx = bbox.max().x()-x0;
-        float dy = bbox.max().y()-y0;
         float in [5] = { m_die(), m_die(), m_die(), m_die(), m_die() };
         float out[5];
-	float m[5] = { dx, dy, 0.1*dx, 0.1*dy, 1 };
-        diagonal_transform<5,float> trans(m);
-	trans.apply(in,out);
+        m_rectangle_transform.apply(in,out);
         // do {
-        Point_2 p(x0+out[0], y0+out[1]);
+        Point_2 p(out[0], out[1]);
         Vector_2 v(out[2], out[3]);
         r = geometry::Rectangle_2<K>(p, v, out[4]);
         // } while (!m_is_valid(r));
-        return trans.abs_jacobian(in);
+        return 1.;//m_rectangle_transform.abs_jacobian(in);
     }
 #endif
 
@@ -45,17 +63,14 @@ public:
     template<typename K> result_type operator()(geometry::Circle_2<K> &c) const
     {
         typedef typename K::Point_2 Point_2;
-        const Iso_rectangle_2& bbox = m_is_valid.bbox();
-        float x0 = bbox.min().x();
-        float y0 = bbox.min().y();
-        float dx = bbox.max().x()-x0;
-        float dy = bbox.max().y()-y0;
-        double radius = 0.5*geometry::min(dx,dy);
+        float in [3] = { m_die(), m_die(), m_die() };
+        float out[3];
+        m_circle_transform.apply(in,out);
         // do {
-        Point_2 p(x0+dx*m_die(), y0+dy*m_die());
-        c = geometry::Circle_2<K>(p, m_die()*radius);
+        Point_2 p(out[0], out[1]);
+        c = geometry::Circle_2<K>(p, out[2]);
         // } while (!m_is_valid(c));
-        return 1./(dx*dy*radius);
+        return 1.;//m_circle_transform.abs_jacobian(in);
     }
 #endif
 

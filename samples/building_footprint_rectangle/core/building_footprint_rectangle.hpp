@@ -46,8 +46,8 @@ typedef simulated_annealing::max_iteration_end_test                           en
 typedef marked_point_process::graph_configuration<object, unary_energy, binary_energy> configuration;
 
 #include "rjmcmc/sampler/count_sampler.hpp"
-//typedef rjmcmc::poisson_count_sampler                           count_sampler;
-typedef rjmcmc::uniform_count_sampler                           count_sampler;
+typedef marked_point_process::poisson_count_sampler                           count_sampler;
+//typedef marked_point_process::uniform_count_sampler                           count_sampler;
 
 #include "rjmcmc/sampler/sampler_base.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
@@ -55,7 +55,7 @@ typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
 #include "rjmcmc/sampler/direct_sampler.hpp"
-typedef direct_sampler<count_sampler,generator_kernel> d_sampler;
+typedef marked_point_process::direct_sampler<count_sampler,generator_kernel> d_sampler;
 #include "rjmcmc/sampler/metropolis_sampler.hpp"
 typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel,modification_kernel> sampler;
 //typedef rjmcmc::dueck_scheuer_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;

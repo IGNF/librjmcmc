@@ -38,7 +38,7 @@ typedef parameters< wx_parameter > param;
 
 class building_footprint_rectangle_gui : public wxApp, public Controler
 { 
-    typedef composite_visitor<wx_log_visitor*,configuration_frame*,parameters_frame*,chart_frame*
+    typedef rjmcmc::composite_visitor<wx_log_visitor*,configuration_frame*,parameters_frame*,chart_frame*
             > visitor;
 
 private:

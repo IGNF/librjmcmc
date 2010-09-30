@@ -17,7 +17,7 @@ Available models:
 * [classref marked_point_process::metropolis_sampler]
 * [classref marked_point_process::duek_scheuer_sampler]
 * [classref marked_point_process::franz_hoffman_sampler]
-* [classref marked_point_process::rejection_sampler_sampler]
+* [classref marked_point_process::rejection_sampler]
 * ...
 
 [endsect]
