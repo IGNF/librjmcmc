@@ -1,21 +1,21 @@
-[section:section_mpp Marked Point Process]
+[section:section_mpp __MPP__]
 
 [section:mpp_introduction Introduction]
 
-A Marked Point Process (MPP) is a stochastic unordered set of geometric objects of one or many types
+A __MPP__ (MPP) is a stochastic unordered set of geometric objects of one or many types
 (e.g. points, segments, circles, ellipses or rectangles in 2D, ellipsoids or spheres in 3D). The *marked point* denomination
 arises from the usual decomposition of the object parameterization into a *point* of its embedding space (usually its center)
-and a vector of values (the *marks*) that completes the geometric parameterization of the object (e.g. orientation, length, radius parameters), hence the name
-of marked point processes.
+and a vector of values (the *marks*) that completes the geometric parameterization of the object (e.g. orientation, length or radius parameters), hence the name
+of __MPPs__.
 
-A Marked Point Process is defined by a probabilized space.
-Elements of this space are represented as instances of the Configuration concept.
+A __MPP__ is defined by a probabilized space.
+Elements of this space are unordered sets represented as instances of the [link librjmcmc.section_mpp.configuration_concept Configuration] concept.
 A probabilization of this configuration space may be given by a discrete probability defined
-over the natural numbers *N* for each object type that samples the number of object of each type and a object sampler for each type.
-This allows a direct sampling of the Marked Point Process by sampling both the object counts and then each object independently.
+over the natural numbers *N* for each object type that samples the number of object of each type and an object sampler for each type.
+This allows a direct sampling of the __MPP__ by sampling both the object counts and then each object independently.
 
-Such a probabilization enables a direct sampling of the Marked Point Process. However if the probabilization involves
-interactions between objects, sampling the Marked Point Process will require more advanced techniques such as
+Such a probabilization enables a direct sampling of the __MPP__. However if the probabilization involves
+interactions between objects, sampling the __MPP__ will require more advanced techniques such as
 the [link librjmcmc.section_rjmcmc __RJMCMC__] method.
 
 [todo Energies]

@@ -8,7 +8,7 @@ namespace simulated_annealing {
  */
     /**
  * This class is a model of the Schedule concept and wraps another schedule by slowing it down n-fold :
- * \f[T'_i=T_{0}{\lfloor\frac{i}{n}\rfloor\f]
+ * \f[T'_i=T_{\left\lfloor\frac{i}{n}\right\rfloor}\f]
  * This schedule is used to facilitate the convergence of the sampler at a fixed temperature
  * as the temperature decrease is broken down into plateaus of size n.
  */

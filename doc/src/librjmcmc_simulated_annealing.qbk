@@ -11,6 +11,20 @@ Thus the final pdf reduces to a simple dirac at the global minimum if it is uniq
 To interpolate the pdf between the initial reference pdf and the final pdf a boltzmann distribution is usually used, parameterized
 by a temperature which decreases from +[infin] to zero.
 
+        namespace simulated_annealing
+        {
+
+        template<
+            class Configuration, class Sampler,
+            class Schedule, class EndTest,
+            class Visitor
+            >
+            void optimize(
+                    Configuration& config, Sampler& sampler,
+                    Schedule& schedule, EndTest& end_test,
+                    Visitor& visitor );
+        }
+
 [endsect]
 
 [section:schedule_concept Schedule concept]
@@ -57,7 +71,7 @@ Available models:
 
 * [classref rjmcmc::ostream_visitor]
 * [classref rjmcmc::composite_visitor]
-* and wx visitors (requires the [@http://code.google.com/p/gilviewer/ GilViewer] library)...
+* and many other GUI visitors (requires [@http://http://www.wxwidgets.org/ wxWidgets] and the [@http://code.google.com/p/gilviewer/ GilViewer] library)...
 
 [endsect]
 

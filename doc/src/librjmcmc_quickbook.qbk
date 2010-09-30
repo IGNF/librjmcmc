@@ -15,6 +15,8 @@
 
 [include HTML4_symbols.qbk]
 [def __librjmcmc__ librjmcmc]
+[def __MPP__ Marked Point Process]
+[def __MPPs__ Marked Point Processes]
 [def __MCMC__ Markov Chain Monte Carlo]
 [def __RJMCMC__ Reversible-Jump __MCMC__]
 [template todo[text]
