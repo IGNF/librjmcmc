@@ -7,7 +7,8 @@ namespace rjmcmc
 {
 
     template<typename CountSampler, RJMCMC_TUPLE_TYPENAMES>
-    class tsallis_tsariolo_sampler : public sampler_base<tsallis_tsariolo_sampler<CountSampler,RJMCMC_TUPLE_TYPES>, CountSampler, RJMCMC_TUPLE_TYPES>
+    class tsallis_tsariolo_sampler
+        : public sampler_base<tsallis_tsariolo_sampler<CountSampler,RJMCMC_TUPLE_TYPES>, CountSampler, RJMCMC_TUPLE_TYPES>
     {
     private:
         typedef tsallis_tsariolo_sampler<CountSampler, RJMCMC_TUPLE_TYPES> self;

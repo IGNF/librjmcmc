@@ -7,7 +7,8 @@ namespace rjmcmc
 {
 
     template<typename CountSampler, RJMCMC_TUPLE_TYPENAMES>
-    class dueck_scheuer_sampler : public sampler_base<dueck_scheuer_sampler<CountSampler, RJMCMC_TUPLE_TYPES>, CountSampler, RJMCMC_TUPLE_TYPES>
+    class dueck_scheuer_sampler
+        : public sampler_base<dueck_scheuer_sampler<CountSampler, RJMCMC_TUPLE_TYPES>, CountSampler, RJMCMC_TUPLE_TYPES>
     {
     private:
         typedef dueck_scheuer_sampler<CountSampler, RJMCMC_TUPLE_TYPES> self;

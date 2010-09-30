@@ -7,7 +7,7 @@ Some trailing text here
 //]
 
 //[main
-int main(char**argv, int argc)
+int main(int argc, char**argv)
 {
 //]
 	//[step1

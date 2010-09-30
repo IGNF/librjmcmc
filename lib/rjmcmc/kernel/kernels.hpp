@@ -2,7 +2,6 @@
 #define KERNELS_HPP_
 
 #include "rjmcmc/random.hpp"
-#include "rjmcmc/random.hpp"
 #include "rjmcmc/kernel/transform.hpp"
 
 template< typename IsValid >
