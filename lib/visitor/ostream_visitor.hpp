@@ -13,7 +13,7 @@ namespace rjmcmc {
         unsigned int *m_accepted;
         clock_t m_clock_begin, m_clock;
         unsigned int m_dump;
-        unsigned int m_save;
+        unsigned int m_iter;
         int w;
         std::ostream& m_out;
         bool m_add_endline; // todo: compile time with mpl::true_/false_
@@ -25,9 +25,9 @@ namespace rjmcmc {
             if(m_proposed) delete m_proposed;
         }
 
-        void init(int dump, int save) {
+        void init(unsigned int dump, unsigned int) {
+            m_iter = 0;
             m_dump = dump;
-            m_save = save;
         }
 
         template<typename Configuration, typename Sampler>
@@ -73,15 +73,16 @@ namespace rjmcmc {
         }
 
         template<typename Configuration, typename Sampler>
-        bool iterate(const Configuration& config, const Sampler& sampler, double t, unsigned int i) {
+        void visit(const Configuration& config, const Sampler& sampler, double t) {
             enum { kernel_size = Sampler::kernel_size };
 
             m_proposed[sampler.kernel_id()]++;
             if( sampler.accepted() ) m_accepted[sampler.kernel_id()]++;
 
-            if (m_dump && (i % m_dump == 0))
+            ++m_iter;
+            if (m_dump && (m_iter % m_dump == 0) )
             {
-                m_out << std::setw(w) << i;
+                m_out << std::setw(w) << m_iter;
                 m_out << std::setw(w) << config.size();
 
                 unsigned int total_accepted =0;
@@ -104,7 +105,6 @@ namespace rjmcmc {
                     m_out << std::endl;
                 m_out << std::flush;
             }
-            return true;
         }
     };
 

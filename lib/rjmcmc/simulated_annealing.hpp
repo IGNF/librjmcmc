@@ -5,6 +5,7 @@
 namespace simulated_annealing
 {
 
+    //[simulated_annealing_signature
     template<
             class Configuration, class Sampler,
             class Schedule, class EndTest,
@@ -14,17 +15,23 @@ namespace simulated_annealing
                     Configuration& config, Sampler& sampler,
                     Schedule& schedule, EndTest& end_test,
                     Visitor& visitor )
+            //]
     {
-        BOOST_CONCEPT_ASSERT((boost::InputIterator<Schedule>));
 
-	visitor.begin(config,sampler,*schedule);
-	for (unsigned int i=1; end_test(config,sampler,*schedule,i); ++i, ++schedule)
-	{
-            sampler(config,*schedule);
-            bool result = visitor.iterate(config,sampler,*schedule,i);
-            if(!result) break;
-	}
-	visitor.end(config,sampler,*schedule);
+        //[simulated_annealing_concept_assertions
+        BOOST_CONCEPT_ASSERT((boost::InputIterator<Schedule>));
+        //]
+
+        //[simulated_annealing_loop
+        double t = *schedule;
+        visitor.begin(config,sampler,t);
+        for(; !end_test(config,sampler,t); t = *(++schedule))
+        {
+            sampler(config,t);
+            visitor.visit(config,sampler,t);
+        }
+        visitor.end(config,sampler,t);
+        //]
     }
 
 }

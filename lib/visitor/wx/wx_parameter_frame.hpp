@@ -48,7 +48,7 @@ public:
     }
 
     template<typename Configuration, typename Sampler>
-    bool iterate(const Configuration& config, const Sampler& sampler, double, unsigned int i) { return true; }
+    inline void visit(const Configuration& config, const Sampler& sampler, double) {}
 
     void on_file_parameter(wxCommandEvent& event);
     void on_bool_parameter(wxCommandEvent& event);

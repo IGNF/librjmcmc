@@ -11,8 +11,8 @@ namespace rjmcmc {
         {
             int m_dump, m_save;
             visitor_init(int dump, int save) : m_dump(dump), m_save(save) {}
-            template<typename T> void operator()(const T& t) { t .init(m_dump,m_save); }
-            template<typename T> void operator()(T* t) { t->init(m_dump,m_save); }
+            template<typename T> inline void operator()(const T& t) { t .init(m_dump,m_save); }
+            template<typename T> inline void operator()(      T* t) { t->init(m_dump,m_save); }
         };
 
         template<typename Configuration, typename Sampler>
@@ -22,8 +22,18 @@ namespace rjmcmc {
             const Sampler& m_sample;
             double m_t;
             visitor_begin(const Configuration& config, const Sampler& sample, double t) : m_config(config), m_sample(sample), m_t(t) {}
-            template<typename T> void operator()(const T& t) { t .begin(m_config,m_sample,m_t); }
-            template<typename T> void operator()(T* t) { t->begin(m_config,m_sample,m_t); }
+            template<typename T> inline void operator()(const T& t) { t .begin(m_config,m_sample,m_t); }
+            template<typename T> inline void operator()(      T* t) { t->begin(m_config,m_sample,m_t); }
+        };
+        template<typename Configuration, typename Sampler>
+        struct visitor_visit
+        {
+            const Configuration& m_config;
+            const Sampler& m_sample;
+            double m_t;
+            visitor_visit(const Configuration& config, const Sampler& sample, double t) : m_config(config), m_sample(sample), m_t(t) {}
+            template<typename T> inline void operator()(const T& t) { t .visit(m_config,m_sample,m_t); }
+            template<typename T> inline void operator()(      T* t) { t->visit(m_config,m_sample,m_t); }
         };
         template<typename Configuration, typename Sampler>
         struct visitor_end
@@ -32,22 +42,10 @@ namespace rjmcmc {
             const Sampler& m_sample;
             double m_t;
             visitor_end(const Configuration& config, const Sampler& sample, double t) : m_config(config), m_sample(sample), m_t(t) {}
-            template<typename T> void operator()(const T& t) { t .end(m_config,m_sample,m_t); }
-            template<typename T> void operator()(T* t) { t->end(m_config,m_sample,m_t); }
+            template<typename T> inline void operator()(const T& t) { t .end(m_config,m_sample,m_t); }
+            template<typename T> inline void operator()(      T* t) { t->end(m_config,m_sample,m_t); }
         };
 
-        template<typename Configuration, typename Sampler>
-        struct visitor_iterate
-        {
-            const Configuration& m_config;
-            const Sampler& m_sample;
-            double m_t;
-            unsigned int m_i;
-            bool m_bool;
-            visitor_iterate(const Configuration& config, const Sampler& sample, double t, unsigned int i) : m_config(config), m_sample(sample), m_t(t), m_i(i), m_bool(true) {}
-            template<typename T> void operator()(const T& t) { m_bool = m_bool && t .iterate(m_config,m_sample,m_t,m_i); }
-            template<typename T> void operator()(T* t) { m_bool = m_bool && t->iterate(m_config,m_sample,m_t,m_i); }
-        };
     } // namespace internal
 
     template<RJMCMC_TUPLE_TYPENAMES>
@@ -71,11 +69,10 @@ namespace rjmcmc {
         }
 
         template<typename Configuration, typename Sampler>
-        bool iterate(const Configuration& config, const Sampler& sample, double t, unsigned int i)
+        void visit(const Configuration& config, const Sampler& sample, double t)
         {
-            internal::visitor_iterate<Configuration,Sampler> v(config,sample,t,i);
+            internal::visitor_visit<Configuration,Sampler> v(config,sample,t);
             rjmcmc::for_each(m_visitors,v);
-            return v.m_bool;
         }
 
         template<typename Configuration, typename Sampler>

@@ -6,14 +6,14 @@ namespace simulated_annealing
 
     class max_iteration_end_test {
     public:
-        max_iteration_end_test(unsigned int i) : m_iterations(i) {}
+        max_iteration_end_test(int i) : m_iterations(i) {}
         template<typename Configuration, typename Sampler>
-        inline bool operator()(const Configuration&, const Sampler&, double, unsigned int i) {
-            return i<=m_iterations;
+        inline bool operator()(const Configuration&, const Sampler&, double) {
+            return ((--m_iterations)>0);
         }
         void stop () { m_iterations=0; }
     private:
-        unsigned int m_iterations;
+        int m_iterations;
     };
 
 };
