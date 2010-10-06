@@ -3,14 +3,13 @@
 
 namespace simulated_annealing {
     /**
- * \ingroup GroupSchedule
- */
-    /**
- * This class is a model of the Schedule concept and implements a geometric schedule :
- * \f[T_i=T_0*\alpha^i\f]
- * This schedule does not guarantee that the simulated annealing will converge to the global optimum.
- * It is however the most commonly used schedule with a decrease coefficient close to 1 (e.g. 0.99999).
- */
+     * \ingroup GroupSchedule
+     *
+     * This class is a model of the Schedule concept and implements a geometric schedule :
+     * \f[T_i=T_0*\alpha^i\f]
+     * This schedule does not guarantee that the simulated annealing will converge to the global optimum.
+     * It is however the most commonly used schedule with a decrease coefficient close to 1 (e.g. 0.99999).
+     */
     template<typename T>
     class geometric_schedule {
     public:

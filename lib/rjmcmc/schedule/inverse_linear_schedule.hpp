@@ -3,12 +3,11 @@
 
 namespace simulated_annealing {
     /**
- * \ingroup GroupSchedule
- */
-    /**
- * This class is a model of the Schedule concept and implements an inverse linear schedule:
- * \f[\frac{1}{T_{i+1}}=\frac{1}{T_i}+\delta\f]
- */
+     * \ingroup GroupSchedule
+     *
+     * This class is a model of the Schedule concept and implements an inverse linear schedule:
+     * \f[\frac{1}{T_{i+1}}=\frac{1}{T_i}+\delta\f]
+     */
     template<typename T>
     class inverse_linear_schedule {
     public:

@@ -1,7 +1,7 @@
 [section:section_simulated_annealing Simulated Annealing]
 
 [section:simulated_annealing_introduction Introduction]
-Simulated annealing is a physical process ...
+Simulated annealing is a physical process ...[cite_salamon]
 
 Coupled with the rjmcmc framework, it enables the global optimization of an extremely large class of energy functions
 over complex search spaces of varying dimensions. The goal of the simulated annealing process is to drive the initial rjmcmc sampler
@@ -11,25 +11,31 @@ Thus the final pdf reduces to a simple dirac at the global minimum if it is uniq
 To interpolate the pdf between the initial reference pdf and the final pdf a boltzmann distribution is usually used, parameterized
 by a temperature which decreases from +[infin] to zero.
 
-        namespace simulated_annealing
-        {
+[import ../../lib/rjmcmc/simulated_annealing.hpp]
 
-        template<
-            class Configuration, class Sampler,
-            class Schedule, class EndTest,
-            class Visitor
-            >
-            void optimize(
-                    Configuration& config, Sampler& sampler,
-                    Schedule& schedule, EndTest& end_test,
-                    Visitor& visitor );
-        }
+
+The main function of this simulated annealing `namespace` is `simulated_annealing::optimize`:
+[simulated_annealing_signature]
+
+The main loop of the simulated annealing is implemented as follows:
+[simulated_annealing_loop]
+
+The automatic validation of the concepts modeled by the argument templates is currently performed using the following macros:
+[simulated_annealing_concept_assertions]
 
 [endsect]
 
 [section:schedule_concept Schedule concept]
-Models of the Schedule concept are responsible for providing the evolution of the temperature throughout the simulated annealing process.
-This concept is a refinement of the [@http://www.sgi.com/tech/stl/InputIterator.html InputIterator] concept. The
+Models of the `Schedule` concept are responsible for providing the evolution of the temperature throughout
+the simulated annealing process.
+The `Schedule` concept is a refinement of the [@http://www.sgi.com/tech/stl/InputIterator.html InputIterator]
+concept of the [stl].
+
+The evaluation of a suitable initial temperature is not trivial. On the other hand, too high a temperature will unnecessarily
+prolong the initial phase of the simulated annealing where the sampling is unbiased by the energy.
+On the other hand, too low a temperature prevents the exploration of the whole configuration space and results in a
+convergence to a local minimum only. [cite_salamon] suggests considering an estimation of the variance of the energy
+of configurations sampled according to the reference process to estimate the initial temperature.
 
 Available models:
 
@@ -48,9 +54,7 @@ or whatever reason requiring to stop the simulated annealing iterations, such as
 The only requirements of this concept is to provide the following member functions:
 
         template<typename Configuration, typename Sampler>
-        bool operator()(const Configuration& configuration, const Sampler& sampler, double temperature, unsigned int iteration);
-
-        void stop ()
+        bool operator()(const Configuration& configuration, const Sampler& sampler, double temperature);
 
 The former function is guaranteed to be called only once per iteration and states whether the iterative
 process should continue. The stop function asks the EndTest model to return false at the following iteration.
@@ -59,19 +63,34 @@ Available models:
 
 * [classref simulated_annealing::delta_energy_end_test]
 * [classref simulated_annealing::max_iteration_end_test]
+* [classref simulated_annealing::composite_end_test]
 
 [endsect]
 
 [section:visitor_concept Visitor concept]
 
-Visitors are highly customizable objects passed to the simulated annealing process to provide various vizualisations
-of the current state of the optimization.
+Visitors are highly customizable objects passed to the simulated annealing process. They may be used to easily
+provide various vizualisations of the current state of the optimization.
+
+        template<typename Configuration, typename Sampler>
+        void begin(const Configuration& configuration, const Sampler& sampler, double temperature);
+
+        template<typename Configuration, typename Sampler>
+        void visit(const Configuration& configuration, const Sampler& sampler, double temperature);
+
+        template<typename Configuration, typename Sampler>
+        void end(const Configuration& configuration, const Sampler& sampler, double temperature);
+
 
 Available models:
 
 * [classref rjmcmc::ostream_visitor]
 * [classref rjmcmc::composite_visitor]
-* and many other GUI visitors (requires [@http://http://www.wxwidgets.org/ wxWidgets] and the [@http://code.google.com/p/gilviewer/ GilViewer] library)...
+* Various [wx]-based GUI visitors (requiring the [gilviewer] library)
+  * [classref wx_log_visitor]
+  * [classref parameters_frame]
+  * [classref chart_frame]
+  * [classref configuration_frame]
 
 [endsect]
 

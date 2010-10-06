@@ -2,17 +2,15 @@
 #define __LOGARITHMIC_SCHEDULE_HPP__
 
 namespace simulated_annealing {
-
     /**
- * \ingroup GroupSchedule
- */
-    /**
- * This class is a model of the Schedule concept and implements a geometric schedule:
- * \f[T_i=\frac{T_0}{\log_2(2+i)}\f]
- * This schedule guarantees that the simulated annealing will converge to the global optimum
- * if the initial temperature is set sufficiently high.
- * It is however usually too slow to converge in practice, leading to the usage of faster but suboptimal schedules.
- */
+     * \ingroup GroupSchedule
+     *
+     * This class is a model of the Schedule concept and implements a geometric schedule:
+     * \f[T_i=\frac{T_0}{\log_2(2+i)}\f]
+     * This schedule guarantees that the simulated annealing will converge to the global optimum
+     * if the initial temperature is set sufficiently high.
+     * It is however usually too slow to converge in practice, leading to the usage of faster but suboptimal schedules.
+     */
     template<typename T>
     class logarithmic_schedule {
     public:

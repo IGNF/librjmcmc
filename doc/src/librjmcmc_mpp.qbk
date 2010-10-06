@@ -2,6 +2,8 @@
 
 [section:mpp_introduction Introduction]
 
+[cite_lieshout]
+
 A __MPP__ (MPP) is a stochastic unordered set of geometric objects of one or many types
 (e.g. points, segments, circles, ellipses or rectangles in 2D, ellipsoids or spheres in 3D). The *marked point* denomination
 arises from the usual decomposition of the object parameterization into a *point* of its embedding space (usually its center)

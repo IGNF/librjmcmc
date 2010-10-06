@@ -1,17 +1,19 @@
-[section Reference]
+[section:ref Reference]
 
+[section:mpp __MPP__]
 [xinclude ../geometry_reference.xml]
-
 [xinclude ../configuration_reference.xml]
+[endsect]
 
+[section:rjmcmc __RJMCMC__]
 [xinclude ../sampler_reference.xml]
-
 [xinclude ../transform_reference.xml]
+[endsect]
 
+[section:sa Simulated Annealing]
 [xinclude ../schedule_reference.xml]
-
 [xinclude ../end_test_reference.xml]
-
 [xinclude ../visitor_reference.xml]
+[endsect]
 
 [endsect]
