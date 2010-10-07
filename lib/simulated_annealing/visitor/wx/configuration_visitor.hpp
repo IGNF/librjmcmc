@@ -1,5 +1,5 @@
-#ifndef CONFIGURATION_FRAME_HPP
-#define CONFIGURATION_FRAME_HPP
+#ifndef __WX_CCONFIGURATION_VISITOR_HPP__
+#define __WX_CCONFIGURATION_VISITOR_HPP__
 
 #include <wx/wx.h>
 #include <wx/statusbr.h>
@@ -136,4 +136,4 @@ namespace simulated_annealing {
     } // namespace wx
 } // namespace simulated_annealing
 
-#endif /* CONFIGURATION_FRAME_HPP */
+#endif // __WX_CCONFIGURATION_VISITOR_HPP__

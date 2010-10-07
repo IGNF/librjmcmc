@@ -1,5 +1,5 @@
-#ifndef CHART_FRAME_HPP
-#define CHART_FRAME_HPP
+#ifndef __WX_CHART_VISITOR_HPP__
+#define __WX_CHART_VISITOR_HPP__
 
 #include <wx/frame.h>
 
@@ -61,4 +61,4 @@ private:
 } // namespace wx
 } // namespace simulated_annealing
 
-#endif /* CHART_FRAME_HPP */
+#endif // __WX_CHART_VISITOR_HPP__

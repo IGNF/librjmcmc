@@ -1,5 +1,5 @@
-#ifndef COMPOSITE_VISITOR_HPP
-#define COMPOSITE_VISITOR_HPP
+#ifndef __COMPOSITE_VISITOR_HPP__
+#define __COMPOSITE_VISITOR_HPP__
 
 #include "rjmcmc/tuple.hpp"
 
@@ -87,4 +87,4 @@ namespace simulated_annealing {
 
 } // namespace simulated_annealing
 
-#endif // COMPOSITE_VISITOR_HPP
+#endif // __COMPOSITE_VISITOR_HPP__

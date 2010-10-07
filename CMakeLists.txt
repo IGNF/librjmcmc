@@ -58,7 +58,6 @@ else()
 	link_directories( ${Boost_LIBRARY_DIRS} )
 endif()
 
-
 option(USE_CGAL  "Use CGAL library" OFF)
 
 if(USE_CGAL)

@@ -1,5 +1,5 @@
-#ifndef BUILDING_CONTROLER_HPP
-#define BUILDING_CONTROLER_HPP
+#ifndef __CONTROLER_HPP__
+#define __CONTROLER_HPP__
 
 class Controler {
 public:
@@ -11,4 +11,4 @@ public:
     virtual bool chart_visibility() const = 0;
 };
 
-#endif
+#endif // __CONTROLER_HPP__

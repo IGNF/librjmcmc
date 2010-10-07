@@ -153,10 +153,10 @@ private:
     }
 
     configuration *m_config;
-    sampler *m_sampler;
-    schedule *m_schedule;
-    end_test *m_end_test;
-    visitor *m_visitor;
+    sampler       *m_sampler;
+    schedule      *m_schedule;
+    end_test      *m_end_test;
+    visitor       *m_visitor;
     boost::thread *m_thread;
 
     simulated_annealing::wx::configuration_visitor *m_confg_visitor;

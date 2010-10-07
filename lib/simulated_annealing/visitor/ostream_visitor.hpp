@@ -1,5 +1,5 @@
-#ifndef __RJMCMC_OSTREAM_VISITOR_HPP__
-#define __RJMCMC_OSTREAM_VISITOR_HPP__
+#ifndef __OSTREAM_VISITOR_HPP__
+#define __OSTREAM_VISITOR_HPP__
 
 #include <ostream>
 #include <iomanip>
@@ -110,4 +110,4 @@ namespace simulated_annealing {
 
 }; // namespace simulated_annealing
 
-#endif
+#endif // __OSTREAM_VISITOR_HPP__

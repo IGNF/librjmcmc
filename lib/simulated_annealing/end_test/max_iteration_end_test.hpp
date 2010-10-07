@@ -15,7 +15,7 @@ namespace simulated_annealing
         max_iteration_end_test(int n) : m_iterations(n) {}
         template<typename Configuration, typename Sampler>
         inline bool operator()(const Configuration&, const Sampler&, double) {
-            return ((--m_iterations)>0);
+            return ((--m_iterations)<=0);
         }
         void stop () { m_iterations=0; }
     private:

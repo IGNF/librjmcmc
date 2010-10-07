@@ -5,8 +5,8 @@
  *      Author: olivier
  */
 
-#ifndef PARAMETERS_VISITOR
-#define PARAMETERS_VISITOR
+#ifndef __WX_PARAMETERS_VISITOR_HPP__
+#define __WX_PARAMETERS_VISITOR_HPP__
 
 #include <map>
 #include <string>
@@ -67,4 +67,4 @@ namespace simulated_annealing {
     } // namespace wx
 } // namespace simulated_annealing
 
-#endif /* PARAMETERS_VISITOR */
+#endif // __WX_PARAMETERS_VISITOR_HPP__
