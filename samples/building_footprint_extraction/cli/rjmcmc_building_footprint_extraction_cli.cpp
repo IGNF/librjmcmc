@@ -24,7 +24,7 @@ int main(int argc , char** argv)
   initialize_parameters(p);
   if (!p->parse(argc, argv)) return -1;
   
-  rjmcmc::ostream_visitor visitor;
+  simulated_annealing::ostream_visitor visitor;
   init_visitor(p,visitor);
   
   Iso_rectangle_2 bbox = get_bbox(p);

@@ -22,14 +22,14 @@ the [link librjmcmc.section_rjmcmc __RJMCMC__] method.
 
 [endsect]
 
-[section:count_sampler_concept Count sampler]
+[section:density_concept Densities]
 
-`CountSamplers` provide the marginal discrete distribution of the number of objects of a __MPP__.
+`Densities` provide the marginal discrete distribution of the number of objects of a __MPP__.
 
 Available models:
 
-* [classref marked_point_process::poisson_count_sampler]
-* [classref marked_point_process::uniform_count_sampler]
+* [classref marked_point_process::poisson_density]
+* [classref marked_point_process::uniform_density]
 
 [endsect]
 
@@ -52,7 +52,8 @@ For efficiency reasons, `Configurations` are thus tightly coupled with energies 
 A configuration is a wrapper around a container of objects. This wrapper abstraction may be used to cache intermediate
 values such as the binary energy terms between each object to prevent its recomputation.
 
-Multi-__MPPs__ are supported by supplying a `boost::variant` over the types of objects as the Object template argument of the configuration.
+Multi-__MPPs__ are supported by supplying a `boost::variant` over the types of objects as the `Object` template argument
+of the configuration.
 
 Available models:
 

@@ -12,9 +12,9 @@ typedef Rectangle_2 object;
 typedef box_is_valid                         is_valid;
 
 // TODO
-//#include "energy/image_gradient_unary_energy_facade_elements.hpp"
+//#include "mpp/energy/image_gradient_unary_energy_facade_elements.hpp"
 //typedef image_gradient_unary_energy_facade_elements          unary_energy;
-#include "energy/image_gradient_unary_energy.hpp"
+#include "mpp/energy/image_gradient_unary_energy.hpp"
 typedef image_gradient_unary_energy          unary_energy;
 
 #include "energy/intersection_area_binary_energy.hpp"

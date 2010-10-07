@@ -5,13 +5,13 @@
 
 namespace marked_point_process {
 
-    template<typename CountSampler, typename ObjectSampler>
+    template<typename Density, typename ObjectSampler>
     class direct_sampler
     {
     public:
-        direct_sampler( const CountSampler & count_sampler,
+        direct_sampler( const Density & density,
                         const ObjectSampler& object_sampler) :
-        m_count_sampler(count_sampler), m_object_sampler(object_sampler)
+        m_density(density), m_object_sampler(object_sampler)
         {}
 
         template<typename Configuration> void operator()(Configuration &c, double temperature=0) const
@@ -19,7 +19,7 @@ namespace marked_point_process {
             typedef typename Configuration::value_type T;
             T res;
             c.clear();
-            int n = m_count_sampler();
+            int n = m_density();
             for(int i=0; i<n; ++i) {
                 rjmcmc::random_variant_init(res);
                 rjmcmc::apply_visitor(m_object_sampler,res);
@@ -31,7 +31,7 @@ namespace marked_point_process {
         template<typename Configuration, typename Modification>
         double pdf_ratio(const Configuration &c, const Modification &m) const
         {
-            double ratio = m_count_sampler.pdf_ratio(c,m);
+            double ratio = m_density.pdf_ratio(c,m);
             for(typename Modification::birth_const_iterator b = m.birth_begin(); b!=m.birth_end(); ++b)
                 ratio*=rjmcmc::apply_visitor(m_object_sampler.pdf(),*b);
             for(typename Modification::death_const_iterator d = m.death_begin(); d!=m.death_end(); ++d)
@@ -44,7 +44,7 @@ namespace marked_point_process {
         inline bool accepted() const { return true; }
         enum { kernel_size = 1 };
     private:
-        CountSampler  m_count_sampler;
+        Density  m_density;
         ObjectSampler m_object_sampler;
     };
 }

@@ -9,7 +9,7 @@
 #include "core/facade_elements_rectangle.hpp"
 
 // includes for template instanciations
-#include "energy/image_gradient_unary_energy_inc.hpp"
+#include "mpp/energy/image_gradient_unary_energy_inc.hpp"
 #include "image/gradient_image_inc.hpp"
 
 #include "GilViewer/io/gilviewer_io_factory.hpp"

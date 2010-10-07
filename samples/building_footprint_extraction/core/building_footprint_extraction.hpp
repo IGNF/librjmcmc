@@ -8,7 +8,7 @@
 typedef boost::variant<Rectangle_2,Circle_2> object;
 //typedef Rectangle_2 object;
 
-#include "energy/box_is_valid.hpp"
+#include "mpp/energy/box_is_valid.hpp"
 typedef box_is_valid                         is_valid;
 
 #include "core/global_reconstruction_unary_energy.hpp"
@@ -21,7 +21,7 @@ typedef rjmcmc::any_image_t ndvi_image_t;
 typedef oriented<ndvi_image_t>     oriented_ndvi_view;
 typedef global_reconstruction_unary_energy<oriented_gradient_view,oriented_ndvi_view> unary_energy;
 
-#include "energy/intersection_area_binary_energy.hpp"
+#include "mpp/energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy      binary_energy;
 
 #include "rjmcmc/kernel/kernels.hpp"
@@ -44,9 +44,10 @@ typedef simulated_annealing::max_iteration_end_test                           en
 #include "mpp/configuration/graph_configuration.hpp"
 typedef marked_point_process::graph_configuration<object, unary_energy, binary_energy> configuration;
 
-#include "rjmcmc/sampler/count_sampler.hpp"
-typedef marked_point_process::poisson_count_sampler                           count_sampler;
-//typedef marked_point_process::uniform_count_sampler                           count_sampler;
+#include "mpp/density/poisson_density.hpp"
+typedef marked_point_process::poisson_density                           density;
+//#include "mpp/density/uniform_density.hpp"
+//typedef marked_point_process::uniform_density                           density;
 
 #include "rjmcmc/sampler/sampler_base.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
@@ -54,14 +55,14 @@ typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
 #include "rjmcmc/sampler/metropolis_sampler.hpp"
-typedef rjmcmc::metropolis_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
-//typedef rjmcmc::dueck_scheuer_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+typedef rjmcmc::metropolis_sampler<density,birth_death_kernel,modification_kernel> sampler;
+//typedef rjmcmc::dueck_scheuer_sampler<density,birth_death_kernel,modification_kernel> sampler;
 //#include "rjmcmc/sampler/dueck_scheuer_sampler.hpp"
-//typedef rjmcmc::dueck_scheuer_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
+//typedef rjmcmc::dueck_scheuer_sampler<density,birth_death_kernel,modification_kernel> sampler;
 //#include "rjmcmc/sampler/franz_hoffmann_sampler.hpp"
-//typedef rjmcmc::franz_hoffmann_sampler<count_sampler,birth_death_kernel,modification_kernel> sampler;
-//#include "rjmcmc/sampler/direct_sampler.hpp"
-//typedef direct_sampler<count_sampler,generator_kernel> sampler;
+//typedef rjmcmc::franz_hoffmann_sampler<density,birth_death_kernel,modification_kernel> sampler;
+//#include "mpp/direct_sampler.hpp"
+//typedef marked_point_process::direct_sampler<density,generator_kernel> sampler;
 
 /************** main ****************/
 
@@ -118,7 +119,7 @@ void create_sampler(param *p, sampler *&s) {
 		p->get<double>("pbirth"),
 		p->get<double>("pdeath")
 	);
-        count_sampler cs(p->get<double>("poisson"));
+        density cs(p->get<double>("poisson"));
 
 	s = new sampler( cs, kbirthdeath, kmodif );
 //	s = new sampler( cs, birth );

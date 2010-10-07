@@ -1,7 +1,7 @@
 #ifndef IMAGE_GRADIENT_UNARY_ENERGY_INC_HPP_
 #define IMAGE_GRADIENT_UNARY_ENERGY_INC_HPP_
 
-#include "energy/image_gradient_unary_energy.hpp"
+#include "mpp/energy/image_gradient_unary_energy.hpp"
 #include "geometry/integrated_flux.h"
 
 template<typename DSM>
