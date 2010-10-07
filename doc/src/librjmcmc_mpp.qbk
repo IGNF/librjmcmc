@@ -20,13 +20,39 @@ Such a probabilization enables a direct sampling of the __MPP__. However if the 
 interactions between objects, sampling the __MPP__ will require more advanced techniques such as
 the [link librjmcmc.section_rjmcmc __RJMCMC__] method.
 
-[todo Energies]
+[endsect]
+
+[section:count_sampler_concept Count sampler]
+
+`CountSamplers` provide the marginal discrete distribution of the number of objects of a __MPP__.
+
+Available models:
+
+* [classref marked_point_process::poisson_count_sampler]
+* [classref marked_point_process::uniform_count_sampler]
 
 [endsect]
 
-[section:configuration_concept Configuration]
+[section:Generator_concept Generator]
 
-[todo Configuration]
+`Generators` are responsible for sampling a new object.
+
+Available models:
+
+* TODO
+
+[endsect]
+
+
+[section:configuration_concept Configurations and Energies]
+
+__MPPs__ are commonly used to drive a stochastic exploration in a optimization context where the objective function,
+hereafter called an `Energy` is composed as the sum of per-object unary terms and per-pair of objects binary terms.
+For efficiency reasons, `Configurations` are thus tightly coupled with energies in this library.
+A configuration is a wrapper around a container of objects. This wrapper abstraction may be used to cache intermediate
+values such as the binary energy terms between each object to prevent its recomputation.
+
+Multi-__MPPs__ are supported by supplying a `boost::variant` over the types of objects as the Object template argument of the configuration.
 
 Available models:
 
@@ -35,16 +61,30 @@ Available models:
 
 [endsect]
 
-[section:count_sampler_concept Count sampler]
+[section:unary_energies Unary Energies]
+Available models:
 
-[todo Countsampler]
+* [classref image_gradient_unary_energy]
+
+[endsect]
+
+[section:binary_energies Binary Energies]
+Available models:
+
+* [classref intersection_area_binary_energy]
+
+[endsect]
+
+[section:accelerator_concept Accelerator]
+
+When queried with a configuration `C` and an object `X`, an accelerator provides a subset of the set of objects in `C` that interact with `X` (i.e. that have a non-zero binary energy with it). If the binary energy becomes null or negligible when objects are further apart than a given threshold, an accelerator may only report objects that intersect a suitable ball centered on the query object `X`. Further releases of the library may then include more advanced accelerators based for instance on quad-trees, uniform grids or Kd-trees. However, the only model of this concept is currently the trivial accelerator that returns the whole range of objects of the query configuration.
 
 Available models:
 
-* [classref marked_point_process::poisson_count_sampler]
-* [classref marked_point_process::uniform_count_sampler]
+* [classref marked_point_process::trivial_accelerator]
 
 [endsect]
+
 
 
 [endsect]

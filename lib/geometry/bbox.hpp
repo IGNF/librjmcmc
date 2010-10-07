@@ -2,7 +2,6 @@
 #define BOX_HPP_
 #include <boost/array.hpp>
 
-fdqsfds
 /**
  * @brief Bounding box class, templated on the dimension
  */

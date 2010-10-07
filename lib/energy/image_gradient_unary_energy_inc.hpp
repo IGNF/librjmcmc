@@ -12,8 +12,6 @@ double image_gradient_unary_energy<DSM>::operator()(const T &t) const
             - m_ponderation_dsm*integrated_flux(m_dsm,t);
 }
 
-
-
 template<typename DSM>
 image_gradient_unary_energy<DSM>::image_gradient_unary_energy(
         const DSM& dsm,

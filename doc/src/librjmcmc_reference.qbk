@@ -3,6 +3,8 @@
 [section:mpp __MPP__]
 [xinclude ../geometry_reference.xml]
 [xinclude ../configuration_reference.xml]
+[xinclude ../energy_reference.xml]
+[xinclude ../image_reference.xml]
 [endsect]
 
 [section:rjmcmc __RJMCMC__]

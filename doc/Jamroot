@@ -62,6 +62,16 @@ local geometry_includes =
         ../lib/geometry/*.h
     ] ;
 
+local energy_includes =
+    [ glob
+        ../lib/energy/*.hpp
+    ] ;
+
+local image_includes =
+    [ glob
+        ../lib/image/*.hpp
+    ] ;
+
 doxygen configuration_reference
     :
         $(configuration_includes)
@@ -118,6 +128,22 @@ doxygen geometry_reference
         <xsl:param>"boost.doxygen.reftitle=Geometry"
     ;
 
+doxygen image_reference
+    :
+        $(image_includes)
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Image"
+    ;
+
+doxygen energy_reference
+    :
+        $(energy_includes)
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Energy"
+    ;
+
 boostbook librjmcmc 
         : src/librjmcmc_quickbook.qbk 
         : <xsl:param>boost.root=..
@@ -135,4 +161,6 @@ boostbook librjmcmc
         <dependency>end_test_reference
         <dependency>visitor_reference
         <dependency>geometry_reference
+        <dependency>image_reference
+        <dependency>energy_reference
         ; 
