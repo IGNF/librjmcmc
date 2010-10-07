@@ -29,20 +29,20 @@ typedef modifier <is_valid>          modifier_kernel;
 //#include "rjmcmc/logarithmic_schedule.hpp"
 //#include "rjmcmc/step_schedule.hpp"
 //typedef simulated_annealing::step_schedule<rjmcmc::logarithmic_schedule<double> > schedule;
-#include "rjmcmc/schedule/geometric_schedule.hpp"
+#include "simulated_annealing/schedule/geometric_schedule.hpp"
 typedef simulated_annealing::geometric_schedule<double>                 schedule;
-//#include "rjmcmc/schedule/inverse_linear_schedule.hpp"
+//#include "simulated_annealing/schedule/inverse_linear_schedule.hpp"
 //typedef simulated_annealing::inverse_linear_schedule<double>                 schedule;
 
 
-//#include "rjmcmc/end_test/delta_energy_end_test.hpp"
+//#include "simulated_annealing/end_test/delta_energy_end_test.hpp"
 //typedef simulated_annealing::delta_energy_end_test                           end_test;
-#include "rjmcmc/end_test/max_iteration_end_test.hpp"
+#include "simulated_annealing/end_test/max_iteration_end_test.hpp"
 typedef simulated_annealing::max_iteration_end_test                           end_test;
 
-//#include "rjmcmc/configuration/vector_configuration.hpp"
+//#include "mpp/configuration/vector_configuration.hpp"
 //typedef marked_point_process::vector_configuration<object, unary_energy, binary_energy> configuration;
-#include "rjmcmc/configuration/graph_configuration.hpp"
+#include "mpp/configuration/graph_configuration.hpp"
 typedef marked_point_process::graph_configuration<object, unary_energy, binary_energy> configuration;
 
 #include "rjmcmc/sampler/count_sampler.hpp"

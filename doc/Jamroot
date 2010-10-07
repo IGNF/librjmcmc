@@ -25,21 +25,14 @@ local doxygen_params =
         <doxygen:param>VERBATIM_HEADERS=NO
         ;
 
-
-local geometry_includes =
+local configuration_includes =
     [ glob
-        ../lib/geometry/*.hpp
-        ../lib/geometry/*.h
+        ../lib/mpp/configuration/*.hpp
     ] ;
 
 local transform_includes =
     [ glob
         ../lib/rjmcmc/kernel/transform.hpp
-    ] ;
-
-local configuration_includes =
-    [ glob
-        ../lib/rjmcmc/configuration/*.hpp
     ] ;
 
 local sampler_includes =
@@ -49,26 +42,25 @@ local sampler_includes =
 
 local schedule_includes =
     [ glob
-        ../lib/rjmcmc/schedule/*.hpp
+        ../lib/simulated_annealing/schedule/*.hpp
     ] ;
 
 local end_test_includes =
     [ glob
-        ../lib/rjmcmc/end_test/*.hpp
+        ../lib/simulated_annealing/end_test/*.hpp
     ] ;
 
 local visitor_includes =
     [ glob
-        ../lib/visitor/*.hpp
+        ../lib/simulated_annealing/visitor/*.hpp
+        ../lib/simulated_annealing/visitor/wx/*.hpp
     ] ;
 
-doxygen geometry_reference
-    :
-        $(geometry_includes)
-    :
-        $(doxygen_params)
-        <xsl:param>"boost.doxygen.reftitle=Geometry"
-    ;
+local geometry_includes =
+    [ glob
+        ../lib/geometry/*.hpp
+        ../lib/geometry/*.h
+    ] ;
 
 doxygen configuration_reference
     :
@@ -76,6 +68,14 @@ doxygen configuration_reference
     :
         $(doxygen_params)
         <xsl:param>"boost.doxygen.reftitle=Configurations"
+    ;
+
+doxygen transform_reference
+    :
+        $(transform_includes)
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Transforms"
     ;
 
 doxygen sampler_reference
@@ -110,12 +110,12 @@ doxygen visitor_reference
         <xsl:param>"boost.doxygen.reftitle=Visitors"
     ;
 
-doxygen transform_reference
+doxygen geometry_reference
     :
-        $(transform_includes)
+        $(geometry_includes)
     :
         $(doxygen_params)
-        <xsl:param>"boost.doxygen.reftitle=Transforms"
+        <xsl:param>"boost.doxygen.reftitle=Geometry"
     ;
 
 boostbook librjmcmc 
@@ -128,11 +128,11 @@ boostbook librjmcmc
         <xsl:param>html.stylesheet=css/boostbook.css
         <xsl:param>nav.layout=none
         <xsl:param>navig.graphics.path=css/images/
-        <dependency>transform_reference
-        <dependency>geometry_reference
         <dependency>configuration_reference
+        <dependency>transform_reference
         <dependency>sampler_reference
         <dependency>schedule_reference
         <dependency>end_test_reference
         <dependency>visitor_reference
+        <dependency>geometry_reference
         ; 

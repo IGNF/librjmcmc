@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <time.h>
 
-namespace rjmcmc {
+namespace simulated_annealing {
 
     class ostream_visitor {
     private:
@@ -108,6 +108,6 @@ namespace rjmcmc {
         }
     };
 
-}; // namespace rjmcmc
+}; // namespace simulated_annealing
 
 #endif

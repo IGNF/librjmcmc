@@ -8,14 +8,11 @@ typedef parameters< wx_parameter > param;
 
 // optimization
 #include "core/building_footprint_rectangle.hpp"
-#include "rjmcmc/simulated_annealing.hpp"
+#include "simulated_annealing/simulated_annealing.hpp"
 
 // visitors
-#include "visitor/wx/wx_log_visitor.hpp"
-#include "visitor/wx/configuration_frame.hpp"
-#include "visitor/wx/chart_frame.hpp"
-#include "visitor/wx/wx_parameter_frame.hpp"
-#include "visitor/composite_visitor.hpp"
+#include "simulated_annealing/visitor/all.hpp"
+#include "simulated_annealing/visitor/wx/all.hpp"
 
 // template instanciations
 #include "image/oriented_inc.hpp"
@@ -34,11 +31,15 @@ typedef parameters< wx_parameter > param;
 // boost
 #include <boost/filesystem.hpp>
 
-#include "resources/IGN.xpm"
+#include "simulated_annealing/visitor/wx/resources/IGN.xpm"
 
 class building_footprint_rectangle_gui : public wxApp, public Controler
 { 
-    typedef rjmcmc::composite_visitor<wx_log_visitor*,configuration_frame*,parameters_frame*,chart_frame*
+    typedef simulated_annealing::composite_visitor<
+            simulated_annealing::wx::log_visitor*,
+            simulated_annealing::wx::configuration_visitor*,
+            simulated_annealing::wx::parameters_visitor*,
+            simulated_annealing::wx::chart_visitor*
             > visitor;
 
 private:
@@ -58,12 +59,12 @@ private:
         wxSize frame_size;(600,600);
         frame_size.x = std::min(600, wxGetClientDisplayRect().GetWidth());
         frame_size.y = std::min(600, wxGetClientDisplayRect().GetHeight());
-        m_confg_frame = new configuration_frame((wxFrame *)NULL, wxID_ANY, _("librjmcmc: rectangular building footprint extraction"), wxDefaultPosition, wxSize(600,600) );
-        m_confg_frame->SetIcon(wxICON(IGN));
-        m_param_frame = new parameters_frame(m_confg_frame);
-        m_chart_frame = new chart_frame(m_confg_frame);
-        m_visitor = new visitor(&m_wx_log_visitor,m_confg_frame,m_param_frame,m_chart_frame);
-        m_confg_frame->controler(this);
+        m_confg_visitor = new simulated_annealing::wx::configuration_visitor((wxFrame *)NULL, wxID_ANY, _("librjmcmc: rectangular building footprint extraction"), wxDefaultPosition, wxSize(600,600) );
+        m_confg_visitor->SetIcon(wxICON(IGN));
+        m_param_visitor = new simulated_annealing::wx::parameters_visitor(m_confg_visitor);
+        m_chart_visitor = new simulated_annealing::wx::chart_visitor(m_confg_visitor);
+        m_visitor = new visitor(&m_log_visitor,m_confg_visitor,m_param_visitor,m_chart_visitor);
+        m_confg_visitor->controler(this);
         return true;
     }
 
@@ -84,8 +85,8 @@ public:
 
         // Checks if the file is already loaded. If not load it.
         bool already_loaded = false;
-        layer_control::const_iterator it  = m_confg_frame->panelviewer()->layercontrol()->begin();
-        layer_control::const_iterator end = m_confg_frame->panelviewer()->layercontrol()->end();
+        layer_control::const_iterator it  = m_confg_visitor->panelviewer()->layercontrol()->begin();
+        layer_control::const_iterator end = m_confg_visitor->panelviewer()->layercontrol()->end();
         for(;it!=end;++it)
         {
             using namespace boost::filesystem;
@@ -96,12 +97,12 @@ public:
             }
         }
         if(!already_loaded)
-            m_confg_frame->add_layer(dsm_file);
+            m_confg_visitor->add_layer(dsm_file);
 
         set_bbox(p,bbox);
         wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));
         wxPoint p1(wxCoord(bbox.max().x()),wxCoord(bbox.max().y()));
-        m_confg_frame->set_bbox(wxRect(p0,p1));
+        m_confg_visitor->set_bbox(wxRect(p0,p1));
 
         init_visitor        (p,*m_visitor);
         create_configuration(p,grad_view,m_config);
@@ -119,24 +120,24 @@ public:
 
     virtual void stop() { m_end_test->stop(); }
 
-    virtual void param_visibility(bool b) { m_param_frame->Show(b); }
-    virtual void chart_visibility(bool b) { m_chart_frame->Show(b); }
-    virtual bool param_visibility() const { return m_param_frame->IsShown(); }
-    virtual bool chart_visibility() const { return m_chart_frame->IsShown(); }
+    virtual void param_visibility(bool b) { m_param_visitor->Show(b); }
+    virtual void chart_visibility(bool b) { m_chart_visitor->Show(b); }
+    virtual bool param_visibility() const { return m_param_visitor->IsShown(); }
+    virtual bool chart_visibility() const { return m_chart_visitor->IsShown(); }
 
     building_footprint_rectangle_gui() :
             m_config(NULL), m_sampler(NULL), m_schedule(NULL), m_end_test(NULL),
             m_visitor(NULL), m_thread(NULL),
-            m_confg_frame(NULL), m_param_frame(NULL), m_chart_frame(NULL)
+            m_confg_visitor(NULL), m_param_visitor(NULL), m_chart_visitor(NULL)
     {
     }
 
     virtual ~building_footprint_rectangle_gui() {
         release();
         /*
-        if(m_confg_frame) { m_confg_frame->Close(); }
-        if(m_param_frame) { m_param_frame->Close(); }
-        if(m_chart_frame) { m_chart_frame->Close(); }
+        if(m_confg_visitor) { m_confg_visitor->Close(); }
+        if(m_param_visitor) { m_param_visitor->Close(); }
+        if(m_chart_visitor) { m_chart_visitor->Close(); }
         */
         if(m_visitor    ) { delete m_visitor; }
     }
@@ -158,10 +159,10 @@ private:
     visitor *m_visitor;
     boost::thread *m_thread;
 
-    configuration_frame *m_confg_frame;
-    parameters_frame    *m_param_frame;
-    chart_frame         *m_chart_frame;
-    wx_log_visitor       m_wx_log_visitor;
+    simulated_annealing::wx::configuration_visitor *m_confg_visitor;
+    simulated_annealing::wx::parameters_visitor    *m_param_visitor;
+    simulated_annealing::wx::chart_visitor         *m_chart_visitor;
+    simulated_annealing::wx::log_visitor            m_log_visitor;
     boost::shared_ptr<gradient_image_t>     m_grad;
 };
 

@@ -3,7 +3,7 @@
 
 #include "rjmcmc/tuple.hpp"
 
-namespace rjmcmc {
+namespace simulated_annealing {
 
     namespace internal {
 
@@ -85,6 +85,6 @@ namespace rjmcmc {
         Visitors m_visitors;
     };
 
-}
+} // namespace simulated_annealing
 
 #endif // COMPOSITE_VISITOR_HPP

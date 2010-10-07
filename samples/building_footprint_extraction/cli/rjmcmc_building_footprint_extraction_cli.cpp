@@ -8,10 +8,10 @@ typedef parameters< parameter > param;
 
 // optimization
 #include "core/building_footprint_extraction.hpp"
-#include "rjmcmc/simulated_annealing.hpp"
+#include "simulated_annealing/simulated_annealing.hpp"
 
 // visitors
-#include "visitor/ostream_visitor.hpp"
+#include "simulated_annealing/visitor/ostream_visitor.hpp"
 
 // template instanciations
 #include "image/oriented_inc.hpp"

@@ -28,7 +28,6 @@
 [warning *TODO:* [text]]
 ]
 
-
 [/ Bibliography ]
 
 [template cite[author year title society location] [footnote [author], [year], [*[title]], ['[society]], [location].]]

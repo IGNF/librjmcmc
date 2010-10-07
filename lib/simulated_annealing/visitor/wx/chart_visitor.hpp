@@ -4,10 +4,14 @@
 #include <wx/frame.h>
 
 class VectorDataset;
-class chart_frame: public wxFrame
+
+
+namespace simulated_annealing {
+    namespace wx {
+class chart_visitor: public wxFrame
 {
 public:
-    chart_frame(
+    chart_visitor(
             wxWindow *parent = (wxWindow *) NULL,
             wxWindowID id = wxID_ANY,
             const wxString& title = _("librjmcmc charts"),
@@ -53,5 +57,8 @@ private:
 
     DECLARE_EVENT_TABLE();
 };
+
+} // namespace wx
+} // namespace simulated_annealing
 
 #endif /* CHART_FRAME_HPP */

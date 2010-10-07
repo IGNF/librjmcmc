@@ -11,7 +11,7 @@ Thus the final pdf reduces to a simple dirac at the global minimum if it is uniq
 To interpolate the pdf between the initial reference pdf and the final pdf a boltzmann distribution is usually used, parameterized
 by a temperature which decreases from +[infin] to zero.
 
-[import ../../lib/rjmcmc/simulated_annealing.hpp]
+[import ../../lib/simulated_annealing/simulated_annealing.hpp]
 
 
 The main function of this simulated annealing `namespace` is `simulated_annealing::optimize`:
@@ -84,13 +84,13 @@ provide various vizualisations of the current state of the optimization.
 
 Available models:
 
-* [classref rjmcmc::ostream_visitor]
-* [classref rjmcmc::composite_visitor]
+* [classref simulated_annealing::ostream_visitor]
+* [classref simulated_annealing::composite_visitor]
 * Various [wx]-based GUI visitors (requiring the [gilviewer] library)
-  * [classref wx_log_visitor]
-  * [classref parameters_frame]
-  * [classref chart_frame]
-  * [classref configuration_frame]
+  * [classref simulated_annealing::wx::log_visitor]
+  * [classref simulated_annealing::wx::parameters_visitor]
+  * [classref simulated_annealing::wx::chart_visitor]
+  * [classref simulated_annealing::wx::configuration_visitor]
 
 [endsect]
 
