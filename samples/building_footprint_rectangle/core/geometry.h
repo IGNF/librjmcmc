@@ -1,6 +1,7 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+//[building_footprint_rectangle_geometry_base
 #include "geometry/geometry.hpp"
 #include "geometry/Rectangle_2.h"
 
@@ -12,5 +13,6 @@ typedef geometry::Iso_rectangle_2_traits<K>::type Iso_rectangle_2;
 typedef geometry::Rectangle_2<K> Rectangle_2;
 
 #include "geometry/Rectangle_2_intersection.h"
+//]
 
 #endif // GEOMETRY_H

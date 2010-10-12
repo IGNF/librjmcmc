@@ -2,6 +2,7 @@
 #define RJMCMC_IMAGE_TYPES_HPP
 
 #include <boost/gil/extension/dynamic_image/any_image.hpp>
+///@TODO: we should define here {gray32F, gray64F}_image_t instead of hacking boost/gil installation
 #include <boost/gil/extension/matis/float_images.hpp>
 
 namespace rjmcmc {

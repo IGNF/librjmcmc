@@ -1,9 +1,16 @@
 [section:section_samples Samples]
 
-[section:rectangular_building_footprint_extraction Rectangular building footprint extraction]
-[endsect]
+This section explains and comments some of the samples which are delivered with the library. It is a good starting point to learn how to use the library.
 
-[section:multiple_geometries_extraction Multiple geometries extraction]
-[endsect]
+Each sample contains three subdirectories:
+
+* `cli` contains the `main` entry point for a ['command line interface] binary
+* `gui` contains a [@http://docs.wxwidgets.org/2.8/wx_wxapp.html#wxapp wxApp] entry point for a more friendly ['graphical user interface] binary (requires [wx] and [gilviewer] libraries)
+* `core` is the common part of the both `cli` and `gui`; it contains geometry, energies and input parameters definitions
+
+This structure is not mandatory for your particular application: you can have only a `cli` or `gui` implementation. If you have both, you may consider, for readability and maintenance purposes, split the code into separated folders.
+
+[include samples/sample_rectangular_building_footprint_extraction.qbk]
+[include samples/sample_multiple_geometries_extraction.qbk]
 
 [endsect]

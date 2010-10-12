@@ -48,7 +48,7 @@ Available models:
 
 [section:endtest_concept EndTest concept]
 
-Models of the EndTest concept provide a simple predicate that informs the simulated annealing framework that the process has converged
+Models of the `EndTest` concept provide a simple predicate that informs the simulated annealing framework that the process has converged
 or whatever reason requiring to stop the simulated annealing iterations, such as a user-issued cancellation.
 
 The only requirements of this concept is to provide the following member functions:
@@ -57,7 +57,7 @@ The only requirements of this concept is to provide the following member functio
         bool operator()(const Configuration& configuration, const Sampler& sampler, double temperature);
 
 The former function is guaranteed to be called only once per iteration and states whether the iterative
-process should continue. The stop function asks the EndTest model to return false at the following iteration.
+process should continue. The stop function asks the `EndTest` model to return false at the following iteration.
 
 Available models:
 

@@ -209,17 +209,21 @@ doxygen param_reference
         <xsl:param>"boost.doxygen.reftitle=Parameter Input"
     ;
 
-
 boostbook librjmcmc 
         : src/librjmcmc_quickbook.qbk 
         : <xsl:param>boost.root=..
-        <xsl:param>boost.image.src=image/banniere_matis.png
+        <xsl:param>boost.image.src=image/logo_librjmcmc_3.PNG
         <xsl:param>boost.image.alt="\"IGN/MATIS_librjmcmc\""
-        <xsl:param>boost.image.w=900
-        <xsl:param>boost.image.h=160
+        <xsl:param>boost.image.w=366
+        <xsl:param>boost.image.h=200
+        <xsl:param>chunk.section.depth=4
+        #<xsl:param>chunk.first.sections=1
+        <xsl:param>toc.section.depth=3
+        <xsl:param>toc.max.depth=3
+        <xsl:param>generate.section.toc.level=4
         <xsl:param>html.stylesheet=css/boostbook.css
         <xsl:param>nav.layout=none
-        <xsl:param>navig.graphics.path=css/images/
+        <xsl:param>navig.graphics.path=css/images/        
         <dependency>mpp_reference
         <dependency>configuration_reference
         <dependency>density_reference
