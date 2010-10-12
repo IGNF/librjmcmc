@@ -1,0 +1,128 @@
+[section Rectangular building footprint extraction]
+
+Historically, __librjmcmc__ was developped for this particular application: detect rectangles to delineate building footprints in a digital elevation model ([@http://en.wikipedia.org/wiki/Digital_elevation_model DEM], rasterized heights on a regular grid). This work has been published in [@http://www.elsevier.com/wps/find/journaldescription.cws_home/503340/description#description ISPRS Journal][cite_ijprs] and is available online[footnote [@http://dx.doi.org/10.1016/j.isprsjprs.2010.02.002 doi:10.1016/j.isprsjprs.2010.02.002]].
+
+[section Core]
+[section Geometry modeling]
+We aim at detect rectangular objects in the input images. Thus, is provided [classref geometry::Rectangle_2] within the __librjmcmc__ library which implements an original parametrization of this simple geometric object, efficient for fast geometric computations (more details can be found in the aforementionned paper). The header [@../../samples/building_footprint_rectangle/core/geometry.h samples/building_footprint_rectangle/core/geometry.h] defines all geometric related stuffs:
+
+[import ../../../samples/building_footprint_rectangle/core/geometry.h]
+[building_footprint_rectangle_geometry_base]
+
+Syntax rules and modeling respect [@http://www.cgal.org CGAL] standards. Please refer to its [@http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Kernel_23/Chapter_main.html documentation] if you are interseted in more details.
+[endsect]
+
+[section Parameters]
+Each application requires some input parameters (['e.g.], the subimage to process, initial simulated annealing temperature, ...). So, __librjmcmc__ provides a [classref parameter] class to handle them in a generic way. It currently supports the following types (wrapped in a [@http://www.boost.org/doc/libs/1_44_0/doc/html/variant.html `boost::variant`]):
+
+* [@http://www.boost.org/doc/libs/1_44_0/libs/filesystem/v2/doc/reference.html#Class-template-basic_path `boost::filesystem::path`]
+* `std::string`
+* `double`
+* `int`
+* `bool`
+
+To define the parameters required by your application, you only need to include the required header:
+
+[import ../../../samples/building_footprint_rectangle/core/building_footprint_rectangle_parameters_inc.hpp]
+[building_footprint_rectangle_parameters_lib_include]
+
+Then, you have to provide a template function with the following signature:
+``
+	template<typename T> void initialize_parameters(T* params)
+``
+
+Finally, you declare and initialize all parameters in a [@http://www.boost.org/doc/libs/1_44_0/doc/html/program_options.html `boost::program_options`] way. For this application, the following piece of code should be self explanatory:
+[building_footprint_rectangle_initialize_parameters]
+
+The main interest of the [classref parameter] class is that it construct automatically either the command line parser or the graphical user interface to change the parameters values at run-time.
+The full header file is available here: [@../../samples/building_footprint_rectangle/core/building_footprint_rectangle_parameters_inc.hpp samples/building_footprint_rectangle/core/building_footprint_rectangle_parameters_inc.hpp]
+
+[endsect]
+
+[section __MPP__ and __RJMCMC__]
+The final step is to instantiate and implement the concepts previously described. This is easily done by including the appropriate headers and defining some `typedef` for readability purposes. Let's go:
+
+[import ../../../samples/building_footprint_rectangle/core/building_footprint_rectangle.hpp]
+[section Geometry]
+The geometric object involved in this application is a simple [classref geometry::Rectangle_2].
+[building_footprint_rectangle_definition_geometry]
+As the library is able to deal with multiple geometries, it is also possible to define the `object` as a `boost::variant` with a single element:
+``
+	#include <boost/variant.hpp>
+	typedef boost::variant<Rectangle_2> object;
+``
+However, you should prefer the first solution if you deal with a single type of object (simpler and probably more efficient).
+[endsect]
+
+[section Energies]
+Then, we define unary and binary energies. The first one measures the data attachement term, ['i.e.] the adequacy between the image and the objects, the second one measures the strength of the relation between neighboring objects. In this particular application, the unary energy is (almost) an accumulation of gradients along rectangle edges. Since it is a common energy, our choice was to provide it in the library (see `lib/mpp/energy` directory). The same goes for the binary energy which is a measure of the overlapping area between objects.
+[building_footprint_rectangle_definition_energies]
+If you wish to write your own unary energy, you should simply provide a functor:
+``
+	class my_unary_energy
+	{
+		typedef <application-specific> result_type;
+		
+		template<typename T>
+		result_type operator()(const T &t) const
+		{
+			// ...
+		}
+	};
+``
+For the binary energy, it is just two other functors taking two input parameters:
+``
+	class my_binary_energy
+	{
+		typedef <application-specific> result_type;
+		
+		template<typename T, typename U>
+		inline bool interact(const T &t, const U &u) const
+		{
+			// ...
+		}
+		
+		template<typename T, typename U>
+		inline result_type operator()(const T &t, const U &u) const
+		{
+			// ...
+		}
+	};
+``
+The first one tests if to objects interacts. If so, the second one provides a way to compute the binary energy between them (if the objects do not interact, the energy is zero).
+[endsect]
+
+[section Configuration and reference density]
+[building_footprint_rectangle_definition_configuration]
+[building_footprint_rectangle_definition_density]
+[endsect]
+
+[section Kernels and samplers]
+[building_footprint_rectangle_definition_kernels]
+[building_footprint_rectangle_definition_sampler]
+[endsect]
+
+[section Simulated annealing]
+Simulated annealing instatiantion is done as follows:
+[building_footprint_rectangle_definition_simulated_annealing]
+Please refer to [link librjmcmc.section_simulated_annealing.schedule_concept schedule concepts] and [link librjmcmc.section_simulated_annealing.endtest_concept end test concepts] for more simulated annealing schedule and end tests models.
+[endsect]
+
+You then have to provide some simple accessors and creators. [*This part is not mandatory. You could simply do all that stuff in your main entry point. However, as it is a common part for ['cli] and ['gui], it is a good way to factorize your code and ease its reusability]. Most of the time, you simply have to call a constructor filled with some parameters (the ones from the command line or the graphical user interface).
+
+Bounding box related accessors are as simple as possible:
+[building_footprint_rectangle_bbox_accessors]
+[building_footprint_rectangle_create_configuration]
+[building_footprint_rectangle_create_sampler]
+[building_footprint_rectangle_create_schedule]
+[building_footprint_rectangle_create_end_test]
+[building_footprint_rectangle_init_visitor]
+
+
+[endsect]
+[endsect]
+
+[section Proposition kernels]
+[endsect]
+
+[endsect]

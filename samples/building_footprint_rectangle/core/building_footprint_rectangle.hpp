@@ -33,8 +33,10 @@ typedef modifier <is_valid> modifier_kernel;
 /************** rjmcmc library types ****************/
 
 //[building_footprint_rectangle_definition_simulated_annealing
+/*< Choice of the schedule (/include/ and /typedef/) >*/
 #include "simulated_annealing/schedule/geometric_schedule.hpp"
 typedef simulated_annealing::geometric_schedule<double> schedule;
+/*< Choice of the end_test (/include/ and /typedef/) >*/
 #include "simulated_annealing/end_test/max_iteration_end_test.hpp"
 typedef simulated_annealing::max_iteration_end_test     end_test;
 //]
