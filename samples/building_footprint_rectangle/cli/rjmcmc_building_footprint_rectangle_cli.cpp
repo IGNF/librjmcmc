@@ -47,6 +47,12 @@ int main(int argc , char** argv)
   
   simulated_annealing::optimize(*conf,*samp,*sch,*end,visitor);
   
+  // release resources
+  if(conf) {delete conf; conf=NULL;}
+  if(samp) {delete samp; samp=NULL;}
+  if(sch)  {delete sch;  sch=NULL;}
+  if(end)  {delete end;  end=NULL;}
+  
   return 0;
 }
 
