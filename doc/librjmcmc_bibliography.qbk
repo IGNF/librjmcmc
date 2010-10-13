@@ -1,0 +1,39 @@
+[/
+[template cite_salamon[] [cite Salamon, P., Sibani, P., Frost, R. ..2002..Facts, Conjectures and Improvements
+for Simulated Annealing..Society for Industrial and Applied Mathematics..Philadelphia, USA]]
+[template cite_green[] [cite Green, P.J. ..1995..Reversible Jump Markov Chain Monte Carlo computation and
+Bayesian model determination..Biometrika 82 (4)..711-732]]
+[template cite_hastings[] [cite Hastings, W.K. ..1970..Monte Carlo sampling using Markov chains and their
+applications..Biometrica 57 (1)..97-109]]
+[template cite_lieshout[] [cite van Lieshout, M.N.M. ..2000..Markov Point Processes and their Applications..Imperial
+College Press..London, England]]
+[template cite_ijprs[] [. 65 (4)..]]  http://dx.doi.org/10.1016/j.isprsjprs.2010.02.002
+
+]
+[section Bibliography]
+'''
+<bibliography id="librjmcmc.biblio" last-revision="$Date$">
+  <biblioentry id="librjmcmc.bibliography.Tournaire2010">
+    <abbrev id="librjmcmc.bibliography.Tournaire2010.abbrev">Tournaire2010</abbrev>
+    <biblioset relation="article">
+      <authorgroup>
+        <author><firstname>O.</firstname><surname>Tournaire</surname></author>
+        <author><firstname>M.</firstname><surname>Brédif</surname></author>
+        <author><firstname>D.</firstname><surname>Boldo</surname></author>
+        <author><firstname>M.</firstname><surname>Durupt</surname></author>
+      </authorgroup>
+      <title>
+        An efficient stochastic approach for building footprint extraction from digital elevation models
+      </title>
+      <pagenums>317-327</pagenums>
+    </biblioset>
+    <biblioset relation="journal">
+      <title>ISPRS Journal of Photogrammetry and Remote Sensing</title>
+      <volumenum>Vol. 65</volumenum>
+      <issuenum>(4)</issuenum>
+      <date>2010</date>
+    </biblioset>
+  </biblioentry>
+</bibliography>
+'''
+[endsect]

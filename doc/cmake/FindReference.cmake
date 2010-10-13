@@ -45,8 +45,8 @@ macro(add_reference OUTPUT)
   # Update the Doxygen configuration file for XML generation
   file(APPEND ${DOXYFILE} "QUIET = YES\n")
   file(APPEND ${DOXYFILE} "OUTPUT_DIRECTORY = \"${CMAKE_CURRENT_BINARY_DIR}/${DOXYFILE_NAME}\"\n")
-  file(APPEND ${DOXYFILE} "GENERATE_LATEX = YES\n")
-  file(APPEND ${DOXYFILE} "GENERATE_HTML = NO\n")
+  file(APPEND ${DOXYFILE} "GENERATE_LATEX = NO\n")
+  file(APPEND ${DOXYFILE} "GENERATE_HTML = YES\n") # to generate latex images
   file(APPEND ${DOXYFILE} "SEARCHENGINE = NO\n")
   file(APPEND ${DOXYFILE} "GENERATE_XML = YES\n")
 

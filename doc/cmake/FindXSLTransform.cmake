@@ -77,6 +77,9 @@ macro(xsl_transform OUTPUT INPUT)
       XSL_PARAM_LIST ${PARAM})
     list(GET XSL_PARAM_LIST 0 XSL_PARAM_NAME)
     list(GET XSL_PARAM_LIST 1 XSL_PARAM_VALUE)
+    if(${XSL_PARAM_VALUE} MATCHES "^\"([^\"]*)\"$")
+      set(XSL_PARAM_VALUE ${CMAKE_MATCH_1})
+    endif()
 
     list(APPEND THIS_XSL_EXTRA_FLAGS 
       --stringparam ${XSL_PARAM_NAME} ${XSL_PARAM_VALUE})
@@ -103,6 +106,7 @@ macro(xsl_transform OUTPUT INPUT)
     message(SEND_ERROR 
       "xsl_transform macro invoked without a STYLESHEET argument")
   else()
+  
     # Run the XSLT processor to do the XML transformation.
     add_custom_command(OUTPUT ${THIS_XSL_OUTPUT_FILE}
       COMMAND ${THIS_XSL_CATALOG} ${XSLTPROC_EXECUTABLE} ${XSLTPROC_FLAGS} 
@@ -110,7 +114,8 @@ macro(xsl_transform OUTPUT INPUT)
               --path ${CMAKE_CURRENT_BINARY_DIR}
               ${THIS_XSL_STYLESHEET} ${INPUT}
       COMMENT ${THIS_XSL_COMMENT}
-      DEPENDS ${INPUT} ${THIS_XSL_DEFAULT_ARGS})
+      DEPENDS ${INPUT} ${THIS_XSL_DEFAULT_ARGS}
+      VERBATIM )
     set_source_files_properties(${THIS_XSL_OUTPUT_FILE}
       PROPERTIES GENERATED TRUE)
     # Create a custom target to refer to the result of this

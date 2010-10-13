@@ -38,6 +38,7 @@ macro(add_documentation INPUT)
         COMMAND ${CMAKE_COMMAND} -E copy ${srcfile} ${binfile}
         DEPENDS ${srcfile})
     endif(EXISTS ${srcfile})
+
     set(DEPENDENCIES ${DEPENDENCIES} ${binfile})
   endforeach(file ${DOCUMENTATION_DEFAULT_ARGS})
 

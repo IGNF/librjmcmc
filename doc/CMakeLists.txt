@@ -29,26 +29,29 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
   add_reference(librjmcmc-param-ref.xml ${PARAM_HEADER_FILES}
     BOOSTBOOK boost.doxygen.reftitle="Parameter Support")
 
-  add_documentation(librjmcmc.qbk
+  add_documentation(
+    librjmcmc.qbk
+    HTML4_symbols.qbk
+    librjmcmc_introduction.qbk
+    librjmcmc_quickstart.qbk
+    test.cpp
+    librjmcmc_mpp.qbk
+    librjmcmc_rjmcmc.qbk
+    librjmcmc_simulated_annealing.qbk
+    librjmcmc_tutorial.qbk
+    librjmcmc_samples.qbk
+    samples/sample_multiple_geometries_extraction.qbk
+    samples/sample_rectangular_building_footprint_extraction.qbk
+    librjmcmc_reference.qbk
+    librjmcmc_bibliography.qbk
     librjmcmc-mpp-ref.xml
     librjmcmc-rjmcmc-ref.xml
     librjmcmc-sa-ref.xml
     librjmcmc-geom-ref.xml
     librjmcmc-image-ref.xml
     librjmcmc-param-ref.xml
-    HTML4_symbols.qbk
-    librjmcmc_mpp.qbk
-    librjmcmc_quickstart.qbk
-    librjmcmc_rjmcmc.qbk
-    librjmcmc_simulated_annealing.qbk
-    librjmcmc_introduction.qbk
-    librjmcmc_reference.qbk
-    librjmcmc_samples.qbk
-    librjmcmc_tutorial.qbk
-    test.cpp
-    samples/sample_multiple_geometries_extraction.qbk
-    samples/sample_rectangular_building_footprint_extraction.qbk
   PARAMETERS
+    admon.graphics.path=images/
     boost.root=..
     html.stylesheet=css/boostbook.css
     boost.image.src=images/librjmcmc.png
