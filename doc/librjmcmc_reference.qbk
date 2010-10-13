@@ -1,0 +1,10 @@
+[section:ref Reference]
+
+[xinclude librjmcmc-mpp-ref.xml]
+[xinclude librjmcmc-rjmcmc-ref.xml]
+[xinclude librjmcmc-sa-ref.xml]
+[xinclude librjmcmc-geom-ref.xml]
+[xinclude librjmcmc-image-ref.xml]
+[xinclude librjmcmc-param-ref.xml]
+
+[endsect]
