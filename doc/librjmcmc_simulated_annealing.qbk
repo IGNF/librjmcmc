@@ -1,15 +1,12 @@
 [section:section_simulated_annealing Simulated Annealing]
 
 [section:simulated_annealing_introduction Introduction]
-Simulated annealing is a physical process ...[cite_salamon]
+Simulated annealing is a physical process inspired by annealing in mettalurgy and is widely used in many communities where global optimization is of importance. At each step of the algorithm, the current solution is replaced by a new solution close from it. The new solution is chosen with a probability which depends firstly on the variation of the objective function and secondly on the current temperature which decreases a along the process evolution. It thus allows up moves which avoid being trapped in a local minima. Generally, depending on the speed of the decrease and its schedule, an solution close to the optimal one is found.[cite_salamon]
 
-Coupled with the rjmcmc framework, it enables the global optimization of an extremely large class of energy functions
-over complex search spaces of varying dimensions. The goal of the simulated annealing process is to drive the initial rjmcmc sampler
-from an initial probability distribution function given by an energy-agnostic probabilisation of the search space (denoted as the reference
-process) to a final probability distribution function which support is exactly the set of global minima of the energy.
-Thus the final pdf reduces to a simple dirac at the global minimum if it is unique.
-To interpolate the pdf between the initial reference pdf and the final pdf a boltzmann distribution is usually used, parameterized
-by a temperature which decreases from +[infin] to zero.
+Coupled with the rjmcmc framework, it enables the global optimization of an extremely large class of energy functions over complex search spaces of varying dimensions. The goal of the simulated annealing process is to drive the initial rjmcmc sampler from an initial probability distribution function given by an energy-agnostic probabilisation of the search space (denoted as the reference process) to a final probability distribution function which support is exactly the set of global minima of the energy.
+
+Thus the final pdf reduces to a simple Dirac at the global minimum if it is unique.
+To interpolate the pdf between the initial reference pdf and the final pdf a boltzmann distribution is usually used, parameterized by a temperature which decreases from +[infin] to zero.
 
 [import ../../lib/simulated_annealing/simulated_annealing.hpp]
 
