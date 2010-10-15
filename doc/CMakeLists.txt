@@ -29,6 +29,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
   add_reference(librjmcmc-param-ref.xml ${PARAM_HEADER_FILES}
     BOOSTBOOK boost.doxygen.reftitle="Parameter Support")
 
+# PARAMETERS : http://docbook.sourceforge.net/release/xsl/current/doc/
   add_documentation(
     librjmcmc.qbk
     HTML4_symbols.qbk
@@ -51,7 +52,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     librjmcmc-image-ref.xml
     librjmcmc-param-ref.xml
   PARAMETERS
-    admon.graphics.path=images/
     boost.root=..
     html.stylesheet=css/boostbook.css
     boost.image.src=images/librjmcmc.png
@@ -64,7 +64,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     toc.max.depth=2
     generate.section.toc.level=4
     nav.layout=none
-    navig.graphics.path=images/
+    admon.graphics.path=images/admonition/
+    navig.graphics.path=images/navigation/
+    callout.graphics.path=images/callout/
   IMAGES
     images/librjmcmc.png
     css/boostbook.css
