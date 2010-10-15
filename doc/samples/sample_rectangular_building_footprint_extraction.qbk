@@ -114,10 +114,14 @@ You then have to provide some simple accessors and creators. [*This part is not 
 Bounding box related accessors are as simple as possible:
 [building_footprint_rectangle_bbox_accessors]
 
-To create a configuration, you just have to provide the (unary and binary) energies you want to work with. In this particular application, `unary_energy` is a function of the sum of gradient along the objects' edges and `binary_energy` is a weighted function of the overlapping area between two objects in interaction.
+To create a [link librjmcmc.section_mpp.configuration_concept configuration], you just have to provide the (unary and binary) energies you want to work with. In this particular application, `unary_energy` is a function of the sum of gradient along the objects' edges and `binary_energy` is a weighted function of the overlapping area between two objects in interaction.
 [building_footprint_rectangle_create_configuration]
 [building_footprint_rectangle_create_sampler]
+
+To setup the simulated annealing, you have to provide a schedule and an end test. To instantiate the [classref simulated_annealing::geometric_schedule], you only need an initial temperature and a decrease coefficient, available from the `parameters`:
 [building_footprint_rectangle_create_schedule]
+
+The [classref simulated_annealing::max_iteration_end_test] simply requires the maximum number of iterations to run:
 [building_footprint_rectangle_create_end_test]
 [building_footprint_rectangle_init_visitor]
 
