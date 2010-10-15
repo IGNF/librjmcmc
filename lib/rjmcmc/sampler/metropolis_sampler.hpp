@@ -5,7 +5,12 @@
 
 namespace rjmcmc
 {
-
+    /**
+     * \ingroup GroupSampler
+     *
+     * This class is a model of the Sampler concept and implements <i>Metropolis</i> acceptance rule. The new state is accepted with probability:
+     * \f[P_{Metropolis}=\min\left(1,\exp\left(-\Delta E / T\right)\right)\f]
+     */
     template<typename CountSampler, RJMCMC_TUPLE_TYPENAMES>
     class metropolis_sampler
         : public sampler_base<metropolis_sampler<CountSampler,RJMCMC_TUPLE_TYPES>, CountSampler, RJMCMC_TUPLE_TYPES>
