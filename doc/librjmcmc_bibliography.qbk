@@ -12,7 +12,7 @@ College Press..London, England]]
 ]
 [section Bibliography]
 '''
-<bibliography id="librjmcmc.biblio" last-revision="$Date$">
+<bibliolist>
   <biblioentry id="librjmcmc.bibliography.Tournaire2010">
     <abbrev id="librjmcmc.bibliography.Tournaire2010.abbrev">Tournaire2010</abbrev>
     <biblioset relation="article">
@@ -34,6 +34,6 @@ College Press..London, England]]
       <date>2010</date>
     </biblioset>
   </biblioentry>
-</bibliography>
+</bibliolist>
 '''
 [endsect]
