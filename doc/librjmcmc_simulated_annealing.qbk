@@ -1,7 +1,7 @@
 [section:section_simulated_annealing Simulated Annealing]
 
 [section:simulated_annealing_introduction Introduction]
-Simulated annealing is a physical process inspired by annealing in mettalurgy and is widely used in many communities where global optimization is of importance. At each step of the algorithm, the current solution is replaced by a new solution close from it. The new solution is chosen with a probability which depends firstly on the variation of the objective function and secondly on the current temperature which decreases a along the process evolution. It thus allows up moves which avoid being trapped in a local minima. Generally, depending on the speed of the decrease and its schedule, an solution close to the optimal one is found.[cite_salamon]
+Simulated annealing is a physical process inspired by annealing in mettalurgy and is widely used in many communities where global optimization is of importance. At each step of the algorithm, the current solution is replaced by a new solution close from it. The new solution is chosen with a probability which depends firstly on the variation of the objective function and secondly on the current temperature which decreases a along the process evolution. It thus allows up moves which avoid being trapped in a local minima. Generally, depending on the speed of the decrease and its schedule, an solution close to the optimal one is found. [biblioref Salamon2002]
 
 Coupled with the rjmcmc framework, it enables the global optimization of an extremely large class of energy functions over complex search spaces of varying dimensions. The goal of the simulated annealing process is to drive the initial rjmcmc sampler from an initial probability distribution function given by an energy-agnostic probabilisation of the search space (denoted as the reference process) to a final probability distribution function which support is exactly the set of global minima of the energy.
 
@@ -31,7 +31,7 @@ concept of the [stl].
 The evaluation of a suitable initial temperature is not trivial. On the other hand, too high a temperature will unnecessarily
 prolong the initial phase of the simulated annealing where the sampling is unbiased by the energy.
 On the other hand, too low a temperature prevents the exploration of the whole configuration space and results in a
-convergence to a local minimum only. [cite_salamon] suggests considering an estimation of the variance of the energy
+convergence to a local minimum only. [biblioref Salamon2002] suggests considering an estimation of the variance of the energy
 of configurations sampled according to the reference process to estimate the initial temperature.
 
 Available models:

@@ -1,20 +1,112 @@
-[/
-[template cite_salamon[] [cite Salamon, P., Sibani, P., Frost, R. ..2002..Facts, Conjectures and Improvements
-for Simulated Annealing..Society for Industrial and Applied Mathematics..Philadelphia, USA]]
-[template cite_green[] [cite Green, P.J. ..1995..Reversible Jump Markov Chain Monte Carlo computation and
-Bayesian model determination..Biometrika 82 (4)..711-732]]
-[template cite_hastings[] [cite Hastings, W.K. ..1970..Monte Carlo sampling using Markov chains and their
-applications..Biometrica 57 (1)..97-109]]
-[template cite_lieshout[] [cite van Lieshout, M.N.M. ..2000..Markov Point Processes and their Applications..Imperial
-College Press..London, England]]
-[template cite_ijprs[] [. 65 (4)..]]  http://dx.doi.org/10.1016/j.isprsjprs.2010.02.002
-
-]
 [section Bibliography]
+
 '''
 <bibliolist>
-  <biblioentry id="librjmcmc.bibliography.Tournaire2010">
-    <abbrev id="librjmcmc.bibliography.Tournaire2010.abbrev">Tournaire2010</abbrev>
+
+  <biblioentry id="Hastings1970">
+    <biblioset relation="article">
+      <author><firstname>W.K.</firstname><surname>applications</surname></author>
+      <title>Monte Carlo sampling using Markov chains and their applications</title>
+      <pagenums>97-109</pagenums>
+    </biblioset>
+    <biblioset relation="journal">
+      <title>Biometrika</title>
+      <volumenum>Vol. 57</volumenum>
+      <issuenum>(1)</issuenum>
+      <date>1970</date>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry id="Green1995">
+    <biblioset relation="article">
+      <author><firstname>P.J.</firstname><surname>Green</surname></author>
+      <title>Reversible Jump Markov Chain Monte Carlo computation and Bayesian model determination</title>
+      <pagenums>711-732</pagenums>
+    </biblioset>
+    <biblioset relation="journal">
+      <title>Biometrika</title>
+      <volumenum>Vol. 82</volumenum>
+      <issuenum>(4)</issuenum>
+      <date>1995</date>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry id="Lieshout2000">
+    <author><firstname>M.N.M.</firstname><surname>van Lieshout</surname></author>
+    <title>Markov Point Processes and their Applications</title>
+    <publisher><publishername>Imperial College Press</publishername></publisher>
+    <date>2000</date>
+    <address><city>London</city>, <country>England</country></address>
+  </biblioentry>
+
+  <biblioentry id="Salamon2002">
+    <authorgroup>
+      <author><firstname>P.</firstname><surname>Salamon</surname></author>
+      <author><firstname>P.</firstname><surname>Sibani</surname></author>
+      <author><firstname>R.</firstname><surname>Frost</surname></author>
+    </authorgroup>
+    <title>
+      Facts, Conjectures and Improvements for Simulated Annealing
+    </title>
+    <publisher><publishername>Society for Industrial and Applied Mathematics</publishername></publisher>
+    <date>2002</date>
+    <address><city>Philadelphia</city>, <country>USA</country></address>
+  </biblioentry>
+
+  <biblioentry id="Ortner2007">
+    <biblioset relation="article">
+      <authorgroup>
+        <author><firstname>M.</firstname><surname>Ortner</surname></author>
+        <author><firstname>X.</firstname><surname>Descombes</surname></author>
+        <author><firstname>J.</firstname><surname>Zerubia</surname></author>
+      </authorgroup>
+      <title>Building outline extraction from digital elevation models using marked point processes</title>
+      <pagenums>107-132</pagenums>
+    </biblioset>
+    <biblioset relation="journal">
+      <title>International Journal of Computer Vision</title>
+      <volumenum>Vol. 72</volumenum>
+      <issuenum>(2)</issuenum>
+      <date>2007</date>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry id="Lafarge2007">
+    <biblioset relation="article">
+      <authorgroup>
+        <author><firstname>F.</firstname><surname>Lafarge</surname></author>
+        <author><firstname>X.</firstname><surname>Descombes</surname></author>
+        <author><firstname>J.</firstname><surname>Zerubia</surname></author>
+        <author><firstname>M.</firstname><surname>Pierrot-Deseilligny</surname></author>
+      </authorgroup>
+      <title>Structural Approach for Building Reconstruction from a Single DSM</title>
+      <pagenums>135-147</pagenums>
+    </biblioset>
+    <biblioset relation="journal">
+      <title>IEEE Transactions on Pattern Analysis and Machine Intelligence</title>
+      <volumenum>Vol. 32</volumenum>
+      <issuenum>(1)</issuenum>
+      <date>jan 2010</date>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry id="Ortner2008">
+    <biblioset relation="article">
+      <authorgroup>
+        <author><firstname>M.</firstname><surname>Ortner</surname></author>
+        <author><firstname>X.</firstname><surname>Descombes</surname></author>
+        <author><firstname>J.</firstname><surname>Zerubia</surname></author>
+      </authorgroup>
+      <title>A marked point process of rectangles and segments for automatic analysis of Digital Elevation Models</title>
+      <pagenums>97-109</pagenums>
+    </biblioset>
+    <biblioset relation="journal">
+      <title>IEEE Transactions on Pattern Analysis and Machine Intelligence</title>
+      <date>2008</date>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry id="Tournaire2010">
     <biblioset relation="article">
       <authorgroup>
         <author><firstname>O.</firstname><surname>Tournaire</surname></author>
@@ -28,7 +120,7 @@ College Press..London, England]]
       <pagenums>317-327</pagenums>
     </biblioset>
     <biblioset relation="journal">
-      <title>ISPRS Journal of Photogrammetry and Remote Sensing</title>
+      <title><ulink url="http://www.elsevier.com/wps/find/journaldescription.cws_home/503340/description#description">ISPRS Journal of Photogrammetry and Remote Sensing</ulink></title>
       <volumenum>Vol. 65</volumenum>
       <issuenum>(4)</issuenum>
       <date>2010</date>
@@ -37,6 +129,30 @@ College Press..London, England]]
       <ulink url="http://dx.doi.org/10.1016/j.isprsjprs.2010.02.002">doi:10.1016/j.isprsjprs.2010.02.002</ulink>
     </releaseinfo>
   </biblioentry>
+
+  <biblioentry id="Mallet2010">
+    <biblioset relation="article">
+      <authorgroup>
+      <author><firstname>C.</firstname><surname>Mallet</surname></author>
+      <author><firstname>F.</firstname><surname>Lafarge</surname></author>
+        <author><firstname>M.</firstname><surname>Roux</surname></author>
+        <author><firstname>U.</firstname><surname>Soergel</surname></author>
+        <author><firstname>F.</firstname><surname>Bretar</surname></author>
+        <author><firstname>C.</firstname><surname>Heipke</surname></author>
+      </authorgroup>
+      <title>A Marked Point Process for Modeling Lidar Waveforms</title>
+    </biblioset>
+    <biblioset relation="journal">
+      <title>IEEE Transactions on Image Processing</title>
+      <volumenum>Vol. 19</volumenum>
+      <issuenum>(12)</issuenum>
+      <date>2010</date>
+    </biblioset>
+    <releaseinfo>
+      <ulink url="http://dx.doi.org/10.1109/TIP.2010.2052825">doi:10.1109/TIP.2010.2052825 </ulink>
+    </releaseinfo>
+  </biblioentry>
+
 </bibliolist>
 '''
 [endsect]

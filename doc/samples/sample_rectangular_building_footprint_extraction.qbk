@@ -1,6 +1,6 @@
 [section Rectangular building footprint extraction]
 
-Historically, __librjmcmc__ was developped for this particular application: detect rectangles to delineate building footprints in a digital elevation model ([@http://en.wikipedia.org/wiki/Digital_elevation_model DEM], rasterized heights on a regular grid). This work has been published in [@http://www.elsevier.com/wps/find/journaldescription.cws_home/503340/description#description ISPRS Journal][cite_ijprs] and is available online[footnote [@http://dx.doi.org/10.1016/j.isprsjprs.2010.02.002 doi:10.1016/j.isprsjprs.2010.02.002]].
+Historically, __librjmcmc__ was developped for this particular application: detect rectangles to delineate building footprints in a digital elevation model ([@http://en.wikipedia.org/wiki/Digital_elevation_model DEM], rasterized heights on a regular grid). This work has been published in [biblioref Tournaire2010].
 
 [section Core]
 [section Geometry modeling]
