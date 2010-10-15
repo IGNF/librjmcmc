@@ -93,6 +93,7 @@ The first one tests if to objects interacts. If so, the second one provides a wa
 [endsect]
 
 [section Configuration and reference density]
+The configuration is responsible of objects handling and energy computation management (see [link librjmcmc.section_mpp.configuration_concept configuration concept]). Here, we instantiate a simple [classref marked_point_process::graph_configuration] with the `object`, `unary_energy` and `binary_energy` previously declared:
 [building_footprint_rectangle_definition_configuration]
 [building_footprint_rectangle_definition_density]
 [endsect]
@@ -103,15 +104,17 @@ The first one tests if to objects interacts. If so, the second one provides a wa
 [endsect]
 
 [section Simulated annealing]
-Simulated annealing instatiantion is done as follows:
+Simulated annealing instantiation requires to chose a temperatyre schedule and an end test:
 [building_footprint_rectangle_definition_simulated_annealing]
-Please refer to [link librjmcmc.section_simulated_annealing.schedule_concept schedule concepts] and [link librjmcmc.section_simulated_annealing.endtest_concept end test concepts] for more simulated annealing schedule and end tests models.
+Please refer to [link librjmcmc.section_simulated_annealing.schedule_concept schedule] and [link librjmcmc.section_simulated_annealing.endtest_concept end test] concepts for more simulated annealing schedule and end tests models.
 [endsect]
 
 You then have to provide some simple accessors and creators. [*This part is not mandatory. You could simply do all that stuff in your main entry point. However, as it is a common part for ['cli] and ['gui], it is a good way to factorize your code and ease its reusability]. Most of the time, you simply have to call a constructor filled with some parameters (the ones from the command line or the graphical user interface).
 
 Bounding box related accessors are as simple as possible:
 [building_footprint_rectangle_bbox_accessors]
+
+To create a configuration, you just have to provide the (unary and binary) energies you want to work with. In this particular application, `unary_energy` is a function of the sum of gradient along the objects' edges and `binary_energy` is a weighted function of the overlapping area between two objects in interaction.
 [building_footprint_rectangle_create_configuration]
 [building_footprint_rectangle_create_sampler]
 [building_footprint_rectangle_create_schedule]
