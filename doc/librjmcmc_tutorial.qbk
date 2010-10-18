@@ -1,4 +1,4 @@
-[section:section_tutorial Tutorial]
+[/ comment [section:section_tutorial Tutorial]
 
 This part is dedicated to a full tutorial on how to use __librjmcmc__ to create an application from scratch. We will desribe a step by step approach which involves:
 
@@ -7,4 +7,4 @@ This part is dedicated to a full tutorial on how to use __librjmcmc__ to create 
 # Choice of a __RJMCMC__ configuration
 # Parametrization of the simulated annealing
 
-[endsect]
+[endsect] ]
