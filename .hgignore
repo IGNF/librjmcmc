@@ -1,7 +1,4 @@
+debug
+release
 build
-doc/bin
 CMakeLists.txt.user
-doc/.*\.xml
-doc/.*\.html
-Doxyfile
-doc/html/librjmcmc_HTML.manifest

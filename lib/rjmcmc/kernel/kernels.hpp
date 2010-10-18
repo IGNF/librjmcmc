@@ -90,7 +90,7 @@ public:
             float dx = bbox.max().x()-bbox.min().x();
             float dy = bbox.max().y()-bbox.min().y();
             double radius = 0.5*geometry::min(dx,dy);
-            return 1./(dx*dy*radius);
+            return 1.;//1./(dx*dy*radius);
 	}
 #endif
     };
