@@ -1,5 +1,6 @@
 [section:section_samples Samples]
 
+[section Introduction]
 This section explains and comments some of the samples which are delivered with the library. It is a good starting point to learn how to use the library.
 
 Each sample contains three subdirectories:
@@ -9,8 +10,8 @@ Each sample contains three subdirectories:
 * `core` is the common part of the both `cli` and `gui`; it contains geometry, energies and input parameters definitions
 
 This structure is not mandatory for your particular application: you can have only a `cli` or `gui` implementation. If you have both, you may consider, for readability and maintenance purposes, split the code into separated folders.
+[endsect]
 
 [include samples/sample_rectangular_building_footprint_extraction.qbk]
-[include samples/sample_multiple_geometries_extraction.qbk]
 
 [endsect]

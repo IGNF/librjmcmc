@@ -35,7 +35,6 @@
 [include librjmcmc_mpp.qbk]
 [include librjmcmc_rjmcmc.qbk]
 [include librjmcmc_simulated_annealing.qbk]
-[include librjmcmc_tutorial.qbk]
 [include librjmcmc_samples.qbk]
-[include librjmcmc_reference.qbk]
 [include librjmcmc_bibliography.qbk]
+[include librjmcmc_reference.qbk]

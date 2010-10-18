@@ -66,6 +66,7 @@ Available models:
 [section:unary_energies Unary Energies]
 Available models:
 
+* [classref constant_unary_energy]
 * [classref image_gradient_unary_energy]
 
 [endsect]
