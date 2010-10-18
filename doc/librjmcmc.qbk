@@ -24,84 +24,10 @@
 [template wx[] [@http://www.wxwidgets.org/ wxWidgets]]
 [template gilviewer[] [@http://code.google.com/p/gilviewer/ GilViewer]]
 
+[template biblioref[name] '''<biblioref linkend="'''[name]'''"/>''']
+
 [template todo[text]
 [warning *TODO:* [text]]
-]
-
-[/ Bibliography ]
-
-[template cite[author year title society location] [footnote [author], [year], [*[title]], ['[society]], [location].]]
-
-[template cite_salamon[] [cite Salamon, P., Sibani, P., Frost, R. ..2002..Facts, Conjectures and Improvements
-for Simulated Annealing..Society for Industrial and Applied Mathematics..Philadelphia, USA]]
-[template cite_green[] [cite Green, P.J. ..1995..Reversible Jump Markov Chain Monte Carlo computation and
-Bayesian model determination..Biometrika 82 (4)..711-732]]
-[template cite_hastings[] [cite Hastings, W.K. ..1970..Monte Carlo sampling using Markov chains and their
-applications..Biometrica 57 (1)..97-109]]
-[template cite_lieshout[] [cite van Lieshout, M.N.M. ..2000..Markov Point Processes and their Applications..Imperial
-College Press..London, England]]
-[template cite_ijprs[] [cite Tournaire, O., Brédif, M., Boldo, D., Durupt, M. ..2010..An efficient stochastic approach for building footprint extraction from digital
-elevation models..ISPRS Journal of Photogrammetry and Remote Sensing 65 (4)..317-327]]
-
-[/ other refs (copié-collé des ref de l'ijprs TBBD10)
-Alharthy, A., Bethel, J., 2002. Heuristic filtering and 3D feature extraction from LiDAR
-data. International Archives of Photogrammetry, Remote Sensing and Spatial
-Information Science 34 (Part 3), 29-34.
-Brunn, A., Weidner, U., 1997. Extracting buildings from digital surface models.
-International Archives of Photogrammetry and Remote Sensing 32 (Part
-3/4W2), 27-34.
-Cressie, N.A.C., 1993. Statistics for spatial data. In: Probability and Mathematical
-Statistics. Wiley-Interscience, New-York, USA.
-Frédéricque, B., Daniel, S., Bédard, Y., Paparoditis, N., 2008. Populating a building
-multi-representation data base with photogrammetric tools: Recent progress.
-ISPRS Journal of Photogrammetry and Remote Sensing 64 (4), 441-460.
-Geyer, C.J., Møller, J., 1994. Simulation and likelihood inference for spatial point
-processes. Scandinavian Journal of Statistics 21 (4), 359-373.
-Haala, N., Brenner, C., Anders, K.H., 1998. 3D urban GIS from laser altimeter and 2D
-map data. International Archives of Photogrammetry and Remote Sensing 32
-(Part 3), 339-346.
-Haithcoat, T.L., Song, W., Hipple, J.D., 2001. Building footprint extraction and
-3D reconstruction from LiDAR data. In: Proceedings of the Remote Sensing
-and Data Fusion over Urban Areas. 8-9 November. IEEE/ISPRS, Roma, Italy,
-pp. 74-78.
-Lacoste, C., Descombes, X., Zerubia, J., 2005. Point processes for unsupervised line
-network extraction in remote sensing. IEEE Transactions on Pattern Analysis
-and Machine Intelligence 27 (10), 1568-1579.
-Lafarge, F., Descombes, X., Zerubia, J., Pierrot-Deseilligny, M., 2006. A structural
-approach for 3D building reconstruction. Research Report 6048, INRIA.
-Lafarge, F., Descombes, X., Zerubia, J., Pierrot-Deseilligny, M., 2008. Building
-reconstruction from a single DEM. In: Proceedings of the Conference on
-Computer Vision and Pattern Recognition. 24-26 June. IEEE, Anchorage, AK,
-USA.
-Ortner, M., Descombes, X., Zerubia, J., 2007. Building outline extraction from
-digital elevation models using marked point processes. International Journal of
-Computer Vision 72 (2), 107-132.
-Perrin, G., Descombes, X., Zerubia, J., 2006. 2D and 3D vegetation resource
-parameters assessment using marked point processes. In: Proceedings of the
-International Conference on Pattern Recognition. 20-24 August. IAPR, Hong-
-Kong, China.
-Pierrot-Deseilligny, M., Paparoditis, N., 2006. A multiresolution and optimizationbased
-image matching approach: An application to surface reconstruction
-from SPOT5-HRS stereo imagery. In: International Archives of Photogrammetry,
-Remote Sensing and Spatial Information Sciences 36 (Part 1/W41) (on CD-ROM).
-Robert, C.P., Casella, G., 2004. Monte Carlo Statistical Methods, 2nd Edition.
-In: Springer Texts in Statistics, Springer.
-Roy, S., Cox, I.J., 1998. A maximum-flow formulation of the N-camera stereo
-correspondence problem. In: Proceedings of the International Conference on
-Computer Vision. 4-7 January. IEEE, Bombay, India, pp. 492-499.
-Shackelford, A.K., Davis, C.H., Xiangyun Wang, X., 2004. Automated 2D building
-footprint extraction from high-resolution satellite multispectral imagery.
-In: Proceedings of the Geoscience and Remote Sensing Symposium, 2004,
-vol. 3. 20-24 September. IEEE, Anchorage, AK, USA, pp. 1996-1999.
-Stoyan, D., Kendall, W.S., Mecke, J., 1996. Stochastic Geometry and its Applications,
-2nd Edition. Wiley-Interscience.
-Wang, O., Lodha, S.K., Helmbold, D.P., 2006. A Bayesian approach to building
-footprint extraction from aerial LiDAR data. In: Proceedings of the International
-Symposium on 3D Data Processing, Visualization, and Transmission. 14-16
-June. IEEE, Chapel Hill, USA, pp. 192-199.
-Winkler, G., 2003. Image Analysis, Random Fields and Markov Chain Monte Carlo
-Methods: A Mathematical Introduction, 2nd Edition. Springer-Verlag.
-
 ]
 
 [include librjmcmc_introduction.qbk]

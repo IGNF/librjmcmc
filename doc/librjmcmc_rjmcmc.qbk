@@ -6,8 +6,9 @@ A __MCMC__ (MCMC) sampler provides a series of configuration samples according
 to a given unnormalized probability distribution function. __RJMCMC__ (RJMCMC) is an extension
 of MCMC that allows the configurations space to be the union of spaces of varying dimensions.
 
-[cite_green]
-[cite_hastings]
+
+[biblioref Hastings1970]
+[biblioref Green1995]
 
 [endsect]
 

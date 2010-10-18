@@ -4,8 +4,10 @@ cmake_minimum_required(VERSION 2.6)
 
 # Building of Documentation is tested on Linux only
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-  set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+
+# adapted from http://github.com/purpleKarrot/CToolBox.git
   set(THIS_PROJECT_NAME librjmcmc)
+  set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
   find_package(Reference)
   find_package(Documentation)
 
