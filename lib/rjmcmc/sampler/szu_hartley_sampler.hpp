@@ -10,7 +10,7 @@ namespace rjmcmc
      *
      * This class is a model of the Sampler concept and implements <i>Szu and Hartley</i> fast annealing. This is the first variant proposed variant of the classical Metropolis acceptance criterion.
      * \f[P_{SH}=\frac{1}{1+\exp\left(\Delta E / T\right)}\f]
-     * This probability is always less than the Metropolis one, the difference becoming negligible for large \f[\Delta E / T\f].
+     * This probability is always less than the Metropolis one, the difference becoming negligible for large \f$\Delta E / T\f$.
      */
     template<typename CountSampler, RJMCMC_TUPLE_TYPENAMES>
     class szu_hartley_sampler
