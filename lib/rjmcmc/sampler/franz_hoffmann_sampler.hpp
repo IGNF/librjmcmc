@@ -5,7 +5,21 @@
 
 namespace rjmcmc
 {
-
+    /**
+     * \ingroup GroupSampler
+     *
+     * This class is a model of the Sampler concept and implements <i>Franz and Hoffmann</i> acceptance rule, a modification of <i>Tsallis</i> rule:
+     * \f[
+     * P_{Franz_Hoffmann} = \left\{
+     *                      \begin{array}{ll}
+     *                          1 & \texttt{if } \Delta E\leq 0 \\
+     *                          \left(1-\frac{1-q}{2-q}\frac{\Delta E}{T}\right)^{\frac{1}{1-q}} & \texttt{if } \Delta E> 0 \texttt{ and } \frac{1-q}{2-q}\frac{\Delta E}{T}\leq 1 \\
+     *                          0 & \texttt{if } \Delta E> 0 \texttt{ and } \frac{1-q}{2-q}\frac{\Delta E}{T}>1 \\
+     *                      \end{array}
+     *               \right.
+     * \f]
+     * When \f$q\f$ tends to 1, <i>Tsallis</i> acceptance rule is equivalent to <i>Metropolis</i> acceptance rule. The final solution seems to be independant of \f$q\f$, but is reached quicker while decreasing \f$q\f$.
+     */
     template<typename CountSampler, RJMCMC_TUPLE_TYPENAMES>
     class franz_hoffmann_sampler : public sampler_base<franz_hoffmann_sampler<CountSampler,RJMCMC_TUPLE_TYPES>, CountSampler, RJMCMC_TUPLE_TYPES>
     {

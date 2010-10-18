@@ -13,5 +13,6 @@ This structure is not mandatory for your particular application: you can have on
 [endsect]
 
 [include samples/sample_rectangular_building_footprint_extraction.qbk]
+[/ comment [include samples/sample_multiple_geometries_extraction.qbk] ]
 
 [endsect]

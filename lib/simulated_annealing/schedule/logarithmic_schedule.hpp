@@ -5,7 +5,7 @@ namespace simulated_annealing {
     /**
      * \ingroup GroupSchedule
      *
-     * This class is a model of the Schedule concept and implements a geometric schedule:
+     * This class is a model of the Schedule concept and implements a logarithmic schedule:
      * \f[T_i=\frac{T_0}{\log_2(2+i)}\f]
      * This schedule guarantees that the simulated annealing will converge to the global optimum
      * if the initial temperature is set sufficiently high.
