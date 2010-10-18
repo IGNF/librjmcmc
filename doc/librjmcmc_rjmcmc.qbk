@@ -14,7 +14,11 @@ of MCMC that allows the configurations space to be the union of spaces of varyin
 
 [section:sampler_concept Sampler concept]
 
-[todo Sampler]
+The role of a __RJMCMC__ sampler is to generate a __MCMC__ series of configuration with a stationnary pdf based only on its evaluation up to a multiplicative factor. Applied in the __MPP__ context, this allows to bias the sampling of a reference process with energy of the configuration (lower energy configuration getting comparatively more samples).  The reference process may directly be sampled and the density of a configuration may easily be evaluated. The relative influence of the energy values relative to the reference process is tuned by a temperature parameter, as will further be explained in the [link librjmcmc.section_simulated_annealing Simulated Annealing] section.
+
+[todo Samplers_are_templated_by_a_Density_of_]
+
+Models of the `Sampler` concept differ by their computation of the Green ratio impacted by differing formulations of the mixing of the reference density, the energy and the temperature value, [classref rjmcmc::metropolis_sampler] being the most common choice.
 
 Available models:
 
@@ -23,8 +27,6 @@ Available models:
 * [classref rjmcmc::franz_hoffmann_sampler]
 * [classref rjmcmc::szu_hartley_sampler]
 * [classref rjmcmc::tsallis_tsariolo_sampler]
-* [classref rjmcmc::rejection_sampler]
-* ...
 
 [endsect]
 

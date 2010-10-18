@@ -53,7 +53,7 @@ For efficiency reasons, `Configurations` are thus tightly coupled with energies 
 A configuration is a wrapper around a container of objects. This wrapper abstraction may be used to cache intermediate
 values such as the binary energy terms between each object to prevent its recomputation.
 
-Multi-__MPPs__ are supported by supplying a `boost::variant` over the types of objects as the `Object` template argument
+Multi-__MPPs__ are supported by supplying a [boost variant] over the types of objects as the `Object` template argument
 of the configuration.
 
 Available models:
