@@ -18,7 +18,7 @@ namespace rjmcmc
      *                      \end{array}
      *               \right.
      * \f]
-     * When \f$q\f$ tends to 1, <i>Tsallis</i> acceptance rule is equivalent to <i>Metropolis</i> acceptance rule. The final solution seems to be independant of \f$q\f$, but is reached quicker while decreasing \f$q\f$.
+     *
      */
     template<typename CountSampler, RJMCMC_TUPLE_TYPENAMES>
     class franz_hoffmann_sampler : public sampler_base<franz_hoffmann_sampler<CountSampler,RJMCMC_TUPLE_TYPES>, CountSampler, RJMCMC_TUPLE_TYPES>
