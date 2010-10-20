@@ -37,7 +37,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     HTML4_symbols.qbk
     librjmcmc_introduction.qbk
     librjmcmc_quickstart.qbk
-    test.cpp
+    quickstart.cpp
     librjmcmc_mpp.qbk
     librjmcmc_rjmcmc.qbk
     librjmcmc_simulated_annealing.qbk
@@ -73,6 +73,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     images/librjmcmc.png
     css/boostbook.css
   )
+
+
+
+file( GLOB_RECURSE LIB_HEADER_FILES    ../lib/*.hpp ../lib/*.h)
+
+add_executable( quickstart quickstart.cpp ${LIB_HEADER_FILES})
+target_link_libraries( quickstart ${Boost_LIBRARIES} ${GEOMETRY_LIBRARIES} )
+
 
 endif(CMAKE_SYSTEM_NAME STREQUAL Linux)
 

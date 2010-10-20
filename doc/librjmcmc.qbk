@@ -23,6 +23,8 @@
 [template stl[] [@http://www.sgi.com/tech/stl STL]]
 [template wx[] [@http://www.wxwidgets.org/ wxWidgets]]
 [template gilviewer[] [@http://code.google.com/p/gilviewer/ GilViewer]]
+[/ extends [@http://www.boost.org/doc/html/variant.html `boost::variant`] to other boost libs]
+[template boost[lib] '''<ulink url="http://www.boost.org/doc/html/'''[lib]'''.html"><code><phrase role="identifier">boost</phrase><phrase role="special">::</phrase><phrase role="identifier">'''[lib]'''</phrase></code></ulink>''']
 
 [template biblioref[name] '''<biblioref linkend="'''[name]'''"/>''']
 
@@ -35,7 +37,6 @@
 [include librjmcmc_mpp.qbk]
 [include librjmcmc_rjmcmc.qbk]
 [include librjmcmc_simulated_annealing.qbk]
-[include librjmcmc_tutorial.qbk]
 [include librjmcmc_samples.qbk]
-[include librjmcmc_reference.qbk]
 [include librjmcmc_bibliography.qbk]
+[include librjmcmc_reference.qbk]

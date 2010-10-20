@@ -1,5 +1,10 @@
 [section Bibliography]
 
+[def __IJPRS__ '''<ulink url="http://www.elsevier.com/wps/find/journaldescription.cws_home/503340/description#description">ISPRS Journal of Photogrammetry and Remote Sensing</ulink>''']
+[def __PAMI__  '''<ulink url="http://www.computer.org/portal/web/tpami/">IEEE Transactions on Pattern Analysis and Machine Intelligence</ulink>''']
+[def __TIP__   '''<ulink url="http://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=83">IEEE Transactions on Image Processing</ulink>''']
+[def __IJCV__  '''<ulink url="http://www.springer.com/computer/image+processing/journal/11263">International Journal of Computer Vision</ulink>''']
+
 '''
 <bibliolist>
 
@@ -64,7 +69,7 @@
       <pagenums>107-132</pagenums>
     </biblioset>
     <biblioset relation="journal">
-      <title>International Journal of Computer Vision</title>
+      <title>'''__IJCV__'''</title>
       <volumenum>Vol. 72</volumenum>
       <issuenum>(2)</issuenum>
       <date>2007</date>
@@ -83,7 +88,7 @@
       <pagenums>135-147</pagenums>
     </biblioset>
     <biblioset relation="journal">
-      <title>IEEE Transactions on Pattern Analysis and Machine Intelligence</title>
+      <title>'''__PAMI__'''</title>
       <volumenum>Vol. 32</volumenum>
       <issuenum>(1)</issuenum>
       <date>jan 2010</date>
@@ -101,7 +106,7 @@
       <pagenums>97-109</pagenums>
     </biblioset>
     <biblioset relation="journal">
-      <title>IEEE Transactions on Pattern Analysis and Machine Intelligence</title>
+      <title>'''__PAMI__'''</title>
       <date>2008</date>
     </biblioset>
   </biblioentry>
@@ -120,7 +125,7 @@
       <pagenums>317-327</pagenums>
     </biblioset>
     <biblioset relation="journal">
-      <title><ulink url="http://www.elsevier.com/wps/find/journaldescription.cws_home/503340/description#description">ISPRS Journal of Photogrammetry and Remote Sensing</ulink></title>
+      <title>'''__IJPRS__'''</title>
       <volumenum>Vol. 65</volumenum>
       <issuenum>(4)</issuenum>
       <date>2010</date>
@@ -143,7 +148,7 @@
       <title>A Marked Point Process for Modeling Lidar Waveforms</title>
     </biblioset>
     <biblioset relation="journal">
-      <title>IEEE Transactions on Image Processing</title>
+      <title>'''__TIP__'''</title>
       <volumenum>Vol. 19</volumenum>
       <issuenum>(12)</issuenum>
       <date>2010</date>

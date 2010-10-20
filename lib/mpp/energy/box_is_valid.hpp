@@ -1,8 +1,6 @@
 #ifndef BOX_IS_VALID_HPP_
 #define BOX_IS_VALID_HPP_
 
-#include "core/geometry.h"
-
 class box_is_valid
 {
 public:

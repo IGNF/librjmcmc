@@ -1,10 +1,14 @@
 [section Introduction]
 
-The __librjmcmc__ is a generic C++ library designed to be both heavily optimized and highly modular.
-It focuses on (multi-) __MPPs__ in both sampling and optimization contexts.
-When direct sampling of the __MPP__ is not possible, as when its probability density function is not samplable
-and not normalized, the __RJMCMC__ algorithm requires almost only the evaluation (up to a multiplicative constant)
-of this pdf to produce a __MCMC__ which stationnary pdf is the desired one.
+The __librjmcmc__ is a [@http://www.boost.org/community/generic_programming.html generic] C++ library designed to be both heavily optimized and highly modular.
+It currently focuses on (multi-) __MPPs__ [biblioref Lieshout2000] in both sampling and optimization contexts.
+When direct sampling of the __MPP__ is not possible, as when its probability density function (pdf) is not samplable
+and not normalized, the __RJMCMC__ algorithm only requires the evaluation (up to a multiplicative constant)
+of this pdf to produce a Markov Chain which stationnary pdf is the desired one.
 Coupled with simulated annealing, the __RJMCMC__ framework enables
 the stochastic minimization of a large class of energies.
+
+Embedding a __RJMCMC__ sampler
+in a Simulated Annealing process to minimize an objective function over the probabilized search space
+defined by a __MPP__ in a modular yet efficient way is the main purpose of the __librjmcmc__ library.
 [endsect]

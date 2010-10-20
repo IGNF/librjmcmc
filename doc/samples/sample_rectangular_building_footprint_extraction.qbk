@@ -1,6 +1,6 @@
 [section Rectangular building footprint extraction]
 
-Historically, __librjmcmc__ was developped for this particular application: detect rectangles to delineate building footprints in a digital elevation model ([@http://en.wikipedia.org/wiki/Digital_elevation_model DEM], rasterized heights on a regular grid). This work has been published in [biblioref Tournaire2010].
+Historically, __librjmcmc__ was developped for this particular application: detecting rectangles to delineate building footprints in a Digital Elevation Model ([@http://en.wikipedia.org/wiki/Digital_elevation_model DEM], rasterized heights on a regular grid). This work has been published in [biblioref Tournaire2010].
 
 [section Core]
 [section Geometry modeling]
@@ -13,9 +13,9 @@ Syntax rules and modeling respect [@http://www.cgal.org CGAL] standards. Please 
 [endsect]
 
 [section Parameters]
-Each application requires some input parameters (['e.g.], the subimage to process, initial simulated annealing temperature, ...). So, __librjmcmc__ provides a [classref parameter] class to handle them in a generic way. It currently supports the following types (wrapped in a [@http://www.boost.org/doc/libs/1_44_0/doc/html/variant.html `boost::variant`]):
+Each application requires some input parameters (['e.g.], the subimage to process, initial simulated annealing temperature, ...). So, __librjmcmc__ provides a [classref parameter] class to handle them in a generic way. It currently supports the following types (wrapped in a [boost variant]):
 
-* [@http://www.boost.org/doc/libs/1_44_0/libs/filesystem/v2/doc/reference.html#Class-template-basic_path `boost::filesystem::path`]
+* [@http://www.boost.org/libs/filesystem/v2/doc/reference.html#Class-template-basic_path `boost::filesystem::path`]
 * `std::string`
 * `double`
 * `int`
@@ -31,7 +31,7 @@ Then, you have to provide a template function with the following signature:
 	template<typename T> void initialize_parameters(T* params)
 ``
 
-Finally, you declare and initialize all parameters in a [@http://www.boost.org/doc/libs/1_44_0/doc/html/program_options.html `boost::program_options`] way. For this application, the following piece of code should be self explanatory:
+Finally, you declare and initialize all parameters in a [boost program_options] way. For this application, the following piece of code should be self explanatory:
 [building_footprint_rectangle_initialize_parameters]
 
 The main interest of the [classref parameter] class is that it construct automatically either the command line parser or the graphical user interface to change the parameters values at run-time.
@@ -46,7 +46,7 @@ The final step is to instantiate and implement the concepts previously described
 [section Geometry]
 The geometric object involved in this application is a simple [classref geometry::Rectangle_2].
 [building_footprint_rectangle_definition_geometry]
-As the library is able to deal with multiple geometries, it is also possible to define the `object` as a `boost::variant` with a single element:
+As the library is able to deal with multiple geometries, it is also possible to define the `object` as a [boost variant] with a single element:
 ``
 	#include <boost/variant.hpp>
 	typedef boost::variant<Rectangle_2> object;
@@ -57,39 +57,23 @@ However, you should prefer the first solution if you deal with a single type of 
 [section Energies]
 Then, we define unary and binary energies. The first one measures the data attachement term, ['i.e.] the adequacy between the image and the objects, the second one measures the strength of the relation between neighboring objects. In this particular application, the unary energy is (almost) an accumulation of gradients along rectangle edges. Since it is a common energy, our choice was to provide it in the library (see `lib/mpp/energy` directory). The same goes for the binary energy which is a measure of the overlapping area between objects.
 [building_footprint_rectangle_definition_energies]
-If you wish to write your own unary energy, you should simply provide a functor:
+If you wish to write your own unary energy, you should simply provide a functor, where `object` is your object type:
 ``
 	class my_unary_energy
 	{
-		typedef <application-specific> result_type;
-		
-		template<typename T>
-		result_type operator()(const T &t) const
-		{
-			// ...
-		}
+                typedef <application-specific> result_type;
+                result_type operator()(const object &x) const;
 	};
 ``
-For the binary energy, it is just two other functors taking two input parameters:
+For the binary energy, it is just a functor taking two input parameters:
 ``
 	class my_binary_energy
 	{
 		typedef <application-specific> result_type;
-		
-		template<typename T, typename U>
-		inline bool interact(const T &t, const U &u) const
-		{
-			// ...
-		}
-		
-		template<typename T, typename U>
-		inline result_type operator()(const T &t, const U &u) const
-		{
-			// ...
-		}
+                result_type operator()(const object &x, const object &y) const;
 	};
 ``
-The first one tests if to objects interacts. If so, the second one provides a way to compute the binary energy between them (if the objects do not interact, the energy is zero).
+if the `object` type is a [boost variant], the energy classes must instead provide `operator()` methods for each possible combination of object types.
 [endsect]
 
 [section Configuration and reference density]
