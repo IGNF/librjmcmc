@@ -54,7 +54,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     librjmcmc-image-ref.xml
     librjmcmc-param-ref.xml
   PARAMETERS
-    boost.root=..
+    #boost.root=..
     html.stylesheet=css/boostbook.css
     boost.image.src=images/librjmcmc.png
     boost.image.alt="IGN/MATIS librjmcmc"
@@ -69,6 +69,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     admon.graphics.path=images/admonition/
     navig.graphics.path=images/navigation/
     callout.graphics.path=images/callout/
+    img.src.path=../images/useless_directory/
   IMAGES
     images/librjmcmc.png
     css/boostbook.css
