@@ -108,12 +108,12 @@ public:
   inline void scale           (const FT &f       ) { n=f*n; }
   inline void reverse_orientation () { r = -r; }
 
-  inline Self rotate(int i) const { 
+  inline Rectangle_2 rotate(int i) const {
     switch (i%4) {
-    case  0: return Self(c, n,r);
-    case  2: return Self(c,-n,r);
-    case  1: { Vector_2 m(-r*n.y(), r*n.x()); return Self(c,m,1/r); }
-    default: { Vector_2 m( r*n.y(),-r*n.x()); return Self(c,m,1/r); }
+    case  0: return Rectangle_2(c, n,r);
+    case  2: return Rectangle_2(c,-n,r);
+    case  1: { Vector_2 m(-r*n.y(), r*n.x()); return Rectangle_2(c,m,1/r); }
+    default: { Vector_2 m( r*n.y(),-r*n.x()); return Rectangle_2(c,m,1/r); }
     }
   }
 /* Variants */
@@ -125,20 +125,20 @@ public:
   }
 */
   // if v is (r.cost,r.sint), scale_and_rotate scales the rectangle by r and rotates it by t.
-  inline Self translated       (const Vector_2& v ) const { return Rectangle_2(c+v,n,r); }
+  inline Rectangle_2 translated       (const Vector_2& v ) const { return Rectangle_2(c+v,n,r); }
   // if v is (r.cost,r.sint), scale_and_rotate scales the rectangle by r and rotates it by t.
-  inline Self scaled_and_rotated(const Vector_2& v ) const { return Rectangle_2(c,Vector_2(v.x()*n.x()-v.y()*n.y(),v.y()*n.x()+v.x()*n.y()),r); }
-  inline Self opposite() const { return Rectangle_2(c,n,-r); }
-  inline Self reversed_orientation () const { return opposite(); }
-  inline Self scaled(const FT &f) const { return Rectangle_2(c,f*n,r); }
+  inline Rectangle_2 scaled_and_rotated(const Vector_2& v ) const { return Rectangle_2(c,Vector_2(v.x()*n.x()-v.y()*n.y(),v.y()*n.x()+v.x()*n.y()),r); }
+  inline Rectangle_2 opposite() const { return Rectangle_2(c,n,-r); }
+  inline Rectangle_2 reversed_orientation () const { return opposite(); }
+  inline Rectangle_2 scaled(const FT &f) const { return Rectangle_2(c,f*n,r); }
 
-  Self scaled_center(int i, const FT &f) const {
+  Rectangle_2 scaled_center(int i, const FT &f) const {
     // translate edges(i) and (i+2) linearly from the center with f : 0->degenerate, 1->identity...
     if(i%2) return Rectangle_2(c,f*n,r/f);
     return Rectangle_2(c,n,f*r);
   }
 
-  Self scaled_edge(int i, const FT &f) const {
+  Rectangle_2 scaled_edge(int i, const FT &f) const {
     // translates edge(i) linearly from edge(i+2) with f : 0->degenerate, 1->identity...
     // assert(!is_degenerate());
     Vector_2 m(-r*n.y(),r*n.x());
@@ -149,7 +149,7 @@ public:
     default: return Rectangle_2(c+(1-f)*n,-m,f/r);
     }
   }
-  inline Self rotation_scaled_corner(int i, const Vector_2& v) const { 
+  inline Rectangle_2 rotation_scaled_corner(int i, const Vector_2& v) const {
     Vector_2 u(-r*v.y(),r*v.x());
     switch (i%4) {
     case  0: return Rectangle_2(c+v+u, n+v,r);
@@ -160,7 +160,7 @@ public:
   }
 
 /* Split and merge */
-  std::pair<Self,Self> split(int i, const FT &f=0.5) const {
+  std::pair<Rectangle_2,Rectangle_2> split(int i, const FT &f=0.5) const {
     // optimized version of make_pair(scale_edge(i,f),scale_edge(i+2,1-f));
     Vector_2 m(-r*n.y(),r*n.x());
     switch (i%4) {
@@ -176,7 +176,7 @@ public:
   // moves one segment of this to match the supporting line of the furthest corresponding segment of a
   // rotated version of b. The rotation is the smallest of the 4 possible rotations to align b with this.
   // the moving segment is based on the quadrant (n+-45deg,m+-45deg,-n+-45deg or -m+-45deg) b.c is relative to this
-  Self merge(const Rectangle_2 &b) const {
+  Rectangle_2 merge(const Rectangle_2 &b) const {
     Vector_2 v(b.c-c);
     FT ar(abs(r));
     Vector_2 an(n), am(-n.y(),n.x());
