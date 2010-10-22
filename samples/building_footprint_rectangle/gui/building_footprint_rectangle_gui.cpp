@@ -9,7 +9,7 @@ typedef parameters< wx_parameter > param;
 //]
 
 //[building_footprint_rectangle_gui_visitors
-#include "simulated_annealing/visitor/all.hpp"
+#include "simulated_annealing/visitor/composite_visitor.hpp"
 #include "simulated_annealing/visitor/wx/all.hpp"
 //]
 
