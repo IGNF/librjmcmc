@@ -107,6 +107,8 @@ To setup the simulated annealing, you have to provide a schedule and an end test
 
 The [classref simulated_annealing::max_iteration_end_test] simply requires the maximum number of iterations to run:
 [building_footprint_rectangle_create_end_test]
+
+Finally, visitors which are useful to follow the optimisation process are initialized with the number of iterations between each save and each display:
 [building_footprint_rectangle_init_visitor]
 
 

@@ -26,7 +26,7 @@ void initialize_parameters(T* params)
     params->template insert<int>("ymax",'Y',1000000, "Ymax");
     params->template insert<int>("subsampling",'u',1, "Subsampling");
     params->template insert<double>("gaussian",'g',2, "Gaussian filter variance");
-    params->template insert<double>("sigmaD",'G',1, "Taille du noyau de flou pour le calcul des gradients");
+    params->template insert<double>("sigmaD",'G',1, "Kernel size for gradients computation");
     params->template insert<double>("minsize",'m',5, "Minimum rectangle size");
     params->template insert<double>("maxratio",'M',5, "Maximum rectangle aspect ratio");
     params->template insert<double>("surface",'s',10, "Intersection area weight");
