@@ -17,7 +17,7 @@
 #include "parameters_visitor.hpp"
 typedef parameters< wx_parameter > param;
 
-#include "resources/IGN.xpm"
+#include "gui/resources/IGN.xpm"
 
 namespace simulated_annealing {
     namespace wx {

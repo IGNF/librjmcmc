@@ -6,7 +6,7 @@
 #include "wx/xy/xylinerenderer.h"
 #include "wx/xy/xyplot.h"
 
-#include "resources/IGN.xpm"
+#include "gui/resources/IGN.xpm"
 
 namespace simulated_annealing {
     namespace wx {

@@ -25,7 +25,7 @@ The main entry point starts by parsing the input parameters, providing default v
 [parse_parameters]
 Once an empty configuration is created and initialized with the energy objects, the reference poisson process is instantiated.
 Then, `samp` is the __RJMCMC__ sampler object. Finally, the `simulated_annealing` objects are created and the
-optimization is performed in place on the `configuration c`.
+optimization is performed in place on the `configuration` instance `c`.
 [optimize]
 
 [endsect]

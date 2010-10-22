@@ -139,10 +139,47 @@ The main entry point of the executable is then a few lines of code:
 
 Once compiled and run, you should have the following in your terminal:
 
-[$images/screenshot_bfr_cli.png]
+[$images/screenshot_bfr_cli.png [align center]]
 [endsect]
 
 [section Graphical user interface]
+Having a ['graphical user interface] executable is a good starting point when your are developing your modeling: it helps debugging as it provides a visualization of the evolution of the optimization process (it thus depends on [gilviewer] and [wx]). Note that the following application does exactly the same as the previous ['command line interface] sample. For the sake of simplicity, there is a single implementation file which contains declaration and implementation of the interface class (based on [wx]).
+
+[import ../../../samples/building_footprint_rectangle/gui/building_footprint_rectangle_gui.cpp]
+
+As for the ['command line interface], we first define a `param` type. For a ['gui] application, __librjmcmc__ also provides this type:
+[building_footprint_rectangle_gui_parameters]
+
+The same for the core include file:
+[building_footprint_rectangle_gui_core_include]
+
+
+[building_footprint_rectangle_gui_visitors]
+[building_footprint_rectangle_gui_specific]
+[building_footprint_rectangle_gui_gilviewer_and_resources]
+
+The main application is derived from a [@http://docs.wxwidgets.org/trunk/classwx_app.html wxApp] (the main entry point of a [wx] application) and a [classref Controler] which is a model for the user interactions (start/stop optimization process and switch windows visibility).
+[building_footprint_rectangle_gui_app_declaration]
+
+[building_footprint_rectangle_gui_app_typedef_visitor]
+
+[building_footprint_rectangle_gui_app_oninit]
+
+[building_footprint_rectangle_gui_go]
+
+[building_footprint_rectangle_gui_controller_overload]
+
+[building_footprint_rectangle_gui_cons_des]
+
+[building_footprint_rectangle_gui_release]
+
+[building_footprint_rectangle_gui_members]
+
+[building_footprint_rectangle_gui_implement]
+
+Once compiled and run, you should have the following on your screen:
+
+[$images/screenshot_bfr_gui.png [align center]]
 [endsect]
 
 [endsect]
