@@ -1,14 +1,19 @@
 #ifndef __BUILDING_FOOTPRINT_RECTANGLE_HPP__
 #define __BUILDING_FOOTPRINT_RECTANGLE_HPP__
 
+//<-
 /************** application-specific types ****************/
+//->
 
 //[building_footprint_rectangle_definition_geometry
 #include "core/geometry.h"
 typedef Rectangle_2 object;
 //]
+
+//<-
 //#include <boost/variant.hpp>
 //typedef boost::variant<Rectangle_2> object;
+//->
 
 //[building_footprint_rectangle_definition_energies
 #include "mpp/energy/image_gradient_unary_energy.hpp"
@@ -30,7 +35,10 @@ typedef generator<is_valid> generator_kernel;
 typedef modifier <is_valid> modifier_kernel;
 //]
 
+
+//<-
 /************** rjmcmc library types ****************/
+//->
 
 //[building_footprint_rectangle_definition_simulated_annealing
 /*< Choice of the schedule (/include/ and /typedef/) >*/
@@ -41,6 +49,7 @@ typedef simulated_annealing::geometric_schedule<double> schedule;
 typedef simulated_annealing::max_iteration_end_test     end_test;
 //]
 
+//<-
 //#include "rjmcmc/step_schedule.hpp"
 //typedef simulated_annealing::step_schedule<rjmcmc::logarithmic_schedule<double> > schedule;
 
@@ -52,6 +61,8 @@ typedef simulated_annealing::max_iteration_end_test     end_test;
 
 //#include "mpp/configuration/vector_configuration.hpp"
 //typedef marked_point_process::vector_configuration<object, unary_energy, binary_energy> configuration;
+//->
+
 //[building_footprint_rectangle_definition_configuration
 #include "mpp/configuration/graph_configuration.hpp"
 typedef marked_point_process::graph_configuration<object, unary_energy, binary_energy> configuration;
@@ -61,8 +72,11 @@ typedef marked_point_process::graph_configuration<object, unary_energy, binary_e
 #include "mpp/density/poisson_density.hpp"
 typedef marked_point_process::poisson_density                           density;
 //]
+
+//<-
 //#include "mpp/density/uniform_density.hpp"
 //typedef marked_point_process::uniform_density                           density;
+//->
 
 //[building_footprint_rectangle_definition_sampler
 #include "rjmcmc/sampler/sampler_base.hpp"
@@ -75,6 +89,8 @@ typedef marked_point_process::direct_sampler<density,generator_kernel> d_sampler
 #include "rjmcmc/sampler/metropolis_sampler.hpp"
 typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel,modification_kernel> sampler;
 //]
+
+//<-
 //#include "rjmcmc/sampler/dueck_scheuer_sampler.hpp"
 //typedef rjmcmc::dueck_scheuer_sampler<density,birth_death_kernel,modification_kernel> sampler;
 
@@ -83,8 +99,7 @@ typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel,modification_ker
 
 //#include "rjmcmc/sampler/rejection_sampler.hpp"
 //typedef rejection_sampler<d_sampler,null_binary_energy_predicate> sampler;
-
-/************** main ****************/
+//->
 
 //[building_footprint_rectangle_bbox_accessors
 Iso_rectangle_2 get_bbox(const param *p) {
@@ -205,5 +220,16 @@ double estimate_initial_temperature(param *p, unsigned int n, configuration& c)
   p->set("temp",2*std_dev);
 }
 */
+
+//[building_footprint_rectangle_image_include_tpl_instanciations
+#include "image/image_types.hpp"
+#include "image/oriented_inc.hpp"
+#include "image/gradient_functor_inc.hpp"
+#include "mpp/energy/image_gradient_unary_energy_inc.hpp"
+//]
+
+//[building_footprint_rectangle_optimization
+#include "simulated_annealing/simulated_annealing.hpp"
+//]
 
 #endif // __BUILDING_FOOTPRINT_RECTANGLE_HPP__

@@ -93,7 +93,7 @@ Simulated annealing instantiation requires to chose a temperatyre schedule and a
 Please refer to [link librjmcmc.section_simulated_annealing.schedule_concept schedule] and [link librjmcmc.section_simulated_annealing.endtest_concept end test] concepts for more simulated annealing schedule and end tests models.
 [endsect]
 
-You then have to provide some simple accessors and creators. [*This part is not mandatory. You could simply do all that stuff in your main entry point. However, as it is a common part for ['cli] and ['gui], it is a good way to factorize your code and ease its reusability]. Most of the time, you simply have to call a constructor filled with some parameters (the ones from the command line or the graphical user interface).
+You then have to provide some simple accessors and creators. [*This part is not mandatory. You could simply do all that stuff in your main entry point. However, as it is a common part for ['cli] and ['gui], it is a good way to factorize your code and ease its reusability]. Most of the time, you simply have to call a constructor filled with some parameters (the ones from the command line or the graphical user interface). In the code below, `param` is a `typedef` specifically defined for each application.
 
 Bounding box related accessors are as simple as possible:
 [building_footprint_rectangle_bbox_accessors]
@@ -111,11 +111,38 @@ The [classref simulated_annealing::max_iteration_end_test] simply requires the m
 Finally, visitors which are useful to follow the optimisation process are initialized with the number of iterations between each save and each display:
 [building_footprint_rectangle_init_visitor]
 
+As it is common for both ['cli] and ['gui], we include here all image and optimization related headers:
+[building_footprint_rectangle_image_include_tpl_instanciations]
+[building_footprint_rectangle_optimization]
+
+The full header file is available here: [@../../samples/building_footprint_rectangle/core/building_footprint_rectangle.hpp samples/building_footprint_rectangle/core/building_footprint_rectangle.hpp]
+Everything is now ready to run. We only have to implement the main entry point of the program, whether it is a ['command line] or a ['graphical user] interface.
 
 [endsect]
 [endsect]
 
-[section Proposition kernels]
+[section Command line interface]
+A ['command line interface] executable can be created with few lines of code. However, since it does not provide any graphical visualization, it is not easy to chose the parameters and to finely tune the energies.
+[import ../../../samples/building_footprint_rectangle/cli/building_footprint_rectangle_cli.cpp]
+
+The first thing to do is to define a `param` type. For a ['cli] application, __librjmcmc__ provides this type:
+[building_footprint_rectangle_cli_parameters]
+
+Once done, we include the core include file. ['Note that the `param` type needs to be defined [*before] including this file (see its content for an explanation)].
+[building_footprint_rectangle_cli_core_include]
+
+For a ['cli] application, we only want to trace some steps of the optimization process and display the energy values, the iteration number, the current temperature... __librjmcmc__ provides for this purpose a [classref simulated_annealing::ostream_visitor]:
+[building_footprint_rectangle_cli_visitors]
+
+The main entry point of the executable is then a few lines of code:
+[building_footprint_rectangle_cli_main]
+
+Once compiled and run, you should have the following in your terminal:
+
+[$images/screenshot_bfr_cli.png]
+[endsect]
+
+[section Graphical user interface]
 [endsect]
 
 [endsect]

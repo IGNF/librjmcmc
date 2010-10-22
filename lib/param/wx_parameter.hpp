@@ -4,7 +4,7 @@
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 
-#include "param/parameters.hpp"
+#include "param/parameter.hpp"
 
 /*
 	LayerControl::const_iterator it  = m_panel->GetLayerControl()->begin();

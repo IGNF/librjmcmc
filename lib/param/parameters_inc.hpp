@@ -5,7 +5,7 @@
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
-#include "param/parameters.hpp"
+#include "param/parameter.hpp"
 
 template<typename T>
 struct option_adder {
@@ -29,8 +29,8 @@ struct option_adder {
 template<typename T>
 void init_description(po::options_description& desc, parameters<T>& param) {
     desc.add_options()
-            ("help,h","Message d'aide...")
-            ("config,c",po::value<std::string>(), "Fichier de configuration");
+            ("help,h","Help message...")
+            ("config,c",po::value<std::string>(), "Configuration file");
 
     typedef typename parameters<T>::iterator iterator;
     for(iterator it=param.begin(); it!=param.end();++it)

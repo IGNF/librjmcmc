@@ -69,7 +69,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     admon.graphics.path=images/admonition/
     navig.graphics.path=images/navigation/
     callout.graphics.path=images/callout/
-    img.src.path=../images/useless_directory/
+    #img.src.path=../images/useless_directory/
   IMAGES
     images/librjmcmc.png
     css/boostbook.css

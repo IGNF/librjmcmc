@@ -1,23 +1,14 @@
-// parameters
+//[building_footprint_rectangle_gui_parameters
 #include "param/wx_parameter.hpp"
 typedef parameters< wx_parameter > param;
 #include "core/building_footprint_rectangle_parameters_inc.hpp"
+//]
 
-// images
-#include "image/image_types.hpp"
-
-// optimization
 #include "core/building_footprint_rectangle.hpp"
-#include "simulated_annealing/simulated_annealing.hpp"
 
 // visitors
 #include "simulated_annealing/visitor/all.hpp"
 #include "simulated_annealing/visitor/wx/all.hpp"
-
-// template instanciations
-#include "image/oriented_inc.hpp"
-#include "image/gradient_functor_inc.hpp"
-#include "mpp/energy/image_gradient_unary_energy_inc.hpp"
 
 // threading and wx
 #include <boost/thread.hpp>
