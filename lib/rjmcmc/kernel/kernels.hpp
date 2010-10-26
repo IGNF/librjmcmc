@@ -4,9 +4,11 @@
 #include "rjmcmc/random.hpp"
 #include "rjmcmc/kernel/transform.hpp"
 
+namespace rjmcmc {
+
 template< typename IsValid >
 class generator {
-    typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_real<> > die_type;
+    typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_type;
     mutable die_type m_die;
     IsValid m_is_valid;
 #ifdef GEOMETRY_RECTANGLE_2_H
@@ -99,8 +101,8 @@ public:
 
 template< typename IsValid >
 class modifier {
-    typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_real<> > float_die_type;
-    typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_smallint<> > int_die_type;
+    typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > float_die_type;
+    typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > int_die_type;
     mutable float_die_type m_dief;
     mutable int_die_type   m_die4;
     double m_p_translation;
@@ -233,5 +235,7 @@ public:
 #endif // defined(GEOMETRY_CIRCLE_2_H) && defined(GEOMETRY_RECTANGLE_2_H)
 
 };
+
+} // namespace rjmcmc
 
 #endif /*KERNELS_HPP_*/

@@ -1,5 +1,5 @@
 // parameters
-#include "param/parameters.hpp"
+#include "param/parameter.hpp"
 typedef parameters< parameter > param;
 #include "core/building_footprint_extraction_parameters_inc.hpp"
 

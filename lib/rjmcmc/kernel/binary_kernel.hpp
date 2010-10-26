@@ -57,7 +57,7 @@ namespace rjmcmc {
 
     class uniform_death_kernel
     {
-        typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_smallint<> > die_type;
+        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > die_type;
     public:
         inline const char* name() const { return "death"; }
         template<typename Configuration, typename Modification>
@@ -111,7 +111,7 @@ namespace rjmcmc {
     template<typename Transform>
     class transform_kernel : public unary_kernel
     {
-        typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_real<> > die_t;
+        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_t;
         double m_p, m_q, m_q_over_1_q, m_1_q_over_q;
         Transform m_trans;
         mutable unsigned int m_kernel_id;

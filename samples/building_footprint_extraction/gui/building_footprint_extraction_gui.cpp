@@ -22,7 +22,7 @@ typedef parameters< wx_parameter > param;
 // threading and wx
 #include <boost/thread.hpp>
 #include <wx/app.h>
-#include "simulated_annealing/visitor/wx/resources/IGN.xpm"
+#include "gui/resources/IGN.xpm"
 
 class building_footprint_rectangle_gui : public wxApp, public Controler
 { 

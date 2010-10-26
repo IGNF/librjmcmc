@@ -83,6 +83,7 @@ The configuration is responsible of objects handling and energy computation mana
 [endsect]
 
 [section Kernels and samplers]
+[classref ]
 [building_footprint_rectangle_definition_kernels]
 [building_footprint_rectangle_definition_sampler]
 [endsect]

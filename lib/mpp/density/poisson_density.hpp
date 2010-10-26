@@ -9,7 +9,7 @@ namespace marked_point_process {
     // exp(-poisson) * (poisson^n) / n!
     class poisson_density {
     public:
-        typedef boost::variate_generator<rjmcmc::generator&, boost::poisson_distribution<> > density;
+        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::poisson_distribution<> > density;
         poisson_density(double poisson)
             : m_poisson(poisson)
             , m_die(rjmcmc::random(), boost::poisson_distribution<>(poisson)) {}

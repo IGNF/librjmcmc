@@ -19,7 +19,7 @@ typedef marked_point_process::graph_configuration<object, unary_energy, binary_e
 //[ reference_process
 #include "mpp/energy/box_is_valid.hpp"
 #include "rjmcmc/kernel/kernels.hpp"
-typedef generator<box_is_valid> generator_kernel;
+typedef rjmcmc::generator<box_is_valid> generator_kernel;
 #include "mpp/density/poisson_density.hpp"
 typedef marked_point_process::poisson_density                   density;
 #include "mpp/direct_sampler.hpp"

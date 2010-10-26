@@ -9,7 +9,7 @@ namespace marked_point_process {
     // 1_(n\in[a,b])/(b-a+1)
     class uniform_density {
     public:
-        typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_smallint<> > density;
+        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > density;
         uniform_density(unsigned int a, unsigned int b)
             : m_min(a), m_max(b)
             , m_die(rjmcmc::random(), boost::uniform_smallint<>(a,b)) {}

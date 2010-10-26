@@ -21,7 +21,7 @@ namespace rjmcmc {
     template<typename Modifier>
     class modification_kernel : public unary_kernel
     {
-        typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_smallint<> > die_type;
+        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > die_type;
         Modifier m_modifier;
     public:
         modification_kernel(const Modifier& m, double p=1) : unary_kernel(p), m_modifier(m) {}

@@ -25,8 +25,8 @@ typedef global_reconstruction_unary_energy<oriented_gradient_view,oriented_ndvi_
 typedef intersection_area_binary_energy      binary_energy;
 
 #include "rjmcmc/kernel/kernels.hpp"
-typedef generator<is_valid>          generator_kernel;
-typedef modifier <is_valid>          modifier_kernel;
+typedef rjmcmc::generator<is_valid>          generator_kernel;
+typedef rjmcmc::modifier <is_valid>          modifier_kernel;
 
 /************** rjmcmc library types ****************/
 

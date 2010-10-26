@@ -31,8 +31,8 @@ typedef box_is_valid is_valid;
 
 //[building_footprint_rectangle_definition_kernels
 #include "rjmcmc/kernel/kernels.hpp"
-typedef generator<is_valid> generator_kernel;
-typedef modifier <is_valid> modifier_kernel;
+typedef rjmcmc::generator<is_valid> generator_kernel;
+typedef rjmcmc::modifier <is_valid> modifier_kernel;
 //]
 
 

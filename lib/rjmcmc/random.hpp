@@ -10,15 +10,15 @@
 
 namespace rjmcmc {
 
-    typedef boost::mt19937 generator;
+    typedef boost::mt19937 mt19937_generator;
 
     /**
  * @fn static RJMCMCRandom &GetRandom() Simple function which return an initialised random number generator
  * @todo Properly handle Windows platform
  */
-    static generator &random()
+    static mt19937_generator &random()
     {
-	static generator g;
+        static mt19937_generator g;
 #ifndef WIN32
 	static bool uninitialised = true;
 	if (uninitialised)

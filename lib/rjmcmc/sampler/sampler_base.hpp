@@ -22,7 +22,7 @@ namespace rjmcmc {
         {}
 
         typedef tuple<RJMCMC_TUPLE_TYPES> Kernels;
-        typedef boost::variate_generator<rjmcmc::generator&, boost::uniform_real<> > die_t;
+        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_t;
 
         enum { size = tuple_size<Kernels>::value };
         enum { kernel_size = kernel_traits<Kernels>::size };
