@@ -33,6 +33,7 @@
 ]
 
 [include librjmcmc_introduction.qbk]
+[include librjmcmc_compilation.qbk]
 [include librjmcmc_quickstart.qbk]
 [include librjmcmc_mpp.qbk]
 [include librjmcmc_rjmcmc.qbk]

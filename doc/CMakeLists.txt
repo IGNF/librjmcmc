@@ -36,6 +36,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     librjmcmc.qbk
     HTML4_symbols.qbk
     librjmcmc_introduction.qbk
+    librjmcmc_compilation.qbk
     librjmcmc_quickstart.qbk
     quickstart.cpp
     librjmcmc_mpp.qbk
