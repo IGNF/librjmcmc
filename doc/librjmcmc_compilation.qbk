@@ -1,3 +1,48 @@
 [section:section_compilation Compiling __librjmcmc__]
 
+[section:compilation_introduction Introduction]
+This section explains how to build __librjmcmc__. The instructions are clear enough to be directly used on a `Linux` platform. For other platforms (although some tests have been on `Windows` with `Visual Studio Express - 2009`), you should use a ['trial and error] approach...
+
+For all platforms, you should have already install the following dependencies:
+
+* Image libraries: [*[^libtiff]], [*[^libjpeg]], [*[^libpng]]
+* GUI library (only required for 2D visualization): [*[^[gilviewer]]] and [*[^[wx]]]
+* [general_boost] libraries: [*[^[boost program_options]]], [*[^[boost thread]]], [*[^[boost system]]], [*[^[boost filesystem]]]
+* [*[^[cgal]] (not required)
+
+You also need to download and install the cross-platform build system [cmake] and the ['source control management tool] [hg].
+[endsect]
+
+[section:compilation_download Downloading __librjmcmc__]
+[important Still waiting for a license and an external [hg] repository...]
+
+[h3 First time download]
+__librjmcmc__ is available as a (local) [hg] repository. For a ['read-only] access, you simply have to ['clone] the repository:
+
+``
+	cd wherever_you_like
+	hg clone http://mac0801w055.ign.fr/code/librjmcmc/
+``
+
+This commands will download __librjmcmc__ in =wherever_you_like/librjmcmc=. If you prefer another folder name, just add it at the end of the =hg clone= command:
+
+``
+	hg clone http://mac0801w055.ign.fr/code/librjmcmc/ another_librjmcmc_folder_name
+``
+
+[h3 Updating]
+To update __librjmcmc__, you simply have to run the adequate [hg] commands:
+
+``
+	hg pull
+	hg up
+``
+
+This will update the library with the latest version available in the repository.
+[endsect]
+
+[section:compilation_building Building and installing __librjmcmc__]
+[endsect]
+
+
 [endsect]

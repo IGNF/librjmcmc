@@ -25,6 +25,10 @@
 [template gilviewer[] [@http://code.google.com/p/gilviewer/ GilViewer]]
 [/ extends [@http://www.boost.org/doc/html/variant.html `boost::variant`] to other boost libs]
 [template boost[lib] '''<ulink url="http://www.boost.org/doc/html/'''[lib]'''.html"><code><phrase role="identifier">boost</phrase><phrase role="special">::</phrase><phrase role="identifier">'''[lib]'''</phrase></code></ulink>''']
+[template general_boost[] [@http://www.boost.org Boost]]
+[template cmake[] [@http://www.cmake.org CMake]]
+[template hg[] [@http://mercurial.selenic.com/ mercurial]]
+[template cgal[] [@http://www.cgal.org/ CGAL]]
 
 [template biblioref[name] '''<biblioref linkend="'''[name]'''"/>''']
 

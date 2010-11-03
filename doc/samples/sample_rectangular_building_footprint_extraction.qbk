@@ -83,8 +83,9 @@ The configuration is responsible of objects handling and energy computation mana
 [endsect]
 
 [section Kernels and samplers]
-[classref ]
+A [classref rjmcmc::generator] is responsible either to sample a new object (required) or to modify an existing one (optional). They are templated over the validity concept checking:
 [building_footprint_rectangle_definition_kernels]
+Then, we have to define the kernels involved in the optimization process, and the sampler:
 [building_footprint_rectangle_definition_sampler]
 [endsect]
 

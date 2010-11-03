@@ -79,13 +79,16 @@ typedef marked_point_process::poisson_density                           density;
 //->
 
 //[building_footprint_rectangle_definition_sampler
+/*< /Birth/ and /death kernels/ are required. They are encapsulated in a `binary_kernel` >*/
 #include "rjmcmc/sampler/sampler_base.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
+/*< Optionnaly, we can specify a /modification kernel/ to modify the objects templated over the `rjmcmc::modifier` >*/
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
 #include "mpp/direct_sampler.hpp"
 typedef marked_point_process::direct_sampler<density,generator_kernel> d_sampler;
+/*< The /RJMCMC/ `rjmcmc::metropolis_sampler` then encapsulates all the kernels through its template parameters to enable the sampling of the Marked Point Process relative to the poisson reference process >*/
 #include "rjmcmc/sampler/metropolis_sampler.hpp"
 typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel,modification_kernel> sampler;
 //]
