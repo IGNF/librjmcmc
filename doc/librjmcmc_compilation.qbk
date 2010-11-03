@@ -8,6 +8,7 @@ For all platforms, you should have already install the following dependencies:
 * Image libraries: [*[^libtiff]], [*[^libjpeg]], [*[^libpng]]
 * GUI library (only required for 2D visualization): [*[^[gilviewer]]] and [*[^[wx]]]
 * [general_boost] libraries: [*[^[boost program_options]]], [*[^[boost thread]]], [*[^[boost system]]], [*[^[boost filesystem]]]
+* [general_boost] utilities: [*[^boostbook xsl]], [*[^boostbook dtd]], [*[^boost-build]] (available in your packages manager)
 * [*[^[cgal]] (not required)
 
 You also need to download and install the cross-platform build system [cmake] and the ['source control management tool] [hg].
