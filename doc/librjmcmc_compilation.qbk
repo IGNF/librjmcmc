@@ -47,6 +47,46 @@ This will update the library with the latest version available in the repository
 [endsect]
 
 [section:compilation_building Building and installing __librjmcmc__]
+[h3 Building the library]
+Once __librjmcmc__ is download, you use =(c)cmake= and your favorite compiler to build the binaries (libraries and/or samples). It is as simple as:
+
+``
+	cd wherever_you_like
+	mkdir build
+	cd build
+	ccmake ..
+``
+
+You will then have several options to chose as depicted on the image below:
+
+[$images/screenshot_librjmcmc_ccmake_annotated.png [align center]]
+
+Finally, you run the compilation process:
+
+``
+	make -j<x>
+``
+
+where =<x>= is the number of simultaneous compilation process (usually between 2 and 4 to avoid a too high memory footprint).
+
+[h3 Building the documentation]
+The documentation is available as =html= or as a =pdf= document. To obtain the =html= version, just run:
+
+``
+	make librjmcmc-html
+``
+
+The main =index.html= file is located in =wherever_you_like/build/doc/html/=.
+
+To build the =pdf= document, two steps are required:
+
+``
+	make librjmcmc-fo
+	make librjmcmc-pdf
+``
+
+The output file =librjmcmc.pdf= is located in =wherever_you_like/build/doc/=.
+
 [endsect]
 
 

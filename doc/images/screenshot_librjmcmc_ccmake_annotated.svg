@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="904"
+   height="536"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="Nouveau document 1">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <inkscape:perspective
+       id="perspective2884"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2914"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2947"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4874307"
+     inkscape:cx="453.81308"
+     inkscape:cy="270.75399"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1125"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(717.71429,-215.79076)">
+    <image
+       y="215.79076"
+       x="-717.71429"
+       id="image2886"
+       height="536"
+       width="904"
+       xlink:href="file:///home/olivier/work/dev/lib/librjmcmc/doc/images/screencshot_librjmcmc_ccmake.png"
+       inkscape:export-filename="/home/olivier/work/dev/lib/librjmcmc/doc/images/screencshot_librjmcmc_ccmake_annotated.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:43.24435043px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="-641.48932"
+       y="227.49826"
+       id="text2898"
+       transform="scale(0.64321241,1.5546964)"
+       inkscape:export-filename="/home/olivier/work/dev/lib/librjmcmc/doc/images/screencshot_librjmcmc_ccmake_annotated.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan2900"
+         x="-641.48932"
+         y="227.49826">}</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="-387.91724"
+       y="339.72391"
+       id="text2902"
+       inkscape:export-filename="/home/olivier/work/dev/lib/librjmcmc/doc/images/screencshot_librjmcmc_ccmake_annotated.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan2904"
+         x="-387.91724"
+         y="339.72391"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;font-family:Arial;-inkscape-font-specification:Arial">Build (or not) samples (cli/gui)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:31.92186356px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="-473.58719"
+       y="343.15051"
+       id="text2898-9"
+       transform="scale(0.87135582,1.1476368)"
+       inkscape:export-filename="/home/olivier/work/dev/lib/librjmcmc/doc/images/screencshot_librjmcmc_ccmake_annotated.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan2900-4"
+         x="-473.58719"
+         y="343.15051">}</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="-387.96579"
+       y="389.09204"
+       id="text2902-9"
+       inkscape:export-filename="/home/olivier/work/dev/lib/librjmcmc/doc/images/screencshot_librjmcmc_ccmake_annotated.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan2904-9"
+         x="-387.96579"
+         y="389.09204"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;font-family:Arial;-inkscape-font-specification:Arial">Build binaries shared or static (static <tspan
+   style="font-weight:bold;-inkscape-font-specification:Arial Bold"
+   id="tspan2937">required</tspan> on Windows)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:31.92186356px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="-473.48102"
+       y="491.96155"
+       id="text2898-9-7"
+       transform="scale(0.87135582,1.1476368)"
+       inkscape:export-filename="/home/olivier/work/dev/lib/librjmcmc/doc/images/screencshot_librjmcmc_ccmake_annotated.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan2900-4-2"
+         x="-473.48102"
+         y="491.96155">}</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="-387.87463"
+       y="559.87329"
+       id="text2902-9-7"
+       inkscape:export-filename="/home/olivier/work/dev/lib/librjmcmc/doc/images/screencshot_librjmcmc_ccmake_annotated.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan2904-9-2"
+         x="-387.87463"
+         y="559.87329"
+         style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;font-family:Arial;-inkscape-font-specification:Arial">Experimental (prefer the <tspan
+   style="font-weight:bold;-inkscape-font-specification:Arial Bold"
+   id="tspan2973">OFF</tspan> value for these settings)</tspan></text>
+  </g>
+</svg>
