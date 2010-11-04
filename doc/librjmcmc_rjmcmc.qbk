@@ -21,8 +21,6 @@ The algorithm consists in repeating the following steps until convergence has be
 
 The role of a __RJMCMC__ sampler is to generate a __MCMC__ series of configuration with a stationnary pdf based only on its evaluation up to a multiplicative factor. Applied in the __MPP__ context, this allows to bias the sampling of a reference process with energy of the configuration (lower energy configuration getting comparatively more samples).  The reference process may directly be sampled and the density of a configuration may easily be evaluated. The relative influence of the energy values relative to the reference process is tuned by a temperature parameter, as will further be explained in the [link librjmcmc.section_simulated_annealing Simulated Annealing] section.
 
-[todo Samplers_are_templated_by_a_Density_of_]
-
 Models of the `Sampler` concept differ by their computation of the Green ratio impacted by differing formulations of the mixing of the reference density, the energy and the temperature value, [classref rjmcmc::metropolis_sampler] being the most common choice.
 
 Available models:
@@ -37,17 +35,19 @@ Available models:
 
 [section:kernel_concept Kernel concept]
 
-[todo Kernel]
+A kernel is used to propose atomic moves to explore the configuration space. Most common __MPP__ kernels are [classref rjmcmc::uniform_birth_kernel] and its reverse kernel [classref rjmcmc::uniform_death_kernel].
+
 
 Available models:
+* Application-specific
 
 [endsect]
 
 [section:transform_concept Transform concept]
 
-[todo Transform]
+Transformations encode a bijective differentiable mapping between spaces of equal dimensions. They are thus used to describe the bijection applied during a kernel proposal. They compute automatically the Green ratio term relative to the proposed configuration modification, instead of a manual handling in the Kernel concept.
 
-Transformations encode a bijective differentiable mapping between spaces of equal dimensions. They provide apply, inverse and abs_jacobian functions
+Transformations have to provide =apply=, =inverse= and =abs_jacobian= functions.
 
 Available models:
 
