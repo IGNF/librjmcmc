@@ -8,7 +8,7 @@ namespace simulated_annealing
      *
      * This class is a model of the EndTest concept and stops
      * the simulated annealing process if the energy of the configuration
-     * as not changed during the last `n` iterations.
+     * has not changed during the last `n` iterations.
      *
      */
     class delta_energy_end_test {

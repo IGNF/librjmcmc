@@ -47,8 +47,8 @@ int main(int argc , char** argv)
     int i=0;
     double energy   = (++i<argc) ? atof(argv[i]) : -1.;
     double surface  = (++i<argc) ? atof(argv[i]) : 10.;
-    double minsize  = (++i<argc) ? atof(argv[i]) : 0.8;
-    double maxratio = (++i<argc) ? atof(argv[i]) : 0.1;
+    double rmin     = (++i<argc) ? atof(argv[i]) : 0.8;
+    double rmax     = (++i<argc) ? atof(argv[i]) : 0.1;
     double poisson  = (++i<argc) ? atof(argv[i]) : 200.;
     double pbirth   = (++i<argc) ? atof(argv[i]) : 0.5;
     double pdeath   = (++i<argc) ? atof(argv[i]) : 0.5;
@@ -64,9 +64,9 @@ int main(int argc , char** argv)
     binary_energy e2(surface);
     configuration c(e1,e2);
 
-    Iso_rectangle_2 bbox(0.,0.,1.,1.);
-    box_is_valid valid(bbox, minsize, maxratio );
-    generator_kernel    birth(valid);
+    double min_value[] = { 0., 0., rmin};
+    double max_value[] = { 1., 1., rmax};
+    generator_kernel    birth(min_value, max_value);
     density cs(poisson);
     d_sampler ds( cs, birth );
 

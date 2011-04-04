@@ -8,9 +8,6 @@
 typedef boost::variant<Rectangle_2,Circle_2> object;
 //typedef Rectangle_2 object;
 
-#include "mpp/energy/box_is_valid.hpp"
-typedef box_is_valid                         is_valid;
-
 #include "core/global_reconstruction_unary_energy.hpp"
 #include "image/gradient_functor.hpp"
 #include "image/oriented.hpp"
@@ -26,7 +23,7 @@ typedef intersection_area_binary_energy      binary_energy;
 
 #include "rjmcmc/kernel/kernels.hpp"
 typedef rjmcmc::generator<is_valid>          generator_kernel;
-typedef rjmcmc::modifier <is_valid>          modifier_kernel;
+typedef rjmcmc::modifier          modifier_kernel;
 
 /************** rjmcmc library types ****************/
 
