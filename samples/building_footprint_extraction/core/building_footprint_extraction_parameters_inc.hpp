@@ -24,8 +24,8 @@ void initialize_parameters(T* params)
     params->template insert<int>("subsampling",'u',1, "Sous-échantillonnage");
     params->template insert<double>("gaussian",'g',2, "Variance du filtre gaussien en entree");
     params->template insert<double>("sigmaD",'G',1, "Taille du noyau de flou pour le calcul des gradients");
-    params->template insert<double>("minsize",'m',5, "Taille minimale d'un rectangle");
-    params->template insert<double>("maxratio",'M',5, "Rapport longueur/largeur maximal d'un rectangle");
+    params->template insert<double>("maxcircleradius",'r',5, "Rayon maximum d'un cercle");
+    params->template insert<double>("maxrectangleratio",'M',5, "Rapport longueur/largeur maximal d'un rectangle");
     params->template insert<double>("surface",'s',10, "Ponderation de la surface d'intersection");
     params->template insert<double>("ponderation_grad",'\0',10, "Ponderation de l'energie gradient");
     params->template insert<double>("ponderation_ndvi",'\0',0.5, "Ponderation de l'energie NDVI");

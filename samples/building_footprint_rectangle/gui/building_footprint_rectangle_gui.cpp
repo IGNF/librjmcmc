@@ -29,7 +29,7 @@ typedef parameters< wx_parameter > param;
 //[building_footprint_rectangle_gui_app_declaration
 class building_footprint_rectangle_gui : public wxApp, public Controler
 {
-//]
+    //]
     //[building_footprint_rectangle_gui_app_typedef_visitor
     typedef simulated_annealing::composite_visitor<
             simulated_annealing::wx::log_visitor*,
@@ -44,7 +44,7 @@ private:
     bool OnInit()
     {
         /*<< Gilviewer IO factory initialization >>*/
-        register_all_file_formats();
+        //register_all_file_formats();
         /*< Parameters processing >*/
         char **my_argv = new char*[argc];
         for (int i=0;i<argc;++i)

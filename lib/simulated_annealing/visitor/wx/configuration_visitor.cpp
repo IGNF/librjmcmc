@@ -34,10 +34,11 @@ protected:
 private:
     void update_bbox() {
         boost::shared_ptr<vector_layer_ghost> ghost = vectorlayerghost();
-        if (!ghost->m_drawRectangleSelection) return;
+        const vector_layer_ghost::Rectangle *r = ghost->get<vector_layer_ghost::Rectangle>();
+        if(!r) return;
         param *p = param::instance();
-        wxPoint p0 = ghost->m_rectangleSelection.first;
-        wxPoint p1 = ghost->m_rectangleSelection.second;
+        wxPoint p0(ghost->transform().from_local_int(r->first ));
+        wxPoint p1(ghost->transform().from_local_int(r->second));
         if(p0.x>p1.x) std::swap(p0.x,p1.x);
         if(p0.y>p1.y) std::swap(p0.y,p1.y);
         p->set("xmin",p0.x);
@@ -190,9 +191,7 @@ namespace simulated_annealing {
 
             boost::shared_ptr<vector_layer_ghost> ghost = m_panel->vectorlayerghost();
 
-            m_vlayer->translation_x(/*p0.x+*/ghost->translation_x());
-            m_vlayer->translation_y(/*p0.y+*/ghost->translation_y());
-            m_vlayer->zoom_factor  (     ghost->zoom_factor  ());
+            m_vlayer->transform() = ghost->transform();
 
             m_vlayer->line_color(*wxRED);
             m_vlayer->line_style(wxSOLID);
@@ -205,22 +204,26 @@ namespace simulated_annealing {
             m_vlayer->text_visibility(false);
         }
 
-
         wxRect configuration_visitor::get_bbox() const {
             boost::shared_ptr<vector_layer_ghost> ghost = m_panel->vectorlayerghost();
-            if(!ghost->m_drawRectangleSelection) return wxRect();
-            return wxRect(ghost->m_rectangleSelection.first,ghost->m_rectangleSelection.second);
+            const vector_layer_ghost::Rectangle *r = ghost->get<vector_layer_ghost::Rectangle>();
+            if(!r) return wxRect();
+            wxPoint p0(ghost->transform().from_local_int(r->first ));
+            wxPoint p1(ghost->transform().from_local_int(r->second));
+            if(p0.x>p1.x) std::swap(p0.x,p1.x);
+            if(p0.y>p1.y) std::swap(p0.y,p1.y);
+
+            return wxRect(p0,p1);
         }
 
         void configuration_visitor::set_bbox(const wxRect& r) {
             boost::shared_ptr<vector_layer_ghost> ghost = m_panel->vectorlayerghost();
-            ghost->m_rectangleSelection.first  = r.GetTopLeft    ();
-            ghost->m_rectangleSelection.second = r.GetBottomRight();
-            ghost->m_drawRectangleSelection = true;
+            ghost->reset<vector_layer_ghost::Rectangle>();
+            ghost->add_point(ghost->transform().to_local(r.GetLeftTop()));
+            ghost->add_point(ghost->transform().to_local(r.GetBottomRight()));
             ghost->m_penRectangle = wxPen(*wxRED, 2, wxDOT);
             ghost->m_brushRectangle = wxBrush(*wxRED, wxTRANSPARENT);
         }
-
 
         panel_viewer* configuration_visitor::panelviewer() const { return m_panel; }
 
@@ -231,21 +234,17 @@ namespace simulated_annealing {
             layer::ptrLayerType ilayer;
             try
             {
-                boost::shared_ptr<gilviewer_file_io> file_io = gilviewer_io_factory::instance()->create_object(extension.substr(1,extension.size()-1));
+                boost::shared_ptr<gilviewer_file_io> file_io = PatternSingleton<gilviewer_io_factory>::instance()->create_object(extension.substr(1,extension.size()-1));
                 ilayer = file_io->load(file);
                 m_panel->add_layer( ilayer );
             }
             catch (const std::exception &e)
             {
                 GILVIEWER_LOG_EXCEPTION("Read error: " + file);
-                wxString message( oss.str().c_str() , *wxConvCurrent );
-                ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
                 return;
             }
 
-            ilayer->translation_x(/*p0.x+*/ghost->translation_x());
-            ilayer->translation_y(/*p0.y+*/ghost->translation_y());
-            ilayer->zoom_factor  (     ghost->zoom_factor  ());
+            ilayer->transform() = ghost->transform();
         }
 
     } // namespace wx

@@ -2,9 +2,12 @@
 #include "geometry/geometry.hpp"
 #include "geometry/Circle_2.h"
 #include "geometry/Circle_2_intersection.h"
+#include "geometry/Circle_2_coordinates.hpp"
 typedef geometry::Simple_cartesian<double> K;
+typedef K::Point_2 Point_2;
 typedef geometry::Iso_rectangle_2_traits<K>::type Iso_rectangle_2;
-typedef geometry::Circle_2<K> object;
+typedef geometry::Circle_2<K> Circle_2;
+typedef Circle_2 object;
 //]
 
 //[ objective_function
@@ -17,9 +20,10 @@ typedef marked_point_process::graph_configuration<object, unary_energy, binary_e
 //]
 
 //[ reference_process
-#include "mpp/energy/box_is_valid.hpp"
+#include "mpp/rectilinear_searchspace.hpp"
+typedef rectilinear_searchspace<object> searchspace;
 #include "rjmcmc/kernel/kernels.hpp"
-typedef rjmcmc::generator<box_is_valid> generator_kernel;
+typedef rjmcmc::generator<searchspace> generator_kernel;
 #include "mpp/density/poisson_density.hpp"
 typedef marked_point_process::poisson_density                   density;
 #include "mpp/direct_sampler.hpp"
@@ -47,8 +51,8 @@ int main(int argc , char** argv)
     int i=0;
     double energy   = (++i<argc) ? atof(argv[i]) : -1.;
     double surface  = (++i<argc) ? atof(argv[i]) : 10.;
-    double rmin     = (++i<argc) ? atof(argv[i]) : 0.8;
-    double rmax     = (++i<argc) ? atof(argv[i]) : 0.1;
+    double minsize  = (++i<argc) ? atof(argv[i]) : 0.8;
+    double maxratio = (++i<argc) ? atof(argv[i]) : 0.1;
     double poisson  = (++i<argc) ? atof(argv[i]) : 200.;
     double pbirth   = (++i<argc) ? atof(argv[i]) : 0.5;
     double pdeath   = (++i<argc) ? atof(argv[i]) : 0.5;
@@ -64,9 +68,11 @@ int main(int argc , char** argv)
     binary_energy e2(surface);
     configuration c(e1,e2);
 
-    double min_value[] = { 0., 0., rmin};
-    double max_value[] = { 1., 1., rmax};
-    generator_kernel    birth(min_value, max_value);
+    searchspace ss;
+    ss.min(Circle_2(Point_2(0,0),0  ));
+    ss.max(Circle_2(Point_2(1,1),0.1));
+
+    generator_kernel    birth(ss);
     density cs(poisson);
     d_sampler ds( cs, birth );
 

@@ -25,14 +25,14 @@ typedef image_gradient_unary_energy<oriented_gradient_view> unary_energy;
 #include "mpp/energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy                     binary_energy;
 
-#include "mpp/energy/box_is_valid.hpp"
-typedef box_is_valid is_valid;
+#include "mpp/rectilinear_searchspace.hpp"
+typedef rectilinear_searchspace<object> searchspace;
 //]
 
 //[building_footprint_rectangle_definition_kernels
 #include "rjmcmc/kernel/kernels.hpp"
-typedef rjmcmc::generator<is_valid> generator_kernel;
-typedef rjmcmc::modifier <is_valid> modifier_kernel;
+typedef rjmcmc::generator<searchspace> generator_kernel;
+typedef rjmcmc::modifier<searchspace> modifier_kernel;
 //]
 
 
@@ -90,7 +90,9 @@ typedef rjmcmc::modification_kernel<modifier_kernel>            modification_ker
 typedef marked_point_process::direct_sampler<density,generator_kernel> d_sampler;
 /*< The /RJMCMC/ `rjmcmc::metropolis_sampler` then encapsulates all the kernels through its template parameters to enable the sampling of the Marked Point Process relative to the poisson reference process >*/
 #include "rjmcmc/sampler/metropolis_sampler.hpp"
-typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel,modification_kernel> sampler;
+//typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel> sampler;
+typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel//,modification_kernel
+        > sampler;
 //]
 
 //<-
@@ -106,83 +108,85 @@ typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel,modification_ker
 
 //[building_footprint_rectangle_bbox_accessors
 Iso_rectangle_2 get_bbox(const param *p) {
-  int x0 = p->get<int>("xmin");
-  int x1 = p->get<int>("xmax");
-  int y0 = p->get<int>("ymin");
-  int y1 = p->get<int>("ymax");
-  if(x0>x1) std::swap(x0,x1);
-  if(y0>y1) std::swap(y0,y1);
-  return Iso_rectangle_2(x0,y0,x1,y1);
+    int x0 = p->get<int>("xmin");
+    int x1 = p->get<int>("xmax");
+    int y0 = p->get<int>("ymin");
+    int y1 = p->get<int>("ymax");
+    if(x0>x1) std::swap(x0,x1);
+    if(y0>y1) std::swap(y0,y1);
+    return Iso_rectangle_2(x0,y0,x1,y1);
 }
 
 void set_bbox(param *p, const Iso_rectangle_2& r) {
-  p->set("xmin",(int) r.min().x());
-  p->set("ymin",(int) r.min().y());
-  p->set("xmax",(int) r.max().x());
-  p->set("ymax",(int) r.max().y());
+    p->set("xmin",(int) r.min().x());
+    p->set("ymin",(int) r.min().y());
+    p->set("xmax",(int) r.max().x());
+    p->set("ymax",(int) r.max().y());
 }
 //]
 
 //[building_footprint_rectangle_create_configuration
 void create_configuration(const param *p, const oriented_gradient_view& grad, configuration *&c) {
-	// energies
-  unary_energy e1( grad,
-                   p->get<double>("energy"),
-                   p->get<double>("ponderation_grad")
-                 );
-  
-  binary_energy e2(
-                    p->get<double>("surface")
-                  );
-  
-	// empty initial configuration
-  c = new configuration(e1,e2);
+    // energies
+    unary_energy e1( grad,
+                     p->get<double>("energy"),
+                     p->get<double>("ponderation_grad")
+                     );
+
+    binary_energy e2(
+            p->get<double>("surface")
+            );
+
+    // empty initial configuration
+    c = new configuration(e1,e2);
 }
 //]
 
 //[building_footprint_rectangle_create_sampler
 void create_sampler(const param *p, sampler *&s) {
-  is_valid valid(
-                  get_bbox(p),
-                  p->get<double>("minsize"),
-                  p->get<double>("maxratio")
-                );
-  generator_kernel    birth(valid);
-  density cs(p->get<double>("poisson"));
-  
-  birth_death_kernel kbirthdeath = rjmcmc::make_uniform_birth_death_kernel(
-		birth,
-        p->get<double>("pbirth"),
-        p->get<double>("pdeath")
-	);
+    Iso_rectangle_2 r = get_bbox(p);
+    K::Vector_2 v((r.max()-r.min())*0.05);
 
-  modifier_kernel     modif(valid);
-  modification_kernel kmodif(modif);
-  
-  d_sampler ds( cs, birth );
-  s = new sampler( ds, kbirthdeath, kmodif );
-  //s = new sampler( p->get<double>("qtemp"), cs, kbirthdeath, kmodif );
-  //s = new sampler( ds );
+    searchspace ss;
+    ss.min(Rectangle_2(r.min(),K::Vector_2(0,0),1/p->get<double>("maxratio")));
+    ss.max(Rectangle_2(r.max(),v,p->get<double>("maxratio")));
+
+    generator_kernel    birth(ss);
+    density cs(p->get<double>("poisson"));
+
+    birth_death_kernel kbirthdeath = rjmcmc::make_uniform_birth_death_kernel(
+            birth,
+            p->get<double>("pbirth"),
+            p->get<double>("pdeath")
+            );
+
+    modifier_kernel     modif(ss);
+    modification_kernel kmodif(modif);
+
+    d_sampler ds( cs, birth );
+    s = new sampler( ds, kbirthdeath );//, kmodif );
+    //s = new sampler( p->get<double>("qtemp"), cs, kbirthdeath, kmodif );
+    //s = new sampler( ds );
 }
 //]
 
 //[building_footprint_rectangle_create_schedule
 void create_schedule(const param *p, schedule *&t)
 {
-	t = new schedule(
-		p->get<double>("temp"),
-		p->get<double>("deccoef")
-	);
-  //  t = new schedule( 1000, rjmcmc::logarithmic_schedule(p->get<double>("temp")) );
+    t = new schedule(
+            p->get<double>("temp"),
+            p->get<double>("deccoef")
+            );
+    //  t = new schedule( 1000, rjmcmc::logarithmic_schedule(p->get<double>("temp")) );
 }
 //]
 
 //[building_footprint_rectangle_create_end_test
 void create_end_test(const param *p, end_test *&e)
 {
-  e = new end_test(
-                    p->get<int>("nbiter")
-                  );
+    e = new end_test(
+            p->get<int>("nbiter")
+            );
 }
 //]
 
@@ -190,10 +194,10 @@ void create_end_test(const param *p, end_test *&e)
 template<typename Visitor>
 void init_visitor(const param *p, Visitor& v)
 {
-  v.init(
-          p->get<int>("nbdump"),
-          p->get<int>("nbsave")
-        );
+    v.init(
+            p->get<int>("nbdump"),
+            p->get<int>("nbsave")
+            );
 }
 //]
 

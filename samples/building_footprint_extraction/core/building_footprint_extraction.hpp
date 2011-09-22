@@ -21,9 +21,12 @@ typedef global_reconstruction_unary_energy<oriented_gradient_view,oriented_ndvi_
 #include "mpp/energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy      binary_energy;
 
+#include "mpp/rectilinear_searchspace.hpp"
+typedef rectilinear_searchspace<object> searchspace;
+
 #include "rjmcmc/kernel/kernels.hpp"
-typedef rjmcmc::generator<is_valid>          generator_kernel;
-typedef rjmcmc::modifier          modifier_kernel;
+typedef rjmcmc::generator<searchspace>          generator_kernel;
+typedef rjmcmc::modifier <searchspace>          modifier_kernel;
 
 /************** rjmcmc library types ****************/
 
@@ -68,83 +71,84 @@ Iso_rectangle_2 get_bbox(const param *p) {
     int x1 = p->get<int>("xmax");
     int y0 = p->get<int>("ymin");
     int y1 = p->get<int>("ymax");
-	if(x0>x1) std::swap(x0,x1);
+    if(x0>x1) std::swap(x0,x1);
     if(y0>y1) std::swap(y0,y1);
-	return Iso_rectangle_2(x0,y0,x1,y1);
+    return Iso_rectangle_2(x0,y0,x1,y1);
 }
 
 void set_bbox(param *p, const Iso_rectangle_2& r) {
-	p->set("xmin",(int) r.min().x());
-	p->set("ymin",(int) r.min().y());
-	p->set("xmax",(int) r.max().x());
-	p->set("ymax",(int) r.max().y());
+    p->set("xmin",(int) r.min().x());
+    p->set("ymin",(int) r.min().y());
+    p->set("xmax",(int) r.max().x());
+    p->set("ymax",(int) r.max().y());
 }
 
 void create_configuration(param *p, const oriented_gradient_view& grad, const oriented_ndvi_view& ndvi, configuration *&c) {
-	// energies
-	unary_energy e1( grad, ndvi,
-		p->get<double>("energy"),
-		p->get<double>("ponderation_grad"), 
-		p->get<double>("ponderation_ndvi")
-	);
+    // energies
+    unary_energy e1( grad, ndvi,
+                     p->get<double>("energy"),
+                     p->get<double>("ponderation_grad"),
+                     p->get<double>("ponderation_ndvi")
+                     );
 
-	binary_energy e2(
-		p->get<double>("surface")
-	);
+    binary_energy e2(
+            p->get<double>("surface")
+            );
 
-	// empty initial configuration
-	c = new configuration(e1,e2);
+    // empty initial configuration
+    c = new configuration(e1,e2);
 }
 
 void create_sampler(param *p, sampler *&s) {
-	// sampler objects
-	is_valid valid(
-		get_bbox(p),
-		p->get<double>("minsize"),
-		p->get<double>("maxratio")
-	);
+    Iso_rectangle_2 r = get_bbox(p);
 
-	generator_kernel birth(valid);
-	modifier_kernel  modif(valid);
+    searchspace valid;
+    valid.min(Rectangle_2(r.min(),K::Vector_2(0,0)      ,1/p->get<double>("maxrectangleratio")));
+    valid.max(Rectangle_2(r.max(),(r.max()-r.min())*0.05,  p->get<double>("maxrectangleratio")));
+    valid.min(Circle_2(r.min(),0));
+    valid.max(Circle_2(r.max(),p->get<double>("maxcircleradius")));
 
-	birth_kernel        kbirth(birth);
-	death_kernel        kdeath;
-	modification_kernel kmodif(modif);
+    generator_kernel birth(valid);
+    modifier_kernel  modif(valid);
 
-	birth_death_kernel kbirthdeath(
-		kbirth, kdeath,
-		p->get<double>("pbirth"),
-		p->get<double>("pdeath")
-	);
-        density cs(p->get<double>("poisson"));
+    birth_kernel        kbirth(birth);
+    death_kernel        kdeath;
+    modification_kernel kmodif(modif);
 
-	s = new sampler( cs, kbirthdeath, kmodif );
-//	s = new sampler( cs, birth );
+    birth_death_kernel kbirthdeath(
+            kbirth, kdeath,
+            p->get<double>("pbirth"),
+            p->get<double>("pdeath")
+            );
+    density cs(p->get<double>("poisson"));
+
+    s = new sampler( cs, kbirthdeath, kmodif );
+    //	s = new sampler( cs, birth );
 }
 
 void create_schedule(param *p, schedule *&t)
 {
-	t = new schedule(
-		p->get<double>("temp"),
-		p->get<double>("deccoef")
-	);
-  //  t = new schedule( 1000, rjmcmc::logarithmic_schedule(p->get<double>("temp")) );
+    t = new schedule(
+            p->get<double>("temp"),
+            p->get<double>("deccoef")
+            );
+    //  t = new schedule( 1000, rjmcmc::logarithmic_schedule(p->get<double>("temp")) );
 }
 
 void create_end_test(param *p, end_test *&e)
 {
-	e = new end_test(
-		p->get<int>("nbiter")
-	);
+    e = new end_test(
+            p->get<int>("nbiter")
+            );
 }
 
 template<typename Visitor>
 void init_visitor(param *p, Visitor& v)
 {
-	v.init(
-		p->get<int>("nbdump"),
-		p->get<int>("nbsave")
-	);
+    v.init(
+            p->get<int>("nbdump"),
+            p->get<int>("nbsave")
+            );
 }
 
 #endif // __BUILDING_FOOTPRINT_EXTRACTION_HPP__

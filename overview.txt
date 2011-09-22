@@ -1,0 +1,52 @@
+
+------------- RJMCMC algorithm overview ------------- 
+
+i: current model
+j: proposed model
+theta_*: model parameters
+u_*: auxiliary transformation variables
+y: observed data
+k: proposition kernel
+pi(.|i,theta_i,y): possibly configuration and data-dependent kernel choice probability
+g_pki: bijective transformation of the p^th variant of kernel k from model i to j=k(i) with (theta_j,u_j)=g_pki(theta_i,u_i)
+RJ-MCMC step: (i,theta_i)->(j,theta_j)
+
+
+//////// SAMPLER ////////////
+1) sampler 
+- ask each kernel k for an unnormalized probability pi(.|i,theta_i,y)
+- normalize pi(.|i,theta_i,y) (optional)
+- chooses k~pi(.|i,theta_i,y), and thus a proposed model j=k(i)
+
+//////// KERNEL ////////////
+2) kernel k
+- samples discrete parameters   p   ~ q_k (p  | i, theta_i, y) (e.g. decide the dying or modified object or its place of insertion)
+- samples continuous parameters u_i ~ q_pk(u_i| i, theta_i, y) (e.g. create the new object parameters)
+- computes (theta_j,u_j)=g_pki(theta_i,u_i)					   (e.g. create the new object)
+- R  = pi(k^-1|j,theta_j)/pi(k|i,theta_i)
+- R *= q_k^-1 (p   | j, theta_j, y)/q_k (p   | i, theta_i, y)
+- R *= q_pk^-1(u_j | j, theta_j, y)/q_pk(u_i | i, theta_i, y)
+- R *= |J_g_pki(theta_i,u_i)|
+- returns R and the proposed modification from (i,theta_i) to (j,theta_j)
+
+//////// DENSITY  ////////////  R *= f(j,theta_j,y)/f(i,theta_i,y)
+3) reference process :  R *= f(j,theta_j)/f(i,theta_i)
+- R *= f(j)/f(i)
+- R *= f(theta_j|j)/f(theta_i|i)
+
+4) simulated annealing (metropolis, szu, dueker ...)
+- R *= f(y|j,theta_j)/f(y|i,theta_i) 
+- [optional threshold variant] : R = (R>threshold)?1:0
+
+//////// SAMPLER ////////////
+5) acceptation 
+-    x~[0,1] if (x<R) { i=j, theta_i=theta_j }
+
+
+e.g: homogeneous poisson distribution of n objects, V=measure of the parameter space of one object
+R_birth = pi_death/pi_birth * (1/(n+1))/(1/(n+1)) * (1)/(1/V) * lambda/(n+1) * (1/V) * exp(-E/T)
+        = pi_death/pi_birth * lambda/(n+1) * exp(-E/T)
+
+R_death = pi_birth/pi_death * (1/n)/(1/n) * (1/V) * n/lambda * (1)/(1/V) * exp(-E/T)
+        = pi_death/pi_birth * n/lambda * exp(-E/T)
+

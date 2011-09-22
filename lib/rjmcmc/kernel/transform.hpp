@@ -96,26 +96,29 @@ namespace rjmcmc {
     public:
 
         inline T determinant() const { return m_determinant; }
-        inline T abs_jacobian(const T[N]) const { return m_abs_determinant; }
+        template<typename Iterator>
+        inline T abs_jacobian(Iterator it) const { return m_abs_determinant; }
 
-        inline void apply  (const T in[N], T out[N]) const {
-            T *m = m_mat;
-            for(T *oit = out;oit<out+N;++oit) *oit = (*in++)*(*m++);
+        template<typename IteratorIn,typename IteratorOut>
+        inline void apply  (IteratorIn in, IteratorOut out) const {
+            for(T *m = m_mat;m!=m_mat+N;++m) *out++ = (*in++)*(*m);
         }
-        inline void inverse(const T in[N], T out[N]) const {
-            T *m = m_inv;
-            for(T *oit = out;oit<out+N;++oit) *oit = (*in++)*(*m++);
+        template<typename IteratorIn,typename IteratorOut>
+        inline void inverse(IteratorIn in, IteratorOut out) const {
+            for(T *m = m_inv;m!=m_inv+N;++m) *out++ = (*in++)*(*m);
         }
 
         diagonal_linear_transform() {}
 
-        diagonal_linear_transform(T v[N]) {
+        template<typename Iterator>
+        diagonal_linear_transform(Iterator it) {
             m_determinant = 1.;
             for(unsigned int i=0; i<N; ++i)
             {
-                m_determinant *= v[i];
-                m_mat[i] = v[i];
-                m_inv[i] = T(1)/v[i];
+                T v = *it++;
+                m_determinant *= v;
+                m_mat[i] = v;
+                m_inv[i] = T(1)/v;
             }
             m_abs_determinant = std::fabs(m_determinant);
         }
@@ -133,27 +136,31 @@ namespace rjmcmc {
     public:
 
         inline T determinant() const { return m_determinant; }
-        inline T abs_jacobian(const T[N]) const { return m_abs_determinant; }
+        template<typename Iterator>
+        inline T abs_jacobian(Iterator it) const { return m_abs_determinant; }
 
-        inline void apply  (const T in[N], T out[N]) const {
+        template<typename IteratorIn,typename IteratorOut>
+        inline void apply  (IteratorIn in, IteratorOut out) const {
             const T *m = m_mat, *d = m_delta;
             for(T *oit = out;oit<out+N;++oit) *oit = (*in++)*(*m++) + (*d++);
         }
-        inline void inverse(const T in[N], T out[N]) const {
+        template<typename IteratorIn,typename IteratorOut>
+        inline void inverse(IteratorIn in, IteratorOut out) const {
             const T *m = m_inv, *d = m_delta;
             for(T *oit = out;oit<out+N;++oit) *oit = ((*in++) - (*d++))*(*m++);
         }
 
         diagonal_affine_transform() {}
 
-        diagonal_affine_transform(T v[N], T d[N]) {
+        template<typename IteratorV,typename IteratorD>
+        diagonal_affine_transform(IteratorD d,IteratorV v) {
             m_determinant = 1.;
-            for(unsigned int i=0; i<N; ++i)
+            for(unsigned int i=0; i<N; ++i,++v,++d)
             {
-                m_determinant *= v[i];
-                m_mat[i] = v[i];
-                m_inv[i] = T(1)/v[i];
-                m_delta[i] = d[i];
+                m_determinant *= *d;
+                m_mat[i] = *d;
+                m_inv[i] = T(1)/(*d);
+                m_delta[i] = *v;
             }
             m_abs_determinant = std::fabs(m_determinant);
         }
@@ -166,6 +173,17 @@ namespace rjmcmc {
         T m_abs_determinant;
 
     };
+
+
+
+
+    template<unsigned int N, typename T>
+    std::ostream& operator<<(std::ostream& out, const diagonal_affine_transform<N,T>& t )
+    {
+        out << "det=" << t.determinant()<<std::endl;
+        return out;
+    }
+
 
 }
 

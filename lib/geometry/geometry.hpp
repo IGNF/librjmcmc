@@ -70,6 +70,8 @@ namespace internal {
     inline T operator*(const Vector_2& v) const { return x()*v.x()+y()*v.y(); }
     inline Vector_2 operator+(const Vector_2& v) const { return Vector_2(x()+v.x(),y()+v.y()); }
     inline Vector_2 operator-() const { return Vector_2(-x(),-y()); }
+    inline Vector_2 operator*(const T& v) const { return Vector_2(x()*v,y()*v); }
+    inline Vector_2 operator/(const T& v) const { return Vector_2(x()/v,y()/v); }
   };
   template <typename T>  class Line_2 {
     T c_[3];

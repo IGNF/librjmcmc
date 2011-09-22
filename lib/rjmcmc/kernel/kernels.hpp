@@ -3,201 +3,170 @@
 
 #include "rjmcmc/random.hpp"
 #include "rjmcmc/kernel/transform.hpp"
+#include <boost/array.hpp>
+#include <boost/fusion/algorithm/iteration/for_each.hpp>
+#include <boost/fusion/algorithm.hpp>
 
 namespace rjmcmc {
 
-    template< typename IsValid >
-    class generator {
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_type;
-        mutable die_type m_die;
-        IsValid m_is_valid;
-    #ifdef GEOMETRY_RECTANGLE_2_H
-        rjmcmc::diagonal_affine_transform<5,float> m_rectangle_transform;
-    #endif
-    #ifdef GEOMETRY_CIRCLE_2_H
-        rjmcmc::diagonal_affine_transform<3,float> m_circle_transform;
-    #endif
+    template<typename U> class transform_entry : public boost::fusion::pair<U,rjmcmc::diagonal_affine_transform<coordinates_iterator<U>::size,double> > {};
 
-    public:
-        generator(const IsValid& is_valid) :
-                m_die(rjmcmc::random(), boost::uniform_real<>(0,1)),
-                m_is_valid(is_valid)
-        {
-            const Iso_rectangle_2& bbox = m_is_valid.bbox();
-            float x0 = bbox.min().x();
-            float y0 = bbox.min().y();
-            float dx = bbox.max().x()-x0;
-            float dy = bbox.max().y()-y0;
-    #ifdef GEOMETRY_RECTANGLE_2_H
-            float rect_m[5] = { dx, dy, 0.1*dx, 0.1*dy, 1 };
-            float rect_d[5] = { x0, y0, 0., 0., 0. };
-            m_rectangle_transform = rjmcmc::diagonal_affine_transform<5,float>(rect_m,rect_d);
-    #endif
-    #ifdef GEOMETRY_CIRCLE_2_H
-            float circ_m[3] = { dx, dy, 0.5*geometry::min(dx,dy) };
-            float circ_d[3] = { x0, y0, 0. };
-            m_circle_transform    = rjmcmc::diagonal_affine_transform<3,float>(circ_m,circ_d);
-    #endif
+    template<typename U>
+    class transform_map : public boost::fusion::map<transform_entry<U> > {};
 
-        }
-
-        typedef double result_type;
-
-    #ifdef GEOMETRY_RECTANGLE_2_H
-        template<typename K> result_type operator()(geometry::Rectangle_2<K> &r) const
-        {
-            typedef typename K::Point_2 Point_2;
-            typedef typename K::Vector_2 Vector_2;
-            float in [5] = { m_die(), m_die(), m_die(), m_die(), m_die() };
-            float out[5];
-            m_rectangle_transform.apply(in,out);
-            // do {
-            Point_2 p(out[0], out[1]);
-            Vector_2 v(out[2], out[3]);
-            r = geometry::Rectangle_2<K>(p, v, out[4]);
-            // } while (!m_is_valid(r));
-            return 1.;//m_rectangle_transform.abs_jacobian(in);
-        }
-    #endif
-
-    #ifdef GEOMETRY_CIRCLE_2_H
-        template<typename K> result_type operator()(geometry::Circle_2<K> &c) const
-        {
-            typedef typename K::Point_2 Point_2;
-            float in [3] = { m_die(), m_die(), m_die() };
-            float out[3];
-            m_circle_transform.apply(in,out);
-            // do {
-            Point_2 p(out[0], out[1]);
-            c = geometry::Circle_2<K>(p, out[2]);
-            // } while (!m_is_valid(c));
-            return 1.;//m_circle_transform.abs_jacobian(in);
-        }
-    #endif
-
-        struct pdf_visitor {
-            IsValid m_is_valid;
-            typedef double result_type;
-            pdf_visitor(const IsValid& is_valid) : m_is_valid(is_valid) {}
-    #ifdef GEOMETRY_RECTANGLE_2_H
-            template<typename K> result_type operator()(const geometry::Rectangle_2<K> &r) const
-            {
-                return 1.;
-            }
-    #endif
-    #ifdef GEOMETRY_CIRCLE_2_H
-            template<typename K> result_type operator()(const geometry::Circle_2<K> &r) const
-            {
-                const Iso_rectangle_2& bbox = m_is_valid.bbox();
-                float dx = bbox.max().x()-bbox.min().x();
-                float dy = bbox.max().y()-bbox.min().y();
-                double radius = 0.5*geometry::min(dx,dy);
-                return 1.;//1./(dx*dy*radius);
-            }
-    #endif
-        };
-        inline pdf_visitor pdf() const { return pdf_visitor(m_is_valid); }
+    template<BOOST_VARIANT_ENUM_PARAMS(typename U)>
+    class transform_map<boost::variant<BOOST_VARIANT_ENUM_PARAMS(U)> >
+        : public boost::fusion::result_of::as_map<
+        typename boost::mpl::transform<typename boost::variant<BOOST_VARIANT_ENUM_PARAMS(U)>::types, transform_entry<boost::mpl::_> >::type>::type
+    {
     };
 
-
-/*
-    template< RJMCMC_TUPLE_TYPENAMES >
-    class generator
-    {
-    public:
-        generator(const Density& d, RJMCMC_TUPLE_ARGS) :
-                m_kernel(RJMCMC_TUPLE_PARAMS),
-                m_die(random(), boost::uniform_real<>(0,1)),
-                m_density(d)
+    template< typename Searchspace >
+    struct transform_init {
+        Searchspace m_searchspace;
+        transform_init(const Searchspace& searchspace) :
+                m_searchspace(searchspace)
         {}
 
-        typedef tuple<RJMCMC_TUPLE_TYPES> Kernels;
-    template< typename IsValid >
+        template<typename T> void operator() (transform_entry<T>& t) const
+        {
+            typedef typename coordinates_iterator<T>::type iterator;
+            iterator bmin  = coordinates_begin(m_searchspace.template min<T>());
+            iterator bmax  = coordinates_begin(m_searchspace.template max<T>());
+            iterator m = bmin;
+            static const unsigned int size = coordinates_iterator<T>::size;
+            double d[size];
+            double *it = d, *end = it+size;
+            for(;it!=end; ++it, ++bmin, ++bmax)
+            {
+                *it = (*bmax) - (*bmin);
+            };
+            t.second = rjmcmc::diagonal_affine_transform<size,double>(d,m);
+        }
+    };
+
+    template< typename Searchspace >
     class generator {
         typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_type;
         mutable die_type m_die;
+        Searchspace m_searchspace;
+
+        typedef typename Searchspace::value_type value_type;
+        typedef transform_map<value_type> transform_type;
+        transform_type m_transform;
 
     public:
-        generator(const IsValid& is_valid) :
+        generator(const Searchspace& searchspace) :
                 m_die(rjmcmc::random(), boost::uniform_real<>(0,1)),
-                m_is_valid(is_valid)
+                m_searchspace(searchspace)
         {
-            const Iso_rectangle_2& bbox = m_is_valid.bbox();
-            float x0 = bbox.min().x();
-            float y0 = bbox.min().y();
-            float dx = bbox.max().x()-x0;
-            float dy = bbox.max().y()-y0;
-    #ifdef GEOMETRY_RECTANGLE_2_H
-            float rect_m[5] = { dx, dy, 0.1*dx, 0.1*dy, 1 };
-            float rect_d[5] = { x0, y0, 0., 0., 0. };
-            m_rectangle_transform = rjmcmc::diagonal_affine_transform<5,float>(rect_m,rect_d);
-    #endif
-    #ifdef GEOMETRY_CIRCLE_2_H
-            float circ_m[3] = { dx, dy, 0.5*geometry::min(dx,dy) };
-            float circ_d[3] = { x0, y0, 0. };
-            m_circle_transform    = rjmcmc::diagonal_affine_transform<3,float>(circ_m,circ_d);
-    #endif
-
+            boost::fusion::for_each(m_transform,transform_init<Searchspace>(m_searchspace));
         }
 
         typedef double result_type;
 
-        template<typename K> result_type operator()(geometry::Rectangle_2<K> &r) const
+        template<typename T> result_type operator()(T &t) const
         {
+            static const unsigned int size = coordinates_iterator<T>::size;
+            double in [size];
+            double out[size];
+            object_from_coordinates<T> creator;
+            do {
+                for(double *it = in; it!=in+size; ++it) *it = m_die();
+                boost::fusion::at_key<T>(m_transform).apply(in,out);
+                t = creator(out);
+            } while (!m_searchspace.inside(t)); // rejection sampling...
+            return boost::fusion::at_key<T>(m_transform).abs_jacobian(in);
+        }
+
+        struct pdf_visitor {
+            typedef double result_type;
+            const generator& m_generator;
+
+            template<typename T>
+            result_type operator()(const T &t) const { return m_generator.abs_jacobian(t); }
+            pdf_visitor(const generator& g) : m_generator(g) {}
+        };
+        inline pdf_visitor pdf() const { return pdf_visitor(*this); }
+
+        template<typename T>
+        inline result_type abs_jacobian(const T &t) const
+                                        {
+            return boost::fusion::at_key<T>(m_transform).abs_jacobian(coordinates_begin(t));
         }
     };
-*/
 
-class modifier {
-    typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > float_die_type;
-    typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > int_die_type;
-    mutable float_die_type m_dief;
-    mutable int_die_type   m_die4;
-    double m_p_translation;
-    double m_dx, m_dy;
-public:
-    modifier() :
-            m_dief(rjmcmc::random(), boost::uniform_real<>(0,1)),
-            m_die4(rjmcmc::random(), boost::uniform_smallint<>(0,3)),
-            m_p_translation(0.5),
-            m_dx(20), m_dy(20) {}
+    template< typename Searchspace >
+    class modifier {
+        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > double_die_type;
+        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > int_die_type;
+        mutable double_die_type m_dief;
+        mutable int_die_type   m_die4;
+        double m_p_translation;
+        double m_dx, m_dy;
+        Searchspace m_searchspace;
+    public:
+        modifier(const Searchspace& searchspace) :
+                m_dief(rjmcmc::random(), boost::uniform_real<>(0,1)),
+                m_die4(rjmcmc::random(), boost::uniform_smallint<>(0,3)),
+                m_p_translation(0.5),
+                m_dx(20), m_dy(20),
+                m_searchspace(searchspace) {}
 
-    typedef double result_type;
+        typedef double result_type;
 
-    template<typename T0, typename T1>
-    double operator()(const T0 &t0, T1 &t1) const {
-        return 0;
-    }
+        template<typename T0, typename T1>
+        double operator()(const T0 &t0, T1 &t1) const {
+            return 0;
+        }
 
 #ifdef GEOMETRY_RECTANGLE_2_H
-    template<typename K> result_type operator()(
-    const geometry::Rectangle_2<K> &r,
-    geometry::Rectangle_2<K> &res
-    ) const
-    {
-        typedef typename K::Vector_2 Vector_2;
-        if(m_dief()<m_p_translation) {
-            res = r.scaled_edge(m_die4(),exp(0.5-m_dief()));
-        } else {
-            Vector_2 v(m_dx*(m_dief()-0.5),m_dy*(m_dief()-0.5));
-            res = r.rotation_scaled_corner(m_die4(), v);
+        /*
+        template<typename K>
+        result_type operator()(const geometry::Rectangle_2<K> &t, geometry::Rectangle_2<K> &res ) const
+        {
+            typename K::Point_2 c = t.center();
+            typename K::Vector_2 n = t.normal();
+            typename K::FT r = t.ratio();
+            typename K::Vector_2 m(-r*n.y(),r*n.x());
+            do {
+                typename K::FT f = exp(0.5-m_dief());
+                res = Rectangle_2(c+m*(1-f), n,f*r);
+            } while (!m_searchspace(res));
+            return 1.; // TODO
         }
-        return 1.; // TODO
-    }
-    /*
+
+
+        // translates edge(i) linearly from edge(i+2) with f : 0->degenerate, 1->identity...
+        // assert(!is_degenerate());
+        switch (i%4) {
+        case  0: return Rectangle_2(c+(1-f)*m, n,f*r);
+        case  1: return Rectangle_2(c-(1-f)*n, m,f/r);
+        case  2: return Rectangle_2(c-(1-f)*m,-n,f*r);
+        default: return Rectangle_2(c+(1-f)*n,-m,f/r);
+        }
+        template<typename K> result_type operator()(
+        const geometry::Rectangle_2<K> &r,
+        geometry::Rectangle_2<K> &res
+        ) const
+        {
+                res = r.scaled_edge(m_die4(),exp(0.5-m_dief()));
+            return 1.; // TODO
+        }
+
   template<typename K> result_type operator()(
                                                const geometry::Rectangle_2<K> &r,
                                                std::pair<geometry::Rectangle_2<K>,geometry::Rectangle_2<K> > &res
                                              ) const
   {
     int i = m_die4();
-    float f = m_dief();
-    float g = m_dief()*(1-f);
+    double f = m_dief();
+    double g = m_dief()*(1-f);
     res.first  = r.scaled_edge(i  ,f);
     res.second = r.scaled_edge(i+2,g);
     return 1.; // TODO
   }
-  
+
   template<typename K> result_type operator()(
                                                const std::pair<geometry::Rectangle_2<K>,geometry::Rectangle_2<K> > &r,
                                                geometry::Rectangle_2<K> &res
@@ -207,7 +176,7 @@ public:
     return 1.; // TODO
   }
 #endif // GEOMETRY_RECTANGLE_2_H
-  
+
 #ifdef GEOMETRY_CIRCLE_2_H
   template<typename K> result_type operator()(
                                                const geometry::Circle_2<K> &c,
@@ -227,9 +196,9 @@ public:
     return 1.; // TODO
   }
 #endif // GEOMETRY_CIRCLE_2_H
-  
+
 #if defined(GEOMETRY_CIRCLE_2_H) && defined(GEOMETRY_RECTANGLE_2_H)
-  
+
   template<typename K> result_type operator()(
                                                const geometry::Rectangle_2<K> &r,
                                                geometry::Circle_2<K> &c
@@ -241,30 +210,30 @@ public:
     c = geometry::Circle_2<K>(r.center(),radius);
     return 1.; // TODO
   }
-  
+
   template<typename K> result_type operator()(
                                                const geometry::Circle_2<K> &c,
                                                geometry::Rectangle_2<K> &r
                                              ) const
   {
-    typedef typename K::Vector_2 Vector_2; 
+    typedef typename K::Vector_2 Vector_2;
     Vector_2 v((2*m_dief()-1),(2*m_dief()-1));
     v = v*(geometry::radius(c)/sqrt(v.squared_length()));
     r = geometry::Rectangle_2<K>(c.center(),v,1);
     return 1.; // TODO
   }
-  
+
   template<typename K> result_type operator()(
                                                const geometry::Rectangle_2<K> &r,
                                                std::pair<geometry::Rectangle_2<K>,geometry::Circle_2<K> > &res
                                              ) const
   {
     typedef typename K::Vector_2 Vector_2;
-		// todo: verifier que ca fait pas n'importe quoi...
+                // todo: verifier que ca fait pas n'importe quoi...
     int i = m_die4();
-    float f = m_dief();
-    float g = m_dief();
-    float h = m_dief();
+    double f = m_dief();
+    double g = m_dief();
+    double h = m_dief();
     Vector_2 n = r.normal(i)*std::min(1.,std::abs(r.ratio()));
     if(i%2) n = n*(1./r.ratio());
     Vector_2 v(-n.x()+n.y(),-n.y()-n.x());
@@ -274,7 +243,7 @@ public:
   }*/
 #endif // defined(GEOMETRY_CIRCLE_2_H) && defined(GEOMETRY_RECTANGLE_2_H)
 
-};
+    };
 
 } // namespace rjmcmc
 
