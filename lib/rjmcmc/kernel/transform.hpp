@@ -134,7 +134,7 @@ namespace rjmcmc {
     class diagonal_affine_transform
     {
     public:
-
+        enum { size = N };
         inline T determinant() const { return m_determinant; }
         template<typename Iterator>
         inline T abs_jacobian(Iterator it) const { return m_abs_determinant; }

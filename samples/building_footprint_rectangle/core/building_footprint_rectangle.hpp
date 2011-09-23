@@ -32,7 +32,37 @@ typedef rectilinear_searchspace<object> searchspace;
 //[building_footprint_rectangle_definition_kernels
 #include "rjmcmc/kernel/kernels.hpp"
 typedef rjmcmc::generator<searchspace> generator_kernel;
-typedef rjmcmc::modifier<searchspace> modifier_kernel;
+
+
+
+struct modifier_transform
+{
+    enum { size = 5 };
+
+    template<typename Iterator>
+    inline double abs_jacobian(Iterator it) const { return 1.; }
+
+    template<typename IteratorIn,typename IteratorOut>
+    inline void apply  (IteratorIn in, IteratorOut out) const {
+        typedef typename K::FT FT;
+        FT x = *in++;
+        FT y = *in++;
+        FT u = *in++;
+        FT v = *in++;
+        FT r = *in++;
+        FT s = 1-(*in);
+        FT f = exp(10*(s-0.5));
+        FT g = 1-f;
+        //   res = Rectangle_2(c+m*(1-f), n,f*r);
+        *out++ = x-g*r*v;
+        *out++ = y+g*r*u;
+        *out++ = u;
+        *out++ = v;
+        *out++ = f*r;
+        *out++ = s;
+    }
+};
+typedef rjmcmc::modifier<modifier_transform,Rectangle_2,Rectangle_2> modifier_kernel;
 //]
 
 
@@ -91,7 +121,7 @@ typedef marked_point_process::direct_sampler<density,generator_kernel> d_sampler
 /*< The /RJMCMC/ `rjmcmc::metropolis_sampler` then encapsulates all the kernels through its template parameters to enable the sampling of the Marked Point Process relative to the poisson reference process >*/
 #include "rjmcmc/sampler/metropolis_sampler.hpp"
 //typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel> sampler;
-typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel//,modification_kernel
+typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel,modification_kernel
         > sampler;
 //]
 
@@ -160,11 +190,12 @@ void create_sampler(const param *p, sampler *&s) {
             p->get<double>("pdeath")
             );
 
-    modifier_kernel     modif(ss);
+    modifier_transform mt;
+    modifier_kernel     modif(mt);
     modification_kernel kmodif(modif);
 
     d_sampler ds( cs, birth );
-    s = new sampler( ds, kbirthdeath );//, kmodif );
+    s = new sampler( ds, kbirthdeath, kmodif );
     //s = new sampler( p->get<double>("qtemp"), cs, kbirthdeath, kmodif );
     //s = new sampler( ds );
 }

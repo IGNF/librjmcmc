@@ -76,26 +76,63 @@ namespace rjmcmc {
                 boost::fusion::at_key<T>(m_transform).apply(in,out);
                 t = creator(out);
             } while (!m_searchspace.inside(t)); // rejection sampling...
-            return boost::fusion::at_key<T>(m_transform).abs_jacobian(in);
+            return boost::fusion::at_key<T>(m_transform).abs_jacobian(out);
         }
 
         struct pdf_visitor {
-            typedef double result_type;
+            typedef generator::result_type result_type;
             const generator& m_generator;
-
-            template<typename T>
-            result_type operator()(const T &t) const { return m_generator.abs_jacobian(t); }
+            template<typename T> inline result_type operator()(const T &t) const { return m_generator.pdf(t); }
             pdf_visitor(const generator& g) : m_generator(g) {}
         };
         inline pdf_visitor pdf() const { return pdf_visitor(*this); }
 
         template<typename T>
-        inline result_type abs_jacobian(const T &t) const
-                                        {
+        inline result_type pdf(const T &t) const
+        {
+            if(!m_searchspace.inside(t)) return 0;
             return boost::fusion::at_key<T>(m_transform).abs_jacobian(coordinates_begin(t));
         }
     };
 
+    template<typename Transform,  typename Input,  typename Output>
+    class modifier {
+        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_type;
+        mutable die_type m_die;
+        Transform   m_transform;
+
+    public:
+        modifier(const Transform& transform) :
+                m_die(rjmcmc::random(), boost::uniform_real<>(0,1)),
+                m_transform(transform) {}
+
+        typedef double result_type;
+        typedef Input  input_type;
+        typedef Output output_type;
+        typedef typename coordinates_iterator<input_type>::type iterator;
+
+        template<typename T0, typename T1>
+        double operator()(const T0 &t0, T1 &t1) const {
+            return 0;
+        }
+        double operator()(const input_type &input, output_type &output) const
+        {
+            static const unsigned int size = Transform::size;
+            static const unsigned int in_size  = coordinates_iterator< input_type>::size;
+            static const unsigned int out_size = coordinates_iterator<output_type>::size;
+            double in [Transform::size];
+            double out[Transform::size];
+            iterator input_it  = coordinates_begin(input);
+            for(double *it = in; it!=in+in_size; ++it, ++input_it) *it = *input_it;
+            for(double *it = in+in_size; it!=in+size; ++it) *it = m_die();
+            m_transform.apply(in,out);
+            object_from_coordinates<output_type> creator;
+            output = creator(out);
+            return m_transform.abs_jacobian(in); // *probability(out+out_size,out+size)/probability(in+in_size,in+size);
+            // |dTmn(theta_m,u_mn)/d(theta_m,u_mn)| * phi(v_mn) / phi(u_mn)
+        }
+
+        /*
     template< typename Searchspace >
     class modifier {
         typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > double_die_type;
@@ -121,7 +158,6 @@ namespace rjmcmc {
         }
 
 #ifdef GEOMETRY_RECTANGLE_2_H
-        /*
         template<typename K>
         result_type operator()(const geometry::Rectangle_2<K> &t, geometry::Rectangle_2<K> &res ) const
         {
@@ -240,9 +276,9 @@ namespace rjmcmc {
     res.first  = r.scaled_edge(i,f).scaled_edge(i+1,g);
     res.second = geometry::Circle_2<K>(r[i+3]+v*h,h*std::sqrt(n.squared_length()));
     return 1.; // TODO
-  }*/
+  }
 #endif // defined(GEOMETRY_CIRCLE_2_H) && defined(GEOMETRY_RECTANGLE_2_H)
-
+*/
     };
 
 } // namespace rjmcmc

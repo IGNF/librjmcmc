@@ -15,7 +15,6 @@
 #include <GilViewer/io/gilviewer_file_io.hpp>
 #include <GilViewer/io/gilviewer_io_factory.hpp>
 #include <GilViewer/convenient/macros_gilviewer.hpp>
-
 #include "param/wx_parameter.hpp"
 #include "parameters_visitor.hpp"
 typedef parameters< wx_parameter > param;
@@ -142,6 +141,7 @@ namespace simulated_annealing {
 
             m_dockManager.AddPane( librjmcmctoolbar , applicationToolBarInfo );
             m_dockManager.Update();
+
             Show();
         }
 
@@ -219,8 +219,8 @@ namespace simulated_annealing {
         void configuration_visitor::set_bbox(const wxRect& r) {
             boost::shared_ptr<vector_layer_ghost> ghost = m_panel->vectorlayerghost();
             ghost->reset<vector_layer_ghost::Rectangle>();
-            ghost->add_point(ghost->transform().to_local(r.GetLeftTop()));
-            ghost->add_point(ghost->transform().to_local(r.GetBottomRight()));
+            ghost->add_point(wxRealPoint(r.GetLeft (),r.GetTop   ()));
+            ghost->add_point(wxRealPoint(r.GetRight(),r.GetBottom()));
             ghost->m_penRectangle = wxPen(*wxRED, 2, wxDOT);
             ghost->m_brushRectangle = wxBrush(*wxRED, wxTRANSPARENT);
         }
