@@ -35,6 +35,8 @@ namespace rjmcmc {
             if(c.empty()) return 1.;
             typedef typename Configuration::value_type T;
             typedef typename Configuration::iterator iterator;
+
+            /*
             typedef typename variant_pairs<T>::type MT;
             MT out, in;
 
@@ -53,12 +55,23 @@ namespace rjmcmc {
                 do { i2 = cdie(); } while(i==i2);
                 iterator it2 = c.begin();
                 std::advance(it2, cdie());
+                modif.insert_death(it);
                 modif.insert_death(it2);
                 make_variant_pair<T> vmp;
                 in = apply_visitor(vmp,c[it],c[it2]);
             }
 
             random_variant_init(out);
+            */
+
+            int n = c.size();
+            die_type cdie(random(), boost::uniform_smallint<>(0,n-1));
+            iterator it = c.begin();
+            std::advance(it, cdie());
+            modif.insert_death(it);
+            typename Modifier::input_type in = c[it];
+            typename Modifier::output_type out;
+
             double green_ratio = apply_visitor(m_modifier,in,out);
             apply_visitor(modif.birth_inserter(),out);
             return green_ratio;

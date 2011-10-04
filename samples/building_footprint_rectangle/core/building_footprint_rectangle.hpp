@@ -62,6 +62,7 @@ struct modifier_transform
         *out++ = s;
     }
 };
+
 typedef rjmcmc::modifier<modifier_transform,Rectangle_2,Rectangle_2> modifier_kernel;
 //]
 

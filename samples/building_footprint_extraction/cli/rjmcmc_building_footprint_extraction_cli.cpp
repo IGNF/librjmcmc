@@ -33,7 +33,6 @@ int main(int argc , char** argv)
   clip_bbox(bbox,dsm_file );
   clip_bbox(bbox,ndvi_file);
   
-  
   gradient_functor gf(p->get<double>("sigmaD"));
   oriented_gradient_view grad_view(dsm_file,  bbox, gf);
   oriented_ndvi_view     ndvi_view(ndvi_file, bbox);

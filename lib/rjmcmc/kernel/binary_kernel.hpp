@@ -107,67 +107,6 @@ namespace rjmcmc {
         }
     };
 
-    /*
-    template<typename Transform>
-    class transform_kernel : public unary_kernel
-    {
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_t;
-        double m_p, m_q, m_q_over_1_q, m_1_q_over_q;
-        Transform m_trans;
-        mutable unsigned int m_kernel_id;
-        mutable die_t m_die;
-
-    public:
-        enum { size = 2 };
-        inline unsigned int kernel_id() const { return m_kernel_id; }
-        inline const char* name(unsigned int i) const { return "transform_kernel"; }
-
-        transform_kernel(const Transform& t, double p=1., double q=0.5) :
-                m_trans(t), m_p(p), m_q(q)
-        {
-            // assert(q>0 && q<1);
-            m_q_over_1_q = q/(1-q);
-            m_1_q_over_q = (1-q)/q;
-        }
-
-        inline void probability(double p) { m_p = p; }
-        inline double probability() const { return m_p; }
-
-        template<typename Configuration, typename Modification>
-        double operator()(double p, Configuration& c, Modification& modif) const
-        {
-            typedef typename Transform::FT FT;
-            enum { N =Transform::size };
-            enum { N0=Transform::argument_size };
-            enum { N1=Transform::result_size   };
-            FT in [N];
-            FT out[N];
-            if(p<m_q*m_p) {
-                m_kernel_id = 0;
-                for(unsigned int i=N0; i<N; ++i) in[i]=m_die();
-                typename Transform::argument_type in_objects;
-                get_objects(c,in_objects);
-                get_parameters(in_objects,in);
-                double res = m_trans.apply(in,out);
-                typename Transform::result_type out_objects;
-                set_parameters(out,out_objects);
-                return m_1_q_over_q*res;
-            } else {
-                m_kernel_id = 1;
-                for(unsigned int i=N1; i<N; ++i) in[i]=m_die();
-                typename Transform::result_type in_objects;
-                get_objects(c,in_objects);
-                get_parameters(in_objects,in);
-                double res = m_trans.reverse(in,out);
-                typename Transform::argument_type out_objects;
-                set_parameters(out,out_objects);
-                return m_q_over_1_q*res;
-            }
-        }
-
-    };
-*/
-
     // convenience make functions
 
     template<typename Generator>

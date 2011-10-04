@@ -20,7 +20,7 @@ namespace rjmcmc {
         typedef boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> T;
         typedef typename T::types types;
         typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > die_type;
-        const int N = variant_size<T>::value;
+        static const int N = variant_size<T>::value;
         die_type vdie(random(), boost::uniform_smallint<>(0,N-1));
         switch(vdie())        {
 #define BOOST_PP_LOCAL_LIMITS (0,BOOST_VARIANT_LIMIT_TYPES-1)

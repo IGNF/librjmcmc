@@ -111,10 +111,11 @@ namespace rjmcmc {
         typedef Output output_type;
         typedef typename coordinates_iterator<input_type>::type iterator;
 
-        template<typename T0, typename T1>
+/*        template<typename T0, typename T1>
         double operator()(const T0 &t0, T1 &t1) const {
             return 0;
         }
+*/
         double operator()(const input_type &input, output_type &output) const
         {
             static const unsigned int size = Transform::size;
