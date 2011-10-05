@@ -39,6 +39,15 @@ namespace marked_point_process {
             return ratio;
         }
 
+        template<typename Configuration>
+        double pdf(const Configuration &c) const
+        {
+            double res = m_density.pdf(c);
+            for(typename Configuration::const_iterator it = c.begin(); it!=c.end(); ++it)
+                res*=rjmcmc::apply_visitor(m_object_sampler.pdf(),c[it]);
+            return res;
+        }
+
         inline const char * kernel_name(unsigned int i) const { return "direct"; }
         inline int kernel_id() const { return 0; }
         inline bool accepted() const { return true; }

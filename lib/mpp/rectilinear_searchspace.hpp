@@ -31,7 +31,8 @@ public:
         const std::pair<U,U>& minmax = boost::fusion::at_key<U>(m_minmax);
         iterator bmin  = coordinates_begin(minmax.first );
         iterator bmax  = coordinates_begin(minmax.second);
-        for(int i=0; i<size; ++i, ++it) if(*it<*bmin || *it>*bmax) return false;
+        // using (i<size) instead of (it!=end) should enable loop unrolling statically
+        for(int i=0; i<size; ++i, ++it) if(*it<*bmin++ || *it>*bmax++) return false;
         return true;
     }
 

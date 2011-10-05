@@ -3,6 +3,7 @@
 
 #include "rjmcmc/random.hpp"
 #include <boost/random/poisson_distribution.hpp>
+#include <boost/math/distributions/poisson.hpp>
 
 namespace marked_point_process {
 
@@ -12,6 +13,7 @@ namespace marked_point_process {
         typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::poisson_distribution<> > density;
         poisson_density(double poisson)
             : m_poisson(poisson)
+            , m_distribution(poisson)
             , m_die(rjmcmc::random(), boost::poisson_distribution<>(poisson)) {}
 
         // old/new : (m_poisson^dn) * n! / (n+dn)!
@@ -26,10 +28,17 @@ namespace marked_point_process {
             return res;
         }
 
+        template<typename Configuration>
+        double pdf(const Configuration &c) const
+        {
+            return boost::math::pdf(m_distribution, c.size());
+        }
+
         inline unsigned int operator()() const { return m_die(); }
 
     private:
         double m_poisson;
+        boost::math::poisson_distribution<> m_distribution;
         mutable density m_die;
     };
 

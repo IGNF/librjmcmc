@@ -3,6 +3,7 @@
 
 #include "rjmcmc/random.hpp"
 #include <boost/random/uniform_smallint.hpp>
+// #include <boost/math/distributions/uniform.hpp> is not used as it is linked to real values rather than integral values
 
 namespace marked_point_process {
 
@@ -24,6 +25,13 @@ namespace marked_point_process {
             unsigned int n0 = c.size();
             unsigned int n1 = (n0 + m.birth_size())-m.death_size();
             return (n0<m_min || n1<m_min || n0>m_max || n1>m_max)? 0. : 1.;
+        }
+
+        template<typename Configuration>
+        double pdf(const Configuration &c) const
+        {
+            unsigned int n = c.size();
+            return (n<m_min || n>m_max)? 0. : 1./(m_max+1-m_min);
         }
 
         inline unsigned int operator()() const { return m_die(); }

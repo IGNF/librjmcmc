@@ -39,7 +39,7 @@ namespace rjmcmc {
             double *it = d, *end = it+size;
             for(;it!=end; ++it, ++bmin, ++bmax)
             {
-                *it = (*bmax) - (*bmin);
+                *it = (*bmax) - (*bmin)+50;
             };
             t.second = rjmcmc::diagonal_affine_transform<size,double>(d,m);
         }

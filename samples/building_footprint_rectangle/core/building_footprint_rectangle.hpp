@@ -186,7 +186,7 @@ void create_sampler(const param *p, sampler *&s) {
 
     searchspace ss;
     ss.min(Rectangle_2(r.min(),K::Vector_2(0,0),1/p->get<double>("maxratio")));
-    ss.max(Rectangle_2(r.max(),v,p->get<double>("maxratio")));
+    ss.max(Rectangle_2(r.max(),v               ,  p->get<double>("maxratio")));
 
     generator_kernel    birth(ss);
     density cs(p->get<double>("poisson"));

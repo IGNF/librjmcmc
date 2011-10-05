@@ -7,6 +7,7 @@
 #include "rjmcmc/kernel/kernel_traits.hpp"
 #include "rjmcmc/kernel/unary_kernel.hpp"
 #include "rjmcmc/kernel/binary_kernel.hpp"
+#include <iomanip>
 
 namespace rjmcmc {
 
@@ -63,6 +64,7 @@ namespace rjmcmc {
             }
             m_delta       = c.delta_energy(modif);
             m_acceptance_probability  = m_acceptance(m_delta,m_temperature,m_green_ratio);
+
             //5
             m_accepted    = ( m_die() < m_acceptance_probability );
             if (m_accepted) c.apply(modif);
