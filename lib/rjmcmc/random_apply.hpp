@@ -12,7 +12,7 @@ namespace rjmcmc {
 - x should be drawn uniformly in [0,1]
 */
 
-    namespace internal {
+    namespace detail {
 
         template <unsigned int I, unsigned int N> struct random_apply_impl
         {
@@ -34,11 +34,27 @@ namespace rjmcmc {
             }
         };
 
+        template <unsigned int I, unsigned int N> struct random_apply_normalisation
+        {
+            template <typename T>
+                    inline double operator()(const T& t) {
+                return get<I>(t).probability()+random_apply_normalisation<I+1,N>()(t);
+            }
+        };
+
+        template <unsigned int N> struct random_apply_normalisation<N,N>
+        {
+            template <typename T>
+                    inline double operator()(const T& t) {
+                return 0;
+            }
+        };
     };
 
     template <typename T, typename F>
             inline typename F::result_type random_apply(unsigned int& i, double x, T& t, F &f) {
-        return internal::random_apply_impl<0,tuple_size<T>::value>()(i,x,t,f);
+        double normalisation = detail::random_apply_normalisation<0,tuple_size<T>::value>()(t);
+        return detail::random_apply_impl<0,tuple_size<T>::value>()(i,x*normalisation,t,f);
     }
 
 }; // namespace rjmcmc
