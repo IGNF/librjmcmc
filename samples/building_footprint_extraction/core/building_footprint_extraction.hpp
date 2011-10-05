@@ -26,7 +26,14 @@ typedef rectilinear_searchspace<object> searchspace;
 
 #include "rjmcmc/kernel/kernels.hpp"
 typedef rjmcmc::generator<searchspace>          generator_kernel;
-typedef rjmcmc::modifier <searchspace>          modifier_kernel;
+
+#include "geometry/kernels/rectangle_scaled_edge_kernel.hpp"
+#include "geometry/kernels/rectangle_rotation_scaled_corner_kernel.hpp"
+#include "geometry/kernels/circle_translation_kernel.hpp"
+typedef geometry::rectangle_scaled_edge_kernel<K> modifier_kernel1;
+typedef geometry::rectangle_rotation_scaled_corner_kernel<K> modifier_kernel2;
+typedef geometry::circle_translation_kernel<K> modifier_kernel3;
+
 
 /************** rjmcmc library types ****************/
 
@@ -49,20 +56,30 @@ typedef marked_point_process::poisson_density                           density;
 //#include "mpp/density/uniform_density.hpp"
 //typedef marked_point_process::uniform_density                           density;
 
-#include "rjmcmc/sampler/sampler_base.hpp"
+#include "rjmcmc/sampler/sampler.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
-typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
-#include "rjmcmc/sampler/metropolis_sampler.hpp"
-typedef rjmcmc::metropolis_sampler<density,birth_death_kernel,modification_kernel> sampler;
-//typedef rjmcmc::dueck_scheuer_sampler<density,birth_death_kernel,modification_kernel> sampler;
+typedef rjmcmc::modification_kernel<modifier_kernel1>            modification_kernel1;
+typedef rjmcmc::modification_kernel<modifier_kernel2>            modification_kernel2;
+typedef rjmcmc::modification_kernel<modifier_kernel3>            modification_kernel3;
+
 //#include "rjmcmc/sampler/dueck_scheuer_sampler.hpp"
-//typedef rjmcmc::dueck_scheuer_sampler<density,birth_death_kernel,modification_kernel> sampler;
+//typedef rjmcmc::dueck_scheuer_acceptance acceptance;
 //#include "rjmcmc/sampler/franz_hoffmann_sampler.hpp"
-//typedef rjmcmc::franz_hoffmann_sampler<density,birth_death_kernel,modification_kernel> sampler;
-//#include "mpp/direct_sampler.hpp"
-//typedef marked_point_process::direct_sampler<density,generator_kernel> sampler;
+//typedef rjmcmc::franz_hoffmann_acceptance acceptance;
+#include "rjmcmc/acceptance/metropolis_acceptance.hpp"
+typedef rjmcmc::metropolis_acceptance acceptance;
+
+#include "mpp/direct_sampler.hpp"
+typedef marked_point_process::direct_sampler<density,generator_kernel> d_sampler;
+
+typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel
+        ,modification_kernel1
+        ,modification_kernel2
+        ,modification_kernel3
+        > sampler;
+
 
 /************** main ****************/
 
@@ -103,26 +120,35 @@ void create_sampler(param *p, sampler *&s) {
     Iso_rectangle_2 r = get_bbox(p);
 
     searchspace valid;
-    valid.min(Rectangle_2(r.min(),K::Vector_2(0,0)      ,1/p->get<double>("maxrectangleratio")));
-    valid.max(Rectangle_2(r.max(),(r.max()-r.min())*0.05,  p->get<double>("maxrectangleratio")));
+    valid.min(Rectangle_2(r.min(),K::Vector_2(0,0) ,1/p->get<double>("maxrectangleratio")));
+    valid.max(Rectangle_2(r.max(),(r.max()-r.min()),  p->get<double>("maxrectangleratio")));
     valid.min(Circle_2(r.min(),0));
     valid.max(Circle_2(r.max(),p->get<double>("maxcircleradius")));
 
     generator_kernel birth(valid);
-    modifier_kernel  modif(valid);
 
     birth_kernel        kbirth(birth);
     death_kernel        kdeath;
-    modification_kernel kmodif(modif);
 
     birth_death_kernel kbirthdeath(
             kbirth, kdeath,
             p->get<double>("pbirth"),
             p->get<double>("pdeath")
             );
+
+    modifier_kernel1     modif1;
+    modifier_kernel2     modif2;
+    modifier_kernel3     modif3;
+
     density cs(p->get<double>("poisson"));
 
-    s = new sampler( cs, kbirthdeath, kmodif );
+    acceptance a;
+    d_sampler ds( cs, birth );
+    s = new sampler( ds, a, kbirthdeath
+                     , rjmcmc::make_modification_kernel(modif1,0.2)
+                     , rjmcmc::make_modification_kernel(modif2,0.2)
+                     , rjmcmc::make_modification_kernel(modif3,0.2)
+                     );
     //	s = new sampler( cs, birth );
 }
 

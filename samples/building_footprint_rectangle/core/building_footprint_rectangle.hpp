@@ -33,17 +33,19 @@ typedef rectilinear_searchspace<object> searchspace;
 #include "rjmcmc/kernel/kernels.hpp"
 typedef rjmcmc::generator<searchspace> generator_kernel;
 
-
-
-struct modifier_transform
+/*
+struct rectangle_edge_translation_transform
 {
-    enum { size = 5 };
+    enum { size = 6 };
+    typedef Rectangle_2 input_type;
+    typedef Rectangle_2 output_type;
 
     template<typename Iterator>
     inline double abs_jacobian(Iterator it) const { return 1.; }
 
     template<typename IteratorIn,typename IteratorOut>
-    inline void apply  (IteratorIn in, IteratorOut out) const {
+    inline double apply  (IteratorIn in, IteratorOut out) const {
+        double res = abs_jacobian(in);
         typedef typename K::FT FT;
         FT x = *in++;
         FT y = *in++;
@@ -60,10 +62,51 @@ struct modifier_transform
         *out++ = v;
         *out++ = f*r;
         *out++ = s;
+        return res;
     }
 };
 
-typedef rjmcmc::modifier<modifier_transform,Rectangle_2,Rectangle_2> modifier_kernel;
+struct rectangle_corner_translation_transform
+{
+    enum { size = 7 };
+    typedef Rectangle_2 input_type;
+    typedef Rectangle_2 output_type;
+
+    template<typename Iterator>
+    inline double abs_jacobian(Iterator it) const { return 1.; }
+
+    template<typename IteratorIn,typename IteratorOut>
+    inline double apply  (IteratorIn in, IteratorOut out) const {
+        double res = abs_jacobian(in);
+        typedef typename K::FT FT;
+        FT x = *in++;
+        FT y = *in++;
+        FT u = *in++;
+        FT v = *in++;
+        FT r = *in++;
+        FT s = *in++;
+        FT t = *in;
+        //   res = Rectangle_2(c+v+u, n+v,r);
+        *out++ = x+s-r*t;
+        *out++ = y+t+r*s;
+        *out++ = u+s;
+        *out++ = v+t;
+        *out++ = r;
+        *out++ =-s;
+        *out++ =-t;
+        return res;
+    }
+};
+
+typedef rjmcmc::modifier<rectangle_edge_translation_transform  > modifier_kernel1;
+typedef rjmcmc::modifier<rectangle_corner_translation_transform> modifier_kernel2;
+*/
+#include "geometry/kernels/rectangle_scaled_edge_kernel.hpp"
+#include "geometry/kernels/rectangle_rotation_scaled_corner_kernel.hpp"
+#include "geometry/kernels/rectangle_split_merge_kernel.hpp"
+typedef geometry::rectangle_scaled_edge_kernel<K> modifier_kernel1;
+typedef geometry::rectangle_rotation_scaled_corner_kernel<K> modifier_kernel2;
+
 //]
 
 
@@ -116,7 +159,8 @@ typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
 /*< Optionnaly, we can specify a /modification kernel/ to modify the objects templated over the `rjmcmc::modifier` >*/
-typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
+typedef rjmcmc::modification_kernel<modifier_kernel1>            modification_kernel1;
+typedef rjmcmc::modification_kernel<modifier_kernel2>            modification_kernel2;
 #include "mpp/direct_sampler.hpp"
 typedef marked_point_process::direct_sampler<density,generator_kernel> d_sampler;
 /*< The /RJMCMC/ `rjmcmc::sampler` then encapsulates all the kernels through its template parameters to enable the sampling of the Marked Point Process relative to the poisson reference process >*/
@@ -134,7 +178,10 @@ typedef rjmcmc::metropolis_acceptance acceptance;
 
 
 //typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel> sampler;
-typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel,modification_kernel> sampler;
+typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel
+        ,modification_kernel1
+        ,modification_kernel2
+        > sampler;
 
 //<-
 //#include "rjmcmc/sampler/rejection_sampler.hpp"
@@ -185,8 +232,8 @@ void create_sampler(const param *p, sampler *&s) {
     K::Vector_2 v((r.max()-r.min())*0.05);
 
     searchspace ss;
-    ss.min(Rectangle_2(r.min(),K::Vector_2(0,0),1/p->get<double>("maxratio")));
-    ss.max(Rectangle_2(r.max(),v               ,  p->get<double>("maxratio")));
+    ss.min(Rectangle_2(r.min(),-v,1/p->get<double>("maxratio")));
+    ss.max(Rectangle_2(r.max(), v, p->get<double>("maxratio")));
 
     generator_kernel    birth(ss);
     density cs(p->get<double>("poisson"));
@@ -200,12 +247,14 @@ void create_sampler(const param *p, sampler *&s) {
             p->get<double>("pdeath")
             );
 
-    modifier_transform mt;
-    modifier_kernel     modif(mt);
-    modification_kernel kmodif(modif);
+    modifier_kernel1     modif1;
+    modifier_kernel2     modif2;
 
     d_sampler ds( cs, birth );
-    s = new sampler( ds, a, kbirthdeath, kmodif );
+    s = new sampler( ds, a, kbirthdeath
+                     , rjmcmc::make_modification_kernel(modif1,0)
+                     , rjmcmc::make_modification_kernel(modif2,1)
+                     );
     //s = new sampler( ds, a, kbirthdeath);
     //s = new sampler( ds );
 }

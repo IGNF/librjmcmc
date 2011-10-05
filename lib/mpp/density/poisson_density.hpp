@@ -12,9 +12,7 @@ namespace marked_point_process {
     public:
         typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::poisson_distribution<> > density;
         poisson_density(double poisson)
-            : m_poisson(poisson)
-            , m_distribution(poisson)
-            , m_die(rjmcmc::random(), boost::poisson_distribution<>(poisson)) {}
+            : m_die(rjmcmc::random(), boost::poisson_distribution<>(poisson)) {}
 
         // old/new : (m_poisson^dn) * n! / (n+dn)!
         template<typename Configuration, typename Modification>
@@ -23,22 +21,20 @@ namespace marked_point_process {
             unsigned int n = c.size();
             int dn = m.birth_size()-m.death_size();
             double res = 1.;
-            for(   ;dn>0;--dn) res *= m_poisson/(n+dn);
-            for(++n;dn<0;++dn) res *= (n+dn)/m_poisson;
+            for(   ;dn>0;--dn) res *= m_die.distribution().mean()/(n+dn);
+            for(++n;dn<0;++dn) res *= (n+dn)/m_die.distribution().mean();
             return res;
         }
 
         template<typename Configuration>
         double pdf(const Configuration &c) const
         {
-            return boost::math::pdf(m_distribution, c.size());
+            return boost::math::pdf(m_die.distribution(), c.size());
         }
 
         inline unsigned int operator()() const { return m_die(); }
 
     private:
-        double m_poisson;
-        boost::math::poisson_distribution<> m_distribution;
         mutable density m_die;
     };
 

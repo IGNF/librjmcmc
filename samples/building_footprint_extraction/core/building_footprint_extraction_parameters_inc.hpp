@@ -7,7 +7,7 @@ template<typename T>
 void initialize_parameters(T* params)
 {
     params->caption("Building footprint extraction parameters");
-    params->template insert<double>("temp",'t',150,"Temperature initiale");
+    params->template insert<double>("temp",'t',15000,"Temperature initiale");
     params->template insert<int>("nbiter",'I',15000000,"Nombre d'iterations");
     params->template insert<int>("nbdump",'d',10000,"Nombre d'iterations entre chaque affichage");
     params->template insert<int>("nbsave",'S',10000,"Nombre d'iterations entre chaque sauvegarde");
@@ -17,16 +17,16 @@ void initialize_parameters(T* params)
     params->template insert<double>("pdeath",'D',0.1, "Probabilite de mort");
     params->template insert<boost::filesystem::path>("dsm",'i',"../data/test.tif", "Image DSM");
     params->template insert<boost::filesystem::path>("ndvi",'n',"../data/test_ndvi.tif", "Image NDVI");
-    params->template insert<int>("xmin",'x',0, "Xmin)");
-    params->template insert<int>("ymin",'y',0, "Ymin)");
+    params->template insert<int>("xmin",'x',0, "Xmin");
+    params->template insert<int>("ymin",'y',0, "Ymin");
     params->template insert<int>("xmax",'X',1000000, "Xmax");
     params->template insert<int>("ymax",'Y',1000000, "Ymax");
     params->template insert<int>("subsampling",'u',1, "Sous-échantillonnage");
     params->template insert<double>("gaussian",'g',2, "Variance du filtre gaussien en entree");
     params->template insert<double>("sigmaD",'G',1, "Taille du noyau de flou pour le calcul des gradients");
-    params->template insert<double>("maxcircleradius",'r',5, "Rayon maximum d'un cercle");
+    params->template insert<double>("maxcircleradius",'r',100, "Rayon maximum d'un cercle");
     params->template insert<double>("maxrectangleratio",'M',5, "Rapport longueur/largeur maximal d'un rectangle");
-    params->template insert<double>("surface",'s',10, "Ponderation de la surface d'intersection");
+    params->template insert<double>("surface",'s',1000, "Ponderation de la surface d'intersection");
     params->template insert<double>("ponderation_grad",'\0',10, "Ponderation de l'energie gradient");
     params->template insert<double>("ponderation_ndvi",'\0',0.5, "Ponderation de l'energie NDVI");
 

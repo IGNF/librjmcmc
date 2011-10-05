@@ -8,6 +8,24 @@
 
 namespace rjmcmc {
 
+    template<typename U, typename V>
+    inline const U * variant_get(const V *v) { return v; }
+
+    template<typename U, BOOST_VARIANT_ENUM_PARAMS(typename T) >
+    inline const U * variant_get(const boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> *v)
+    {
+        return boost::get<U>(v);
+    }
+
+    template<typename U, typename V>
+    inline U * variant_get(V *v) { return v; }
+
+    template<typename U, BOOST_VARIANT_ENUM_PARAMS(typename T) >
+    inline U * variant_get(boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> *v)
+    {
+        return boost::get<U>(v);
+    }
+
     template<typename Visitor, typename Variant>
     inline typename Visitor::result_type apply_visitor(const Visitor &v, const Variant &v1) { return v(v1); }
 

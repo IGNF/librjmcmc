@@ -63,21 +63,33 @@ namespace rjmcmc {
 
             random_variant_init(out);
             */
+            typedef typename Modifier::input_type  input_type;
+            typedef typename Modifier::output_type output_type;
+
 
             int n = c.size();
+            //if(n==0) return 0;
             die_type cdie(random(), boost::uniform_smallint<>(0,n-1));
             iterator it = c.begin();
             std::advance(it, cdie());
-            modif.insert_death(it);
-            typename Modifier::input_type in = c[it];
-            typename Modifier::output_type out;
+            const input_type *in = variant_get<input_type>(&c[it]);
+            if(!in) return 0;
+            output_type out;
 
-            double green_ratio = apply_visitor(m_modifier,in,out);
-            apply_visitor(modif.birth_inserter(),out);
+            double green_ratio = apply_visitor(m_modifier,*in,out);
+            modif.insert_death(it);
+            modif.insert_birth(out);
             return green_ratio;
         }
     };
 
+
+
+    template<typename Modifier>
+    modification_kernel<Modifier> make_modification_kernel(const Modifier& m, double p=1)
+    {
+        return modification_kernel<Modifier>(m,p);
+    }
 }; // namespace rjmcmc
 
 #endif // UNARY_KERNEL_HPP_

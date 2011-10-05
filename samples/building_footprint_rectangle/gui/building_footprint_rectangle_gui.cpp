@@ -120,7 +120,7 @@ public:
         create_end_test     (p,m_end_test);
 
         std::cout << "Salamon initial schedule : " << salamon_initial_schedule(m_sampler->density(),*m_config,1000) << std::endl;
-
+        m_config->clear();
 
         m_thread = new boost::thread(
                 simulated_annealing::optimize<configuration,sampler,schedule,end_test,visitor>,
