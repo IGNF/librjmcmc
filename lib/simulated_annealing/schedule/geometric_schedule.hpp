@@ -12,6 +12,7 @@ namespace simulated_annealing {
      */
     template<typename T>
     class geometric_schedule {
+        
     public:
         typedef std::input_iterator_tag iterator_category;
         typedef T                       value_type;

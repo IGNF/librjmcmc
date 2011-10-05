@@ -111,7 +111,7 @@ typedef marked_point_process::poisson_density                           density;
 
 //[building_footprint_rectangle_definition_sampler
 /*< /Birth/ and /death kernels/ are required. They are encapsulated in a `binary_kernel` >*/
-#include "rjmcmc/sampler/sampler_base.hpp"
+#include "rjmcmc/sampler/sampler.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
@@ -119,23 +119,29 @@ typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kern
 typedef rjmcmc::modification_kernel<modifier_kernel>            modification_kernel;
 #include "mpp/direct_sampler.hpp"
 typedef marked_point_process::direct_sampler<density,generator_kernel> d_sampler;
-/*< The /RJMCMC/ `rjmcmc::metropolis_sampler` then encapsulates all the kernels through its template parameters to enable the sampling of the Marked Point Process relative to the poisson reference process >*/
-#include "rjmcmc/sampler/metropolis_sampler.hpp"
-//typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel> sampler;
-typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel,modification_kernel
-        > sampler;
-//]
+/*< The /RJMCMC/ `rjmcmc::sampler` then encapsulates all the kernels through its template parameters to enable the sampling of the Marked Point Process relative to the poisson reference process >*/
+
+#include "rjmcmc/acceptance/metropolis_acceptance.hpp"
+typedef rjmcmc::metropolis_acceptance acceptance;
 
 //<-
-//#include "rjmcmc/sampler/dueck_scheuer_sampler.hpp"
-//typedef rjmcmc::dueck_scheuer_sampler<density,birth_death_kernel,modification_kernel> sampler;
+//#include "rjmcmc/acceptance/dueck_scheuer_sampler.hpp"
+//typedef rjmcmc::dueck_scheuer_acceptance acceptance;
 
-//#include "rjmcmc/sampler/franz_hoffmann_sampler.hpp"
-//typedef rjmcmc::franz_hoffmann_sampler<density,birth_death_kernel,modification_kernel> sampler;
+//#include "rjmcmc/acceptance/franz_hoffmann_sampler.hpp"
+//typedef rjmcmc::franz_hoffmann_acceptance acceptance;
+//->
 
+
+//typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel> sampler;
+typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel,modification_kernel> sampler;
+
+//<-
 //#include "rjmcmc/sampler/rejection_sampler.hpp"
 //typedef rejection_sampler<d_sampler,null_binary_energy_predicate> sampler;
 //->
+//]
+
 
 //[building_footprint_rectangle_bbox_accessors
 Iso_rectangle_2 get_bbox(const param *p) {
@@ -185,6 +191,9 @@ void create_sampler(const param *p, sampler *&s) {
     generator_kernel    birth(ss);
     density cs(p->get<double>("poisson"));
 
+    acceptance a;
+    //acceptance a(p->get<double>("qtemp"));
+
     birth_death_kernel kbirthdeath = rjmcmc::make_uniform_birth_death_kernel(
             birth,
             p->get<double>("pbirth"),
@@ -196,8 +205,8 @@ void create_sampler(const param *p, sampler *&s) {
     modification_kernel kmodif(modif);
 
     d_sampler ds( cs, birth );
-    s = new sampler( ds, kbirthdeath, kmodif );
-    //s = new sampler( p->get<double>("qtemp"), cs, kbirthdeath, kmodif );
+    s = new sampler( ds, a, kbirthdeath, kmodif );
+    //s = new sampler( ds, a, kbirthdeath);
     //s = new sampler( ds );
 }
 //]

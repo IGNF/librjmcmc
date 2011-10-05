@@ -1,5 +1,5 @@
-#ifndef __RJMCMC_SAMPLER_BASE_HPP__
-#define __RJMCMC_SAMPLER_BASE_HPP__
+#ifndef __RJMCMC_SAMPLER_HPP__
+#define __RJMCMC_SAMPLER_HPP__
 
 #include "rjmcmc/tuple.hpp"
 #include "rjmcmc/random.hpp"
@@ -11,14 +11,15 @@
 namespace rjmcmc {
 
     // Derived: Curiously recurring template pattern
-    template<typename Derived, typename Density, RJMCMC_TUPLE_TYPENAMES >
-    class sampler_base
+    template<typename Density, typename Acceptance, RJMCMC_TUPLE_TYPENAMES >
+    class sampler
     {
     public:
-        sampler_base(const Density& d, RJMCMC_TUPLE_ARGS) :
-                m_kernel(RJMCMC_TUPLE_PARAMS),
+        sampler(const Density& d, const Acceptance& a, RJMCMC_TUPLE_ARGS) :
                 m_die(random(), boost::uniform_real<>(0,1)),
-                m_density(d)
+                m_density(d),
+                m_acceptance(a),
+                m_kernel(RJMCMC_TUPLE_PARAMS)
         {}
 
         typedef tuple<RJMCMC_TUPLE_TYPES> Kernels;
@@ -61,9 +62,9 @@ namespace rjmcmc {
                 return;
             }
             m_delta       = c.delta_energy(modif);
-            m_acceptance  = static_cast<Derived*>(this)->acceptance_probability();
+            m_acceptance_probability  = m_acceptance(m_delta,m_temperature,m_green_ratio);
             //5
-            m_accepted    = ( m_die() < m_acceptance );
+            m_accepted    = ( m_die() < m_acceptance_probability );
             if (m_accepted) c.apply(modif);
         }
 
@@ -92,7 +93,7 @@ namespace rjmcmc {
         };
 
     public:
-        inline double acceptance () const { return m_acceptance; }
+        inline double acceptance_probability() const { return m_acceptance_probability; }
         inline double temperature() const { return m_temperature; }
         inline double delta() const { return m_delta; }
         inline double green_ratio() const { return m_green_ratio; }
@@ -100,20 +101,35 @@ namespace rjmcmc {
         inline const char * kernel_name(unsigned int i) const { return get_name     <0,size>()(i,m_kernel); }
         inline unsigned int kernel_id  () const { return get_kernel_id<0,size>()(m_kernel_id,m_kernel); }
 
-    protected:
+
+    private:
+        die_t      m_die;
+        Density    m_density;
+        Acceptance m_acceptance;
+        Kernels    m_kernel;
+
+        double  m_acceptance_probability;
+        bool    m_accepted;
+        unsigned int m_kernel_id;
         double  m_temperature;
         double  m_delta;
         double  m_green_ratio;
-
-    private:
-        double  m_acceptance;
-        bool    m_accepted;
-        unsigned int m_kernel_id;
-        Kernels m_kernel;
-        die_t   m_die;
-        Density m_density;
     };
 
+    /*
+    // convenience creation functions
+    template<typename Density, typename Acceptance, RJMCMC_TUPLE_TYPENAMES >
+    sampler<Density,Acceptance,RJMCMC_TUPLE_TYPES> make_sampler(const Density& d, const Acceptance& a, RJMCMC_TUPLE_ARGS)
+    {
+        return sampler<Density,Acceptance,RJMCMC_TUPLE_TYPES>(d,a,RJMCMC_TUPLE_PARAMS);
+    }
+
+    template<typename Density, typename Acceptance, RJMCMC_TUPLE_TYPENAMES >
+    sampler<Density,Acceptance,RJMCMC_TUPLE_TYPES> * new_sampler(const Density& d, const Acceptance& a, RJMCMC_TUPLE_ARGS)
+    {
+        return new sampler<Density,Acceptance,RJMCMC_TUPLE_TYPES>(d,a,RJMCMC_TUPLE_PARAMS);
+    }
+    */
 }; // namespace rjmcmc
 
-#endif // __RJMCMC_SAMPLER_BASE_HPP__
+#endif // __RJMCMC_SAMPLER_HPP__
