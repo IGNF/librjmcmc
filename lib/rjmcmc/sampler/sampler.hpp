@@ -95,6 +95,10 @@ namespace rjmcmc {
         };
 
     public:
+        // data accessors
+        inline const Density& density() const { return m_density; }
+
+        // statistics accessors
         inline double acceptance_probability() const { return m_acceptance_probability; }
         inline double temperature() const { return m_temperature; }
         inline double delta() const { return m_delta; }
@@ -103,13 +107,14 @@ namespace rjmcmc {
         inline const char * kernel_name(unsigned int i) const { return get_name     <0,size>()(i,m_kernel); }
         inline unsigned int kernel_id  () const { return get_kernel_id<0,size>()(m_kernel_id,m_kernel); }
 
-
     private:
+        // data
         die_t      m_die;
         Density    m_density;
         Acceptance m_acceptance;
         Kernels    m_kernel;
 
+        // statistics
         double  m_acceptance_probability;
         bool    m_accepted;
         unsigned int m_kernel_id;

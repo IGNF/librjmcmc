@@ -242,33 +242,6 @@ void init_visitor(const param *p, Visitor& v)
 }
 //]
 
-/*
-// Salamon
-#include "rjmcmc/sampler/direct_poisson_sampler.hpp"
-double estimate_initial_temperature(param *p, unsigned int n, configuration& c)
-{
-  is_valid valid(
-                  get_bbox(p),
-                  p->get<double>("minsize"),
-                  p->get<double>("maxratio")
-                );
-  generator_kernel generator(valid);
-  direct_poisson_sampler<generator_kernel> dps(p->get<double>("poisson"),generator);
-  double e1 = 0;
-  double e2 = 0;
-  double invn = 1./n;
-  for(unsigned int i=0; i<n; ++i) {
-    dps(c);
-    double e = c.energy();
-    double invne = invn*e;
-    e1 += invne;
-    e2 += invne*e;
-  }
-  double std_dev = sqrt(e2-e1*e1);
-  p->set("temp",2*std_dev);
-}
-*/
-
 //[building_footprint_rectangle_image_include_tpl_instanciations
 #include "image/image_types.hpp"
 #include "image/oriented_inc.hpp"

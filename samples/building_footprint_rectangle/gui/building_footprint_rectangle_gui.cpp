@@ -13,6 +13,8 @@ typedef parameters< wx_parameter > param;
 #include "simulated_annealing/visitor/wx/all.hpp"
 //]
 
+#include "simulated_annealing/salamon_initial_schedule.hpp"
+
 //[building_footprint_rectangle_gui_specific
 #include <boost/thread.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -116,6 +118,9 @@ public:
         create_sampler      (p,m_sampler);
         create_schedule     (p,m_schedule);
         create_end_test     (p,m_end_test);
+
+        std::cout << "Salamon initial schedule : " << salamon_initial_schedule(m_sampler->density(),*m_config,1000) << std::endl;
+
 
         m_thread = new boost::thread(
                 simulated_annealing::optimize<configuration,sampler,schedule,end_test,visitor>,
