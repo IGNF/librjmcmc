@@ -51,10 +51,10 @@ typedef simulated_annealing::max_iteration_end_test                           en
 #include "mpp/configuration/graph_configuration.hpp"
 typedef marked_point_process::graph_configuration<object, unary_energy, binary_energy> configuration;
 
-#include "mpp/density/poisson_density.hpp"
-typedef marked_point_process::poisson_density                           density;
-//#include "mpp/density/uniform_density.hpp"
-//typedef marked_point_process::uniform_density                           density;
+#include "rjmcmc/distribution/poisson_distribution.hpp"
+typedef rjmcmc::poisson_distribution                           distribution;
+//#include "mpp/distribution/uniform_distribution.hpp"
+//typedef marked_point_process::uniform_distribution                           distribution;
 
 #include "rjmcmc/sampler/sampler.hpp"
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
@@ -72,7 +72,7 @@ typedef rjmcmc::modification_kernel<modifier_kernel3>            modification_ke
 typedef rjmcmc::metropolis_acceptance acceptance;
 
 #include "mpp/direct_sampler.hpp"
-typedef marked_point_process::direct_sampler<density,generator_kernel> d_sampler;
+typedef marked_point_process::direct_sampler<distribution,generator_kernel> d_sampler;
 
 typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel
         ,modification_kernel1
@@ -140,7 +140,7 @@ void create_sampler(param *p, sampler *&s) {
     modifier_kernel2     modif2;
     modifier_kernel3     modif3;
 
-    density cs(p->get<double>("poisson"));
+    distribution cs(p->get<double>("poisson"));
 
     acceptance a;
     d_sampler ds( cs, birth );

@@ -35,6 +35,7 @@ namespace marked_point_process {
             inline void insert_death(iterator d)  { m_death.push_back(d); }
             inline unsigned int birth_size() const { return m_birth.size(); }
             inline unsigned int death_size() const { return m_death.size(); }
+            inline int delta_size() const { return (int) birth_size() - (int) death_size(); }
             inline void clear() { m_birth.clear(); m_death.clear(); }
 
 

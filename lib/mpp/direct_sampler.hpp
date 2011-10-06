@@ -19,7 +19,7 @@ namespace marked_point_process {
             typedef typename Configuration::value_type T;
             T res;
             c.clear();
-            int n = m_density();
+            int n = m_density(rjmcmc::random());
             for(int i=0; i<n; ++i) {
                 rjmcmc::random_variant_init(res);
                 rjmcmc::apply_visitor(m_object_sampler,res);
@@ -31,7 +31,7 @@ namespace marked_point_process {
         template<typename Configuration, typename Modification>
         double pdf_ratio(const Configuration &c, const Modification &m) const
         {
-            double ratio = m_density.pdf_ratio(c,m);
+            double ratio = m_density.pdf_ratio(c.size(),c.size()+m.delta_size());
             for(typename Modification::birth_const_iterator b = m.birth_begin(); b!=m.birth_end(); ++b)
                 ratio*=rjmcmc::apply_visitor(m_object_sampler.pdf(),*b);
             for(typename Modification::death_const_iterator d = m.death_begin(); d!=m.death_end(); ++d)

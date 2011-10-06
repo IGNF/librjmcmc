@@ -142,14 +142,14 @@ typedef simulated_annealing::max_iteration_end_test     end_test;
 typedef marked_point_process::graph_configuration<object, unary_energy, binary_energy> configuration;
 //]
 
-//[building_footprint_rectangle_definition_density
-#include "mpp/density/poisson_density.hpp"
-typedef marked_point_process::poisson_density                           density;
+//[building_footprint_rectangle_definition_distribution
+#include "rjmcmc/distribution/poisson_distribution.hpp"
+typedef rjmcmc::poisson_distribution                           distribution;
 //]
 
 //<-
-//#include "mpp/density/uniform_density.hpp"
-//typedef marked_point_process::uniform_density                           density;
+//#include "rjmcmc/distribution/uniform_distribution.hpp"
+//typedef rjmcmc::uniform_distribution                           distribution;
 //->
 
 //[building_footprint_rectangle_definition_sampler
@@ -162,7 +162,7 @@ typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kern
 typedef rjmcmc::modification_kernel<modifier_kernel1>            modification_kernel1;
 typedef rjmcmc::modification_kernel<modifier_kernel2>            modification_kernel2;
 #include "mpp/direct_sampler.hpp"
-typedef marked_point_process::direct_sampler<density,generator_kernel> d_sampler;
+typedef marked_point_process::direct_sampler<distribution,generator_kernel> d_sampler;
 /*< The /RJMCMC/ `rjmcmc::sampler` then encapsulates all the kernels through its template parameters to enable the sampling of the Marked Point Process relative to the poisson reference process >*/
 
 #include "rjmcmc/acceptance/metropolis_acceptance.hpp"
@@ -236,7 +236,7 @@ void create_sampler(const param *p, sampler *&s) {
     ss.max(Rectangle_2(r.max(), v, p->get<double>("maxratio")));
 
     generator_kernel    birth(ss);
-    density cs(p->get<double>("poisson"));
+    distribution cs(p->get<double>("poisson"));
 
     acceptance a;
     //acceptance a(p->get<double>("qtemp"));
