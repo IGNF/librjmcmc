@@ -97,6 +97,7 @@ namespace simulated_annealing {
             rjmcmc_panel_viewer::Register(this);
             m_panel = panel_manager::instance()->create_object("rjmcmc_panel_viewer");
 
+            SetMenuBar( m_panel->menubar() );
             m_statusBar->SetStatusText(_("librjmcmc"));
 
             wxAuiPaneInfo toolbarInfo;

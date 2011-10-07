@@ -83,13 +83,17 @@ namespace rjmcmc {
         }
     };
 
-
-
     template<typename Modifier>
     modification_kernel<Modifier> make_modification_kernel(const Modifier& m, double p=1)
     {
         return modification_kernel<Modifier>(m,p);
     }
 }; // namespace rjmcmc
+
+template<typename Modifier>
+rjmcmc::modification_kernel<Modifier> operator*(double p, const Modifier& m)
+{
+    return rjmcmc::modification_kernel<Modifier>(m,p);
+}
 
 #endif // UNARY_KERNEL_HPP_

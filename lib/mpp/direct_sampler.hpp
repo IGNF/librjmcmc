@@ -19,7 +19,7 @@ namespace marked_point_process {
             typedef typename Configuration::value_type T;
             T res;
             c.clear();
-            int n = m_density(rjmcmc::random());
+            int n = m_density();
             for(int i=0; i<n; ++i) {
                 rjmcmc::random_variant_init(res);
                 rjmcmc::apply_visitor(m_object_sampler,res);

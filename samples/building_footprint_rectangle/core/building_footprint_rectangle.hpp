@@ -30,7 +30,7 @@ typedef rectilinear_searchspace<object> searchspace;
 //]
 
 //[building_footprint_rectangle_definition_kernels
-#include "rjmcmc/kernel/kernels.hpp"
+#include "rjmcmc/kernel/transform_kernels.hpp"
 typedef rjmcmc::generator<searchspace> generator_kernel;
 
 /*
@@ -251,9 +251,10 @@ void create_sampler(const param *p, sampler *&s) {
     modifier_kernel2     modif2;
 
     d_sampler ds( cs, birth );
-    s = new sampler( ds, a, kbirthdeath
-                     , rjmcmc::make_modification_kernel(modif1,0)
-                     , rjmcmc::make_modification_kernel(modif2,1)
+    s = new sampler( ds, a,
+                       kbirthdeath
+                       , 0.5 * modif1
+                       , 0.5 * modif2
                      );
     //s = new sampler( ds, a, kbirthdeath);
     //s = new sampler( ds );

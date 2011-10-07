@@ -174,17 +174,6 @@ namespace rjmcmc {
 
     };
 
-
-
-
-    template<unsigned int N, typename T>
-    std::ostream& operator<<(std::ostream& out, const diagonal_affine_transform<N,T>& t )
-    {
-        out << "det=" << t.determinant()<<std::endl;
-        return out;
-    }
-
-
 }
 
 

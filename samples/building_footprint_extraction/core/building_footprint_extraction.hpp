@@ -24,7 +24,7 @@ typedef intersection_area_binary_energy      binary_energy;
 #include "mpp/rectilinear_searchspace.hpp"
 typedef rectilinear_searchspace<object> searchspace;
 
-#include "rjmcmc/kernel/kernels.hpp"
+#include "rjmcmc/kernel/transform_kernels.hpp"
 typedef rjmcmc::generator<searchspace>          generator_kernel;
 
 #include "geometry/kernels/rectangle_scaled_edge_kernel.hpp"

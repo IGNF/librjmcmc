@@ -62,17 +62,17 @@ public:
         update_values(p);
 
         Iso_rectangle_2 bbox = get_bbox(p);
-        std::string  dsm_file = p->get<boost::filesystem::path>("dsm" ).string();
         std::string ndvi_file = p->get<boost::filesystem::path>("ndvi").string();
-        clip_bbox(bbox,dsm_file );
+        std::string  dsm_file = p->get<boost::filesystem::path>("dsm" ).string();
         clip_bbox(bbox,ndvi_file);
+        clip_bbox(bbox,dsm_file );
 
         gradient_functor gf(p->get<double>("sigmaD"));
         oriented_gradient_view grad_view(dsm_file,  bbox, gf);
         oriented_ndvi_view     ndvi_view(ndvi_file, bbox);
 
-        m_confg_visitor->add_layer(dsm_file);
         m_confg_visitor->add_layer(ndvi_file);
+        m_confg_visitor->add_layer(dsm_file);
         set_bbox(p,bbox);
         wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));
         wxPoint p1(wxCoord(bbox.max().x()),wxCoord(bbox.max().y()));
