@@ -3,7 +3,6 @@
 
 #include "rjmcmc/random.hpp"
 #include "rjmcmc/kernel/transform.hpp"
-#include <boost/array.hpp>
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/fusion/algorithm.hpp>
 
@@ -98,18 +97,19 @@ namespace rjmcmc {
         }
     };
 
-    template<
+    template <
             typename Transform,
             typename Input  = typename Transform::input_type,
-            typename Output = typename Transform::input_type>
-        class transform_modifier
-                              {
+            typename Output = typename Transform::input_type
+    >
+    class transform_modifier
+    {
         typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_type;
         mutable die_type m_die;
         Transform   m_transform;
 
-                              public:
-        modifier(const Transform& transform) :
+    public:
+        transform_modifier(const Transform& transform) :
                 m_die(rjmcmc::random(), boost::uniform_real<>(0,1)),
                 m_transform(transform) {}
 

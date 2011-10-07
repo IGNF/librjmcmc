@@ -60,9 +60,11 @@ typedef rjmcmc::poisson_distribution                           distribution;
 typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
 typedef rjmcmc::uniform_death_kernel                            death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
-typedef rjmcmc::modification_kernel<modifier_kernel1>            modification_kernel1;
-typedef rjmcmc::modification_kernel<modifier_kernel2>            modification_kernel2;
-typedef rjmcmc::modification_kernel<modifier_kernel3>            modification_kernel3;
+
+#include "mpp/kernel/kernel.hpp"
+typedef mpp::modification_kernel<modifier_kernel1>            modification_kernel1;
+typedef mpp::modification_kernel<modifier_kernel2>            modification_kernel2;
+typedef mpp::modification_kernel<modifier_kernel3>            modification_kernel3;
 
 //#include "rjmcmc/sampler/dueck_scheuer_sampler.hpp"
 //typedef rjmcmc::dueck_scheuer_acceptance acceptance;
@@ -145,9 +147,9 @@ void create_sampler(param *p, sampler *&s) {
     acceptance a;
     d_sampler ds( cs, birth );
     s = new sampler( ds, a, kbirthdeath
-                     , rjmcmc::make_modification_kernel(modif1,0.2)
-                     , rjmcmc::make_modification_kernel(modif2,0.2)
-                     , rjmcmc::make_modification_kernel(modif3,0.2)
+                     , mpp::make_modification_kernel(modif1,0.2)
+                     , mpp::make_modification_kernel(modif2,0.2)
+                     , mpp::make_modification_kernel(modif3,0.2)
                      );
     //	s = new sampler( cs, birth );
 }
