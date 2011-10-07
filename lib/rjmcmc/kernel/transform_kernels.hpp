@@ -1,8 +1,9 @@
-#ifndef TRANSFORM_KERNELS_HPP_
-#define TRANSFORM_KERNELS_HPP_
+#ifndef KERNELS_HPP_
+#define KERNELS_HPP_
 
 #include "rjmcmc/random.hpp"
 #include "rjmcmc/kernel/transform.hpp"
+#include <boost/array.hpp>
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/fusion/algorithm.hpp>
 
@@ -96,9 +97,45 @@ namespace rjmcmc {
             return boost::fusion::at_key<T>(m_transform).abs_jacobian(coordinates_begin(t));
         }
     };
-    
 
-    
+    template<
+            typename Transform,
+            typename Input  = typename Transform::input_type,
+            typename Output = typename Transform::input_type>
+        class transform_modifier
+                              {
+        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_type;
+        mutable die_type m_die;
+        Transform   m_transform;
+
+                              public:
+        modifier(const Transform& transform) :
+                m_die(rjmcmc::random(), boost::uniform_real<>(0,1)),
+                m_transform(transform) {}
+
+        typedef double result_type;
+        typedef Input  input_type;
+        typedef Output output_type;
+        typedef typename coordinates_iterator<input_type>::type iterator;
+
+        double operator()(const input_type &input, output_type &output) const
+        {
+            static const unsigned int size = Transform::size;
+            static const unsigned int in_size  = coordinates_iterator< input_type>::size;
+            static const unsigned int out_size = coordinates_iterator<output_type>::size;
+            double in [Transform::size];
+            double out[Transform::size];
+            iterator input_it  = coordinates_begin(input);
+            for(double *it = in; it!=in+in_size; ++it, ++input_it) *it = *input_it;
+            for(double *it = in+in_size; it!=in+size; ++it) *it = m_die();
+            m_transform.apply(in,out);
+            object_from_coordinates<output_type> creator;
+            output = creator(out);
+            return m_transform.abs_jacobian(in); // *probability(out+out_size,out+size)/probability(in+in_size,in+size);
+            // |dTmn(theta_m,u_mn)/d(theta_m,u_mn)| * phi(v_mn) / phi(u_mn)
+        }
+    };
+
 } // namespace rjmcmc
 
-#endif /*TRANSFORM_KERNELS_HPP_*/
+#endif /*KERNELS_HPP_*/
