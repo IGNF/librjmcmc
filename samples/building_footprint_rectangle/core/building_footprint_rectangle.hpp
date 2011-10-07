@@ -155,11 +155,11 @@ typedef rjmcmc::poisson_distribution                           distribution;
 //[building_footprint_rectangle_definition_sampler
 /*< /Birth/ and /death kernels/ are required. They are encapsulated in a `binary_kernel` >*/
 #include "rjmcmc/sampler/sampler.hpp"
-typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
-typedef rjmcmc::uniform_death_kernel                            death_kernel;
-typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
-/*< Optionnaly, we can specify a /modification kernel/ to modify the objects templated over the `rjmcmc::modifier` >*/
 #include "mpp/kernel/kernel.hpp"
+typedef mpp::uniform_birth_kernel<generator_kernel>           birth_kernel;
+typedef mpp::uniform_death_kernel                             death_kernel;
+typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>      birth_death_kernel;
+/*< Optionnaly, we can specify a /modification kernel/ to modify the objects templated over the `rjmcmc::modifier` >*/
 typedef mpp::modification_kernel<modifier_kernel1>            modification_kernel1;
 typedef mpp::modification_kernel<modifier_kernel2>            modification_kernel2;
 #include "mpp/direct_sampler.hpp"
@@ -242,7 +242,7 @@ void create_sampler(const param *p, sampler *&s) {
     acceptance a;
     //acceptance a(p->get<double>("qtemp"));
 
-    birth_death_kernel kbirthdeath = rjmcmc::make_uniform_birth_death_kernel(
+    birth_death_kernel kbirthdeath = mpp::make_uniform_birth_death_kernel(
             birth,
             p->get<double>("pbirth"),
             p->get<double>("pdeath")

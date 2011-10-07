@@ -57,11 +57,11 @@ typedef rjmcmc::poisson_distribution                           distribution;
 //typedef marked_point_process::uniform_distribution                           distribution;
 
 #include "rjmcmc/sampler/sampler.hpp"
-typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
-typedef rjmcmc::uniform_death_kernel                            death_kernel;
-typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
-
 #include "mpp/kernel/kernel.hpp"
+typedef mpp::uniform_birth_kernel<generator_kernel>           birth_kernel;
+typedef mpp::uniform_death_kernel                             death_kernel;
+typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>      birth_death_kernel;
+
 typedef mpp::modification_kernel<modifier_kernel1>            modification_kernel1;
 typedef mpp::modification_kernel<modifier_kernel2>            modification_kernel2;
 typedef mpp::modification_kernel<modifier_kernel3>            modification_kernel3;
