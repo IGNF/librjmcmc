@@ -24,3 +24,4 @@ private:
 };
 
 #endif /*INTERSECTION_AREA_BINARY_ENERGY_HPP_*/
+
