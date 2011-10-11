@@ -50,3 +50,11 @@ R_birth = pi_death/pi_birth * (1/(n+1))/(1/(n+1)) * (1)/(1/V) * lambda/(n+1) * (
 R_death = pi_birth/pi_death * (1/n)/(1/n) * (1/V) * n/lambda * (1)/(1/V) * exp(-E/T)
         = pi_death/pi_birth * n/lambda * exp(-E/T)
 
+
+------------------------ syntax wish list -----------------------------------------
+
+energy        = sum_1(m_defaultEnergy -  m_ponderation_dsm*integrated_flux(m_dsm)) - m_coefSurface* sum_2(intersection_area_binary_energy)
+kernel        = 0.3*uniform_birth + 0.1*translate_edge;
+reference_pdf = poisson(100)*rectangle_gen + poisson(10)*circle_gen;
+reference_pdf = poisson(200)*(0.4*rectangle_gen + 0.6*circle_gen);
+

@@ -11,9 +11,27 @@
 
 namespace rjmcmc {
 
+
+    class sampler_base
+    {
+    public:
+        inline double acceptance_probability() const { return m_acceptance_probability; }
+        inline double temperature() const { return m_temperature; }
+        inline double delta() const { return m_delta; }
+        inline double green_ratio() const { return m_green_ratio; }
+        inline bool accepted() const { return m_accepted; }
+
+    protected:
+        double  m_acceptance_probability;
+        double  m_temperature;
+        double  m_delta;
+        double  m_green_ratio;
+        bool    m_accepted;
+    };
+
     // Derived: Curiously recurring template pattern
     template<typename Density, typename Acceptance, RJMCMC_TUPLE_TYPENAMES >
-    class sampler
+    class sampler : public sampler_base
     {
     public:
         sampler(const Density& d, const Acceptance& a, RJMCMC_TUPLE_ARGS) :
@@ -27,7 +45,7 @@ namespace rjmcmc {
         typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_t;
 
         enum { size = tuple_size<Kernels>::value };
-        enum { kernel_size = kernel_traits<Kernels>::size };
+        enum { m_kernel_size = kernel_traits<Kernels>::size };
 
         template<typename Configuration, typename Modification>
         struct kernel_functor
@@ -99,13 +117,9 @@ namespace rjmcmc {
         inline const Density& density() const { return m_density; }
 
         // statistics accessors
-        inline double acceptance_probability() const { return m_acceptance_probability; }
-        inline double temperature() const { return m_temperature; }
-        inline double delta() const { return m_delta; }
-        inline double green_ratio() const { return m_green_ratio; }
-        inline bool accepted() const { return m_accepted; }
         inline const char * kernel_name(unsigned int i) const { return get_name     <0,size>()(i,m_kernel); }
         inline unsigned int kernel_id  () const { return get_kernel_id<0,size>()(m_kernel_id,m_kernel); }
+        inline unsigned int kernel_size() const { return m_kernel_size; }
 
     private:
         // data
@@ -115,12 +129,7 @@ namespace rjmcmc {
         Kernels    m_kernel;
 
         // statistics
-        double  m_acceptance_probability;
-        bool    m_accepted;
         unsigned int m_kernel_id;
-        double  m_temperature;
-        double  m_delta;
-        double  m_green_ratio;
     };
 
     /*

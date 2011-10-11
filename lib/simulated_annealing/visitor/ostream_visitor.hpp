@@ -33,7 +33,7 @@ namespace simulated_annealing {
         template<typename Configuration, typename Sampler>
         void begin(const Configuration& config, const Sampler& sampler, double t)
         {
-            enum { kernel_size =  Sampler::kernel_size };
+            unsigned int kernel_size =  sampler.kernel_size();
 
             if(m_accepted) delete m_accepted;
             if(m_proposed) delete m_proposed;
@@ -74,7 +74,7 @@ namespace simulated_annealing {
 
         template<typename Configuration, typename Sampler>
         void visit(const Configuration& config, const Sampler& sampler, double t) {
-            enum { kernel_size = Sampler::kernel_size };
+            unsigned int kernel_size =  sampler.kernel_size();
 
             m_proposed[sampler.kernel_id()]++;
             if( sampler.accepted() ) m_accepted[sampler.kernel_id()]++;
