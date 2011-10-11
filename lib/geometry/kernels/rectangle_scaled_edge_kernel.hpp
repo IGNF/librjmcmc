@@ -2,6 +2,8 @@
 #define RECTANGLE_SCALED_EDGE_KERNEL_HPP
 
 #include "geometry/Rectangle_2.h"
+#include "rjmcmc/random.hpp"
+#include <boost/random/variate_generator.hpp>
 
 namespace geometry {
 

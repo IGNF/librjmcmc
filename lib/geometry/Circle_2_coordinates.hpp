@@ -26,10 +26,11 @@ private:
     unsigned int m_i;
 };
 
-template<typename K> struct coordinates_iterator< geometry::Circle_2<K> >
+template<typename K>
+struct coordinates_iterator< geometry::Circle_2<K> >
 {
-typedef circle_coordinates_iterator<K> type;
-const static unsigned int size = 3;
+    typedef circle_coordinates_iterator<K> type;
+    enum { dimension = 3 };
 };
 
 template<typename K>

@@ -27,10 +27,11 @@ private:
     unsigned int m_i;
 };
 
-template<typename K> struct coordinates_iterator< geometry::Rectangle_2<K> >
+template<typename K>
+struct coordinates_iterator< geometry::Rectangle_2<K> >
 {
-typedef rectangle_coordinates_iterator<K> type;
-const static unsigned int size = 5;
+    typedef rectangle_coordinates_iterator<K> type;
+    enum { dimension = 5 };
 };
 
 template<typename K>
