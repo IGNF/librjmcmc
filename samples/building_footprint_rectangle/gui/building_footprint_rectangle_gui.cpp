@@ -11,6 +11,9 @@ typedef parameters< wx_parameter > param;
 //[building_footprint_rectangle_gui_visitors
 #include "simulated_annealing/visitor/composite_visitor.hpp"
 #include "simulated_annealing/visitor/wx/all.hpp"
+#include "simulated_annealing/visitor/any_visitor.hpp"
+#include "rjmcmc/sampler/any_sampler.hpp"
+#include "simulated_annealing/visitor/controler.hpp"
 //]
 
 #include "simulated_annealing/salamon_initial_schedule.hpp"
@@ -23,21 +26,26 @@ typedef parameters< wx_parameter > param;
 //]
 
 //[building_footprint_rectangle_gui_gilviewer_and_resources
-#include <GilViewer/io/gilviewer_io_factory.hpp>
+#include <GilViewer/gui/basic_viewer_frame.hpp>
 #include <GilViewer/gui/panel_viewer.hpp>
+#include <GilViewer/gui/panel_manager.hpp>
+#include <GilViewer/gui/layer_control.hpp>
+#include <GilViewer/io/gilviewer_io_factory.hpp>
 #include "gui/resources/IGN.xpm"
 //]
 
 //[building_footprint_rectangle_gui_app_declaration
-class building_footprint_rectangle_gui : public wxApp, public Controler
+class building_footprint_rectangle_gui : public wxApp, public simulated_annealing::Controler
 {
     //]
     //[building_footprint_rectangle_gui_app_typedef_visitor
+
     typedef simulated_annealing::composite_visitor<
             simulated_annealing::wx::log_visitor*,
             simulated_annealing::wx::configuration_visitor*,
             simulated_annealing::wx::parameters_visitor*,
-            simulated_annealing::wx::chart_visitor*
+            simulated_annealing::wx::chart_visitor*,
+            simulated_annealing::wx::controler_visitor*
             > visitor;
     //] //_typedef_visitor
 
@@ -59,16 +67,43 @@ private:
         initialize_parameters(p);
         if(!p->parse(argc,my_argv)) return false;
         /*< Various gui stuffs >*/
-        wxSize frame_size;(600,600);
-        frame_size.x = std::min(600, wxGetClientDisplayRect().GetWidth());
+        wxSize frame_size;
+        frame_size.x = std::min(800, wxGetClientDisplayRect().GetWidth());
         frame_size.y = std::min(600, wxGetClientDisplayRect().GetHeight());
-        m_confg_visitor = new simulated_annealing::wx::configuration_visitor((wxFrame *)NULL, wxID_ANY, _("librjmcmc: rectangular building footprint extraction"), wxDefaultPosition, wxSize(600,600) );
-        m_confg_visitor->SetIcon(wxICON(IGN));
+        m_frame = new basic_viewer_frame((wxFrame *)NULL, wxID_ANY, _("librjmcmc: rectangular building footprint extraction"), wxDefaultPosition, frame_size);
+        m_frame->SetIcon(wxICON(IGN));
+        wxAuiManager * manager = m_frame->dockManager();
+        panel_viewer::Register(m_frame,manager);
+        m_panelviewer = panel_manager::instance()->create_object("PanelViewer");
+        wxAuiPaneInfo paneInfoDrawPane;
+        paneInfoDrawPane.Name( wxT("Viewer panel name") );
+        paneInfoDrawPane.Caption( wxT("Viewer panel") );
+        paneInfoDrawPane.TopDockable();
+        paneInfoDrawPane.Center();
+        paneInfoDrawPane.CloseButton(false);
+        paneInfoDrawPane.CaptionVisible(false);
+        manager->AddPane( m_panelviewer, paneInfoDrawPane );
+
+        //create toolbars
+        m_panelviewer->main_toolbar(m_frame,manager);
+        m_panelviewer->mode_and_geometry_toolbar(m_frame,manager);
+
+
+        m_frame->SetMenuBar( m_panelviewer->menubar() );
+        m_frame->SetStatusText(wxT("GilViewer - Adrien Chauve & Olivier Tournaire"));
+
+        m_confg_visitor = new simulated_annealing::wx::configuration_visitor(m_panelviewer);
         /*< Visitors initialization >*/
-        m_param_visitor = new simulated_annealing::wx::parameters_visitor(m_confg_visitor);
-        m_chart_visitor = new simulated_annealing::wx::chart_visitor(m_confg_visitor);
-        m_visitor = new visitor(&m_log_visitor,m_confg_visitor,m_param_visitor,m_chart_visitor);
-        m_confg_visitor->controler(this);
+
+        m_param_visitor = new simulated_annealing::wx::parameters_visitor(m_frame);
+        m_chart_visitor = new simulated_annealing::wx::chart_visitor(m_frame);
+        m_contr_visitor = new simulated_annealing::wx::controler_visitor(this,m_frame);
+        m_visitor = new visitor(&m_log_visitor,m_confg_visitor,m_param_visitor,m_chart_visitor,m_contr_visitor);
+
+
+        m_contr_visitor->add_pane(manager);
+        manager->Update();
+        m_frame->Show();
         return true;
     }
     //]
@@ -91,8 +126,9 @@ public:
 
         // Checks if the file is already loaded. If not load it.
         bool already_loaded = false;
-        layer_control::const_iterator it  = m_confg_visitor->panelviewer()->layercontrol()->begin();
-        layer_control::const_iterator end = m_confg_visitor->panelviewer()->layercontrol()->end();
+        layer_control *lc = m_confg_visitor->panelviewer()->layercontrol();
+        layer_control::const_iterator it  = lc->begin();
+        layer_control::const_iterator end = lc->end();
         for(;it!=end;++it)
         {
             using namespace boost::filesystem;
@@ -103,7 +139,7 @@ public:
             }
         }
         if(!already_loaded)
-            m_confg_visitor->add_layer(dsm_file);
+            lc->add_layer_from_file(wxString(dsm_file.c_str(), *wxConvCurrent));
 
         set_bbox(p,bbox);
         wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));
@@ -122,11 +158,17 @@ public:
         std::cout << "Salamon initial schedule : " << salamon_initial_schedule(m_sampler->density(),*m_config,1000) << std::endl;
         m_config->clear();
 
+        typedef rjmcmc::any_sampler<configuration> any_sampler;
+        typedef simulated_annealing::any_visitor<configuration,any_sampler> any_visitor;
+
+        any_sampler *sampler = new any_sampler(*m_sampler);
+        any_visitor *visitor = new any_visitor(*m_visitor);
+
         m_thread = new boost::thread(
-                simulated_annealing::optimize<configuration,sampler,schedule,end_test,visitor>,
-                boost::ref(*m_config), boost::ref(*m_sampler),
+                simulated_annealing::optimize<configuration,any_sampler,schedule,end_test,any_visitor>,
+                boost::ref(*m_config), boost::ref(*sampler),
                 boost::ref(*m_schedule),   boost::ref(*m_end_test),
-                boost::ref(*m_visitor) );
+                boost::ref(*visitor) );
     }
     //]
 
@@ -179,11 +221,14 @@ private:
     end_test      *m_end_test;
     visitor       *m_visitor;
     boost::thread *m_thread;
+    basic_viewer_frame *m_frame;
+    panel_viewer *m_panelviewer;
 
     simulated_annealing::wx::configuration_visitor *m_confg_visitor;
     simulated_annealing::wx::parameters_visitor    *m_param_visitor;
     simulated_annealing::wx::chart_visitor         *m_chart_visitor;
     simulated_annealing::wx::log_visitor            m_log_visitor;
+    simulated_annealing::wx::controler_visitor     *m_contr_visitor;
     boost::shared_ptr<gradient_image_t>     m_grad;
 };
 //]
@@ -191,72 +236,3 @@ private:
 //[building_footprint_rectangle_gui_implement
 IMPLEMENT_APP(building_footprint_rectangle_gui);
 //]
-
-
-
-/*
-	LayerControl::const_iterator it  = m_panel->GetLayerControl()->begin();
-    LayerControl::const_iterator end = m_panel->GetLayerControl()->end();
-    Layer::ptrLayerType ilayer;
-    for(;it!=end && !ilayer;++it) {
-         if(boost::dynamic_pointer_cast<ImageLayer>(*it)) ilayer=*it; //use dem tag??
-    }
-    if(!ilayer) {
-        boost::filesystem::path file;
-        param::Instance()->get("dem",file);
-        ilayer = ImageLayer::CreateImageLayer(file.string());
-        if ( !ilayer )
-        {
-          std::ostringstream oss;
-          oss << "File " << file << " does not exist !";
-          wxString message( oss.str().c_str() , *wxConvCurrent );
-          ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
-          return;
-        }
-    }
-
-    wxPoint p0,p1;
-    boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
-    if(ghost->m_drawRectangleSelection) {
-        wxRect rect = ghost->GetRectangle();
-        p0 = ilayer->ToLocal(rect.GetTopLeft    ());
-        p1 = ilayer->ToLocal(rect.GetBottomRight());
-    } else {
-        p0.x = param::Instance()->get<int>("xmin");
-        p0.y = param::Instance()->get<int>("ymin");
-        p1.x = param::Instance()->get<int>("xmax");
-        p1.y = param::Instance()->get<int>("ymax");
-        if(p0.x>p1.x) std::swap(p0.x,p1.x);
-        if(p0.y>p1.y) std::swap(p0.y,p1.y);
-    }
-    try
-    {
-        Layer::ptrLayerType clayer = ilayer->crop(p0.x,p0.y,p1.x,p1.y);
-        if(!clayer) {
-            std::ostringstream oss;
-            oss << "Cropping outside the bounds of " << ilayer->Filename() << " !";
-            wxString message( oss.str().c_str() , *wxConvCurrent );
-            ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
-            return;
-        }
-        m_panel->AddLayer(clayer);
-        clayer->TranslationX(p0.x+ilayer->TranslationX());
-        clayer->TranslationY(p0.y+ilayer->TranslationY());
-        clayer->ZoomFactor  (     ilayer->ZoomFactor  ());
-
-        boost::filesystem::path file(clayer->Filename());
-        param::Instance()->set("dem",file);
-        param::Instance()->set("xmin",0);
-        param::Instance()->set("ymin",0);
-        param::Instance()->set("xmax",p1.x-p0.x);
-        param::Instance()->set("ymax",p1.y-p0.y);
-
-		GOGOGO
-    }
-    catch( const exception &e )
-    {
-        wxString message( e.what() , *wxConvCurrent );
-        ::wxMessageBox( message , _("Exception!") , wxICON_ERROR );
-    }
-*/
-

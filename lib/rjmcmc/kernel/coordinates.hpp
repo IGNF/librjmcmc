@@ -4,7 +4,7 @@
 template<typename T> struct coordinates_iterator
 {
     typedef typename T::iterator type;
-    const static unsigned int size = T::static_size;
+    const static unsigned int dimension = T::dimension;
 };
 
 template<typename T>

@@ -24,21 +24,14 @@ typedef image_gradient_unary_energy<oriented_gradient_view> unary_energy;
 
 #include "mpp/energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy                     binary_energy;
-
-#include "mpp/rectilinear_searchspace.hpp"
-typedef rectilinear_searchspace<object> searchspace;
 //]
 
 //[building_footprint_rectangle_definition_kernels
-#include "rjmcmc/kernel/transform_kernels.hpp"
-typedef rjmcmc::generator<searchspace> generator_kernel;
+#include "rjmcmc/kernel/transform.hpp"
 
-/*
 struct rectangle_edge_translation_transform
 {
-    enum { size = 6 };
-    typedef Rectangle_2 input_type;
-    typedef Rectangle_2 output_type;
+    enum { dimension = 6 };
 
     template<typename Iterator>
     inline double abs_jacobian(Iterator it) const { return 1.; }
@@ -52,8 +45,8 @@ struct rectangle_edge_translation_transform
         FT u = *in++;
         FT v = *in++;
         FT r = *in++;
-        FT s = 1-(*in);
-        FT f = exp(10*(s-0.5));
+        FT s = *in++;
+        FT f = exp(s-0.5);
         FT g = 1-f;
         //   res = Rectangle_2(c+m*(1-f), n,f*r);
         *out++ = x-g*r*v;
@@ -61,16 +54,17 @@ struct rectangle_edge_translation_transform
         *out++ = u;
         *out++ = v;
         *out++ = f*r;
-        *out++ = s;
+        *out++ = 1-s;
         return res;
     }
+
+    template<typename IteratorIn,typename IteratorOut>
+    inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
 };
 
 struct rectangle_corner_translation_transform
 {
-    enum { size = 7 };
-    typedef Rectangle_2 input_type;
-    typedef Rectangle_2 output_type;
+    enum { dimension = 7 };
 
     template<typename Iterator>
     inline double abs_jacobian(Iterator it) const { return 1.; }
@@ -96,19 +90,39 @@ struct rectangle_corner_translation_transform
         *out++ =-t;
         return res;
     }
+
+    template<typename IteratorIn,typename IteratorOut>
+    inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
 };
+/*
+  generated using boost::lambda ??
 
-typedef rjmcmc::modifier<rectangle_edge_translation_transform  > modifier_kernel1;
-typedef rjmcmc::modifier<rectangle_corner_translation_transform> modifier_kernel2;
+ _1+_6-_5*_7,
+ _2+_7-_5*_6,
+ _3+_6,
+ _4+_7,
+ _5,
+-_6,
+-_7
+
+with some aliases :
+
+ _x+_s-_r*_t,
+ _y+_t+_r*_s,
+ _u+_s,
+ _v+_t,
+ _r,
+-_s,
+-_t,
+
 */
-#include "geometry/kernels/rectangle_scaled_edge_kernel.hpp"
-#include "geometry/kernels/rectangle_rotation_scaled_corner_kernel.hpp"
-#include "geometry/kernels/rectangle_split_merge_kernel.hpp"
-typedef geometry::rectangle_scaled_edge_kernel<K> modifier_kernel1;
-typedef geometry::rectangle_rotation_scaled_corner_kernel<K> modifier_kernel2;
 
+
+
+#include "mpp/kernel/kernel.hpp"
+typedef marked_point_process::result_of_make_uniform_birth_death_kernel<object>::type  birth_death_kernel;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<object,rectangle_edge_translation_transform>::type  modification_kernel;
 //]
-
 
 //<-
 /************** rjmcmc library types ****************/
@@ -153,17 +167,13 @@ typedef rjmcmc::poisson_distribution                           distribution;
 //->
 
 //[building_footprint_rectangle_definition_sampler
-/*< /Birth/ and /death kernels/ are required. They are encapsulated in a `binary_kernel` >*/
 #include "rjmcmc/sampler/sampler.hpp"
-#include "mpp/kernel/kernel.hpp"
-typedef mpp::uniform_birth_kernel<generator_kernel>           birth_kernel;
-typedef mpp::uniform_death_kernel                             death_kernel;
-typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>      birth_death_kernel;
-/*< Optionnaly, we can specify a /modification kernel/ to modify the objects templated over the `rjmcmc::modifier` >*/
-typedef mpp::modification_kernel<modifier_kernel1>            modification_kernel1;
-typedef mpp::modification_kernel<modifier_kernel2>            modification_kernel2;
+
+
+typedef marked_point_process::uniform_birth<object> uniform_birth;
+
 #include "mpp/direct_sampler.hpp"
-typedef marked_point_process::direct_sampler<distribution,generator_kernel> d_sampler;
+typedef marked_point_process::direct_sampler<distribution,uniform_birth> d_sampler;
 /*< The /RJMCMC/ `rjmcmc::sampler` then encapsulates all the kernels through its template parameters to enable the sampling of the Marked Point Process relative to the poisson reference process >*/
 
 #include "rjmcmc/acceptance/metropolis_acceptance.hpp"
@@ -179,9 +189,9 @@ typedef rjmcmc::metropolis_acceptance acceptance;
 
 
 //typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel> sampler;
-typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel
-        ,modification_kernel1
-        ,modification_kernel2
+typedef rjmcmc::sampler<d_sampler,acceptance
+                ,birth_death_kernel
+                ,modification_kernel
         > sampler;
 
 //<-
@@ -232,30 +242,23 @@ void create_sampler(const param *p, sampler *&s) {
     Iso_rectangle_2 r = get_bbox(p);
     K::Vector_2 v((r.max()-r.min())*0.05);
 
-    searchspace ss;
-    ss.min(Rectangle_2(r.min(),-v,1/p->get<double>("maxratio")));
-    ss.max(Rectangle_2(r.max(), v, p->get<double>("maxratio")));
+    uniform_birth birth(
+            Rectangle_2(r.min(),-v,1/p->get<double>("maxratio")),
+            Rectangle_2(r.max(), v,  p->get<double>("maxratio"))
+            );
 
-    generator_kernel    birth(ss);
+    //generator_kernel    birth(ss);
     distribution cs(p->get<double>("poisson"));
 
     acceptance a;
     //acceptance a(p->get<double>("qtemp"));
 
-    birth_death_kernel kbirthdeath = mpp::make_uniform_birth_death_kernel(
-            birth,
-            p->get<double>("pbirth"),
-            p->get<double>("pdeath")
-            );
-
-    modifier_kernel1     modif1;
-    modifier_kernel2     modif2;
-
     d_sampler ds( cs, birth );
-    s = new sampler( ds, a,
-                       kbirthdeath
-                       , 0.5 * modif1
-                       , 0.5 * modif2
+    s = new sampler( ds, a
+                     , marked_point_process::make_uniform_birth_death_kernel(birth, p->get<double>("pbirth"), p->get<double>("pdeath") )
+                     , marked_point_process::make_uniform_modification_kernel<object>(rectangle_edge_translation_transform(),1)
+//                       , 0.5 * modif2
+
                      );
     //s = new sampler( ds, a, kbirthdeath);
     //s = new sampler( ds );

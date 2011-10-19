@@ -72,6 +72,19 @@ namespace simulated_annealing {
     };
 
 
+    template<typename Configuration, typename Sampler>
+    class any_composite_visitor : public std::vector<any_visitor<Configuration,Sampler> >
+    {
+        typedef std::vector<any_visitor<Configuration,Sampler> > base;
+    public:
+        typedef typename base::iterator iterator;
+        void init(int dump, int save) { for(iterator it=base::begin(); it!=base::end(); ++it) it->init(dump,save); }
+        void begin(const Configuration& config, const Sampler& sample, double t) { for(iterator it=base::begin(); it!=base::end(); ++it) it->begin(config,sample,t); }
+        void visit(const Configuration& config, const Sampler& sample, double t) { for(iterator it=base::begin(); it!=base::end(); ++it) it->visit(config,sample,t); }
+        void end  (const Configuration& config, const Sampler& sample, double t) { for(iterator it=base::begin(); it!=base::end(); ++it) it->end(config,sample,t); }
+    };
+
+
 } // namespace simulated_annealing
 
 #endif // __ANY_VISITOR_HPP__

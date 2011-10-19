@@ -13,6 +13,7 @@ namespace rjmcmc {
     class linear_transform
     {
     public:
+        enum { dimension = N };
 
         inline T determinant() const { return m_determinant; }
         inline T abs_jacobian(const T[N]) const { return m_abs_determinant; }
@@ -91,9 +92,32 @@ namespace rjmcmc {
     };
 
     template<unsigned int N, typename T>
+    class identity_transform
+    {
+    public:
+        enum { dimension = N };
+
+        inline T determinant() const { return 1.; }
+        template<typename Iterator>
+        inline T abs_jacobian(Iterator) const { return 1.; }
+
+        template<typename IteratorIn,typename IteratorOut>
+        inline void apply  (IteratorIn in, IteratorOut out) const {
+            for(unsigned int i=0; i<N; ++i) *out++ = *in++;
+        }
+        template<typename IteratorIn,typename IteratorOut>
+        inline void inverse(IteratorIn in, IteratorOut out) const {
+            for(unsigned int i=0; i<N; ++i) *out++ = *in++;
+        }
+
+        identity_transform() {}
+    };
+
+    template<unsigned int N, typename T>
     class diagonal_linear_transform
     {
     public:
+        enum { dimension = N };
 
         inline T determinant() const { return m_determinant; }
         template<typename Iterator>
@@ -134,7 +158,7 @@ namespace rjmcmc {
     class diagonal_affine_transform
     {
     public:
-        enum { size = N };
+        enum { dimension = N };
         inline T determinant() const { return m_determinant; }
         template<typename Iterator>
         inline T abs_jacobian(Iterator it) const { return m_abs_determinant; }

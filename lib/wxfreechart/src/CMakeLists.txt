@@ -23,8 +23,14 @@ wxfreechart_add_module(WXFREECHART_SRC ohlc         OHLC         0)
 wxfreechart_add_module(WXFREECHART_SRC pie          PIE          0)
 
 if(UNIX)
-	add_library(wxfreechart ${WXFREECHART_HEADERS} ${WXFREECHART_SRC})
+        add_library(wxfreechart ${WXFREECHART_HEADERS} ${WXFREECHART_SRC})
 else()
 	add_library(wxfreechart STATIC ${WXFREECHART_HEADERS} ${WXFREECHART_SRC})
 endif()
 target_link_libraries(wxfreechart ${wxWidgets_LIBRARIES})
+
+install(TARGETS wxfreechart
+    EXPORT wxfreechart-targets
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+)
+

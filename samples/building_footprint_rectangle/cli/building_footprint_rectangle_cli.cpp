@@ -10,6 +10,8 @@ typedef parameters< parameter > param;
 
 //[building_footprint_rectangle_cli_visitors
 #include "simulated_annealing/visitor/ostream_visitor.hpp"
+#include "simulated_annealing/visitor/any_visitor.hpp"
+#include "rjmcmc/sampler/any_sampler.hpp"
 //]
 
 //[building_footprint_rectangle_cli_main
@@ -21,8 +23,8 @@ int main(int argc , char** argv)
     if (!p->parse(argc, argv)) return -1;
 
     /*< Build and initialize simple visitor which prints some data on the standard output >*/
-    simulated_annealing::ostream_visitor visitor;
-    init_visitor(p,visitor);
+    simulated_annealing::ostream_visitor osvisitor;
+    init_visitor(p,osvisitor);
 
     /*< Input data is an image. We first retrieve from the parameters the region to process... clip the image to fit this region... and then compute the gradient and build the attached view>*/
     Iso_rectangle_2 bbox = get_bbox(p);
@@ -37,8 +39,15 @@ int main(int argc , char** argv)
     schedule      *sch ; create_schedule     (p,sch);
     end_test      *end ; create_end_test     (p,end);
 
+    // test avec les any_*
+    typedef rjmcmc::any_sampler<configuration> any_sampler;
+    typedef simulated_annealing::any_visitor<configuration,any_sampler> any_visitor;
+
+    any_sampler sampler(*samp);
+    any_visitor visitor(osvisitor);
+
     /*< This is the way to launch the optimization process. Here, the magic happen... >*/
-    simulated_annealing::optimize(*conf,*samp,*sch,*end,visitor);
+    simulated_annealing::optimize(*conf,sampler,*sch,*end,visitor);
 
     /*< Finally release all dynamically allocated resources >*/
     if(conf) {delete conf; conf=NULL;}

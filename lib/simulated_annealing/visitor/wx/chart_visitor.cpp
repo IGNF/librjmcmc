@@ -11,19 +11,32 @@
 namespace simulated_annealing {
     namespace wx {
 
-        BEGIN_EVENT_TABLE(chart_visitor, wxFrame)
-                EVT_CLOSE(chart_visitor::OnCloseWindow)
+        class chart_frame : public wxFrame
+        {
+        public:
+            chart_frame(wxWindow *parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+                : wxFrame(parent,id,title,pos,size,style)
+            {
+            }
+            void on_close_window(wxCloseEvent&) { Hide(); }
+        private:
+            DECLARE_EVENT_TABLE();
+        };
+
+
+        BEGIN_EVENT_TABLE(chart_frame, wxFrame)
+                EVT_CLOSE(chart_frame::on_close_window)
                 END_EVENT_TABLE();
 
-        chart_visitor::chart_visitor(wxWindow *parent, wxWindowID id, const wxString& charttitle, long style, const wxPoint& pos, const wxSize& size) :
-                wxFrame(parent, id, charttitle, pos, size, style)
+        chart_visitor::chart_visitor(wxWindow *parent, wxWindowID id, const wxString& charttitle, const wxPoint& pos, const wxSize& size, long style) :
+                m_frame(new chart_frame(parent, id, charttitle, pos, size, style))
         {
-            SetIcon(wxICON(IGN));
+            m_frame->SetIcon(wxICON(IGN));
 
             wxBoxSizer *test_sizer = new wxBoxSizer(wxVERTICAL);
             wxBoxSizer* inner_sizer = new wxBoxSizer(wxVERTICAL);
 
-            wxChartPanel* wnd = new wxChartPanel(this);
+            wxChartPanel* wnd = new wxChartPanel(m_frame.get());
             XYPlot *plot = new XYPlot();
 
             wxColour color[] = { wxColour(0,0,255), wxColour(255,0,0) };
@@ -66,8 +79,8 @@ namespace simulated_annealing {
             wnd->Layout();
 
             test_sizer->Add(wnd, 1, wxEXPAND | wxALL, 5);
-            SetSizer(test_sizer);
-            Show();
+            m_frame->SetSizer(test_sizer);
+            m_frame->Show();
         }
 
 
@@ -90,6 +103,8 @@ namespace simulated_annealing {
             wxMutexGuiLeave();
         }
 
+        void chart_visitor::Show(bool b) { m_frame->Show(b); }
+        bool chart_visitor::IsShown() const { return m_frame->IsShown(); }
 
     } // namespace wx
 } // namespace simulated_annealing

@@ -1,3 +1,4 @@
+/*
 #ifndef RECTILINEAR_SEARCHSPACE_HPP_
 #define RECTILINEAR_SEARCHSPACE_HPP_
 
@@ -26,13 +27,13 @@ public:
     template<typename U> result_type inside(const U &u) const
     {
         typedef typename coordinates_iterator<U>::type iterator;
-        static const int size = coordinates_iterator<U>::size;
+        enum { dimension = coordinates_iterator<U>::dimension };
         iterator it    = coordinates_begin(u);
         const std::pair<U,U>& minmax = boost::fusion::at_key<U>(m_minmax);
         iterator bmin  = coordinates_begin(minmax.first );
         iterator bmax  = coordinates_begin(minmax.second);
-        // using (i<size) instead of (it!=end) should enable loop unrolling statically
-        for(int i=0; i<size; ++i, ++it) if(*it<*bmin++ || *it>*bmax++) return false;
+        // using (i<dimension) instead of (it!=end) should enable loop unrolling statically
+        for(int i=0; i<dimension; ++i, ++it) if(*it<*bmin++ || *it>*bmax++) return false;
         return true;
     }
 
@@ -46,3 +47,4 @@ private:
 };
 
 #endif // RECTILINEAR_SEARCHSPACE
+*/

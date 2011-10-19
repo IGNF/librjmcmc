@@ -2,18 +2,13 @@
 #define __WX_CCONFIGURATION_VISITOR_HPP__
 
 #include <wx/wx.h>
-#include <wx/statusbr.h>
-
-#include <GilViewer/gui/layer_control.hpp>
-#include <GilViewer/gui/basic_viewer_frame.hpp>
-#include <GilViewer/convenient/macros_gilviewer.hpp>
-#include <GilViewer/layers/image_types.hpp>
-
-#include "simulated_annealing/visitor/controler.hpp"
+#include <wx/aboutdlg.h>
 #include "rjmcmc/variant.hpp"
 #include "geometry/wx/paint.h"
+#include <GilViewer/gui/panel_viewer.hpp>
 
 // to be specialized by each object type (-> files lib/geometry/*_paint.h)
+
 template<typename T> void paint(layer::ptrLayerType&, const std::string& s, const T&);
 
 struct layer_painter {
@@ -49,42 +44,29 @@ layer::ptrLayerType& operator<<(layer::ptrLayerType& layer, const Config& config
     return layer;
 }
 
-
 namespace simulated_annealing {
     namespace wx {
 
-        class configuration_visitor: public basic_viewer_frame
+        class configuration_visitor
         {
         public:
-            configuration_visitor(
-                    wxWindow* parent,
-                    wxWindowID id,
-                    const wxString& title,
-                    const wxPoint& pos = wxDefaultPosition,
-                    const wxSize& size = wxDefaultSize,
-                    long style = wxDEFAULT_FRAME_STYLE,
-                    const wxString& name = _("frame"));
-
-            ~configuration_visitor() {}
-
-            void OnGoButton   (wxCommandEvent&);
-            void OnStopButton (wxCommandEvent&);
-            void OnChartButton(wxCommandEvent&);
-            void OnParamButton(wxCommandEvent&);
+            configuration_visitor(panel_viewer *panel);
 
             void init(int dump, int save);
 
             template<typename Configuration, typename Sampler>
-            void begin(const Configuration& config, const Sampler& sample, double t)
+            void begin(const Configuration&, const Sampler&, double)
             {
-                m_buttonGo  ->Disable();
-                m_buttonStop->Enable();
             }
+
             template<typename Configuration, typename Sampler>
-            void end(const Configuration& config, const Sampler& sample, double t)
+            void end(const Configuration& config, const Sampler&, double)
             {
-                m_buttonStop->Disable();
-                m_buttonGo  ->Enable();
+                wxMutexGuiEnter();
+                m_vlayer->clear();
+                m_vlayer << config;
+                m_panel->Refresh();
+                wxMutexGuiLeave();
             }
 
             template<typename Configuration, typename Sampler>
@@ -104,27 +86,19 @@ namespace simulated_annealing {
                     wxMutexGuiEnter();
                     m_vlayer->clear();
                     m_vlayer << config;
-                    Refresh();
+                    m_panel->Refresh();
                     wxMutexGuiLeave();
                 }
             }
 
             virtual wxAboutDialogInfo about_info() const;
 
-            void controler(Controler *c) { m_controler=c; }
-
             panel_viewer* panelviewer() const;
-            void add_layer(const std::string& file);
+
             wxRect get_bbox() const;
             void set_bbox(const wxRect& r);
 
-            DECLARE_GILVIEWER_METHODS_FOR_EVENTS_TABLE() ;
-            DECLARE_EVENT_TABLE() ;
-
         private:
-            Controler    *m_controler;
-            wxButton     *m_buttonGo;
-            wxButton     *m_buttonStop;
             panel_viewer *m_panel;
 
             int m_dump;

@@ -8,24 +8,25 @@
 #ifndef __WX_PARAMETERS_VISITOR_HPP__
 #define __WX_PARAMETERS_VISITOR_HPP__
 
-#include <map>
-#include <string>
-
-#include <wx/frame.h>
+#include <boost/shared_ptr.hpp>
+#include <wx/window.h>
+#include <wx/toplevel.h>
 
 namespace simulated_annealing {
     namespace wx {
 
-        class parameters_visitor: public wxFrame
+        class parameters_frame;
+
+        class parameters_visitor
         {
         public:
             parameters_visitor(
                     wxWindow *parent = (wxWindow *) NULL,
                     wxWindowID id = wxID_ANY,
                     const wxString& title = _("librjmcmc parameters"),
-                    long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL,
                     const wxPoint& pos = wxDefaultPosition,
-                    const wxSize& size = wxSize(600,400));
+                    const wxSize& size = wxSize(600,400),
+                    long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
 
             virtual ~parameters_visitor() {}
 
@@ -34,34 +35,24 @@ namespace simulated_annealing {
             template<typename Configuration, typename Sampler>
             void begin(const Configuration& config, const Sampler& sampler, double t)
             {
-                wxMutexGuiEnter();
-                Refresh();
-                Disable();
-                wxMutexGuiLeave();
+                Enable(false);
             }
 
             template<typename Configuration, typename Sampler>
             void end(const Configuration& config, const Sampler& sampler, double t)
             {
-                wxMutexGuiEnter();
-                Enable();
-                Refresh();
-                Show();
-                wxMutexGuiLeave();
+                Enable(true);
             }
 
             template<typename Configuration, typename Sampler>
             inline void visit(const Configuration& config, const Sampler& sampler, double) {}
 
-            void on_file_parameter(wxCommandEvent& event);
-            void on_bool_parameter(wxCommandEvent& event);
-
-            void OnCloseWindow(wxCloseEvent&) { Hide(); }
+            void Enable(bool b);
+            void Show(bool b = true);
+            bool IsShown() const;
 
         private:
-            std::map<long,std::string> m_name_for_id;
-
-            DECLARE_EVENT_TABLE();
+            boost::shared_ptr<parameters_frame> m_frame;
         };
 
     } // namespace wx

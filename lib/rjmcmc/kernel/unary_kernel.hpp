@@ -1,3 +1,4 @@
+/*
 #ifndef UNARY_KERNEL_HPP_
 #define UNARY_KERNEL_HPP_
 
@@ -17,3 +18,4 @@ namespace rjmcmc {
 }
 
 #endif // UNARY_KERNEL_HPP_
+*/

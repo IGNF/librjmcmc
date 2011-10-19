@@ -31,12 +31,12 @@ void clip_bbox(IsoRectangle& bbox, const oriented<Image>& v)
     internal::clip_bbox(v.x0(), v.y0(), v.x0()+v.view().width(), v.y0()+v.view().height());
 }
 
-#include <boost/gil/extension/io_new/jpeg_read.hpp>
+#include <boost/gil/extension/io_new/tiff_read.hpp>
 template<typename IsoRectangle>
 void clip_bbox(IsoRectangle& bbox, const std::string &file)
 {
     using namespace boost::gil;
-    image_read_info<jpeg_tag> info = read_image_info(file, jpeg_tag());
+    image_read_info<tiff_tag> info = read_image_info(file, tiff_tag());
     internal::clip_bbox(bbox,0,0,info._width,info._height);
 }
 
@@ -98,7 +98,7 @@ oriented<Image>::oriented(const std::string &file, const IsoRectangle& bbox)
     try
     {
         m_img.reset(new Image);
-        image_read_settings<jpeg_tag> irs( point_t(x0,y0), point_t(x1-x0,y1-y0) );
+        image_read_settings<tiff_tag> irs( point_t(x0,y0), point_t(x1-x0,y1-y0) );
         read_image( file, *m_img, irs );
         m_view = boost::gil::view(*m_img);
     }

@@ -12,18 +12,64 @@
 #include <wx/scrolwin.h>
 #include <wx/button.h>
 #include <wx/icon.h>
+#include <wx/frame.h>
 
 #include "param/wx_parameter.hpp"
 #include "parameters_visitor.hpp"
 typedef parameters< wx_parameter > param;
 
 #include "gui/resources/IGN.xpm"
+#include <map>
+#include <string>
 
 namespace simulated_annealing {
     namespace wx {
 
-        BEGIN_EVENT_TABLE(parameters_visitor, wxFrame)
-                EVT_CLOSE(parameters_visitor::OnCloseWindow)
+        class parameters_frame : public wxFrame
+        {
+        public:
+            parameters_frame(wxWindow *parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+                : wxFrame(parent,id,title,pos,size,style)
+            {
+            }
+
+            void on_file_parameter(wxCommandEvent& event);
+            void on_bool_parameter(wxCommandEvent& event);
+
+            void on_close_window(wxCloseEvent&) { Hide(); }
+
+            void name(long id, const std::string& name) { m_name[id] = name; }
+        private:
+            std::map<long,std::string> m_name;
+            DECLARE_EVENT_TABLE();
+        };
+
+
+        void parameters_frame::on_file_parameter(wxCommandEvent& event)
+        {
+            wxString wildcard;
+            wildcard << _("Image files ");
+            wildcard << wxT("(*.tif;*.tiff;*.png;*.jpg;*.jpeg)|*.tif;*.tiff;*.TIF;*.TIFF;*.png;*.PNG;*.jpg;*.jpeg;*.JPG;*.JPEG|");
+            wildcard << wxT("TIFF (*.tif;*.tiff;*.TIF;*.TIFF)|*.tif;*.tiff;*.TIF;*.TIFF|");
+            wildcard << wxT("PNG (*.png;*.PNG)|*.png;*.PNG|");
+            wildcard << wxT("JPEG (*.jpg;*.jpeg;*.JPG;*.JPEG)|*.jpg;*.jpeg;*.JPG;*.JPEG|");
+            wxString str;
+            std::string name = m_name[event.GetId()];
+            wxFileDialog *fileDialog = new wxFileDialog(this, wxString(name.c_str(), *wxConvCurrent), wxT(""), wxT(""), wildcard, wxFD_OPEN|wxFD_CHANGE_DIR );
+            if (fileDialog->ShowModal() == wxID_OK)
+            {
+                boost::filesystem::path file( fileDialog->GetPath().To8BitData() );
+                param::instance()->set(name,file);
+            }
+        }
+
+        void parameters_frame::on_bool_parameter(wxCommandEvent& event)
+        {
+            param::instance()->set(m_name[event.GetId()],event.IsChecked());
+        }
+
+        BEGIN_EVENT_TABLE(parameters_frame, wxFrame)
+                EVT_CLOSE(parameters_frame::on_close_window)
                 END_EVENT_TABLE();
 
         template<typename P>
@@ -32,12 +78,11 @@ namespace simulated_annealing {
             typedef void result_type;
             wxSizer *m_sizer;
             wxWindow *m_wnd;
-            parameters_visitor *m_visitor;
-            std::map<long,std::string>& m_name;
+            parameters_frame *m_frame;
             P& m_p;
 
-            sizer_adder(parameters_visitor *frame, wxSizer *sizer, wxWindow* wnd, std::map<long,std::string>& name, P& p)
-                : m_visitor(frame), m_sizer(sizer), m_wnd(wnd), m_name(name), m_p(p) {}
+            sizer_adder(parameters_frame *frame, wxSizer *sizer, wxWindow* wnd, P& p)
+                : m_frame(frame), m_sizer(sizer), m_wnd(wnd), m_p(p) {}
 
             void AddText(wxSizer *sizer)
             {
@@ -67,8 +112,8 @@ namespace simulated_annealing {
                 checkbox->SetValue(b);
                 m_sizer->Add(checkbox, 0, wxEXPAND|wxALL, 3);
                 checkbox->Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED,
-                                  wxCommandEventHandler(parameters_visitor::on_bool_parameter), NULL, m_visitor);
-                m_name[id]=m_p.name();
+                                  wxCommandEventHandler(parameters_frame::on_bool_parameter), NULL, m_frame);
+                m_frame->name(id,m_p.name());
             }
 
             void operator()(const boost::filesystem::path& p)
@@ -80,22 +125,23 @@ namespace simulated_annealing {
                 wxString desc((m_p.description()+" ...").c_str(), *wxConvCurrent);
                 wxButton *browse_button = new wxButton(m_wnd,id,desc);
                 browse_button->Connect(id, wxEVT_COMMAND_BUTTON_CLICKED,
-                                       wxCommandEventHandler(parameters_visitor::on_file_parameter), NULL, m_visitor);
-                m_name[id]=m_p.name();
+                                       wxCommandEventHandler(parameters_frame::on_file_parameter), NULL, m_frame);
+                m_frame->name(id,m_p.name());
                 m_sizer->Add(browse_button, 0,wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
                 m_sizer->Add(ctrl, 0, wxEXPAND|wxALL, 3);
             }
         };
 
-        parameters_visitor::parameters_visitor(wxWindow *parent, wxWindowID id, const wxString& title, long style, const wxPoint& pos, const wxSize& size) :
-                wxFrame(parent, id, title, pos, size, style)
+        parameters_visitor::parameters_visitor(wxWindow *parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+            : m_frame(new parameters_frame(parent, id, title, pos, size, style))
         {
-            SetIcon(wxICON(IGN));
+
+            m_frame->SetIcon(wxICON(IGN));
             param *p = param::instance();
 
             wxBoxSizer* inner_sizer = new wxBoxSizer(wxVERTICAL);
 
-            wxScrolledWindow* scroll = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE|wxScrolledWindowStyle|wxTAB_TRAVERSAL, wxT("scroll"));
+            wxScrolledWindow* scroll = new wxScrolledWindow(m_frame.get(), wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE|wxScrolledWindowStyle|wxTAB_TRAVERSAL, wxT("scroll"));
             scroll->SetScrollbars(20,20,50,50);
 
             wxFlexGridSizer* sizer = new wxFlexGridSizer(2);
@@ -105,7 +151,7 @@ namespace simulated_annealing {
 
             for(param::iterator it=p->begin(); it!=p->end(); ++it)
             {
-                sizer_adder<param::parameter_t> adder(this,sizer,scroll,m_name_for_id,*it);
+                sizer_adder<param::parameter_t> adder(m_frame.get(),sizer,scroll,*it);
                 boost::apply_visitor(adder,it->value());
             }
 
@@ -114,34 +160,30 @@ namespace simulated_annealing {
             scroll->Layout();
 
             inner_sizer->Add(scroll, 1, wxEXPAND | wxALL, 5);
-            SetSizer(inner_sizer);
-            SetAutoLayout(true);
-            Refresh();
-            Show();
+            m_frame->SetSizer(inner_sizer);
+            m_frame->SetAutoLayout(true);
+            m_frame->Refresh();
+            m_frame->Show();
         }
 
-        void parameters_visitor::on_file_parameter(wxCommandEvent& event)
+        void parameters_visitor::Enable(bool b)
         {
-            wxString wildcard;
-            wildcard << _("Image files ");
-            wildcard << wxT("(*.tif;*.tiff;*.png;*.jpg;*.jpeg)|*.tif;*.tiff;*.TIF;*.TIFF;*.png;*.PNG;*.jpg;*.jpeg;*.JPG;*.JPEG|");
-            wildcard << wxT("TIFF (*.tif;*.tiff;*.TIF;*.TIFF)|*.tif;*.tiff;*.TIF;*.TIFF|");
-            wildcard << wxT("PNG (*.png;*.PNG)|*.png;*.PNG|");
-            wildcard << wxT("JPEG (*.jpg;*.jpeg;*.JPG;*.JPEG)|*.jpg;*.jpeg;*.JPG;*.JPEG|");
-            wxString str;
-            std::string name = m_name_for_id[event.GetId()];
-            wxFileDialog *fileDialog = new wxFileDialog(this, wxString(name.c_str(), *wxConvCurrent), wxT(""), wxT(""), wildcard, wxFD_OPEN|wxFD_CHANGE_DIR );
-            if (fileDialog->ShowModal() == wxID_OK)
+            wxMutexGuiEnter();
+            if(b)
             {
-                boost::filesystem::path file( fileDialog->GetPath().To8BitData() );
-                param::instance()->set(name,file);
+                m_frame->Enable();
+                m_frame->Refresh();
+                m_frame->Show();
             }
-        }
+            else
+            {
+                m_frame->Refresh();
+                m_frame->Disable();
+            }
+            wxMutexGuiLeave();
 
-        void parameters_visitor::on_bool_parameter(wxCommandEvent& event)
-        {
-            param::instance()->set(m_name_for_id[event.GetId()],event.IsChecked());
         }
-
+        void parameters_visitor::Show(bool b) { m_frame->Show(b); }
+        bool parameters_visitor::IsShown() const { return m_frame->IsShown(); }
     } // namespace wx
 } // namespace simulated_annealing
