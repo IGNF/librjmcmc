@@ -12,6 +12,7 @@
 #include <wx/window.h>
 #include <wx/toplevel.h>
 
+class panel_viewer;
 namespace simulated_annealing {
     namespace wx {
 
@@ -20,7 +21,7 @@ namespace simulated_annealing {
         class parameters_visitor
         {
         public:
-            parameters_visitor(
+            parameters_visitor(panel_viewer *panel,
                     wxWindow *parent = (wxWindow *) NULL,
                     wxWindowID id = wxID_ANY,
                     const wxString& title = _("librjmcmc parameters"),
@@ -53,6 +54,7 @@ namespace simulated_annealing {
 
         private:
             boost::shared_ptr<parameters_frame> m_frame;
+            panel_viewer *m_panel;
         };
 
     } // namespace wx

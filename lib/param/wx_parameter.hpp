@@ -3,6 +3,7 @@
 
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
+#include <wx/choice.h>
 
 #include "param/parameter.hpp"
 
@@ -113,16 +114,33 @@ struct wx_parameter : public parameter {
 
         template<typename T> void operator()(bool& t, const wxCheckBox *ctrl) const {
             if(ctrl) t = ctrl->GetValue();
-	}
+        }
 
         template<typename T> void operator()(wxCheckBox *ctrl, bool t) const {
             if(ctrl) ctrl->SetValue(t);
-	}
+        }
 
+        template<typename T> void operator()(T& t, const wxChoice *ctrl) const {
+            if(ctrl==NULL) return;
+            wxString ws(ctrl->GetStringSelection());
+            std::string s(ws.mb_str());
+            std::istringstream iss(s.c_str());
+            iss >> t;
+        }
+
+        template<typename T> void operator()(wxChoice *ctrl, const T& t) const {
+            if(ctrl==NULL) return;
+            std::ostringstream oss;
+            oss << t;
+            wxString s(oss.str().c_str(), *wxConvCurrent);
+            if(ctrl->FindString(s) == wxNOT_FOUND)
+                ctrl->Append(s);
+            ctrl->SetStringSelection(s);
+        }
     };
 
 public:
-    typedef boost::variant<wxCheckBox*,wxTextCtrl*> control_type;
+    typedef boost::variant<wxCheckBox*,wxTextCtrl*,wxChoice*> control_type;
 
     template<typename T> inline void set(const T& t) { parameter::value() = t; update_control(); }
 

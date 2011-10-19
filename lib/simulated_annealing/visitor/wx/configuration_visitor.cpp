@@ -28,7 +28,6 @@ namespace simulated_annealing {
             return info;
         }
 
-
         void configuration_visitor::init(int dump, int save)
         {
             m_iter = 0;
