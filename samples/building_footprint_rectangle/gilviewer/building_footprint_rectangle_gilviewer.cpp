@@ -130,8 +130,11 @@ public:
                 layer::ptrLayerType  ilayer = file_io->load(dsm_file);
                 if(!ilayer) throw std::exception();
                 lc->add_layer( ilayer );
-                ghost->reset();
-                ghost->transform() = ilayer->transform();
+                if(ghost)
+                {
+                    ghost->reset();
+                    ghost->transform() = ilayer->transform();
+                }
             }
             catch (const std::exception &e)
             {

@@ -138,8 +138,9 @@ namespace simulated_annealing {
                 m_sizer->Add(browse_button, 0,wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
                 m_sizer->Add(ctrl, 0, wxEXPAND|wxALL, 3);
 */
-                wxString s(p.string().c_str(), *wxConvCurrent);
+
                 wxChoice* ctrl = new wxChoice(m_wnd, wxID_ANY);
+                ctrl->Append(wxString(p.string().c_str(), *wxConvCurrent));
                 m_lc->update_control<image_layer>(ctrl);
                 m_p.control(ctrl);
                 long id = wxNewId();
