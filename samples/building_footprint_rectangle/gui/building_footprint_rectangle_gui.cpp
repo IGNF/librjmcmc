@@ -88,7 +88,6 @@ private:
         // m_panelviewer->main_toolbar(m_frame,manager); // TODO : buttons do nothing
         // m_panelviewer->mode_and_geometry_toolbar(m_frame,manager); // TODO : buttons do nothing
 
-
         m_frame->SetMenuBar( m_panelviewer->menubar() );
         m_frame->SetStatusText(wxT("GilViewer - Adrien Chauve & Olivier Tournaire"));
 

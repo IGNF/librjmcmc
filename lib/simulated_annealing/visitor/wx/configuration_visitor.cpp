@@ -1,7 +1,6 @@
 #include <GilViewer/layers/vector_layer_ghost.hpp>
 #include <GilViewer/layers/simple_vector_layer.hpp>
 #include <GilViewer/gui/panel_viewer.hpp>
-#include <GilViewer/gui/application_settings.hpp>
 #include <GilViewer/gui/panel_manager.hpp>
 
 #include "configuration_visitor.hpp"
@@ -66,6 +65,7 @@ namespace simulated_annealing {
 
         void configuration_visitor::set_bbox(const wxRect& r) {
             boost::shared_ptr<vector_layer_ghost> ghost = m_panel->vectorlayerghost();
+            if(!ghost) return;
             ghost->reset<vector_layer_ghost::Rectangle>();
             ghost->add_point(wxRealPoint(r.GetLeft (),r.GetTop   ()));
             ghost->add_point(wxRealPoint(r.GetRight(),r.GetBottom()));
