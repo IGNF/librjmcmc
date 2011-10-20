@@ -158,8 +158,8 @@ public:
         create_schedule     (p,m_schedule);
         create_end_test     (p,m_end_test);
 
-        std::cout << "Salamon initial schedule : " << salamon_initial_schedule(m_sampler->density(),*m_config,1000) << std::endl;
-        m_config->clear();
+    //    std::cout << "Salamon initial schedule : " << salamon_initial_schedule(m_sampler->density(),*m_config,1000) << std::endl;
+    //    m_config->clear();
 
         any_sampler *sampler = new any_sampler(*m_sampler);
 
