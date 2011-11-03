@@ -37,7 +37,8 @@ namespace marked_point_process {
             
             modif.insert_death(it);
             const T& t = c[it];
-            iterator coord_it  = coordinates_begin(t.rotate(die()));
+           // iterator coord_it  = coordinates_begin(t.rotate(die()));
+             iterator coord_it  = coordinates_begin(t);
             for(unsigned int i=0;i<dimension;++i) *out++ = *coord_it++;
             
             // return 1./c.size<T>();
