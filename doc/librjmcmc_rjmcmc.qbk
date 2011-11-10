@@ -1,9 +1,9 @@
-[section:section_rjmcmc __RJMCMC__]
+[section:rjmcmc __RJMCMC__]
 
-[section:section_rjmcmc_intro Introduction]
+[section:intro Introduction]
 
 A __MCMC__ (MCMC) sampler provides a series of configuration samples according
-to a given unnormalized probability distribution function. __RJMCMC__ (RJMCMC) is an extension
+to a given unnormalized probability distribution function. __RJMCMC__ (RJMCMC) [biblioref Hastings1970] [biblioref Green1995] is an extension
 of MCMC that allows the configurations space to be the union of spaces of varying dimensions.
 The algorithm consists in repeating the following steps until convergence has been detected:
 
@@ -12,38 +12,64 @@ The algorithm consists in repeating the following steps until convergence has be
 # Compute the acceptance ratio [$images/acceptance_ratio.png [depth 12pt]] and acceptance rate [$images/acceptance_rate.png [depth 12pt]]
 # With probability [$images/proba_configuration_choice.png [depth 24pt]]
 
-[biblioref Hastings1970]
-[biblioref Green1995]
+
+This algorithm is being implemented in the class [classref rjmcmc::sampler], which can be customized using the following template parameters :
+
+* The [link librjmcmc.rjmcmc.density Density] strategy, that encodes the reference process.
+* The [link librjmcmc.rjmcmc.acceptance Acceptance] strategy, responsible for computing the acceptance ratio `R`.
+* A list of [link librjmcmc.rjmcmc.kernel Kernels], that provides all the proposition kernels  [$images/q_i.png [depth 12pt]].
 
 [endsect]
 
-[section:sampler_concept Sampler concept]
+[section:density Density Concept]
 
-The role of a __RJMCMC__ sampler is to generate a __MCMC__ series of configuration with a stationnary pdf based only on its evaluation up to a multiplicative factor. Applied in the __MPP__ context, this allows to bias the sampling of a reference process with energy of the configuration (lower energy configuration getting comparatively more samples).  The reference process may directly be sampled and the density of a configuration may easily be evaluated. The relative influence of the energy values relative to the reference process is tuned by a temperature parameter, as will further be explained in the [link librjmcmc.section_simulated_annealing Simulated Annealing] section.
-
-Models of the `Sampler` concept differ by their computation of the Green ratio impacted by differing formulations of the mixing of the reference density, the energy and the temperature value, [classref rjmcmc::metropolis_sampler] being the most common choice.
+A density strategy is a functor that exposes a [^pdf_ratio(configuration,modification)] member function that outputs the ratio pdf(modified configuration)/pdf(initial configuration), where configuration is a model of the Configuration concept and modification is a object that encodes the changes that are being proposed to the current configuration.
 
 Available models:
 
-* [classref rjmcmc::metropolis_sampler]
-* [classref rjmcmc::dueck_scheuer_sampler]
-* [classref rjmcmc::franz_hoffmann_sampler]
-* [classref rjmcmc::szu_hartley_sampler]
-* [classref rjmcmc::tsallis_tsariolo_sampler]
+* See [link librjmcmc.mpp.density Marked Point Process Densities]
+
+[section:distribution Distribution Concept]
+
+`Distributions` are discrete probabilities over the set of non-negative integers, which are handy as basic blocks to build a [link librjmcmc.rjmcmc.density Density].
+
+Available models:
+
+* [classref rjmcmc::poisson_distribution]
+* [classref rjmcmc::uniform_distribution]
 
 [endsect]
 
-[section:kernel_concept Kernel concept]
+[endsect]
+
+[section:acceptance Acceptance Concept]
+
+The role of a __RJMCMC__ sampler is to generate a __MCMC__ series of configuration with a stationnary pdf based only on its evaluation up to a multiplicative factor. This allows to bias the sampling of a reference process with energy of the configuration (lower energy configuration getting comparatively more samples).
+
+[classref rjmcmc::metropolis_acceptance] being the most common choice, models of the `Acceptance` concept differ by their computation of the Green ratio impacted by differing formulations of the mixing of the reference density, the energy and the temperature value. The temperature will be introduced in the [link librjmcmc.simulated_annealing Simulated Annealing] section, to balance the relative influence of the energy values compared to the reference process.
+
+Available models:
+
+* [classref rjmcmc::metropolis_acceptance]
+* [classref rjmcmc::dueck_scheuer_acceptance]
+* [classref rjmcmc::franz_hoffmann_acceptance]
+* [classref rjmcmc::szu_hartley_acceptance]
+* [classref rjmcmc::tsallis_tsariolo_acceptance]
+
+[endsect]
+
+[section:kernel Kernel Concept]
 
 A kernel is used to propose atomic moves to explore the configuration space. Most common __MPP__ kernels are [classref rjmcmc::uniform_birth_kernel] and its reverse kernel [classref rjmcmc::uniform_death_kernel].
 
 
 Available models:
+
 * Application-specific
 
 [endsect]
 
-[section:transform_concept Transform concept]
+[section:transform Transform Concept]
 
 Transformations encode a bijective differentiable mapping between spaces of equal dimensions. They are thus used to describe the bijection applied during a kernel proposal. They compute automatically the Green ratio term relative to the proposed configuration modification, instead of a manual handling in the Kernel concept.
 

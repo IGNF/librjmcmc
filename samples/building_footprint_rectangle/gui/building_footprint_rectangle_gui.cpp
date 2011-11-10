@@ -13,7 +13,6 @@ typedef parameters< wx_parameter > param;
 #include "simulated_annealing/visitor/wx/all.hpp"
 #include "simulated_annealing/visitor/any_visitor.hpp"
 #include "rjmcmc/sampler/any_sampler.hpp"
-#include "simulated_annealing/visitor/controler.hpp"
 //]
 
 #include "simulated_annealing/salamon_initial_schedule.hpp"

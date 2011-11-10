@@ -1,4 +1,4 @@
-[section:section_simulated_annealing Simulated Annealing]
+[section:simulated_annealing Simulated Annealing]
 
 [section:simulated_annealing_introduction Introduction]
 Simulated annealing is a physical process inspired by annealing in metallurgy and is widely used in many communities where global optimization is of importance. At each step of the algorithm, the current solution is replaced by a new solution close from it. The new solution is chosen with a probability which depends firstly on the variation of the objective function and secondly on the current temperature which decreases a along the process evolution. It thus allows up moves which avoid being trapped in a local minima. Generally, depending on the speed of the decrease and its schedule, an solution close to the optimal one is found. [biblioref Salamon2002]
@@ -22,7 +22,7 @@ The automatic validation of the concepts modeled by the argument templates is cu
 
 [endsect]
 
-[section:schedule_concept Schedule concept]
+[section:schedule Schedule concept]
 Models of the `Schedule` concept are responsible for providing the evolution of the temperature throughout
 the simulated annealing process.
 The `Schedule` concept is a refinement of the [@http://www.sgi.com/tech/stl/InputIterator.html InputIterator]
@@ -43,7 +43,7 @@ Available models:
 
 [endsect]
 
-[section:endtest_concept EndTest concept]
+[section:endtest EndTest concept]
 
 Models of the `EndTest` concept provide a simple predicate that informs the simulated annealing framework that the process has converged
 or whatever reason requiring to stop the simulated annealing iterations, such as a user-issued cancellation.
@@ -64,10 +64,12 @@ Available models:
 
 [endsect]
 
-[section:visitor_concept Visitor concept]
+[section:visitor Visitor concept]
 
 Visitors are highly customizable objects passed to the simulated annealing process. They may be used to easily
 provide various vizualisations of the current state of the optimization.
+
+        void init(int dump, int save);
 
         template<typename Configuration, typename Sampler>
         void begin(const Configuration& configuration, const Sampler& sampler, double temperature);
@@ -88,6 +90,7 @@ Available models:
   * [classref simulated_annealing::wx::parameters_visitor]
   * [classref simulated_annealing::wx::chart_visitor]
   * [classref simulated_annealing::wx::configuration_visitor]
+  * [classref simulated_annealing::wx::controler_visitor]
 
 [endsect]
 

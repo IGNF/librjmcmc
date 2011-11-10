@@ -5,7 +5,6 @@
 #include "geometry/Circle_2_coordinates.hpp"
 typedef geometry::Simple_cartesian<double> K;
 typedef K::Point_2 Point_2;
-typedef geometry::Iso_rectangle_2_traits<K>::type Iso_rectangle_2;
 typedef geometry::Circle_2<K> Circle_2;
 typedef Circle_2 object;
 //]
@@ -20,22 +19,20 @@ typedef marked_point_process::graph_configuration<object, unary_energy, binary_e
 //]
 
 //[ reference_process
-#include "mpp/rectilinear_searchspace.hpp"
-typedef rectilinear_searchspace<object> searchspace;
-#include "rjmcmc/kernel/kernels.hpp"
-typedef rjmcmc::generator<searchspace> generator_kernel;
-#include "mpp/density/poisson_density.hpp"
-typedef marked_point_process::poisson_density                   density;
+#include "rjmcmc/distribution/poisson_distribution.hpp"
+typedef rjmcmc::poisson_distribution                   distribution;
+#include "mpp/kernel/kernel.hpp"
+typedef marked_point_process::uniform_birth<object> uniform_birth;
 #include "mpp/direct_sampler.hpp"
-typedef marked_point_process::direct_sampler<density,generator_kernel> d_sampler;
+typedef marked_point_process::direct_sampler<distribution,uniform_birth> reference_process;
 //]
 
 //[ rjmcmc_sampler
-#include "rjmcmc/sampler/metropolis_sampler.hpp"
-typedef rjmcmc::uniform_birth_kernel<generator_kernel>          birth_kernel;
-typedef rjmcmc::uniform_death_kernel                            death_kernel;
-typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>        birth_death_kernel;
-typedef rjmcmc::metropolis_sampler<d_sampler,birth_death_kernel> sampler;
+#include "rjmcmc/acceptance/metropolis_acceptance.hpp"
+#include "rjmcmc/sampler/sampler.hpp"
+typedef rjmcmc::metropolis_acceptance                                                  acceptance;
+typedef marked_point_process::result_of_make_uniform_birth_death_kernel<object>::type  birth_death_kernel;
+typedef rjmcmc::sampler<reference_process,acceptance,birth_death_kernel>                       sampler;
 //]
 
 //[ simulated_annealing
@@ -51,8 +48,8 @@ int main(int argc , char** argv)
     int i=0;
     double energy   = (++i<argc) ? atof(argv[i]) : -1.;
     double surface  = (++i<argc) ? atof(argv[i]) : 10.;
-    double minsize  = (++i<argc) ? atof(argv[i]) : 0.8;
-    double maxratio = (++i<argc) ? atof(argv[i]) : 0.1;
+    double minradius= (++i<argc) ? atof(argv[i]) : 0.1;
+    double maxradius= (++i<argc) ? atof(argv[i]) : 1;
     double poisson  = (++i<argc) ? atof(argv[i]) : 200.;
     double pbirth   = (++i<argc) ? atof(argv[i]) : 0.5;
     double pdeath   = (++i<argc) ? atof(argv[i]) : 0.5;
@@ -61,23 +58,23 @@ int main(int argc , char** argv)
     double deccoef  = (++i<argc) ? atof(argv[i]) : 0.999999;
     int nbdump      = (++i<argc) ? atoi(argv[i]) : 10000;
     int nbsave      = (++i<argc) ? atoi(argv[i]) : 10000;
-//]
+    //]
 
-//[ optimize
+    //[optimize
+    // Reference process
+    distribution dpoisson(poisson);
+    uniform_birth birth( Circle_2(Point_2(0,0),minradius), Circle_2(Point_2(1,1),maxradius) );
+    reference_process reference_pdf( dpoisson, birth );
+
+    // Initial empty configuration linked with the minimized energy
     unary_energy  e1(energy );
     binary_energy e2(surface);
     configuration c(e1,e2);
 
-    searchspace ss;
-    ss.min(Circle_2(Point_2(0,0),0  ));
-    ss.max(Circle_2(Point_2(1,1),0.1));
-
-    generator_kernel    birth(ss);
-    density cs(poisson);
-    d_sampler ds( cs, birth );
-
-    birth_death_kernel kbirthdeath = rjmcmc::make_uniform_birth_death_kernel(birth, pbirth, pdeath);
-    sampler samp( ds, kbirthdeath );
+    // Optimization
+    sampler samp( reference_pdf, acceptance(),
+                  marked_point_process::make_uniform_birth_death_kernel(birth, pbirth, pdeath)
+                  );
 
     simulated_annealing::geometric_schedule<double> sch(temp,deccoef);
     simulated_annealing::max_iteration_end_test     end(nbiter);

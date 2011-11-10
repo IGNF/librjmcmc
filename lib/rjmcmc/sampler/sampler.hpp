@@ -29,23 +29,30 @@ namespace rjmcmc {
         bool    m_accepted;
     };
 
-    // Derived: Curiously recurring template pattern
-    template<typename Density, typename Acceptance, RJMCMC_TUPLE_TYPENAMES >
-    class sampler : public sampler_base
+    namespace detail
     {
-    public:
-        sampler(const Density& d, const Acceptance& a, RJMCMC_TUPLE_ARGS) :
-                m_die(random(), boost::uniform_real<>(0,1)),
-                m_density(d),
-                m_acceptance(a),
-                m_kernel(RJMCMC_TUPLE_PARAMS)
-        {}
+        // statistics accessors
+        template<typename K, unsigned int I, unsigned int N> struct get_name {
+            inline const char *operator()(unsigned int i, const K& k) const {
+                enum { ks = tuple_element<I,K>::type::size };
+                if(i<ks) return get<I>(k).name(i);
+                return get_name<K,I+1,N>()(i-ks,k);
+            }
+        };
+        template<typename K, unsigned int N> struct get_name<K,N,N> {
+            inline const char *operator()(unsigned int i, const K& k) const { return ""; }
+        };
 
-        typedef tuple<RJMCMC_TUPLE_TYPES> Kernels;
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_t;
-
-        enum { size = tuple_size<Kernels>::value };
-        enum { m_kernel_size = kernel_traits<Kernels>::size };
+        template<typename K, unsigned int I, unsigned int N> struct get_kernel_id {
+            inline unsigned int operator()(unsigned int i, const K& k) const {
+                enum { ks = tuple_element<I,K>::type::size };
+                if(i==I) return get<I>(k).kernel_id();
+                return ks+get_kernel_id<K,I+1,N>()(i,k);
+            }
+        };
+        template<typename K, unsigned int N> struct get_kernel_id<K,N,N> {
+            inline unsigned int operator()(unsigned int i, const K& k) const { return 0; }
+        };
 
         template<typename Configuration, typename Modification>
         struct kernel_functor
@@ -58,8 +65,26 @@ namespace rjmcmc {
                 return t(x,m_c,m_m);
             }
         };
+    }
 
-        // main sampling function
+    template<typename Density, typename Acceptance, RJMCMC_TUPLE_TYPENAMES >
+    class sampler : public sampler_base
+    {
+        typedef tuple<RJMCMC_TUPLE_TYPES> Kernels;
+    public:
+        /// variadic constructor : d is the reference process, a is the acceptance strategy, RJMCMC_TUPLE_ARGS is the comma-separated list of kernels
+        sampler(const Density& d, const Acceptance& a, RJMCMC_TUPLE_ARGS) :
+                m_die(random(), boost::uniform_real<>(0,1)),
+                m_density(d),
+                m_acceptance(a),
+                m_kernel(RJMCMC_TUPLE_PARAMS)
+        {}
+
+
+        enum { size = tuple_size<Kernels>::value };
+        enum { m_kernel_size = kernel_traits<Kernels>::size };
+
+        /// This is the main sampling function, performing an RJMCMC step on the configuration c in place
         template<typename Configuration>
         void operator()(Configuration &c, double temp)
         {
@@ -68,7 +93,7 @@ namespace rjmcmc {
             //1 & 2
             Modification modif;
             m_temperature = temp;
-            kernel_functor<Configuration,Modification> kf(c,modif);
+            detail::kernel_functor<Configuration,Modification> kf(c,modif);
             m_green_ratio  = random_apply(m_kernel_id,m_die(),m_kernel,kf);
 
             //3
@@ -88,42 +113,22 @@ namespace rjmcmc {
             if (m_accepted) c.apply(modif);
         }
 
-        // statistics accessors
-    private: // helpers
-        template<unsigned int I, unsigned int N> struct get_name {
-            inline const char *operator()(unsigned int i, const Kernels& k) const {
-                enum { ks = tuple_element<I,Kernels>::type::size };
-                if(i<ks) return get<I>(k).name(i);
-                return get_name<I+1,N>()(i-ks,k);
-            }
-        };
-        template<unsigned int N> struct get_name<N,N> {
-            inline const char *operator()(unsigned int i, const Kernels& k) const { return ""; }
-        };
-
-        template<unsigned int I, unsigned int N> struct get_kernel_id {
-            inline unsigned int operator()(unsigned int i, const Kernels& k) const {
-                enum { ks = tuple_element<I,Kernels>::type::size };
-                if(i==I) return get<I>(k).kernel_id();
-                return ks+get_kernel_id<I+1,N>()(i,k);
-            }
-        };
-        template<unsigned int N> struct get_kernel_id<N,N> {
-            inline unsigned int operator()(unsigned int i, const Kernels& k) const { return 0; }
-        };
-
     public:
-        // data accessors
+        ///  Getting the density of the reference process
         inline const Density& density() const { return m_density; }
 
-        // statistics accessors
-        inline const char * kernel_name(unsigned int i) const { return get_name     <0,size>()(i,m_kernel); }
-        inline unsigned int kernel_id  () const { return get_kernel_id<0,size>()(m_kernel_id,m_kernel); }
+        ///  statistics accessor : getting the name of the ith kernel
+        inline const char * kernel_name(unsigned int i) const { return detail::get_name<Kernels,0,size>()(i,m_kernel); }
+
+        ///  statistics accessor : getting the id of the latest proposed kernel
+        inline unsigned int kernel_id  () const { return detail::get_kernel_id<Kernels,0,size>()(m_kernel_id,m_kernel); }
+
+        ///  statistics accessor : getting the number of kernels
         inline unsigned int kernel_size() const { return m_kernel_size; }
 
     private:
         // data
-        die_t      m_die;
+        boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > m_die;
         Density    m_density;
         Acceptance m_acceptance;
         Kernels    m_kernel;

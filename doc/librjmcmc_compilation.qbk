@@ -1,21 +1,31 @@
-[section:section_compilation Compiling __librjmcmc__]
+[section:compilation Compiling __librjmcmc__]
 
 [section:compilation_introduction Introduction]
-This section explains how to build __librjmcmc__. The instructions are clear enough to be directly used on a `Linux` platform. For other platforms (although some tests have been on `Windows` with `Visual Studio Express - 2009`), you should use a ['trial and error] approach...
+This section explains how to build the __librjmcmc__. The instructions are clear enough to be directly used on a `Linux` platform. For other platforms (although some tests have been on `Windows` with `Visual Studio Express - 2009`), you should use a ['trial and error] approach...
 
-For all platforms, you should have already install the following dependencies:
+For all platforms, the __librjmcmc__ depends on the following libraries, which should be installed on your system:
 
-* Image libraries: [*[^libtiff]], [*[^libjpeg]], [*[^libpng]]
-* GUI library (only required for 2D visualization): [*[^[gilviewer]]] and [*[^[wx]]]
 * [general_boost] libraries: [*[^[boost program_options]]], [*[^[boost thread]]], [*[^[boost system]]], [*[^[boost filesystem]]]
-* [*[^[cgal]] (not required)
 
-To build the doc, either as =html= or =pdf=, the following utilities are required:
+The image-based energies of the samples require :
 
-* [general_boost] utilities: [*[^boostbook xsl]], [*[^boostbook dtd]], [*[^boost-build]] (available in your packages manager)
-* [*[^doxygen]], [*[^xsltproc]], [*[^docbook xsl]], [*[^docbook dtd]], [*[^fop]] (available in your packages manager)
+* [*[^[boost_gil]]], [*[^libtiff]], [*[^libjpeg]], [*[^libpng]]
 
-You also need to download and install the cross-platform build system [cmake] and the ['source control management tool] [hg].
+The GUI-based samples that provide 2D visualizations are built over :
+
+* [*[^[wx]]], [*[^[gilviewer]]]
+
+Finally to help debugging the geometric aspects of the library (at the cost of computing time...) :
+
+* [*[^[cgal]]]
+
+To build this documentation, either as =html= or =pdf=, the following utilities are required:
+
+* [general_boost] utilities: [*[^boostbook xsl]], [*[^boostbook dtd]], [*[^boost-build]] (available in your package manager)
+* [*[^doxygen]], [*[^xsltproc]], [*[^docbook xsl]], [*[^docbook dtd]], [*[^fop]] (available in your package manager)
+
+You also need to download and install the cross-platform build system [cmake].
+Access to the ['source control management tool] is performed using [hg].
 [endsect]
 
 [section:compilation_download Downloading __librjmcmc__]
@@ -48,7 +58,7 @@ This will update the library with the latest version available in the repository
 
 [section:compilation_building Building and installing __librjmcmc__]
 [h3 Building the library]
-Once __librjmcmc__ is download, you use =(c)cmake= and your favorite compiler to build the binaries (libraries and/or samples). It is as simple as:
+Once __librjmcmc__ is downloaded, you use =cmake=,  =ccmake= or  =cmake-gui= and your favorite compiler to build the binaries (libraries and/or samples). It is as simple as:
 
 ``
 	cd wherever_you_like
@@ -67,7 +77,7 @@ Finally, you run the compilation process:
 	make -j<x>
 ``
 
-where =<x>= is the number of simultaneous compilation process (usually between 2 and 4 to avoid a too high memory footprint).
+where =<x>= is the number of simultaneous compilation process (usually between 2 and 4 to avoid  too high a memory footprint).
 
 [h3 Building the documentation]
 The documentation is available as =html= or as a =pdf= document. To obtain the =html= version, just run:

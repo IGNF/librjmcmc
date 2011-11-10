@@ -42,7 +42,6 @@ typedef parameters< wx_parameter > param;
 #include <boost/filesystem.hpp>
 
 //[building_footprint_rectangle_gilviewer_app_declaration
-#include "simulated_annealing/visitor/controler.hpp"
 class building_footprint_rectangle_gilviewer : public wx_plugin_base, public simulated_annealing::Controler
 {
     //]

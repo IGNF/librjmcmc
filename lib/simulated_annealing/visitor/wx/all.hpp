@@ -5,5 +5,6 @@
 #include "configuration_visitor.hpp"
 #include "parameters_visitor.hpp"
 #include "log_visitor.hpp"
+#include "controler_visitor.hpp"
 
 #endif // __ALL_WX_VISITORS_HPP__

@@ -31,23 +31,27 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
   add_reference(librjmcmc-param-ref.xml ${PARAM_HEADER_FILES}
     BOOSTBOOK boost.doxygen.reftitle="Parameter Support")
 
+set(QBK_SOURCES
+  librjmcmc.qbk
+  HTML4_symbols.qbk
+  librjmcmc_introduction.qbk
+  librjmcmc_compilation.qbk
+  librjmcmc_quickstart.qbk
+  quickstart.cpp
+  librjmcmc_mpp.qbk
+  librjmcmc_rjmcmc.qbk
+  librjmcmc_simulated_annealing.qbk
+  librjmcmc_tutorial.qbk
+  librjmcmc_samples.qbk
+  samples/sample_multiple_geometries_extraction.qbk
+  samples/sample_rectangular_building_footprint_extraction.qbk
+  librjmcmc_reference.qbk
+  librjmcmc_bibliography.qbk
+)
+
 # PARAMETERS : http://docbook.sourceforge.net/release/xsl/current/doc/
   add_documentation(
-    librjmcmc.qbk
-    HTML4_symbols.qbk
-    librjmcmc_introduction.qbk
-    librjmcmc_compilation.qbk
-    librjmcmc_quickstart.qbk
-    quickstart.cpp
-    librjmcmc_mpp.qbk
-    librjmcmc_rjmcmc.qbk
-    librjmcmc_simulated_annealing.qbk
-    librjmcmc_tutorial.qbk
-    librjmcmc_samples.qbk
-    samples/sample_multiple_geometries_extraction.qbk
-    samples/sample_rectangular_building_footprint_extraction.qbk
-    librjmcmc_reference.qbk
-    librjmcmc_bibliography.qbk
+    ${QBK_SOURCES}
     librjmcmc-mpp-ref.xml
     librjmcmc-rjmcmc-ref.xml
     librjmcmc-sa-ref.xml
@@ -77,13 +81,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     css/boostbook.css
   )
 
-
-
 file( GLOB_RECURSE LIB_HEADER_FILES    ../lib/*.hpp ../lib/*.h)
 
 option(BUILD_QUICKSTART "build quickstart" ON)
 if(BUILD_QUICKSTART)
-    add_executable( quickstart quickstart.cpp ${LIB_HEADER_FILES})
+    add_executable( quickstart quickstart.cpp ${LIB_HEADER_FILES}
+    ${QBK_SOURCES}
+)
     target_link_libraries( quickstart ${Boost_LIBRARIES} ${GEOMETRY_LIBRARIES} )
 endif(BUILD_QUICKSTART)
 

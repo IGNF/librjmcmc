@@ -23,8 +23,8 @@ is suboptimal but is more practical and thus more commonly used.
 [simulated_annealing]
 The main entry point starts by parsing the input parameters, providing default values:
 [parse_parameters]
-Once an empty configuration is created and initialized with the energy objects, the reference poisson process is instantiated.
-Then, `samp` is the __RJMCMC__ sampler object. Finally, the `simulated_annealing` objects are created and the
+Once the reference poisson process is instantiated, an empty configuration is created and initialized with the energy objects.
+Then,  the __RJMCMC__ sampler object `samp` is constructed. Finally, the `simulated_annealing` objects are created and the
 optimization is performed in place on the `configuration` instance `c`.
 [optimize]
 

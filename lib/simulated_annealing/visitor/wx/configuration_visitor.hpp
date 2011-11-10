@@ -55,18 +55,15 @@ namespace simulated_annealing {
             void init(int dump, int save);
 
             template<typename Configuration, typename Sampler>
-            void begin(const Configuration&, const Sampler&, double)
+            void begin(const Configuration& config, const Sampler&, double)
             {
+                paint(config);
             }
 
             template<typename Configuration, typename Sampler>
             void end(const Configuration& config, const Sampler&, double)
             {
-                wxMutexGuiEnter();
-                m_vlayer->clear();
-                m_vlayer << config;
-                m_panel->Refresh();
-                wxMutexGuiLeave();
+                paint(config);
             }
 
             template<typename Configuration, typename Sampler>
@@ -83,11 +80,7 @@ namespace simulated_annealing {
                 }
                 if ( m_dump && (m_iter % m_dump == 0) )
                 {
-                    wxMutexGuiEnter();
-                    m_vlayer->clear();
-                    m_vlayer << config;
-                    m_panel->Refresh();
-                    wxMutexGuiLeave();
+                    paint(config);
                 }
             }
 
@@ -105,6 +98,17 @@ namespace simulated_annealing {
             int m_save;
             int m_iter;
             layer::ptrLayerType m_vlayer;
+
+
+            template<typename Configuration>
+            void paint(const Configuration& config)
+            {
+                wxMutexGuiEnter();
+                m_vlayer->clear();
+                m_vlayer << config;
+                m_panel->Refresh();
+                wxMutexGuiLeave();
+            }
         };
 
     } // namespace wx
