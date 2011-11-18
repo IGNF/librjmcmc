@@ -174,8 +174,7 @@ typedef marked_point_process::result_of_make_uniform_modification_kernel<object,
 //]
 
 //[building_footprint_rectangle_definition_energies
-#include "rjmcmc/energy/binary_operator_energy.hpp"
-#include "rjmcmc/energy/unary_operator_energy.hpp"
+#include "rjmcmc/energy/energy_operators.hpp"
 #include "mpp/energy/image_gradient_unary_energy.hpp"
 #include "image/gradient_functor.hpp"
 #include "image/oriented.hpp"
