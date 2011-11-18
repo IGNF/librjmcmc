@@ -23,7 +23,7 @@ namespace simulated_annealing {
                     const wxSize& size = wxDefaultSize,
                     long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
 
-            void init(int dump, int save)
+            void init(int dump, int)
             {
                 m_dump = dump;
                 m_iter = 0;

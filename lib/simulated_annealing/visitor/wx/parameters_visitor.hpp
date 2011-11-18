@@ -31,22 +31,22 @@ namespace simulated_annealing {
 
             virtual ~parameters_visitor() {}
 
-            void init(int dump, int save) {}
+            void init(int, int) {}
 
             template<typename Configuration, typename Sampler>
-            void begin(const Configuration& config, const Sampler& sampler, double t)
+            void begin(const Configuration&, const Sampler&, double)
             {
                 Enable(false);
             }
 
             template<typename Configuration, typename Sampler>
-            void end(const Configuration& config, const Sampler& sampler, double t)
+            void end(const Configuration&, const Sampler&, double)
             {
                 Enable(true);
             }
 
             template<typename Configuration, typename Sampler>
-            inline void visit(const Configuration& config, const Sampler& sampler, double) {}
+            inline void visit(const Configuration&, const Sampler&, double) {}
 
             void Enable(bool b);
             void Show(bool b = true);

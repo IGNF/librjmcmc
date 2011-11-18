@@ -4,22 +4,16 @@
 #include "mpp/energy/image_gradient_unary_energy.hpp"
 #include "geometry/integrated_flux.h"
 
-template<typename DSM>
+template<typename Image, typename Value>
 template<typename T>
-double image_gradient_unary_energy<DSM>::operator()(const T &t) const
+typename image_gradient_unary_energy<Image,Value>::result_type
+image_gradient_unary_energy<Image,Value>::operator()(const T &t) const
 {
-    return m_defaultEnergy
-            - m_ponderation_dsm*integrated_flux(m_dsm,t);
+    return integrated_flux(m_image,t);
 }
 
-template<typename DSM>
-image_gradient_unary_energy<DSM>::image_gradient_unary_energy(
-        const DSM& dsm,
-        double default_energy, double ponderation_dsm) :
-	m_defaultEnergy(default_energy), 
-	m_ponderation_dsm(ponderation_dsm),
-	m_dsm(dsm)
-{
-}
+template<typename Image, typename Value>
+image_gradient_unary_energy<Image,Value>::image_gradient_unary_energy(const Image& image)
+    : m_image(image) {}
 
 #endif

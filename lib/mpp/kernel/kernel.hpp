@@ -37,8 +37,8 @@ namespace marked_point_process {
             
             modif.insert_death(it);
             const T& t = c[it];
-           // iterator coord_it  = coordinates_begin(t.rotate(die()));
-             iterator coord_it  = coordinates_begin(t);
+            iterator coord_it  = coordinates_begin(t.rotate(die()));
+          //   iterator coord_it  = coordinates_begin(t);
             for(unsigned int i=0;i<dimension;++i) *out++ = *coord_it++;
             
             // return 1./c.size<T>();
@@ -81,14 +81,14 @@ namespace marked_point_process {
         typedef double result_type;
         result_type operator()(T& t) const
         {
-            int dummy;
+            int dummy_config, dummy_modif;
             double val0[dimension];
             double val1[dimension];
-            double phi01 = m_variate(dummy,dummy,val0);
+            double phi01 = m_variate(dummy_config,dummy_modif,val0);
             m_transform.apply(val0,val1);
             object_from_coordinates<T> creator;
             t = creator(val1);
-            return  pdf(t);
+            return  phi01*pdf(t);
         }
         
         struct pdf_visitor {

@@ -27,7 +27,7 @@ namespace simulated_annealing {
                               wxWindow *parent = (wxWindow *) NULL,
                               wxWindowID id = wxID_ANY);
 
-            void init(int dump, int save) {}
+            void init(int, int) {}
 
             template<typename Configuration, typename Sampler>
             void begin(const Configuration& config, const Sampler& sampler, double t)

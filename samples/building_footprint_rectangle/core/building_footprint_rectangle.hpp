@@ -15,17 +15,6 @@ typedef Rectangle_2 object;
 //typedef boost::variant<Rectangle_2> object;
 //->
 
-//[building_footprint_rectangle_definition_energies
-#include "mpp/energy/image_gradient_unary_energy.hpp"
-#include "image/gradient_functor.hpp"
-#include "image/oriented.hpp"
-typedef oriented<gradient_image_t>                          oriented_gradient_view;
-typedef image_gradient_unary_energy<oriented_gradient_view> unary_energy;
-
-#include "mpp/energy/intersection_area_binary_energy.hpp"
-typedef intersection_area_binary_energy                     binary_energy;
-//]
-
 //[building_footprint_rectangle_definition_kernels
 #include "rjmcmc/kernel/transform.hpp"
 
@@ -184,6 +173,19 @@ typedef marked_point_process::result_of_make_uniform_birth_death_kernel<object>:
 typedef marked_point_process::result_of_make_uniform_modification_kernel<object,rectangle_edge_translation_transform>::type  modification_kernel;
 //]
 
+//[building_footprint_rectangle_definition_energies
+#include "rjmcmc/energy/binary_operator_energy.hpp"
+#include "rjmcmc/energy/unary_operator_energy.hpp"
+#include "mpp/energy/image_gradient_unary_energy.hpp"
+#include "image/gradient_functor.hpp"
+#include "image/oriented.hpp"
+typedef oriented<gradient_image_t>                          oriented_gradient_view;
+typedef image_gradient_unary_energy<oriented_gradient_view> unary_energy;
+
+#include "mpp/energy/intersection_area_binary_energy.hpp"
+typedef intersection_area_binary_energy<>                   binary_energy;
+//]
+
 //<-
 /************** rjmcmc library types ****************/
 //->
@@ -212,8 +214,15 @@ typedef simulated_annealing::max_iteration_end_test     end_test;
 //->
 
 //[building_footprint_rectangle_definition_configuration
+
+#include "mpp/energy/image_center_unary_energy.hpp"
+typedef oriented<boost::gil::gray16_image_t> mask_type;
 #include "mpp/configuration/graph_configuration.hpp"
-typedef marked_point_process::graph_configuration<object, unary_energy, binary_energy> configuration;
+typedef marked_point_process::graph_configuration<
+        object,
+        plus_energy<multiplies_energy<constant_energy<>,image_center_unary_energy<mask_type> >,minus_energy<constant_energy<>,multiplies_energy<constant_energy<>,unary_energy> > >,
+        multiplies_energy<constant_energy<>,binary_energy>
+        > configuration;
 //]
 
 //[building_footprint_rectangle_definition_distribution
@@ -250,8 +259,8 @@ typedef rjmcmc::metropolis_acceptance acceptance;
 
 //typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel> sampler;
 typedef rjmcmc::sampler<d_sampler,acceptance
-                ,birth_death_kernel
-                ,modification_kernel
+        ,birth_death_kernel
+        ,modification_kernel
         > sampler;
 
 //<-
@@ -281,26 +290,28 @@ void set_bbox(param *p, const Iso_rectangle_2& r) {
 //]
 
 //[building_footprint_rectangle_create_configuration
+#include "image/conversion_functor.hpp"
+
 void create_configuration(const param *p, const oriented_gradient_view& grad, configuration *&c) {
     // energies
-    unary_energy e1( grad,
-                     p->get<double>("energy"),
-                     p->get<double>("ponderation_grad")
-                     );
+    unary_energy e1( grad );
+    binary_energy e2;
 
-    binary_energy e2(
-            p->get<double>("surface")
-            );
-
+    std::string mask_file = p->get<boost::filesystem::path>("mask" ).string();
+    Iso_rectangle_2 bbox = get_bbox(p);
+    clip_bbox(bbox,mask_file);
+    mask_type mask(mask_file , bbox, conversion_functor() );
+    image_center_unary_energy<mask_type> ec(mask);
     // empty initial configuration
-    c = new configuration(e1,e2);
+    c = new configuration( (p->get<double>("ponderation_mask")*ec)+(p->get<double>("energy") - ( p->get<double>("ponderation_grad") * e1)),
+                            p->get<double>("ponderation_surface")*e2);
 }
 //]
 
 //[building_footprint_rectangle_create_sampler
 void create_sampler(const param *p, sampler *&s) {
     Iso_rectangle_2 r = get_bbox(p);
-    K::Vector_2 v((r.max()-r.min())*0.05);
+    K::Vector_2 v(p->get<double>("maxsize"),p->get<double>("maxsize"));
 
     uniform_birth birth(
             Rectangle_2(r.min(),-v,1/p->get<double>("maxratio")),
@@ -317,7 +328,7 @@ void create_sampler(const param *p, sampler *&s) {
     s = new sampler( ds, a
                      , marked_point_process::make_uniform_birth_death_kernel(birth, p->get<double>("pbirth"), p->get<double>("pdeath") )
                      , marked_point_process::make_uniform_modification_kernel<object>(rectangle_edge_translation_transform(),1)
-//                       , 0.5 * modif2
+                     //                       , 0.5 * modif2
 
                      );
     //s = new sampler( ds, a, kbirthdeath);

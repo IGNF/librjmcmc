@@ -192,17 +192,8 @@ namespace simulated_annealing {
         void parameters_visitor::Enable(bool b)
         {
             wxMutexGuiEnter();
-            if(b)
-            {
-                m_frame->Enable();
-                m_frame->Refresh();
-                m_frame->Show();
-            }
-            else
-            {
-                m_frame->Refresh();
-                m_frame->Disable();
-            }
+            m_frame->Enable(b);
+            m_frame->Refresh();
             wxMutexGuiLeave();
 
         }
