@@ -80,6 +80,7 @@ public:
         it->set(v);
     }
 
+    bool save (const std::string& filename) const;
     bool parse(const std::string& filename);
     bool parse(int argc, char **argv);
     
@@ -92,6 +93,7 @@ public:
     template<typename V> void insert(const std::string& name);
 
     void erase(const std::string& name);
+    void clear() { m_parameter.clear(); }
 
     inline void caption(const std::string& c) { m_caption=c; }
     inline const std::string& caption() const { return m_caption; }
@@ -102,5 +104,23 @@ private:
     parameters() {}
     parameters(const parameters &);
 };
+
+
+#include <fstream>
+template<typename T>
+bool parameters<T>::save(const std::string& filename) const
+{
+    std::ofstream file(filename.c_str());
+    if(!file)
+    {
+        std::cout << "Unable to open : "<<filename << std::endl;
+        return false;
+    }
+    for(const_iterator it=m_parameter.begin(); it!=m_parameter.end();++it)
+    {
+        file << it->name() << " = " << it->value() << std::endl;
+    }
+    return true;
+}
 
 #endif // PARAMETERS_HPP

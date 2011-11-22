@@ -37,10 +37,14 @@ namespace simulated_annealing {
             parameters_frame(wxWindow *parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
                 : wxFrame(parent,id,title,pos,size,style)
             {
+                SetIcon(wxICON(IGN));
             }
+            void build(layer_control *lc);
 
             void on_file_parameter(wxCommandEvent& event);
             void on_bool_parameter(wxCommandEvent& event);
+            void on_save_parameter(wxCommandEvent& event);
+            void on_load_parameter(wxCommandEvent& event);
 
             void on_close_window(wxCloseEvent&) { Hide(); }
 
@@ -52,6 +56,27 @@ namespace simulated_annealing {
         };
 
 
+        void parameters_frame::on_load_parameter(wxCommandEvent& event)
+        {
+            wxFileDialog *fileDialog = new wxFileDialog(this, wxString("Loading Parameter file", *wxConvCurrent), wxT(""), wxT(""),  wxT("INI (*.ini)|*.ini;*.INI"), wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_CHANGE_DIR );
+            if (fileDialog->ShowModal() == wxID_OK)
+            {
+                param *p = param::instance();
+                p->parse(fileDialog->GetPath().To8BitData().data());
+                update_controls(p);
+                Refresh();
+            }
+        }
+
+        void parameters_frame::on_save_parameter(wxCommandEvent& event)
+        {
+            wxFileDialog *fileDialog = new wxFileDialog(this, wxString("Saving Parameter file", *wxConvCurrent), wxT(""), wxT(""),  wxT("INI (*.ini)|*.ini;*.INI"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT|wxFD_CHANGE_DIR );
+            if (fileDialog->ShowModal() == wxID_OK)
+            {
+                param::instance()->save(fileDialog->GetPath().To8BitData().data());
+            }
+        }
+
         void parameters_frame::on_file_parameter(wxCommandEvent& event)
         {
             wxString wildcard;
@@ -60,7 +85,6 @@ namespace simulated_annealing {
             wildcard << wxT("TIFF (*.tif;*.tiff;*.TIF;*.TIFF)|*.tif;*.tiff;*.TIF;*.TIFF|");
             wildcard << wxT("PNG (*.png;*.PNG)|*.png;*.PNG|");
             wildcard << wxT("JPEG (*.jpg;*.jpeg;*.JPG;*.JPEG)|*.jpg;*.jpeg;*.JPG;*.JPEG|");
-            wxString str;
             std::string name = m_name[event.GetId()];
             wxFileDialog *fileDialog = new wxFileDialog(this, wxString(name.c_str(), *wxConvCurrent), wxT(""), wxT(""), wildcard, wxFD_OPEN|wxFD_CHANGE_DIR );
             if (fileDialog->ShowModal() == wxID_OK)
@@ -154,17 +178,13 @@ namespace simulated_annealing {
             }
         };
 
-        parameters_visitor::parameters_visitor(panel_viewer *panel, wxWindow *parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
-            : m_frame(new parameters_frame(parent, id, title, pos, size, style))
-            , m_panel(panel)
+        void parameters_frame::build(layer_control *lc)
         {
-
-            m_frame->SetIcon(wxICON(IGN));
             param *p = param::instance();
 
             wxBoxSizer* inner_sizer = new wxBoxSizer(wxVERTICAL);
 
-            wxScrolledWindow* scroll = new wxScrolledWindow(m_frame.get(), wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE|wxScrolledWindowStyle|wxTAB_TRAVERSAL, wxT("scroll"));
+            wxScrolledWindow* scroll = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE|wxScrolledWindowStyle|wxTAB_TRAVERSAL, wxT("scroll"));
             scroll->SetScrollbars(20,20,50,50);
 
             wxFlexGridSizer* sizer = new wxFlexGridSizer(2);
@@ -172,9 +192,22 @@ namespace simulated_annealing {
             sizer->AddSpacer(10);
             sizer->AddSpacer(10);
 
+            wxString desc_save("Save", *wxConvCurrent);
+            wxString desc_load("Load", *wxConvCurrent);
+            wxButton *save_button = new wxButton(scroll,wxID_ANY,desc_save);
+            wxButton *load_button = new wxButton(scroll,wxID_ANY,desc_load);
+            sizer->Add(save_button, 0,wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+            sizer->Add(load_button, 0,wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+            save_button->Connect(wxID_ANY, wxEVT_COMMAND_BUTTON_CLICKED,
+                                 wxCommandEventHandler(parameters_frame::on_save_parameter), NULL, this);
+            load_button->Connect(wxID_ANY, wxEVT_COMMAND_BUTTON_CLICKED,
+                                 wxCommandEventHandler(parameters_frame::on_load_parameter), NULL, this);
+
+            load_button->Disable(); // NOT operational yet... makes the app crash
+
             for(param::iterator it=p->begin(); it!=p->end(); ++it)
             {
-                sizer_adder<param::parameter_t> adder(m_frame.get(),m_panel->layercontrol(),sizer,scroll,*it);
+                sizer_adder<param::parameter_t> adder(this,lc,sizer,scroll,*it);
                 boost::apply_visitor(adder,it->value());
             }
 
@@ -183,9 +216,18 @@ namespace simulated_annealing {
             scroll->Layout();
 
             inner_sizer->Add(scroll, 1, wxEXPAND | wxALL, 5);
-            m_frame->SetSizer(inner_sizer);
-            m_frame->SetAutoLayout(true);
-            m_frame->Refresh();
+            SetSizer(inner_sizer);
+            SetAutoLayout(true);
+            Refresh();
+
+        }
+
+
+        parameters_visitor::parameters_visitor(panel_viewer *panel, wxWindow *parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+            : m_frame(new parameters_frame(parent, id, title, pos, size, style))
+            , m_panel(panel)
+        {
+            m_frame->build(m_panel->layercontrol());
             m_frame->Show();
         }
 
@@ -195,8 +237,8 @@ namespace simulated_annealing {
             m_frame->Enable(b);
             m_frame->Refresh();
             wxMutexGuiLeave();
-
         }
+
         void parameters_visitor::Show(bool b) { m_frame->Show(b); }
         bool parameters_visitor::IsShown() const { return m_frame->IsShown(); }
     } // namespace wx

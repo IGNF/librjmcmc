@@ -20,9 +20,9 @@ struct option_adder {
         if(s!='\0') name = (name + ",")+ s;
         m_desc.add_options()(
                 name.c_str(),
-                po::value<V>(&t)->default_value(t),
+                po::value<V>(&t),
                 m_p.description().c_str()
-		);
+                );
     }
 };
 
@@ -82,7 +82,6 @@ void parameters<T>::erase(const std::string& name) {
     if (it==end()) throw unknown_parameter_name();
     m_parameter.erase(it);
 }
-
 
 template<typename T> template<typename V>
 void parameters<T>::insert(const std::string& name, char c, const V& v, const std::string& desc) {
