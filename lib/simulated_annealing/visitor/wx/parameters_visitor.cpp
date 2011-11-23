@@ -15,6 +15,7 @@
 #include <wx/icon.h>
 #include <wx/frame.h>
 
+#include "param/parameters_inc.hpp"
 #include "param/wx_parameter.hpp"
 #include "parameters_visitor.hpp"
 typedef parameters< wx_parameter > param;
@@ -62,6 +63,7 @@ namespace simulated_annealing {
             if (fileDialog->ShowModal() == wxID_OK)
             {
                 param *p = param::instance();
+                update_values(p);
                 p->parse(fileDialog->GetPath().To8BitData().data());
                 update_controls(p);
                 Refresh();
@@ -73,7 +75,9 @@ namespace simulated_annealing {
             wxFileDialog *fileDialog = new wxFileDialog(this, wxString("Saving Parameter file", *wxConvCurrent), wxT(""), wxT(""),  wxT("INI (*.ini)|*.ini;*.INI"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT|wxFD_CHANGE_DIR );
             if (fileDialog->ShowModal() == wxID_OK)
             {
-                param::instance()->save(fileDialog->GetPath().To8BitData().data());
+                param *p = param::instance();
+                update_values(p);
+                p->save(fileDialog->GetPath().To8BitData().data());
             }
         }
 
@@ -128,6 +132,7 @@ namespace simulated_annealing {
             {
                 AddText(m_sizer);
                 std::ostringstream oss;
+                oss.precision(std::numeric_limits<double>::digits10+1);
                 oss << t;
                 wxString s(oss.str().c_str(), *wxConvCurrent);
                 wxTextCtrl   *ctrl = new wxTextCtrl(m_wnd, wxID_ANY, s);
@@ -203,7 +208,7 @@ namespace simulated_annealing {
             load_button->Connect(wxID_ANY, wxEVT_COMMAND_BUTTON_CLICKED,
                                  wxCommandEventHandler(parameters_frame::on_load_parameter), NULL, this);
 
-            load_button->Disable(); // NOT operational yet... makes the app crash
+      //      load_button->Disable(); // NOT operational yet... makes the app crash
 
             for(param::iterator it=p->begin(); it!=p->end(); ++it)
             {

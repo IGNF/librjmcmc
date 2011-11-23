@@ -21,6 +21,7 @@ public:
 
     template<typename T> void operator()(const T& t) const {
         std::ostringstream oss;
+        oss.precision(std::numeric_limits<double>::digits10+1);
         oss << m_energy;
         paint(m_layer,oss.str(),t);
     }

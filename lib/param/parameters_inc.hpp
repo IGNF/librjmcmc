@@ -49,6 +49,7 @@ bool parameters<T>::parse(const std::string& filename)
         std::cout << "Unable to read : "<<filename << std::endl;
         return false;
     }
+    file.precision(std::numeric_limits<double>::digits10+1);
     po::store(po::parse_config_file(file,desc), vm);
 
     if ( vm.count("config") && !parse(vm["config"].as<std::string> ()))

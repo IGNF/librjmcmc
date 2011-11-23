@@ -108,6 +108,7 @@ struct wx_parameter : public parameter {
         template<typename T> void operator()(wxTextCtrl *ctrl, const T& t) const {
             if(ctrl==NULL) return;
             std::ostringstream oss;
+            oss.precision(std::numeric_limits<double>::digits10+1);
             oss << t;
             ctrl->SetValue(wxString(oss.str().c_str(), *wxConvCurrent));
 	}
@@ -131,6 +132,7 @@ struct wx_parameter : public parameter {
         template<typename T> void operator()(wxChoice *ctrl, const T& t) const {
             if(ctrl==NULL) return;
             std::ostringstream oss;
+            oss.precision(std::numeric_limits<double>::digits10+1);
             oss << t;
             wxString s(oss.str().c_str(), *wxConvCurrent);
             if(ctrl->FindString(s) == wxNOT_FOUND)

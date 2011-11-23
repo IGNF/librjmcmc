@@ -116,6 +116,7 @@ bool parameters<T>::save(const std::string& filename) const
         std::cout << "Unable to open : "<<filename << std::endl;
         return false;
     }
+    file.precision(std::numeric_limits<double>::digits10+1);
     for(const_iterator it=m_parameter.begin(); it!=m_parameter.end();++it)
     {
         file << it->name() << " = " << it->value() << std::endl;
