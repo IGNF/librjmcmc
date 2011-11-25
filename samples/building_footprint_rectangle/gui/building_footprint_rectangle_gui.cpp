@@ -107,6 +107,25 @@ private:
     //]
 
 public:
+
+    void load_image(const std::string& file)
+    {
+        if(file=="") return;
+        layer_control *lc = m_confg_visitor->panelviewer()->layercontrol();
+        layer_control::const_iterator it  = lc->begin();
+        layer_control::const_iterator end = lc->end();
+        for(;it!=end;++it)
+        {
+            using namespace boost::filesystem;
+            if((*it)->filename()==path(system_complete(file)).string())
+            {
+                return; // it;
+            }
+        }
+        // return
+                lc->add_layer_from_file(wxString(file.c_str(), *wxConvCurrent));
+    }
+
     //[building_footprint_rectangle_gui_go
     virtual void go()
     {
@@ -115,29 +134,17 @@ public:
         update_values(p);
 
         Iso_rectangle_2 bbox = get_bbox(p);
-        std::string  dsm_file = p->get<boost::filesystem::path>("dsm" ).string();
+        std::string  dsm_file = p->get<boost::filesystem::path>("dsm").string();
         clip_bbox(bbox,dsm_file );
 
         gradient_functor gf(p->get<double>("sigmaD"));
         oriented_gradient_view grad_view(dsm_file,  bbox, gf);
         m_grad = grad_view.img();
 
-        // Checks if the file is already loaded. If not load it.
-        bool already_loaded = false;
-        layer_control *lc = m_confg_visitor->panelviewer()->layercontrol();
-        layer_control::const_iterator it  = lc->begin();
-        layer_control::const_iterator end = lc->end();
-        for(;it!=end;++it)
-        {
-            using namespace boost::filesystem;
-            if((*it)->filename()==path(system_complete(dsm_file)).string())
-            {
-                already_loaded = true;
-                break;
-            }
-        }
-        if(!already_loaded)
-            lc->add_layer_from_file(wxString(dsm_file.c_str(), *wxConvCurrent));
+        std::string  mask_file = p->get<boost::filesystem::path>("mask").string();
+
+        load_image(dsm_file );
+        load_image(mask_file);
 
         set_bbox(p,bbox);
         wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));

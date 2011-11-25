@@ -219,7 +219,7 @@ typedef oriented<boost::gil::gray16_image_t> mask_type;
 #include "mpp/configuration/graph_configuration.hpp"
 typedef marked_point_process::graph_configuration<
         object,
-        plus_energy<multiplies_energy<constant_energy<>,image_center_unary_energy<mask_type> >,minus_energy<constant_energy<>,multiplies_energy<constant_energy<>,unary_energy> > >,
+        minus_energy<constant_energy<>,multiplies_energy<constant_energy<>,unary_energy> >,
         multiplies_energy<constant_energy<>,binary_energy>
         > configuration;
 //]
@@ -292,18 +292,29 @@ void set_bbox(param *p, const Iso_rectangle_2& r) {
 #include "image/conversion_functor.hpp"
 
 void create_configuration(const param *p, const oriented_gradient_view& grad, configuration *&c) {
+    std::string mask_file = p->get<boost::filesystem::path>("mask" ).string();
+    if(mask_file!="")
+    {
+        Iso_rectangle_2 bbox = get_bbox(p);
+        clip_bbox(bbox,mask_file);
+        mask_type mask(mask_file , bbox, conversion_functor() );
+        for(unsigned int j=0; j<grad.view().height();++j)
+        {
+            for(unsigned int i=0; i<grad.view().width();++i)
+            {
+                unsigned char m = (i < mask.view().width() && j < mask.view().height() && mask.view()(i,j)>0) ? 1 : 0;
+                boost::gil::at_c<0>(grad.view()(i,j)) = m * boost::gil::at_c<0>(grad.view()(i,j));
+                boost::gil::at_c<1>(grad.view()(i,j)) = m * boost::gil::at_c<1>(grad.view()(i,j));
+            }
+        }
+    }
     // energies
     unary_energy e1( grad );
     binary_energy e2;
 
-    std::string mask_file = p->get<boost::filesystem::path>("mask" ).string();
-    Iso_rectangle_2 bbox = get_bbox(p);
-    clip_bbox(bbox,mask_file);
-    mask_type mask(mask_file , bbox, conversion_functor() );
-    image_center_unary_energy<mask_type> ec(mask);
     // empty initial configuration
-    c = new configuration( (p->get<double>("ponderation_mask")*ec)+(p->get<double>("energy") - ( p->get<double>("ponderation_grad") * e1)),
-                            p->get<double>("ponderation_surface")*e2);
+    c = new configuration( (p->get<double>("energy") - ( p->get<double>("ponderation_grad") * e1)),
+                           p->get<double>("ponderation_surface")*e2);
 }
 //]
 

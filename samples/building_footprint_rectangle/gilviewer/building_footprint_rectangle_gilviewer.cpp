@@ -88,6 +88,44 @@ public:
         chart_visibility(true);
     }
 
+    void load_image(const std::string& file)
+    {
+        if(file=="") return;
+        layer_control *lc = m_confg_visitor->panelviewer()->layercontrol();
+        layer_control::const_iterator it  = lc->begin();
+        layer_control::const_iterator end = lc->end();
+        for(;it!=end;++it)
+        {
+            using namespace boost::filesystem;
+            if((*it)->filename()==path(system_complete(file)).string())
+            {
+                return; // it;
+            }
+        }
+        // return
+        panel_viewer *panel = m_confg_visitor->panelviewer();
+        boost::shared_ptr<vector_layer_ghost> ghost = panel->vectorlayerghost();
+        std::string extension(boost::filesystem::extension(file));
+        try
+        {
+            boost::shared_ptr<gilviewer_file_io> file_io = m_factory->create_object(extension.substr(1,extension.size()-1));
+            layer::ptrLayerType  ilayer = file_io->load(file);
+            if(!ilayer) throw std::exception();
+            lc->add_layer( ilayer );
+            if(ghost)
+            {
+                ghost->reset();
+                ghost->transform() = ilayer->transform();
+            }
+        }
+        catch (const std::exception &e)
+        {
+            using namespace std;
+            GILVIEWER_LOG_EXCEPTION("Read error: " + file);
+            return;
+        }
+    }
+
     //[building_footprint_rectangle_gilviewer_go
     virtual void process()
     {
@@ -97,51 +135,16 @@ public:
         update_values(p);
 
         Iso_rectangle_2 bbox = get_bbox(p);
-        std::string  dsm_file = p->get<boost::filesystem::path>("dsm" ).string();
+        std::string  dsm_file = p->get<boost::filesystem::path>("dsm"  ).string();
+        std::string mask_file = p->get<boost::filesystem::path>("mask" ).string();
         clip_bbox(bbox,dsm_file );
 
         gradient_functor gf(p->get<double>("sigmaD"));
         oriented_gradient_view grad_view(dsm_file,  bbox, gf);
         m_grad = grad_view.img();
 
-        // Checks if the file is already loaded. If not load it.
-        bool already_loaded = false;
-        layer_control *lc = m_confg_visitor->panelviewer()->layercontrol();
-        layer_control::const_iterator it  = lc->begin();
-        layer_control::const_iterator end = lc->end();
-        for(;it!=end;++it)
-        {
-            using namespace boost::filesystem;
-            if((*it)->filename()==path(system_complete(dsm_file)).string())
-            {
-                already_loaded = true;
-                break;
-            }
-        }
-        if(!already_loaded)
-        {
-            panel_viewer *panel = m_confg_visitor->panelviewer();
-            boost::shared_ptr<vector_layer_ghost> ghost = panel->vectorlayerghost();
-            std::string extension(boost::filesystem::extension(dsm_file));
-            try
-            {
-                boost::shared_ptr<gilviewer_file_io> file_io = m_factory->create_object(extension.substr(1,extension.size()-1));
-                layer::ptrLayerType  ilayer = file_io->load(dsm_file);
-                if(!ilayer) throw std::exception();
-                lc->add_layer( ilayer );
-                if(ghost)
-                {
-                    ghost->reset();
-                    ghost->transform() = ilayer->transform();
-                }
-            }
-            catch (const std::exception &e)
-            {
-                using namespace std;
-                GILVIEWER_LOG_EXCEPTION("Read error: " + dsm_file);
-                return;
-            }
-        }
+        load_image(dsm_file );
+        load_image(mask_file);
 
         set_bbox(p,bbox);
         wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));
@@ -157,8 +160,8 @@ public:
         create_schedule     (p,m_schedule);
         create_end_test     (p,m_end_test);
 
-    //    std::cout << "Salamon initial schedule : " << salamon_initial_schedule(m_sampler->density(),*m_config,1000) << std::endl;
-    //    m_config->clear();
+        //    std::cout << "Salamon initial schedule : " << salamon_initial_schedule(m_sampler->density(),*m_config,1000) << std::endl;
+        //    m_config->clear();
 
         any_sampler *sampler = new any_sampler(*m_sampler);
 
@@ -193,7 +196,7 @@ public:
     }
     //]
 
-virtual bool Register(gilviewer_io_factory *factory)
+    virtual bool Register(gilviewer_io_factory *factory)
     {
         m_factory = factory;
     }
