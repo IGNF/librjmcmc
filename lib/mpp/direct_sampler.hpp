@@ -42,7 +42,7 @@ namespace marked_point_process {
         template<typename Configuration>
         double pdf(const Configuration &c) const
         {
-            double res = m_density.pdf(c);
+            double res = m_density.pdf(c.size());
             for(typename Configuration::const_iterator it = c.begin(); it!=c.end(); ++it)
                 res*=rjmcmc::apply_visitor(m_object_sampler.pdf(),c[it]);
             return res;

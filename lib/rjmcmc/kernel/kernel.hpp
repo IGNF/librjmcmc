@@ -3,43 +3,11 @@
 
 namespace rjmcmc {
 
-    /*
-
-    class unary_kernel
-    {
-        double m_p;
-    public:
-        enum { size = 1 };
-        unary_kernel(double p=1.) : m_p(p) {}
-        inline unsigned int kernel_id() const { return 0; }
-        inline void probability(double p) { m_p = p; }
-        inline double probability() const { return m_p; }
-    };
-*/
-
-
-    // a binary_kernel encodes a reversible jump
+    // a kernel encodes a reversible jump
     // for complex problems, a reversible jump typically only modifies a portion of the whole configuration.
     // eg for mpp problems, a reversible jump typically only adds, removes or modifies a few objects.
     // a view denotes the part of the configuration modified by the jump, other aspects of the configuration remaining constant.
-    /*
     //
-
-        // Kernel0 provides a between a subview of the configuration of type Input, and the possibly additional input random variates
-    // Kernel1 provides a between a subview of the configuration of type Output, and the possibly additional output random variates
-    // trivial problems do not require Views: types View0, View1 and Configuration are equal, and Kernels return the whole configuration
-    // for mpp problems, a Kernel may return a 0, 1 or more objects that are to be killed, modified, switched, split...
-
-    // Transforms maps
-    // Kernels are also responsible
-
-*/
-
-    /*
-    template<typename Kernel, typename Transform,
-             typename View = Transform::first_argument_type,
-             > class unary_kernel
-*/
 
     class null_view
     {
@@ -70,7 +38,7 @@ namespace rjmcmc {
         }
         template<typename Configuration, typename Modification, typename InputIterator>
         inline double inverse_pdf(Configuration& c, Modification& modif, InputIterator it) const {
-            // check support
+            // check support ?
             return 1.;
         }
         template<typename InputIterator>

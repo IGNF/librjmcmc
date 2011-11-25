@@ -35,7 +35,7 @@ struct rectangle_edge_translation_transform
         FT v = *in++;
         FT r = *in++;
         FT s = *in++;
-        FT f = exp(s-0.5);
+        FT f = exp(4.0*(s-0.5));
         FT g = 1-f;
         //   res = Rectangle_2(c+m*(1-f), n,f*r);
         *out++ = x-g*r*v;
@@ -43,7 +43,7 @@ struct rectangle_edge_translation_transform
         *out++ = u;
         *out++ = v;
         *out++ = f*r;
-        *out++ = 1-s;
+        *out++ = 1.0-s;
         return res;
     }
 
@@ -370,7 +370,6 @@ void init_visitor(const param *p, Visitor& v)
 #include "image/image_types.hpp"
 #include "image/oriented_inc.hpp"
 #include "image/gradient_functor_inc.hpp"
-#include "mpp/energy/image_gradient_unary_energy_inc.hpp"
 //]
 
 //[building_footprint_rectangle_optimization

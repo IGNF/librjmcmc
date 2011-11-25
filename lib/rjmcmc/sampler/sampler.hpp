@@ -5,8 +5,7 @@
 #include "rjmcmc/random.hpp"
 #include "rjmcmc/random_apply.hpp"
 #include "rjmcmc/kernel/kernel_traits.hpp"
-#include "rjmcmc/kernel/unary_kernel.hpp"
-#include "rjmcmc/kernel/binary_kernel.hpp"
+#include "rjmcmc/kernel/kernel.hpp"
 #include <iomanip>
 
 namespace rjmcmc {
