@@ -26,9 +26,11 @@ typedef parameters< wx_parameter > param;
 
 //[building_footprint_rectangle_gui_gilviewer_and_resources
 #include <GilViewer/gui/basic_viewer_frame.hpp>
+#include <GilViewer/gui/define_id.hpp>
 #include <GilViewer/gui/panel_viewer.hpp>
 #include <GilViewer/gui/panel_manager.hpp>
 #include <GilViewer/gui/layer_control.hpp>
+#include <GilViewer/io/gilviewer_io_factory.hpp>
 #include <GilViewer/io/gilviewer_io_factory.hpp>
 #include "gui/resources/IGN.xpm"
 //]
@@ -84,8 +86,8 @@ private:
         manager->AddPane( m_panelviewer, paneInfoDrawPane );
 
         //create toolbars
-        // m_panelviewer->main_toolbar(m_frame,manager); // TODO : buttons do nothing
-        // m_panelviewer->mode_and_geometry_toolbar(m_frame,manager); // TODO : buttons do nothing
+        m_panelviewer->main_toolbar(m_frame,manager); // TODO : buttons do nothing
+        m_panelviewer->mode_and_geometry_toolbar(m_frame,manager); // TODO : buttons do nothing
 
         m_frame->SetMenuBar( m_panelviewer->menubar() );
         m_frame->SetStatusText(wxT("GilViewer - Adrien Chauve & Olivier Tournaire"));
@@ -235,8 +237,18 @@ private:
     simulated_annealing::wx::log_visitor            m_log_visitor;
     simulated_annealing::wx::controler_visitor     *m_contr_visitor;
     boost::shared_ptr<gradient_image_t>     m_grad;
+
+    DECLARE_GILVIEWER_METHODS_FOR_EVENTS_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 //]
+
+BEGIN_EVENT_TABLE(building_footprint_rectangle_gui,wxApp)
+ADD_GILVIEWER_EVENTS_TO_TABLE(building_footprint_rectangle_gui)
+END_EVENT_TABLE()
+
+IMPLEMENTS_GILVIEWER_METHODS_FOR_EVENTS_TABLE(building_footprint_rectangle_gui,m_panelviewer);
+
 
 //[building_footprint_rectangle_gui_implement
 IMPLEMENT_APP(building_footprint_rectangle_gui);
