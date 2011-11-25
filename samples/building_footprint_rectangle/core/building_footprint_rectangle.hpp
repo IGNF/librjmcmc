@@ -170,7 +170,8 @@ with some aliases :
 
 #include "mpp/kernel/kernel.hpp"
 typedef marked_point_process::result_of_make_uniform_birth_death_kernel<object>::type  birth_death_kernel;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<object,rectangle_edge_translation_transform>::type  modification_kernel;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<object,rectangle_edge_translation_transform  >::type  edge_modification_kernel;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<object,rectangle_corner_translation_transform>::type  corner_modification_kernel;
 //]
 
 //[building_footprint_rectangle_definition_energies
@@ -259,7 +260,8 @@ typedef rjmcmc::metropolis_acceptance acceptance;
 //typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel> sampler;
 typedef rjmcmc::sampler<d_sampler,acceptance
         ,birth_death_kernel
-        ,modification_kernel
+        ,edge_modification_kernel
+        ,corner_modification_kernel
         > sampler;
 
 //<-
@@ -328,21 +330,17 @@ void create_sampler(const param *p, sampler *&s) {
             Rectangle_2(r.max(), v,  p->get<double>("maxratio"))
             );
 
-    //generator_kernel    birth(ss);
     distribution cs(p->get<double>("poisson"));
 
-    acceptance a;
-    //acceptance a(p->get<double>("qtemp"));
-
     d_sampler ds( cs, birth );
-    s = new sampler( ds, a
+
+    s = new sampler( ds, acceptance()
                      , marked_point_process::make_uniform_birth_death_kernel(birth, p->get<double>("pbirth"), p->get<double>("pdeath") )
-                     , marked_point_process::make_uniform_modification_kernel<object>(rectangle_edge_translation_transform(),1)
+                     , marked_point_process::make_uniform_modification_kernel<object>(rectangle_edge_translation_transform(),0.4)
+                     , marked_point_process::make_uniform_modification_kernel<object>(rectangle_corner_translation_transform(),0.4)
                      //                       , 0.5 * modif2
 
                      );
-    //s = new sampler( ds, a, kbirthdeath);
-    //s = new sampler( ds );
 }
 //]
 

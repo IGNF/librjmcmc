@@ -18,7 +18,7 @@ void initialize_parameters(T* params)
 //    params->template insert<bool>("dosave",'b',false, "Save intermediate results");
     params->template insert<int>("nbsave",'S',10000,"Number of iterations between each save");
     params->template insert<double>("poisson",'p',200, "Poisson processus parameter");
-    params->template insert<double>("maxsize",'m',100, "Maximum rectangle size");
+    params->template insert<double>("maxsize",'m',20, "Maximum rectangle size");
     params->template insert<double>("maxratio",'M',5, "Maximum rectangle aspect ratio");
     params->template insert<double>("pbirth",'B',0.1, "Birth probability");
     params->template insert<double>("pdeath",'D',0.1, "Death probability");
