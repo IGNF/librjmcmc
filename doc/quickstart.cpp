@@ -10,11 +10,12 @@ typedef Circle_2 object;
 //]
 
 //[ objective_function
-#include "mpp/energy/constant_unary_energy.hpp"
+#include "rjmcmc/energy/constant_energy.hpp"
+#include "rjmcmc/energy/energy_operators.hpp"
 #include "mpp/energy/intersection_area_binary_energy.hpp"
 #include "mpp/configuration/graph_configuration.hpp"
-typedef constant_unary_energy           unary_energy;
-typedef intersection_area_binary_energy binary_energy;
+typedef constant_energy<>           unary_energy;
+typedef multiplies_energy<constant_energy<>,intersection_area_binary_energy<> > binary_energy;
 typedef marked_point_process::graph_configuration<object, unary_energy, binary_energy> configuration;
 //]
 
@@ -67,9 +68,7 @@ int main(int argc , char** argv)
     reference_process reference_pdf( dpoisson, birth );
 
     // Initial empty configuration linked with the minimized energy
-    unary_energy  e1(energy );
-    binary_energy e2(surface);
-    configuration c(e1,e2);
+    configuration c(unary_energy(energy),surface*intersection_area_binary_energy<>());
 
     // Optimization
     sampler samp( reference_pdf, acceptance(),
