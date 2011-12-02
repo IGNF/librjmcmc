@@ -7,7 +7,10 @@
 
 #ifndef __WX_PARAMETERS_VISITOR_HPP__
 #define __WX_PARAMETERS_VISITOR_HPP__
-
+#ifdef WIN32
+	#pragma warning(disable : 4251)
+	#pragma warning(disable : 4275)
+#endif
 #include <boost/shared_ptr.hpp>
 #include <wx/window.h>
 #include <wx/toplevel.h>

@@ -1,6 +1,11 @@
 #ifndef WX_PARAMETER_TRAITS
 #define WX_PARAMETER_TRAITS
 
+#ifdef WIN32
+	#pragma warning(disable : 4251)
+	#pragma warning(disable : 4275)
+#endif
+
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/choice.h>

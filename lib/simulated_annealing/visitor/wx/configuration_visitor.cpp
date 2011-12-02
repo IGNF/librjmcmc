@@ -1,3 +1,7 @@
+#ifdef WIN32
+	#pragma warning(disable : 4251)
+	#pragma warning(disable : 4275)
+#endif
 #include <GilViewer/layers/vector_layer_ghost.hpp>
 #include <GilViewer/layers/simple_vector_layer.hpp>
 #include <GilViewer/gui/panel_viewer.hpp>

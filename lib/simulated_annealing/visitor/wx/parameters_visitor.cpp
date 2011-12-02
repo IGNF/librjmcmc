@@ -4,7 +4,10 @@
  *  Created on: 4 déc. 2008
  *      Author: olivier
  */
-
+#ifdef WIN32
+	#pragma warning(disable : 4251)
+	#pragma warning(disable : 4275)
+#endif
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -28,6 +31,14 @@ typedef parameters< wx_parameter > param;
 #include <GilViewer/layers/image_layer.hpp>
 #include <GilViewer/gui/panel_viewer.hpp>
 
+const char *c_str(const wxString& s)
+{
+#if wxMINOR_VERSION > 8
+	return s.To8BitData().data();
+#else
+	return s.To8BitData();
+#endif
+}
 namespace simulated_annealing {
     namespace wx {
 
@@ -64,7 +75,7 @@ namespace simulated_annealing {
             {
                 param *p = param::instance();
                 update_values(p);
-                p->parse(fileDialog->GetPath().To8BitData().data());
+                p->parse(c_str(fileDialog->GetPath()));
                 update_controls(p);
                 Refresh();
             }
@@ -77,7 +88,7 @@ namespace simulated_annealing {
             {
                 param *p = param::instance();
                 update_values(p);
-                p->save(fileDialog->GetPath().To8BitData().data());
+                p->save(c_str(fileDialog->GetPath()));
             }
         }
 

@@ -10,6 +10,11 @@
 #ifndef WXFREECHARTDEFS_H
 #define WXFREECHARTDEFS_H
 
+#ifdef WIN32
+	#pragma warning(disable : 4251)
+	#pragma warning(disable : 4275)
+#endif
+
 #include <wx/wxprec.h>
 
 #ifdef __BORLANDC__

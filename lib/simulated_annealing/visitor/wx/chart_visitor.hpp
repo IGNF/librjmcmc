@@ -4,6 +4,13 @@
 class VectorDataset;
 
 #include <boost/shared_ptr.hpp>
+
+
+#ifdef WIN32
+	#pragma warning(disable : 4251)
+	#pragma warning(disable : 4275)
+    #include <wx/msw/winundef.h>
+#endif
 #include <wx/window.h>
 #include <wx/toplevel.h>
 

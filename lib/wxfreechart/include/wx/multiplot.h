@@ -10,6 +10,11 @@
 #ifndef MULTIPLOT_H_
 #define MULTIPLOT_H_
 
+#ifdef WIN32
+	#pragma warning(disable : 4251)
+	#pragma warning(disable : 4275)
+#endif
+
 #include <wx/dynarray.h>
 #include <wx/plot.h>
 

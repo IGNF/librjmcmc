@@ -7,6 +7,11 @@
 // Licence:	wxWidgets licence
 /////////////////////////////////////////////////////////////////////////////
 
+#ifdef WIN32
+	#pragma warning(disable : 4251)
+	#pragma warning(disable : 4275)
+#endif
+
 #include <wx/dynarray.h>
 #include <wx/arrimpl.cpp>
 
@@ -42,7 +47,7 @@ wxColour GetDefaultColour(size_t index)
 	return defaultColours[index];
 }
 
-Symbol *GetDefaultSymbol(size_t index)
+Symbol WXDLLIMPEXP_FREECHART *GetDefaultSymbol(size_t index)
 {
 	size_t count = defaultSymbols.Count();
 
