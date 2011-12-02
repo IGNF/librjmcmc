@@ -7,6 +7,7 @@ template<typename Image, typename Value = double>
 class image_center_unary_energy : public rjmcmc::energy<Value>
 {
 public:
+    typedef Value result_type;
     template<typename T>
     result_type operator()(const T &t) const
     {

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-find_package(wxWidgets REQUIRED adv base core xml aui xrc html zlib png expat)
+find_package(wxWidgets REQUIRED ${wxWidgets_REQUIRED_COMPONENTS})
 INCLUDE(${wxWidgets_USE_FILE})
 
 include_directories( include )

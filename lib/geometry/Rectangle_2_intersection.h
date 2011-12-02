@@ -57,16 +57,16 @@ template <class FT> FT triangle_area(FT n2, FT m2, FT tx, FT ty, FT rx, FT ry) {
     typedef typename K::Line_2 Line_2;
     typedef typename K::Point_2 Point_2;
     typedef typename K::FT FT;
-
+    Origin O;
     if(a.is_degenerate() || b.is_degenerate()) return 0;
     std::vector<Vector_2> v;
     std::vector<Line_2> l;
-    for(unsigned int i=0; i<4; ++i)    { v.push_back(b[i]-ORIGIN); l.push_back(b.line(i)); }
+    for(unsigned int i=0; i<4; ++i)    { v.push_back(b[i]-O); l.push_back(b.line(i)); }
     const Vector_2& n = a.normal();
     FT r = a.ratio();
     FT n2 = n.squared_length();
     FT rn2 = r*r*n2;
-    Vector_2 vc(a.center()-ORIGIN);
+    Vector_2 vc(a.center()-O);
     Vector_2 trn(-r*n.y(),r*n.x());
     FT ctrn = vc*trn;
     FT cn = vc*n;
@@ -114,34 +114,34 @@ template <class FT> FT triangle_area(FT n2, FT m2, FT tx, FT ty, FT rx, FT ry) {
                  w.push_back(v[j]);
                  m.push_back(l[j]);
             }
-            Point_2 inter(ORIGIN);
+            Point_2 inter(O);
             Line_2 li(ln[i].x(),ln[i].y(),-lc[i]);
             intersection(l[(end0+n-1)%n],li).assign(inter);
-            w.push_back(inter-ORIGIN);
+            w.push_back(inter-O);
             m.push_back(li);
             m.push_back(l[(begin0+n-1)%n]);
             intersection(li,m.back()).assign(inter);
-            w.push_back(inter-ORIGIN);
+            w.push_back(inter-O);
         }
         if(end1!=-1) { // cut outside line(i+3)
             for(int j=begin0; j!=end1; j=(j+1)%n) {
                 w.push_back(v[j]);
                 m.push_back(l[j]);
             }
-            Point_2 inter(ORIGIN);
+            Point_2 inter(O);
             Line_2 li(ln[i].x(),ln[i].y(),-lc[i+2]);
             intersection(l[(end1+n-1)%n],li).assign(inter);
-            w.push_back(inter-ORIGIN);
+            w.push_back(inter-O);
             m.push_back(li);
             m.push_back(l[(begin1+n-1)%n]);
             intersection(li,m.back()).assign(inter);
-            w.push_back(inter-ORIGIN);
+            w.push_back(inter-O);
         }
         std::swap(v,w);
         std::swap(l,m);
     }
     std::vector<Point_2> p;
-    for(unsigned int i=0; i<v.size(); ++i)    { p.push_back(ORIGIN+v[i]); }
+    for(unsigned int i=0; i<v.size(); ++i)    { p.push_back(O+v[i]); }
     FT area;
     area_2(p.begin(),p.end(),area);
     return abs(area);

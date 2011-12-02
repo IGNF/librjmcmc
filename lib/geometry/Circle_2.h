@@ -54,15 +54,7 @@ template < class K >
 std::ostream &
 operator<<(std::ostream &os, const Circle_2<K> &c)
 {
-	switch(os.iword(IO::mode))
-	{
-		case IO::ASCII :
-		return os << c.center() << ' ' << c.radius();
-		case IO::BINARY :
-		return os << c.center() << c.radius();
-		default:
-		return os << "Circle_2(" << c.center() << ", " << c.radius() << ")";
-	}
+        return os << c.center() << ' ' << c.radius();
 }
 
 template < class K >

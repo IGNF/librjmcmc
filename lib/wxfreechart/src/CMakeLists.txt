@@ -27,8 +27,11 @@ add_definitions("-D_LOCAL_")
 if(UNIX)
     add_library(wxfreechart ${WXFREECHART_HEADERS} ${WXFREECHART_SRC})
 else()
-	add_library(wxfreechart STATIC ${WXFREECHART_HEADERS} ${WXFREECHART_SRC})
+    add_library(wxfreechart STATIC ${WXFREECHART_HEADERS} ${WXFREECHART_SRC})
 endif()
+
+message(STATUS ${wxWidgets_LIBRARIES})
+
 target_link_libraries(wxfreechart ${wxWidgets_LIBRARIES})
 
 install(TARGETS wxfreechart

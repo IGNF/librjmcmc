@@ -8,6 +8,7 @@ template<typename Image, typename Value = double>
 class image_gradient_unary_energy : public rjmcmc::energy<Value>
 {
 public:
+    typedef Value result_type;
 	template<typename T>
     inline result_type operator()(const T &t) const
     {

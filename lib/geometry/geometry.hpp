@@ -32,12 +32,6 @@ enum Bounded_side { ON_BOUNDED_SIDE=-1, ON_BOUNDARY=0, ON_UNBOUNDED_SIDE=1 } ;
 enum Sign { NEGATIVE=-1, ZERO=0, POSITIVE=1 } ;
 
 struct Origin {};
-extern Origin ORIGIN;
-class IO {
-public:
-    enum Mode {ASCII = 0, PRETTY, BINARY};
-    static int mode;
-};
 
 template <typename T> struct Simple_cartesian;
 
@@ -141,14 +135,7 @@ namespace internal {
   template < typename T >
   std::ostream & operator<<(std::ostream &os, const internal::Point_2<T> &p)
   {
-    switch(os.iword(IO::mode)) {
-    case IO::ASCII :
-      return os << p.x() << ' ' << p.y();
-    case IO::BINARY :
-      return os << p.x() << p.y();
-    default:
-      return os << "Point_2(" << p.x() << ", " << p.y() << ")";
-    }
+    return os << p.x() << " " << p.y();
   }
 
   template < typename T >
@@ -181,14 +168,7 @@ namespace internal {
   template < typename T >
   std::ostream & operator<<(std::ostream &os, const internal::Vector_2<T> &v)
   {
-    switch(os.iword(IO::mode)) {
-    case IO::ASCII :
-      return os << v.x() << ' ' << v.y();
-    case IO::BINARY :
-      return os << v.x() << v.y();
-    default:
-      return os << "Vector_2(" << v.x() << ", " << v.y() << ")";
-    }
+      return os << v.x() << " " << v.y();
   }
 
   template < typename T, typename U >

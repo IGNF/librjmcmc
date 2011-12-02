@@ -4,8 +4,8 @@ project( building_footprint_extraction )
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
-option(BUILD_BUILDING_FOOTPRINT_EXTRACTION_CLI "build building_footprint_extraction CLI sample" ON)
-option(BUILD_BUILDING_FOOTPRINT_EXTRACTION_GUI "build building_footprint_extraction GUI sample" ON)
+option(BUILD_BUILDING_FOOTPRINT_EXTRACTION_CLI "build building_footprint_extraction CLI sample" OFF)
+option(BUILD_BUILDING_FOOTPRINT_EXTRACTION_GUI "build building_footprint_extraction GUI sample" OFF)
 
 #copy the data image
 add_custom_target(building_footprint_extraction_data

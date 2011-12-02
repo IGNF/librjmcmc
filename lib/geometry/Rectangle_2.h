@@ -366,14 +366,7 @@ template < class R >
 std::ostream &
 operator<<(std::ostream &os, const Rectangle_2<R> &r)
 {
-  switch(os.iword(IO::mode)) {
-  case IO::ASCII :
-    return os << r.center() << ' ' << r.normal() << ' ' << r.ratio();
-  case IO::BINARY :
-    return os << r.center() << r.normal() << r.ratio();
-  default:
-    return os << "Rectangle_2(" << r.center() << ", " << r.normal() << ", " << r.ratio() << ")";
-  }
+  return os << r.center() << ' ' << r.normal() << ' ' << r.ratio();
 }
 
 template < class R >

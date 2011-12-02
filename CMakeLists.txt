@@ -1,33 +1,40 @@
+#########################################################
+#                 general setup                       ###
+#########################################################
 cmake_minimum_required(VERSION 2.6)
-
-# cmake version 2.8.0
-#  CMP0014
-#       Input directories must have CMakeLists.txt.
-#       CMake versions before 2.8 silently ignored missing CMakeLists.txt
-#       files in directories referenced by add_subdirectory() or subdirs(),
-#       treating them as if present but empty.  In CMake 2.8.0 and above this
-#       policy determines whether or not the case is an error.  The OLD
-#       behavior for this policy is to silently ignore the problem.  The NEW
-#       behavior for this policy is to report an error.
-#       This policy was introduced in CMake version 2.8.0.  CMake version
-#       2.8.0 warns when the policy is not set and uses OLD behavior.  Use the
-#       cmake_policy command to set it to OLD or NEW explicitly.
-#cmake_policy(SET CMP0014 OLD)
-
-# Project name
 project( librjmcmc CXX)
 
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_BUILD_TYPE "Release")
+set(ROOT_DIR ${PROJECT_SOURCE_DIR})
+
+include_directories( lib )
+
+#########################################################
+#            platform-specific setup                  ###
+#########################################################
 if(UNIX)
-	add_definitions(-fPIC)
+        add_definitions(-fPIC)
+        add_definitions(-Wno-deprecated) # hide BGL hash_set deprecation warning
+        set(wxWidgets_REQUIRED_COMPONENTS adv base core xml aui xrc html ) # png expat)
 endif(UNIX)
 
 if(WIN32)
-	add_definitions(/MP)
+        add_definitions(/MP) # multiprocess compilation
+        set(wxWidgets_REQUIRED_COMPONENTS adv base core xml aui xrc html expat) #  zlib png
 endif(WIN32)
 
-set( ROOT_DIR ${PROJECT_SOURCE_DIR})
-# SET classical path for the MATIS library
+#########################################################
+#            Compilation OPTION                       ###
+#########################################################
 
+option(BUILD_SHARED_LIBS "Dynamic libraries" ON)
+option(BUILD_SHARED_EXE  "Dynamic executables" ON)
+
+#########################################################
+#            C++0x Variadic template OPTION           ###
+#########################################################
 option(VARIADIC_TEMPLATES "Enable variadic template implementation" OFF)
 if(VARIADIC_TEMPLATES)
   add_definitions("-DUSE_VARIADIC_TEMPLATES=1")
@@ -48,13 +55,10 @@ if(WIN32)
 endif(WIN32)
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL  " real install path" FORCE)
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 
-option(BUILD_SHARED_LIBS "Dynamic libraries" ON)
-option(BUILD_SHARED_EXE  "Dynamic executables" ON)
-
-# Find BOOST
+#########################################################
+#            Finding REQUIRED package Boost           ###
+#########################################################
 set(Boost_ADDITIONAL_VERSIONS 
            "1.39.0" "1.39" 
 		   "1.40.0" "1.40" 
@@ -69,23 +73,22 @@ set(Boost_ADDITIONAL_VERSIONS
 set(Boost_USE_STATIC_LIBS OFF CACHE BOOL "use boost static lib")
 set(Boost_USE_MULTITHREAD ON CACHE BOOL "use boost multi thread lib")
 set(BOOST_ROOT "" CACHE PATH "path to boost root directory")
-find_package( Boost 1.37 COMPONENTS thread program_options system filesystem )
-if( NOT Boost_FOUND )
-	message(FATAL_ERROR "Boost not found ! Please set Boost path ...")
-else()
-	include_directories( ${Boost_INCLUDE_DIRS} )
-	link_directories( ${Boost_LIBRARY_DIRS} )
-endif()
+find_package( Boost 1.37 COMPONENTS thread program_options system filesystem REQUIRED)
+include_directories( ${Boost_INCLUDE_DIRS} )
+link_directories( ${Boost_LIBRARY_DIRS} )
+
 if(WIN32)
     message(STATUS "Boost_LIB_DIAGNOSTIC_DEFINITIONS ${Boost_LIB_DIAGNOSTIC_DEFINITIONS} ")
 	add_definitions( ${Boost_LIB_DIAGNOSTIC_DEFINITIONS} )
     if(NOT Boost_USE_STATIC_LIBS)
 		add_definitions("/DBOOST_ALL_DYN_LINK" )
- 	endif(NOT Boost_USE_STATIC_LIBS)
+    endif(NOT Boost_USE_STATIC_LIBS)
 endif(WIN32)
 
+#########################################################
+#            Finding OPTIONAL package CGAL            ###
+#########################################################
 option(USE_CGAL  "Use CGAL library" OFF)
-
 if(USE_CGAL)
   find_package( CGAL COMPONENTS Core )
   set(USE_CGAL ${CGAL_FOUND})
@@ -94,13 +97,14 @@ endif(USE_CGAL)
 if(USE_CGAL)
   include(${CGAL_USE_FILE})
   add_definitions("-DUSE_CGAL=1")
-  set(GEOMETRY_LIBRARIES geometry ${CGAL_LIBRARIES})
+  set(GEOMETRY_LIBRARIES ${CGAL_LIBRARIES})
 else(USE_CGAL)
-  set(GEOMETRY_LIBRARIES geometry)
+  set(GEOMETRY_LIBRARIES )
 endif(USE_CGAL)
 
-include_directories( lib )
-
+#########################################################
+#            Recursion to subdirs                     ###
+#########################################################
 add_subdirectory(lib)
 add_subdirectory(samples)
 add_subdirectory(doc)
