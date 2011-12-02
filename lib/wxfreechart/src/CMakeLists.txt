@@ -22,8 +22,10 @@ wxfreechart_add_module(WXFREECHART_SRC gantt        GANTT        0)
 wxfreechart_add_module(WXFREECHART_SRC ohlc         OHLC         0)
 wxfreechart_add_module(WXFREECHART_SRC pie          PIE          0)
 
+add_definitions("-D_LOCAL_")
+
 if(UNIX)
-        add_library(wxfreechart ${WXFREECHART_HEADERS} ${WXFREECHART_SRC})
+    add_library(wxfreechart ${WXFREECHART_HEADERS} ${WXFREECHART_SRC})
 else()
 	add_library(wxfreechart STATIC ${WXFREECHART_HEADERS} ${WXFREECHART_SRC})
 endif()
