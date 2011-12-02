@@ -220,7 +220,7 @@ typedef oriented<boost::gil::gray16_image_t> mask_type;
 #include "mpp/configuration/graph_configuration.hpp"
 typedef marked_point_process::graph_configuration<
         object,
-        minus_energy<constant_energy<>,multiplies_energy<constant_energy<>,unary_energy> >,
+		minus_energy<constant_energy<>,multiplies_energy<constant_energy<>,unary_energy> >,
         multiplies_energy<constant_energy<>,binary_energy>
         > configuration;
 //]
@@ -314,9 +314,12 @@ void create_configuration(const param *p, const oriented_gradient_view& grad, co
     unary_energy e1( grad );
     binary_energy e2;
 
+minus_energy<constant_energy<>,multiplies_energy<constant_energy<>,unary_energy> > E1(p->get<double>("energy"),
+																					  multiplies_energy<constant_energy<>,unary_energy>(p->get<double>("ponderation_grad"),e1));
+multiplies_energy<constant_energy<>,binary_energy> E2(p->get<double>("ponderation_surface"),e2);
     // empty initial configuration
-    c = new configuration( (p->get<double>("energy") - ( p->get<double>("ponderation_grad") * e1)),
-                           p->get<double>("ponderation_surface")*e2);
+    c = new configuration( E1,
+                           E2);
 }
 //]
 

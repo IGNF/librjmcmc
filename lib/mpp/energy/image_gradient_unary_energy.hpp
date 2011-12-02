@@ -2,14 +2,13 @@
 #define IMAGE_GRADIENT_UNARY_ENERGY_HPP_
 
 #include "geometry/integrated_flux.h"
+#include "rjmcmc/energy.hpp"
 
 template<typename Image, typename Value = double>
-class image_gradient_unary_energy
+class image_gradient_unary_energy : public rjmcmc::energy<Value>
 {
 public:
-    typedef Value result_type;
-
-    template<typename T>
+	template<typename T>
     inline result_type operator()(const T &t) const
     {
         return integrated_flux(m_image,t);

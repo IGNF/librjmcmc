@@ -1,12 +1,12 @@
 #ifndef IMAGE_CENTER_UNARY_ENERGY_HPP_
 #define IMAGE_CENTER_UNARY_ENERGY_HPP_
 
+#include "rjmcmc/energy.hpp"
+
 template<typename Image, typename Value = double>
-class image_center_unary_energy
+class image_center_unary_energy : public rjmcmc::energy<Value>
 {
 public:
-    typedef Value result_type;
-
     template<typename T>
     result_type operator()(const T &t) const
     {

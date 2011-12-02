@@ -1,8 +1,10 @@
-#ifndef BINARY_OPERATOR_ENERGY_HPP_
-#define BINARY_OPERATOR_ENERGY_HPP_
+#ifndef ENERGY_OPERATORS_HPP_
+#define ENERGY_OPERATORS_HPP_
+
+#include "rjmcmc/energy.hpp"
 
 template<typename Energy, typename Operator>
-class unary_operator_energy
+class unary_operator_energy : public rjmcmc::energy<typename Operator::result_type>
 {
 public:
     typedef typename Energy::result_type result_type0;
@@ -18,7 +20,7 @@ private:
 };
 
 template<typename Energy0, typename Energy1, typename Operator>
-struct binary_operator_energy
+struct binary_operator_energy : public rjmcmc::energy<typename Operator::result_type>
 {
 public:
     typedef typename Energy0::result_type result_type0;
@@ -82,9 +84,11 @@ struct modulus_energy : public binary_operator_energy<Energy0,Energy1,std::modul
 
 // operators
 
+#include "constant_energy.hpp"
+/*
 // SFINAE utility
 template<typename Test, typename Value> struct enable { typedef Value type; };
-#define ENERGY(E) typename enable<typename E::result_type,E>::type
+#define ENERGY(E) typename enable<typename E::is_energy,E>::type
 
 template<typename E0, typename E1> plus_energy      <ENERGY(E0),ENERGY(E1)> operator+(const E0& e0, const E1& e1) { return plus_energy      <E0,E1>(e0,e1); }
 template<typename E0, typename E1> minus_energy     <ENERGY(E0),ENERGY(E1)> operator-(const E0& e0, const E1& e1) { return minus_energy     <E0,E1>(e0,e1); }
@@ -92,30 +96,31 @@ template<typename E0, typename E1> multiplies_energy<ENERGY(E0),ENERGY(E1)> oper
 template<typename E0, typename E1> divides_energy   <ENERGY(E0),ENERGY(E1)> operator/(const E0& e0, const E1& e1) { return divides_energy   <E0,E1>(e0,e1); }
 template<typename E0, typename E1> modulus_energy   <ENERGY(E0),ENERGY(E1)> operator%(const E0& e0, const E1& e1) { return modulus_energy   <E0,E1>(e0,e1); }
 
-#include "constant_energy.hpp"
 
-template<typename E0> plus_energy      <E0,constant_energy<typename E0::result_type> >
+template<typename E0> plus_energy      <ENERGY(E0),constant_energy<typename E0::result_type> >
 operator+(const E0& e0, typename E0::result_type e1) { return plus_energy      <E0,constant_energy<typename E0::result_type> >(e0,e1); }
-template<typename E0> minus_energy     <E0,constant_energy<typename E0::result_type> >
+template<typename E0> minus_energy     <ENERGY(E0),constant_energy<typename E0::result_type> >
 operator-(const E0& e0, typename E0::result_type e1) { return minus_energy     <E0,constant_energy<typename E0::result_type> >(e0,e1); }
-template<typename E0> multiplies_energy<E0,constant_energy<typename E0::result_type> >
+template<typename E0> multiplies_energy<ENERGY(E0),constant_energy<typename E0::result_type> >
 operator*(const E0& e0, typename E0::result_type e1) { return multiplies_energy<E0,constant_energy<typename E0::result_type> >(e0,e1); }
-template<typename E0> divides_energy   <E0,constant_energy<typename E0::result_type> >
+template<typename E0> divides_energy   <ENERGY(E0),constant_energy<typename E0::result_type> >
 operator/(const E0& e0, typename E0::result_type e1) { return divides_energy   <E0,constant_energy<typename E0::result_type> >(e0,e1); }
-template<typename E0> modulus_energy   <E0,constant_energy<typename E0::result_type> >
+template<typename E0> modulus_energy   <ENERGY(E0),constant_energy<typename E0::result_type> >
 operator%(const E0& e0, typename E0::result_type e1) { return modulus_energy   <E0,constant_energy<typename E0::result_type> >(e0,e1); }
 
-template<typename E1> plus_energy      <constant_energy<typename E1::result_type>,E1>
+template<typename E1> plus_energy      <constant_energy<typename E1::result_type>,ENERGY(E1)>
 operator+(typename E1::result_type e0, const E1& e1) { return plus_energy      <constant_energy<typename E1::result_type>,E1>(e0,e1); }
-template<typename E1> minus_energy     <constant_energy<typename E1::result_type>,E1>
+template<typename E1> minus_energy     <constant_energy<typename E1::result_type>,ENERGY(E1)>
 operator-(typename E1::result_type e0, const E1& e1) { return minus_energy     <constant_energy<typename E1::result_type>,E1>(e0,e1); }
-template<typename E1> multiplies_energy<constant_energy<typename E1::result_type>,E1>
+template<typename E1> multiplies_energy<constant_energy<typename E1::result_type>,ENERGY(E1)>
 operator*(typename E1::result_type e0, const E1& e1) { return multiplies_energy<constant_energy<typename E1::result_type>,E1>(e0,e1); }
-template<typename E1> divides_energy   <constant_energy<typename E1::result_type>,E1>
+template<typename E1> divides_energy   <constant_energy<typename E1::result_type>,ENERGY(E1)>
 operator/(typename E1::result_type e0, const E1& e1) { return divides_energy   <constant_energy<typename E1::result_type>,E1>(e0,e1); }
-template<typename E1> modulus_energy   <constant_energy<typename E1::result_type>,E1>
+template<typename E1> modulus_energy   <constant_energy<typename E1::result_type>,ENERGY(E1)>
 operator%(typename E1::result_type e0, const E1& e1) { return modulus_energy   <constant_energy<typename E1::result_type>,E1>(e0,e1); }
 
 template<typename E> negate_energy<ENERGY(E)> operator-(const E& e) { return negate_energy<E>(e); }
 
-#endif /*BINARY_OPERATOR_ENERGY_HPP_*/
+*/
+
+#endif /*ENERGY_OPERATORS_HPP_*/
