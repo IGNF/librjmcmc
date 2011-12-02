@@ -199,6 +199,7 @@ public:
     virtual bool Register(gilviewer_io_factory *factory)
     {
         m_factory = factory;
+		return true;
     }
 
 private:

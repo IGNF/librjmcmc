@@ -92,7 +92,7 @@ namespace marked_point_process {
         }
         
         struct pdf_visitor {
-            typedef uniform_birth::result_type result_type;
+            typedef typename uniform_birth<T>::result_type result_type;
             const uniform_birth& m_uniform_birth;
             inline result_type operator()(const T &t) const { return m_uniform_birth.pdf(t); }
             pdf_visitor(const uniform_birth& g) : m_uniform_birth(g) {}

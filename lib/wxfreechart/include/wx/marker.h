@@ -65,7 +65,7 @@ private:
 	wxColour m_textColour;
 };
 
-
+#if defined(USE_LINE_MARKER)
 class WXDLLIMPEXP_FREECHART LineMarker : public Marker
 {
 public:
@@ -74,7 +74,10 @@ public:
 
 	virtual void Draw(wxDC &dc, wxRect rcData, Axis *horizAxis, Axis *vertAxis);
 };
+#endif
 
+
+#if defined(USE_RANGE_MARKER)
 class WXDLLIMPEXP_FREECHART RangeMarker : public Marker
 {
 public:
@@ -99,5 +102,6 @@ private:
 	double m_minValue;
 	double m_maxValue;
 };
+#endif
 
 #endif /*MARKER_H_*/

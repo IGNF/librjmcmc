@@ -9,9 +9,9 @@
 
 namespace internal {
 
-#ifdef WIN32
+#if !defined(M_PI)
     const double M_PI = 4.0 * atan(1.0);
-#endif // WIN32
+#endif
 
     template<typename Kernel1D>
     void initKernelGaussian1D(Kernel1D& kernel, double m_sigma)

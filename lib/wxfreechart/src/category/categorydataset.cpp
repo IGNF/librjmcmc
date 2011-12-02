@@ -21,7 +21,7 @@ CategoryDataset::~CategoryDataset()
 
 bool CategoryDataset::AcceptRenderer(Renderer *renderer)
 {
-	return wxDynamicCast(renderer, BarRenderer);
+	return wxDynamicCast(renderer, BarRenderer)!=NULL;
 }
 
 bool CategoryDataset::HasValue(size_t WXUNUSED(index), size_t WXUNUSED(serie))
