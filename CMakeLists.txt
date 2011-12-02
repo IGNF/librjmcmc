@@ -17,7 +17,13 @@ cmake_minimum_required(VERSION 2.6)
 # Project name
 project( librjmcmc CXX)
 
-add_definitions(-fPIC)
+if(UNIX)
+	add_definitions(-fPIC)
+endif(UNIX)
+
+if(WIN32)
+	add_definitions(/MP)
+endif(WIN32)
 
 set( ROOT_DIR ${PROJECT_SOURCE_DIR})
 # SET classical path for the MATIS library
@@ -49,9 +55,20 @@ option(BUILD_SHARED_LIBS "Dynamic libraries" ON)
 option(BUILD_SHARED_EXE  "Dynamic executables" ON)
 
 # Find BOOST
-set( Boost_ADDITIONAL_VERSIONS "1.39.0" "1.39" "1.40.0" "1.40" "1.41.0" "1.41" "1.42.0" "1.42" "1.43.0" "1.43" "1.44.0" "1.44" )
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREAD ON)
+set(Boost_ADDITIONAL_VERSIONS 
+           "1.39.0" "1.39" 
+		   "1.40.0" "1.40" 
+		   "1.41.0" "1.41" 
+		   "1.42.0" "1.42" 
+		   "1.43.0" "1.43" 
+		   "1.44.0" "1.44" 
+		   "1.45" "1.45.0" 
+		   "1.46" "1.46.1"
+		    "1.47" "1.47.1"
+		    "1.48" "1.48.1")
+set(Boost_USE_STATIC_LIBS OFF CACHE BOOL "use boost static lib")
+set(Boost_USE_MULTITHREAD ON CACHE BOOL "use boost multi thread lib")
+set(BOOST_ROOT "" CACHE PATH "path to boost root directory")
 find_package( Boost 1.37 COMPONENTS thread program_options system filesystem )
 if( NOT Boost_FOUND )
 	message(FATAL_ERROR "Boost not found ! Please set Boost path ...")
@@ -59,6 +76,13 @@ else()
 	include_directories( ${Boost_INCLUDE_DIRS} )
 	link_directories( ${Boost_LIBRARY_DIRS} )
 endif()
+if(WIN32)
+    message(STATUS "Boost_LIB_DIAGNOSTIC_DEFINITIONS ${Boost_LIB_DIAGNOSTIC_DEFINITIONS} ")
+	add_definitions( ${Boost_LIB_DIAGNOSTIC_DEFINITIONS} )
+    if(NOT Boost_USE_STATIC_LIBS)
+		add_definitions("/DBOOST_ALL_DYN_LINK" )
+ 	endif(NOT Boost_USE_STATIC_LIBS)
+endif(WIN32)
 
 option(USE_CGAL  "Use CGAL library" OFF)
 
