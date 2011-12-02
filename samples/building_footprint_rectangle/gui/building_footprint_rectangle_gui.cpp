@@ -95,7 +95,7 @@ private:
         m_confg_visitor = new simulated_annealing::wx::configuration_visitor(m_panelviewer);
         /*< Visitors initialization >*/
 
-        m_param_visitor = new simulated_annealing::wx::parameters_visitor(m_panelviewer,m_frame);
+        m_param_visitor = new simulated_annealing::wx::parameters_visitor(m_panelviewer,p,m_frame);
         m_chart_visitor = new simulated_annealing::wx::chart_visitor(m_frame);
         m_contr_visitor = new simulated_annealing::wx::controler_visitor(this,m_frame);
         m_visitor = new visitor(&m_log_visitor,m_confg_visitor,m_param_visitor,m_chart_visitor,m_contr_visitor);

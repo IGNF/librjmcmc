@@ -4,7 +4,7 @@
 #include <wx/wx.h>
 #include <wx/aboutdlg.h>
 #include "rjmcmc/variant.hpp"
-#include "geometry/wx/paint.h"
+#include "configuration_visitor/paint.h"
 #include <GilViewer/gui/panel_viewer.hpp>
 
 // to be specialized by each object type (-> files lib/geometry/*_paint.h)

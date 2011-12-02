@@ -61,7 +61,7 @@ private:
         /*< Visitors initialization >*/
         panel_viewer *panel = panel_manager::instance()->panels_list()[0];
         m_confg_visitor = new simulated_annealing::wx::configuration_visitor(panel);
-        m_param_visitor = new simulated_annealing::wx::parameters_visitor(panel,m_parent);
+        m_param_visitor = new simulated_annealing::wx::parameters_visitor(panel,p,m_parent);
         m_chart_visitor = new simulated_annealing::wx::chart_visitor(m_parent);
         m_contr_visitor = new simulated_annealing::wx::controler_visitor(this,m_parent);
         // m_visitor.push_back( m_log_visitor);
