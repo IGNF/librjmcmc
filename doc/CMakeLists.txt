@@ -81,8 +81,9 @@ set(QBK_SOURCES
     css/boostbook.css
   )
 
-file( GLOB_RECURSE LIB_HEADER_FILES    ../lib/*.hpp ../lib/*.h)
+endif(CMAKE_SYSTEM_NAME STREQUAL Linux)
 
+file( GLOB_RECURSE LIB_HEADER_FILES    ../lib/*.hpp ../lib/*.h)
 option(BUILD_QUICKSTART "build quickstart" ON)
 if(BUILD_QUICKSTART)
     add_executable( quickstart quickstart.cpp ${LIB_HEADER_FILES}
@@ -90,7 +91,3 @@ if(BUILD_QUICKSTART)
 )
     target_link_libraries( quickstart ${Boost_LIBRARIES} ${GEOMETRY_LIBRARIES} )
 endif(BUILD_QUICKSTART)
-
-
-endif(CMAKE_SYSTEM_NAME STREQUAL Linux)
-
