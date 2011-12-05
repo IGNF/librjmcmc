@@ -300,9 +300,9 @@ void create_configuration(const param *p, const oriented_gradient_view& grad, co
         Iso_rectangle_2 bbox = get_bbox(p);
         clip_bbox(bbox,mask_file);
         mask_type mask(mask_file , bbox, conversion_functor() );
-        for(unsigned int j=0; j<grad.view().height();++j)
+        for(int j=0; j<grad.view().height();++j)
         {
-            for(unsigned int i=0; i<grad.view().width();++i)
+            for(int i=0; i<grad.view().width();++i)
             {
                 unsigned char m = (i < mask.view().width() && j < mask.view().height() && mask.view()(i,j)>0) ? 1 : 0;
                 boost::gil::at_c<0>(grad.view()(i,j)) = m * boost::gil::at_c<0>(grad.view()(i,j));
