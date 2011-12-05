@@ -55,13 +55,13 @@ private:
     {
         if(m_confg_visitor) return true;
         /*< Parameters processing >*/
-        param *p = param::instance();
-        initialize_parameters(p);
+        m_param = new param;
+        initialize_parameters(m_param);
 
         /*< Visitors initialization >*/
         panel_viewer *panel = panel_manager::instance()->panels_list()[0];
         m_confg_visitor = new simulated_annealing::wx::configuration_visitor(panel);
-        m_param_visitor = new simulated_annealing::wx::parameters_visitor(panel,m_parent);
+        m_param_visitor = new simulated_annealing::wx::parameters_visitor(panel,m_param,m_parent);
         m_chart_visitor = new simulated_annealing::wx::chart_visitor(m_parent);
         m_contr_visitor = new simulated_annealing::wx::controler_visitor(this,m_parent);
         // m_visitor.push_back( m_log_visitor);
@@ -131,34 +131,33 @@ public:
     {
         OnInit();
         release();
-        param *p = param::instance();
-        update_values(p);
+        update_values(m_param);
 
-        Iso_rectangle_2 bbox = get_bbox(p);
-        std::string  dsm_file = p->get<boost::filesystem::path>("dsm"  ).string();
-        std::string mask_file = p->get<boost::filesystem::path>("mask" ).string();
+        Iso_rectangle_2 bbox = get_bbox(m_param);
+        std::string  dsm_file = m_param->get<boost::filesystem::path>("dsm"  ).string();
+        std::string mask_file = m_param->get<boost::filesystem::path>("mask" ).string();
         clip_bbox(bbox,dsm_file );
 
-        gradient_functor gf(p->get<double>("sigmaD"));
+        gradient_functor gf(m_param->get<double>("sigmaD"));
         oriented_gradient_view grad_view(dsm_file,  bbox, gf);
         m_grad = grad_view.img();
 
         load_image(dsm_file );
         load_image(mask_file);
 
-        set_bbox(p,bbox);
+        set_bbox(m_param,bbox);
         wxPoint p0(wxCoord(bbox.min().x()),wxCoord(bbox.min().y()));
         wxPoint p1(wxCoord(bbox.max().x()),wxCoord(bbox.max().y()));
         m_confg_visitor->set_bbox(wxRect(p0,p1));
 
-        init_visitor        (p,m_visitor);
-        create_configuration(p,grad_view,m_config);
+        init_visitor        (m_param,m_visitor);
+        create_configuration(m_param,grad_view,m_config);
         //<-
-        //    estimate_initial_temperature(p,100,*m_config);
+        //    estimate_initial_temperature(m_param,100,*m_config);
         //->
-        create_sampler      (p,m_sampler);
-        create_schedule     (p,m_schedule);
-        create_end_test     (p,m_end_test);
+        create_sampler      (m_param,m_sampler);
+        create_schedule     (m_param,m_schedule);
+        create_end_test     (m_param,m_end_test);
 
         //    std::cout << "Salamon initial schedule : " << salamon_initial_schedule(m_sampler->density(),*m_config,1000) << std::endl;
         //    m_config->clear();
@@ -193,6 +192,7 @@ public:
 
     virtual ~building_footprint_rectangle_gilviewer() {
         release();
+        if(m_param) delete m_param;
     }
     //]
 
@@ -222,6 +222,7 @@ private:
     end_test      *m_end_test;
     any_composite_visitor  m_visitor;
     boost::thread *m_thread;
+    param         *m_param;
 
     gilviewer_io_factory *m_factory;
 

@@ -6,94 +6,13 @@
 	#pragma warning(disable : 4275)
 #endif
 
+#include <sstream>
+
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/choice.h>
 
 #include "param/parameter.hpp"
-
-/*
-	LayerControl::const_iterator it  = m_panel->GetLayerControl()->begin();
-    LayerControl::const_iterator end = m_panel->GetLayerControl()->end();
-    Layer::ptrLayerType ilayer;
-    for(;it!=end && !ilayer;++it) {
-         if(boost::dynamic_pointer_cast<ImageLayer>(*it)) ilayer=*it; //use dem tag??
-    }
-    if(!ilayer) {
-        boost::filesystem::path file;
-        param::Instance()->get("dem",file);
-        ilayer = ImageLayer::CreateImageLayer(file.string());
-        if ( !ilayer )
-        {
-          std::ostringstream oss;
-          oss << "File " << file << " does not exist !";
-          wxString message( oss.str().c_str() , *wxConvCurrent );
-          ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
-          return;
-        }
-    }
-
-    wxPoint p0,p1;
-    boost::shared_ptr<VectorLayerGhost> ghost = m_panel->GetVectorLayerGhost();
-    if(ghost->m_drawRectangleSelection) {
-        wxRect rect = ghost->GetRectangle();
-        p0 = ilayer->ToLocal(rect.GetTopLeft    ());
-        p1 = ilayer->ToLocal(rect.GetBottomRight());
-    } else {
-        p0.x = param::Instance()->get<int>("xmin");
-        p0.y = param::Instance()->get<int>("ymin");
-        p1.x = param::Instance()->get<int>("xmax");
-        p1.y = param::Instance()->get<int>("ymax");
-        if(p0.x>p1.x) std::swap(p0.x,p1.x);
-        if(p0.y>p1.y) std::swap(p0.y,p1.y);
-    }
-    try
-    {
-       boost::shared_ptr<Layer> vlayer = boost::shared_ptr<Layer>(new simple_vector_layer("Extracted elements"));
-        Layer::ptrLayerType clayer = ilayer->crop(p0.x,p0.y,p1.x,p1.y);
-        if(!clayer) {
-            std::ostringstream oss;
-            oss << "Cropping outside the bounds of " << ilayer->Filename() << " !";
-            wxString message( oss.str().c_str() , *wxConvCurrent );
-            ::wxMessageBox( message , _("Error !") , wxICON_ERROR );
-            return;
-        }
-        m_panel->AddLayer(clayer);
-        m_panel->AddLayer(vlayer);
-        vlayer->TranslationX(p0.x+ilayer->TranslationX());
-        vlayer->TranslationY(p0.y+ilayer->TranslationY());
-        vlayer->ZoomFactor  (     ilayer->ZoomFactor  ());
-        clayer->TranslationX(p0.x+ilayer->TranslationX());
-        clayer->TranslationY(p0.y+ilayer->TranslationY());
-        clayer->ZoomFactor  (     ilayer->ZoomFactor  ());
-	
-	vlayer->set_line_color(*wxRED);
-        vlayer->set_line_style(wxSOLID);
-        vlayer->set_line_width(3);
-        vlayer->set_polygon_border_color(*wxBLUE);
-        vlayer->set_polygon_border_style(wxSOLID);
-        vlayer->set_polygon_border_width(3);
-        vlayer->set_polygon_inner_color(*wxRED);
-        vlayer->set_polygon_inner_style(wxTRANSPARENT);
-        vlayer->text_visibility(false);
-        
-        boost::filesystem::path file(clayer->Filename());
-        param::Instance()->set("dem",file);
-        param::Instance()->set("xmin",0);
-        param::Instance()->set("ymin",0);
-        param::Instance()->set("xmax",p1.x-p0.x);
-        param::Instance()->set("ymax",p1.y-p0.y);
-        
-        m_vlayer = vlayer;
-        boost::shared_ptr<ImageLayer> iclayer = boost::dynamic_pointer_cast<ImageLayer>(clayer);
-		return iclayer->View()->value; // todo
-    }
-    catch( const exception &e )
-    {
-        wxString message( e.what() , *wxConvCurrent );
-        ::wxMessageBox( message , _("Exception!") , wxICON_ERROR );
-    }
-*/
 
 struct wx_parameter : public parameter {
 

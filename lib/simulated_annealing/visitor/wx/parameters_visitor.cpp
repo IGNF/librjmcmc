@@ -21,7 +21,6 @@
 #include "param/parameters_inc.hpp"
 #include "param/wx_parameter.hpp"
 #include "parameters_visitor.hpp"
-typedef parameters< wx_parameter > param;
 
 #include "gui/resources/IGN.xpm"
 #include <map>
@@ -46,8 +45,8 @@ namespace simulated_annealing {
         {
             typedef std::vector<wxControlWithItems *> notified_control_type;
         public:
-            parameters_frame(wxWindow *parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
-                : wxFrame(parent,id,title,pos,size,style)
+            parameters_frame(param *p, wxWindow *parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+                : wxFrame(parent,id,title,pos,size,style), m_param(p)
             {
                 SetIcon(wxICON(IGN));
             }
@@ -63,6 +62,7 @@ namespace simulated_annealing {
             void name(long id, const std::string& name) { m_name[id] = name; }
 
         private:
+            param *m_param;
             std::map<long,std::string> m_name;
             DECLARE_EVENT_TABLE();
         };
@@ -73,10 +73,9 @@ namespace simulated_annealing {
             wxFileDialog *fileDialog = new wxFileDialog(this, wxString("Loading Parameter file", *wxConvCurrent), wxT(""), wxT(""),  wxT("INI (*.ini)|*.ini;*.INI"), wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_CHANGE_DIR );
             if (fileDialog->ShowModal() == wxID_OK)
             {
-                param *p = param::instance();
-                update_values(p);
-                p->parse(c_str(fileDialog->GetPath()));
-                update_controls(p);
+                update_values(m_param);
+                m_param->parse(c_str(fileDialog->GetPath()));
+                update_controls(m_param);
                 Refresh();
             }
         }
@@ -86,9 +85,8 @@ namespace simulated_annealing {
             wxFileDialog *fileDialog = new wxFileDialog(this, wxString("Saving Parameter file", *wxConvCurrent), wxT(""), wxT(""),  wxT("INI (*.ini)|*.ini;*.INI"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT|wxFD_CHANGE_DIR );
             if (fileDialog->ShowModal() == wxID_OK)
             {
-                param *p = param::instance();
-                update_values(p);
-                p->save(c_str(fileDialog->GetPath()));
+                update_values(m_param);
+                m_param->save(c_str(fileDialog->GetPath()));
             }
         }
 
@@ -105,13 +103,13 @@ namespace simulated_annealing {
             if (fileDialog->ShowModal() == wxID_OK)
             {
                 boost::filesystem::path file( fileDialog->GetPath().To8BitData() );
-                param::instance()->set(name,file);
+                m_param->set(name,file);
             }
         }
 
         void parameters_frame::on_bool_parameter(wxCommandEvent& event)
         {
-            param::instance()->set(m_name[event.GetId()],event.IsChecked());
+            m_param->set(m_name[event.GetId()],event.IsChecked());
         }
 
         BEGIN_EVENT_TABLE(parameters_frame, wxFrame)
@@ -196,8 +194,6 @@ namespace simulated_annealing {
 
         void parameters_frame::build(layer_control *lc)
         {
-            param *p = param::instance();
-
             wxBoxSizer* inner_sizer = new wxBoxSizer(wxVERTICAL);
 
             wxScrolledWindow* scroll = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE|wxScrolledWindowStyle|wxTAB_TRAVERSAL, wxT("scroll"));
@@ -221,7 +217,7 @@ namespace simulated_annealing {
 
       //      load_button->Disable(); // NOT operational yet... makes the app crash
 
-            for(param::iterator it=p->begin(); it!=p->end(); ++it)
+            for(param::iterator it=m_param->begin(); it!=m_param->end(); ++it)
             {
                 sizer_adder<param::parameter_t> adder(this,lc,sizer,scroll,*it);
                 boost::apply_visitor(adder,it->value());
@@ -239,8 +235,8 @@ namespace simulated_annealing {
         }
 
 
-        parameters_visitor::parameters_visitor(panel_viewer *panel, wxWindow *parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
-            : m_frame(new parameters_frame(parent, id, title, pos, size, style))
+        parameters_visitor::parameters_visitor(panel_viewer *panel, param *p, wxWindow *parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+            : m_frame(new parameters_frame(p, parent, id, title, pos, size, style))
             , m_panel(panel)
         {
             m_frame->build(m_panel->layercontrol());

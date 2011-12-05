@@ -18,7 +18,7 @@ typedef parameters< parameter > param;
 int main(int argc , char** argv)
 {
     /*< Retrieve the singleton instance of the parameters object... initialize the parameters object with the default values provided... parse the command line to eventually change the values >*/
-    param *p = param::instance();
+    param *p = new param;
     initialize_parameters(p);
     if (!p->parse(argc, argv)) return -1;
 

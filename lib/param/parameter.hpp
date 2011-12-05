@@ -6,8 +6,6 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/variant.hpp>
 
-#include "param/pattern_singleton.hpp"
-
 /**
  * @brief Class for application parameters handling
  * @author O. Tournaire, M. Bredif
@@ -51,10 +49,8 @@ struct name_equals {
 
 template<typename T>
 class parameters
-    : public PatternSingleton< parameters<T> >
 {
 public:
-    friend class PatternSingleton<parameters>;
     typedef T parameter_t;
     
     typedef std::list< T > parameter_list;
@@ -98,15 +94,19 @@ public:
     inline void caption(const std::string& c) { m_caption=c; }
     inline const std::string& caption() const { return m_caption; }
 
+    parameters() {}
+
 private:
     parameter_list m_parameter;
     std::string m_caption;
-    parameters() {}
     parameters(const parameters &);
 };
 
 
 #include <fstream>
+#include <iostream>
+#include <limits>
+
 template<typename T>
 bool parameters<T>::save(const std::string& filename) const
 {

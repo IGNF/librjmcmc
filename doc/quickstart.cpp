@@ -10,6 +10,7 @@ typedef Circle_2 object;
 //]
 
 //[ objective_function
+#include "rjmcmc/energy/constant_energy.hpp"
 #include "rjmcmc/energy/energy_operators.hpp"
 #include "mpp/energy/intersection_area_binary_energy.hpp"
 #include "mpp/configuration/graph_configuration.hpp"

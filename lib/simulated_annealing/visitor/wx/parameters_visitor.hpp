@@ -15,6 +15,11 @@
 #include <wx/window.h>
 #include <wx/toplevel.h>
 
+
+struct wx_parameter;
+template<typename T> struct parameters;
+typedef parameters< wx_parameter > param;
+
 class panel_viewer;
 namespace simulated_annealing {
     namespace wx {
@@ -24,7 +29,7 @@ namespace simulated_annealing {
         class parameters_visitor
         {
         public:
-            parameters_visitor(panel_viewer *panel,
+            parameters_visitor(panel_viewer *panel, param *p,
                     wxWindow *parent = (wxWindow *) NULL,
                     wxWindowID id = wxID_ANY,
                     const wxString& title = _("librjmcmc parameters"),
