@@ -107,8 +107,8 @@ namespace simulated_annealing {
                 wxMutexGuiEnter();
                 m_vlayer->clear();
                 m_vlayer << config;
-                m_panel->Refresh();
                 wxMutexGuiLeave();
+                m_panel->Refresh();
             }
         };
 

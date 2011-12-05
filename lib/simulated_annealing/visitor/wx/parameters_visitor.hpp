@@ -17,7 +17,7 @@
 
 
 struct wx_parameter;
-template<typename T> struct parameters;
+template<typename T> class parameters;
 typedef parameters< wx_parameter > param;
 
 class panel_viewer;
