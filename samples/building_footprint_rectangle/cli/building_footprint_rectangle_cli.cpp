@@ -9,10 +9,12 @@ typedef parameters< parameter > param;
 //]
 
 //[building_footprint_rectangle_cli_visitors
-#include "simulated_annealing/visitor/ostream_visitor.hpp"
-#include "simulated_annealing/visitor/shp/shp_visitor.hpp"
-#include "simulated_annealing/visitor/any_visitor.hpp"
 #include "rjmcmc/sampler/any_sampler.hpp"
+#include "simulated_annealing/visitor/any_visitor.hpp"
+#include "simulated_annealing/visitor/ostream_visitor.hpp"
+#ifdef USE_SHP
+# include "simulated_annealing/visitor/shp/shp_visitor.hpp"
+#endif
 //]
 
 //[building_footprint_rectangle_cli_main
@@ -48,7 +50,9 @@ int main(int argc , char** argv)
     typedef simulated_annealing::any_composite_visitor<configuration,any_sampler> any_visitor;
     any_visitor visitor;
     visitor.push_back(simulated_annealing::ostream_visitor());
+#ifdef USE_SHP
     visitor.push_back(simulated_annealing::shp::shp_visitor(argv[0]));
+#endif
     init_visitor(p,visitor);
 
     /*< This is the way to launch the optimization process. Here, the magic happen... >*/
