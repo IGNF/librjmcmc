@@ -16,7 +16,7 @@ void initialize_parameters(T* params)
 //    params->template insert<double>("qtemp",'q',0.5,"Sampler (q) [0;1]");
     params->template insert<int>("nbdump",'d',10000,"Number of iterations between each result display");
 //    params->template insert<bool>("dosave",'b',false, "Save intermediate results");
-    params->template insert<int>("nbsave",'S',10000,"Number of iterations between each save");
+    params->template insert<int>("nbsave",'S',100000,"Number of iterations between each save");
     params->template insert<double>("poisson",'p',200, "Poisson processus parameter");
     params->template insert<double>("maxsize",'m',20, "Maximum rectangle size");
     params->template insert<double>("maxratio",'M',5, "Maximum rectangle aspect ratio");

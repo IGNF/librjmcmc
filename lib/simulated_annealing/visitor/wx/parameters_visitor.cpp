@@ -19,7 +19,7 @@
 #include <wx/frame.h>
 
 #include "param/parameters_inc.hpp"
-#include "param/wx_parameter.hpp"
+#include "wx_parameter.hpp"
 #include "parameters_visitor.hpp"
 
 #include "gui/resources/IGN.xpm"

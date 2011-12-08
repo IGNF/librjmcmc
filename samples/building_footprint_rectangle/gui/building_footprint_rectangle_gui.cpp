@@ -1,5 +1,5 @@
 //[building_footprint_rectangle_gui_parameters
-#include "param/wx_parameter.hpp"
+#include "simulated_annealing/visitor/wx/wx_parameter.hpp"
 typedef parameters< wx_parameter > param;
 #include "core/building_footprint_rectangle_parameters_inc.hpp"
 //]
