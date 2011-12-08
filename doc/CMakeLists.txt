@@ -89,5 +89,5 @@ if(BUILD_QUICKSTART)
     add_executable( quickstart quickstart.cpp ${LIB_HEADER_FILES}
     ${QBK_SOURCES}
 )
-    target_link_libraries( quickstart ${Boost_LIBRARIES} ${GEOMETRY_LIBRARIES} ${SHAPELIB_LIBRARIES})
+    target_link_libraries( quickstart ${Boost_LIBRARIES} ${GEOMETRY_LIBRARIES} ${shapelib_LIBRARIES})
 endif(BUILD_QUICKSTART)
