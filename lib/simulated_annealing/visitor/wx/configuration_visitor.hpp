@@ -7,10 +7,6 @@
 #include "configuration_visitor/paint.h"
 #include <GilViewer/gui/panel_viewer.hpp>
 
-// to be specialized by each object type (-> files lib/geometry/*_paint.h)
-
-template<typename T> void paint(layer::ptrLayerType&, const std::string& s, const T&);
-
 struct layer_painter {
 public:
     layer_painter( layer::ptrLayerType& layer) : m_layer(layer) {}

@@ -40,7 +40,9 @@ typedef rjmcmc::sampler<reference_process,acceptance,birth_death_kernel>        
 #include "simulated_annealing/schedule/geometric_schedule.hpp"
 #include "simulated_annealing/end_test/max_iteration_end_test.hpp"
 #include "simulated_annealing/simulated_annealing.hpp"
+#include "simulated_annealing/visitor/composite_visitor.hpp"
 #include "simulated_annealing/visitor/ostream_visitor.hpp"
+#include "simulated_annealing/visitor/shp/shp_visitor.hpp"
 //]
 
 //[ parse_parameters
@@ -79,9 +81,10 @@ int main(int argc , char** argv)
 
     simulated_annealing::geometric_schedule<double> sch(temp,deccoef);
     simulated_annealing::max_iteration_end_test     end(nbiter);
-    simulated_annealing::ostream_visitor visitor;
+    simulated_annealing::ostream_visitor osvisitor;
+    simulated_annealing::shp::shp_visitor shpvisitor("quickstart_");
     visitor.init(nbdump,nbsave);
-    simulated_annealing::optimize(c,samp,sch,end,visitor);
+    simulated_annealing::optimize(c,samp,sch,end,simulated_annealing::make_visitor(osvisitor,shpvisitor));
 
     return 0;
 }

@@ -55,7 +55,7 @@ namespace rjmcmc {
         template<unsigned int I, unsigned int N>
         struct for_each_impl
         {
-            template<typename T, typename F> inline void operator()(const T& t, F& f) const
+            template<typename T, typename F> inline void operator()(T& t, F& f) const
             {
                 f(get<I>(t));
                 for_each_impl<I+1,N>()(t,f);
@@ -65,12 +65,12 @@ namespace rjmcmc {
         template<unsigned int N>
         struct for_each_impl<N,N>
         {
-            template<typename T, typename F> inline void operator()(const T& t, F& f) const {}
+            template<typename T, typename F> inline void operator()(T& t, F& f) const {}
         };
     } // namespace internal
 
     template<typename T, typename F>
-    inline void for_each(const T& t, F& f)
+    inline void for_each(T& t, F& f)
     {
         internal::for_each_impl<0,tuple_size<T>::value>()(t,f);
     }

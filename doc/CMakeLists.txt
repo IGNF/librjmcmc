@@ -83,11 +83,12 @@ set(QBK_SOURCES
 
 endif(CMAKE_SYSTEM_NAME STREQUAL Linux)
 
+find_package(shapelib)
 file( GLOB_RECURSE LIB_HEADER_FILES    ../lib/*.hpp ../lib/*.h)
 option(BUILD_QUICKSTART "build quickstart" ON)
 if(BUILD_QUICKSTART)
     add_executable( quickstart quickstart.cpp ${LIB_HEADER_FILES}
     ${QBK_SOURCES}
 )
-    target_link_libraries( quickstart ${Boost_LIBRARIES} ${GEOMETRY_LIBRARIES} )
+    target_link_libraries( quickstart ${Boost_LIBRARIES} ${GEOMETRY_LIBRARIES} ${SHAPELIB_LIBRARIES})
 endif(BUILD_QUICKSTART)

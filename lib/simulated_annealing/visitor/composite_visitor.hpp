@@ -11,8 +11,8 @@ namespace simulated_annealing {
         {
             int m_dump, m_save;
             visitor_init(int dump, int save) : m_dump(dump), m_save(save) {}
-            template<typename T> inline void operator()(const T& t) { t .init(m_dump,m_save); }
-            template<typename T> inline void operator()(      T* t) { t->init(m_dump,m_save); }
+            template<typename T> inline void operator()(T& t) { t .init(m_dump,m_save); }
+            template<typename T> inline void operator()(T* t) { t->init(m_dump,m_save); }
         };
 
         template<typename Configuration, typename Sampler>
@@ -22,8 +22,8 @@ namespace simulated_annealing {
             const Sampler& m_sample;
             double m_t;
             visitor_begin(const Configuration& config, const Sampler& sample, double t) : m_config(config), m_sample(sample), m_t(t) {}
-            template<typename T> inline void operator()(const T& t) { t .begin(m_config,m_sample,m_t); }
-            template<typename T> inline void operator()(      T* t) { t->begin(m_config,m_sample,m_t); }
+            template<typename T> inline void operator()(T& t) { t .begin(m_config,m_sample,m_t); }
+            template<typename T> inline void operator()(T* t) { t->begin(m_config,m_sample,m_t); }
         };
         template<typename Configuration, typename Sampler>
         struct visitor_visit
@@ -32,8 +32,8 @@ namespace simulated_annealing {
             const Sampler& m_sample;
             double m_t;
             visitor_visit(const Configuration& config, const Sampler& sample, double t) : m_config(config), m_sample(sample), m_t(t) {}
-            template<typename T> inline void operator()(const T& t) { t .visit(m_config,m_sample,m_t); }
-            template<typename T> inline void operator()(      T* t) { t->visit(m_config,m_sample,m_t); }
+            template<typename T> inline void operator()(T& t) { t .visit(m_config,m_sample,m_t); }
+            template<typename T> inline void operator()(T* t) { t->visit(m_config,m_sample,m_t); }
         };
         template<typename Configuration, typename Sampler>
         struct visitor_end
@@ -42,8 +42,8 @@ namespace simulated_annealing {
             const Sampler& m_sample;
             double m_t;
             visitor_end(const Configuration& config, const Sampler& sample, double t) : m_config(config), m_sample(sample), m_t(t) {}
-            template<typename T> inline void operator()(const T& t) { t .end(m_config,m_sample,m_t); }
-            template<typename T> inline void operator()(      T* t) { t->end(m_config,m_sample,m_t); }
+            template<typename T> inline void operator()(T& t) { t .end(m_config,m_sample,m_t); }
+            template<typename T> inline void operator()(T* t) { t->end(m_config,m_sample,m_t); }
         };
 
     } // namespace internal
@@ -85,6 +85,13 @@ namespace simulated_annealing {
         Visitors m_visitors;
     };
 
+/*
+    template<RJMCMC_TUPLE_TYPENAMES>
+    composite_visitor<RJMCMC_TUPLE_TYPES> make_visitor(RJMCMC_TUPLE_ARGS)
+    {
+        return composite_visitor(RJMCMC_TUPLE_PARAMS);
+    }
+*/
 } // namespace simulated_annealing
 
 #endif // __COMPOSITE_VISITOR_HPP__

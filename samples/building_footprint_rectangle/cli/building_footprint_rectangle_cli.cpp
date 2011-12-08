@@ -10,6 +10,7 @@ typedef parameters< parameter > param;
 
 //[building_footprint_rectangle_cli_visitors
 #include "simulated_annealing/visitor/ostream_visitor.hpp"
+#include "simulated_annealing/visitor/shp/shp_visitor.hpp"
 #include "simulated_annealing/visitor/any_visitor.hpp"
 #include "rjmcmc/sampler/any_sampler.hpp"
 //]
@@ -22,16 +23,16 @@ int main(int argc , char** argv)
     initialize_parameters(p);
     if (!p->parse(argc, argv)) return -1;
 
-    /*< Build and initialize simple visitor which prints some data on the standard output >*/
-    simulated_annealing::ostream_visitor osvisitor;
-    init_visitor(p,osvisitor);
 
     /*< Input data is an image. We first retrieve from the parameters the region to process... clip the image to fit this region... and then compute the gradient and build the attached view>*/
     Iso_rectangle_2 bbox = get_bbox(p);
     std::string  dsm_file = p->get<boost::filesystem::path>("dsm").string();
     clip_bbox(bbox, dsm_file);
+
     gradient_functor gf(p->get<double>("sigmaD"));
     oriented_gradient_view grad_view(dsm_file, bbox, gf);
+
+    set_bbox(p,bbox);
 
     /*< Before launching the optimization process, we create all the required stuffs: a configuration, a sampler, a schedule scheme and an end test >*/
     configuration *conf; create_configuration(p,grad_view,conf);
@@ -41,10 +42,14 @@ int main(int argc , char** argv)
 
     // test avec les any_*
     typedef rjmcmc::any_sampler<configuration> any_sampler;
-    typedef simulated_annealing::any_visitor<configuration,any_sampler> any_visitor;
-
     any_sampler sampler(*samp);
-    any_visitor visitor(osvisitor);
+
+    /*< Build and initialize simple visitor which prints some data on the standard output >*/
+    typedef simulated_annealing::any_composite_visitor<configuration,any_sampler> any_visitor;
+    any_visitor visitor;
+    visitor.push_back(simulated_annealing::ostream_visitor());
+    visitor.push_back(simulated_annealing::shp::shp_visitor(argv[0]));
+    init_visitor(p,visitor);
 
     /*< This is the way to launch the optimization process. Here, the magic happen... >*/
     simulated_annealing::optimize(*conf,sampler,*sch,*end,visitor);
