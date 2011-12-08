@@ -5,8 +5,6 @@ else()
 	message(FATAL_ERROR "TIFF not found ! Please set TIFF path ...")
 endif()
 
-find_package(shapelib)
-
 file( GLOB ALL_CLI_HEADER_FILES *.h *.hpp )
 aux_source_directory( ${CMAKE_CURRENT_SOURCE_DIR} ALL_CLI_SRC )
 set( CLI_SRC ${ALL_LIBRJMCMC_HEADERS_FILES} ${ALL_CLI_HEADER_FILES} ${ALL_CLI_SRC} )

@@ -102,6 +102,22 @@ else(USE_CGAL)
   set(GEOMETRY_LIBRARIES )
 endif(USE_CGAL)
 
+
+#########################################################
+#            Finding OPTIONAL package shapelib        ###
+#########################################################
+option(USE_SHP "Use SHP library" ON)
+
+if(USE_SHP)
+    set(SHAPELIB_LIBRARIES "shp" CACHE PATH "SHP library" FORCE  )
+    set(SHAPELIB_INCLUDE_DIRS "" CACHE PATH "SHP include directories" FORCE)
+    find_package(shapelib QUIET)
+    add_definitions("-DUSE_SHP=1")
+    if(${SHAPELIB_INCLUDE_DIRS})
+      include_directories(${SHAPELIB_INCLUDE_DIRS})
+    endif()
+endif(USE_SHP)
+
 #########################################################
 #            Recursion to subdirs                     ###
 #########################################################

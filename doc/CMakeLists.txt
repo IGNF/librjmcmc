@@ -83,7 +83,6 @@ set(QBK_SOURCES
 
 endif(CMAKE_SYSTEM_NAME STREQUAL Linux)
 
-find_package(shapelib)
 file( GLOB_RECURSE LIB_HEADER_FILES    ../lib/*.hpp ../lib/*.h)
 option(BUILD_QUICKSTART "build quickstart" ON)
 if(BUILD_QUICKSTART)
