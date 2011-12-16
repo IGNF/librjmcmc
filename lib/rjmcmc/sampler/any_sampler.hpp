@@ -77,6 +77,8 @@ namespace rjmcmc {
         inline double delta() const { return content->base()->delta(); }
         inline double green_ratio() const { return content->base()->green_ratio(); }
         inline bool accepted() const { return content->base()->accepted(); }
+        inline double kernel_ratio() const { return content->base()->kernel_ratio(); }
+        inline double ref_pdf_ratio() const { return content->base()->ref_pdf_ratio(); }
 
     private:
         detail::sampler_placeholder<Configuration>* content;

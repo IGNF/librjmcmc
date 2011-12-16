@@ -101,6 +101,14 @@ namespace simulated_annealing {
                 m_out << std::setw(w) << config.unary_energy();
                 m_out << std::setw(w) << config.binary_energy();
                 m_out << std::setw(w) << config.energy();
+                m_out << std::setw(w) << sampler.acceptance_probability();
+                m_out << std::setw(w) << sampler.temperature();
+                m_out << std::setw(w) << sampler.delta();
+                m_out << std::setw(w) << sampler.green_ratio();
+                m_out << std::setw(w) << sampler.accepted();
+                m_out << std::setw(w) << sampler.kernel_ratio();
+                m_out << std::setw(w) << sampler.ref_pdf_ratio();
+
                 if(m_add_endline)
                     m_out << std::endl;
                 m_out << std::flush;

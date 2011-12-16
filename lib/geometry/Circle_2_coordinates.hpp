@@ -5,24 +5,33 @@
 #include "geometry/Circle_2.h"
 #include <boost/iterator/iterator_facade.hpp>
 
+
 template<typename K>
 struct circle_coordinates_iterator
-    : public boost::iterator_facade<circle_coordinates_iterator<K>, const typename K::FT, boost::forward_traversal_tag>
+        : public boost::iterator_facade<circle_coordinates_iterator<K>, const typename K::FT, boost::forward_traversal_tag>
 {
-    circle_coordinates_iterator() : m_circle(), m_i(3) {}
-    explicit circle_coordinates_iterator(const geometry::Circle_2<K>& c) : m_circle(c), m_i(0) {}
+    enum { dimension = 3 };
+    circle_coordinates_iterator() : m_i(dimension) {}
+    explicit circle_coordinates_iterator(const geometry::Circle_2<K>& c) : m_i(0)
+    {
+        m_coord[0] = c.center().x();
+        m_coord[1] = c.center().y();
+        m_coord[2] = c.radius();
+    }
+
+    typedef typename K::FT FT;
+
 private:
     friend class boost::iterator_core_access;
     void increment() { ++m_i; }
-    typename K::FT dereference() const {
-        switch(m_i) {
-        case 0 : return m_circle.center().x();
-        case 1 : return m_circle.center().y();
-        case 2 : return m_circle.radius();
-        default : return typename K::FT();
+    void advance(int i) { m_i+=i; }
+
+    const FT& dereference() const {
+        //assert(m_i<dimension);
+        return m_coord[m_i];
     }
-    }
-    const geometry::Circle_2<K>& m_circle;
+
+    FT m_coord[dimension];
     unsigned int m_i;
 };
 
@@ -30,7 +39,7 @@ template<typename K>
 struct coordinates_iterator< geometry::Circle_2<K> >
 {
     typedef circle_coordinates_iterator<K> type;
-    enum { dimension = 3 };
+    enum { dimension = type::dimension };
 };
 
 template<typename K>

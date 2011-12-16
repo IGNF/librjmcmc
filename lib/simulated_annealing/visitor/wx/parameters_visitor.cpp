@@ -32,7 +32,7 @@
 
 const char *c_str(const wxString& s)
 {
-#if wxMINOR_VERSION > 8
+#if wxMAJOR_VERSION >=2 && wxMINOR_VERSION >= 9
 	return s.To8BitData().data();
 #else
 	return s.To8BitData();
@@ -102,7 +102,7 @@ namespace simulated_annealing {
             wxFileDialog *fileDialog = new wxFileDialog(this, wxString(name.c_str(), *wxConvCurrent), wxT(""), wxT(""), wildcard, wxFD_OPEN|wxFD_CHANGE_DIR );
             if (fileDialog->ShowModal() == wxID_OK)
             {
-                boost::filesystem::path file( fileDialog->GetPath().To8BitData() );
+                boost::filesystem::path file( c_str(fileDialog->GetPath()) );
                 m_param->set(name,file);
             }
         }

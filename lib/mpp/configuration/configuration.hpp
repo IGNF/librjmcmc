@@ -40,12 +40,12 @@ namespace marked_point_process {
 
 
             template<typename V> class inserter {
-		mutable V& m_v;
+                V& m_v;
             public:
 		inserter(V& v) : m_v(v) {}
 		typedef void result_type;
-		template<typename T> void operator()(const T& t) const { m_v.push_back(value_type(t)); }
-		template<typename T, typename U> void operator()(const std::pair<T,U>& t) const {
+                template<typename T> void operator()(const T& t) { m_v.push_back(value_type(t)); }
+                template<typename T, typename U> void operator()(const std::pair<T,U>& t) {
                     m_v.push_back(value_type(t.first));
                     m_v.push_back(value_type(t.second));
 		}

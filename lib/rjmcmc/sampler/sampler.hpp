@@ -19,12 +19,16 @@ namespace rjmcmc {
         inline double delta() const { return m_delta; }
         inline double green_ratio() const { return m_green_ratio; }
         inline bool accepted() const { return m_accepted; }
+        inline double kernel_ratio() const { return m_kernel_ratio; }
+        inline double ref_pdf_ratio() const { return m_ref_pdf_ratio; }
 
     protected:
         double  m_acceptance_probability;
         double  m_temperature;
         double  m_delta;
         double  m_green_ratio;
+        double  m_kernel_ratio;
+        double  m_ref_pdf_ratio;
         bool    m_accepted;
     };
 
@@ -93,10 +97,11 @@ namespace rjmcmc {
             Modification modif;
             m_temperature = temp;
             detail::kernel_functor<Configuration,Modification> kf(c,modif);
-            m_green_ratio  = random_apply(m_kernel_id,m_die(),m_kernel,kf);
+            m_kernel_ratio = random_apply(m_kernel_id,m_die(),m_kernel,kf);
 
             //3
-            m_green_ratio *= m_density.pdf_ratio(c,modif);
+            m_ref_pdf_ratio = m_density.pdf_ratio(c,modif);
+            m_green_ratio = m_kernel_ratio*m_ref_pdf_ratio;
 
             //4
             if(m_green_ratio<=0) {

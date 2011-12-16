@@ -35,13 +35,13 @@ public:
 	Circle_2(const Point_2 &center, double radius) : m_center(center), m_radius(radius), m_squared_radius(radius*radius)
 	{}
 
-	inline Point_2 center() const
+        inline const Point_2& center() const
 	{	return m_center;}
 	inline bool is_degenerate() const
 	{	return m_radius==0;}
-	inline FT radius() const
+        inline const FT& radius() const
 	{	return m_radius;}
-	inline FT squared_radius() const
+        inline const FT& squared_radius() const
 	{	return m_squared_radius;}
 
 private :
