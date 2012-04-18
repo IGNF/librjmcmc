@@ -1,3 +1,39 @@
+/***********************************************************************
+This file is part of the librjmcmc project source files.
+
+Copyright : Institut Geographique National (2008-2012)
+Contributors : Mathieu Brédif, Olivier Tournaire, Didier Boldo
+email : librjmcmc@ign.fr
+
+This software is a generic C++ library for stochastic optimization.
+
+This software is governed by the CeCILL license under French law and
+abiding by the rules of distribution of free software. You can use,
+modify and/or redistribute the software under the terms of the CeCILL
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info".
+
+As a counterpart to the access to the source code and rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty and the software's author, the holder of the
+economic rights, and the successive licensors have only limited liability.
+
+In this respect, the user's attention is drawn to the risks associated
+with loading, using, modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean that it is complicated to manipulate, and that also
+therefore means that it is reserved for developers and experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test the software's suitability as regards their
+requirements in conditions enabling the security of their systems and/or
+data to be ensured and, more generally, to use and operate it in the
+same conditions as regards security.
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL license and that you accept its terms.
+
+***********************************************************************/
+
 #ifndef __OSTREAM_VISITOR_HPP__
 #define __OSTREAM_VISITOR_HPP__
 
@@ -42,7 +78,7 @@ namespace simulated_annealing {
             for (unsigned int i=0; i<kernel_size; ++i) m_accepted[i] = m_proposed[i] = 0;
 
             m_out.fill(' ');
-            w = 10;
+            w = 15;
             m_out << std::setw(w)<<"Iteration"<< std::setw(w)<< "Objects";
             for(unsigned int i=0; i<kernel_size; ++i)
             {
@@ -51,8 +87,8 @@ namespace simulated_annealing {
                 m_out << std::setw(w)<<("A"+s);
             }
             m_out << std::setw(w)<<"Accept"<< std::setw(w)<<"Time(ms)";
-            m_out << std::setw(w)<<"Temp"<< std::setw(w)<<"E_data";
-            m_out << std::setw(w)<<"E_priori"<< std::setw(w)<<"E_total";
+            m_out << std::setw(w)<<"Temp"<< std::setw(w)<<"U_1";
+            m_out << std::setw(w)<<"U_2"<< std::setw(w)<<"U";
             if(m_add_endline)
                 m_out << std::endl;
             m_out << std::flush;
@@ -68,7 +104,7 @@ namespace simulated_annealing {
             m_out << "Graph Data energy integrity : " << config.audit_unary_energy() - config.unary_energy() << std::endl;
             m_out << "Graph Prior energy integrity: " << config.audit_binary_energy() - config.binary_energy()<< std::endl;
             m_out << "Graph Structure integrity : " << config.audit_structure() << std::endl;
-            m_out << config;
+          //  m_out << config;
             m_out << std::endl << std::flush;
         }
 
