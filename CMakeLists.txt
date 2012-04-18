@@ -60,7 +60,6 @@ set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL  " real install path" 
 #            Finding REQUIRED package Boost           ###
 #########################################################
 set(Boost_ADDITIONAL_VERSIONS 
-           "1.39.0" "1.39" 
 		   "1.40.0" "1.40" 
 		   "1.41.0" "1.41" 
 		   "1.42.0" "1.42" 
