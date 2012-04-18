@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __VARIANT_PAIR_HPP__
-#define __VARIANT_PAIR_HPP__
+#ifndef VARIANT_PAIR_HPP
+#define VARIANT_PAIR_HPP
 
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/insert_range.hpp>
@@ -96,4 +96,4 @@ namespace rjmcmc {
 
 }; // namespace rjmcmc
 
-#endif // __VARIANT_PAIR_HPP__
+#endif // VARIANT_PAIR_HPP

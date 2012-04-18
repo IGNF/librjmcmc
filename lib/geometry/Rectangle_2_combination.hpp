@@ -34,11 +34,11 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef GEOMETRY_RECTANGLE_2_COMBINATION_H
-#define GEOMETRY_RECTANGLE_2_COMBINATION_H
+#ifndef GEOMETRY_RECTANGLE_2_COMBINATION_HPP
+#define GEOMETRY_RECTANGLE_2_COMBINATION_HPP
 
 #include <CGAL/Polygon_2_algorithms.h>
-#include "Rectangle_2_intersection.h"
+#include "intersection/Rectangle_2_intersection.hpp"
 
 namespace geometry {
 
@@ -275,4 +275,4 @@ template<class K> typename K::FT combination_area(const Rectangle_2<K> &a, const
 
 }; // namespace geometry
 
-#endif // GEOMETRY_RECTANGLE_2_COMBINATION_H
+#endif // GEOMETRY_RECTANGLE_2_COMBINATION_HPP

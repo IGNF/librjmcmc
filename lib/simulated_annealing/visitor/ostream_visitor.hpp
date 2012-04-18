@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __OSTREAM_VISITOR_HPP__
-#define __OSTREAM_VISITOR_HPP__
+#ifndef OSTREAM_VISITOR_HPP
+#define OSTREAM_VISITOR_HPP
 
 #include <ostream>
 #include <iomanip>
@@ -154,4 +154,4 @@ namespace simulated_annealing {
 
 }; // namespace simulated_annealing
 
-#endif // __OSTREAM_VISITOR_HPP__
+#endif // OSTREAM_VISITOR_HPP

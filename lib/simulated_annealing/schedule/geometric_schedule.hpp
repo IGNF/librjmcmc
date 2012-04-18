@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __GEOMETRIC_SCHEDULE_HPP__
-#define __GEOMETRIC_SCHEDULE_HPP__
+#ifndef GEOMETRIC_SCHEDULE_HPP
+#define GEOMETRIC_SCHEDULE_HPP
 
 namespace simulated_annealing {
     /**
@@ -79,4 +79,4 @@ namespace simulated_annealing {
 
 }; // namespace simulated_annealing
 
-#endif // __GEOMETRIC_SCHEDULE_HPP__
+#endif // GEOMETRIC_SCHEDULE_HPP

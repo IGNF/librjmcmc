@@ -34,10 +34,10 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __ALL_VISITORS_HPP__
-#define __ALL_VISITORS_HPP__
+#ifndef ALL_VISITORS_HPP
+#define ALL_VISITORS_HPP
 
 #include "ostream_visitor.hpp"
 #include "composite_visitor.hpp"
 
-#endif // __ALL_VISITORS_HPP__
+#endif // ALL_VISITORS_HPP

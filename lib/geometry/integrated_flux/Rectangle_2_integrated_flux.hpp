@@ -34,12 +34,12 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_H
-#define GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_H
+#ifndef GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_HPP
+#define GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_HPP
 
-#include "Rectangle_2.h"
-#include "geometry/Segment_2_iterator.h"
-#include "geometry/Iso_rectangle_2_Segment_2_clip.h"
+#include "geometry/Rectangle_2.hpp"
+#include "geometry/Segment_2_iterator.hpp"
+#include "geometry/Iso_rectangle_2_Segment_2_clip.hpp"
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
 
@@ -109,4 +109,4 @@ template<typename View, typename K> double inverted_integrated_flux(const View& 
 }
 */
 
-#endif // GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_H
+#endif // GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_HPP

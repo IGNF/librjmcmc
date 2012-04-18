@@ -34,28 +34,31 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef RECTANGLE_2_PAINT_H
-#define RECTANGLE_2_PAINT_H
+#ifndef COORDINATES_HPP
+#define COORDINATES_HPP
 
-#include <GilViewer/layers/layer.hpp>
-#include "geometry/geometry.hpp"
-#include "geometry/Rectangle_2.h"
-
-template<typename K> void paint(
-        layer::ptrLayerType& l,
-	const std::string& s,
-	const geometry::Rectangle_2<K>& r)
+template<typename T> struct coordinates_iterator
 {
-  std::vector<double> vectx, vecty;
-  for (unsigned int i=0; i<4;++i)
-  {
-    vectx.push_back(geometry::to_double(r[i].x()));
-    vecty.push_back(geometry::to_double(r[i].y()));
-  }
-  double x = geometry::to_double(r.center().x());
-  double y = geometry::to_double(r.center().y());
-  l->add_polygon(vectx, vecty );
-  l->add_text(x, y, s , wxColour(255,0,0) );
+    typedef typename T::iterator type;
+    const static unsigned int dimension = T::dimension;
+};
+
+template<typename T>
+typename coordinates_iterator<T>::type coordinates_begin(const T& t)
+{
+    return typename coordinates_iterator<T>::type(t);
 }
 
-#endif // RECTANGLE_2_PAINT_H
+template<typename T>
+typename coordinates_iterator<T>::type coordinates_end(const T&)
+{
+    return typename coordinates_iterator<T>::type();
+}
+
+template<typename T>
+struct object_from_coordinates {
+    template<typename Iterator> T operator()(Iterator it) { return T(it); }
+};
+
+#endif // COORDINATES_HPP
+

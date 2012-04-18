@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __INVERSE_LINEAR_SCHEDULE_HPP__
-#define __INVERSE_LINEAR_SCHEDULE_HPP__
+#ifndef INVERSE_LINEAR_SCHEDULE_HPP
+#define INVERSE_LINEAR_SCHEDULE_HPP
 
 namespace simulated_annealing {
     /**
@@ -77,4 +77,4 @@ namespace simulated_annealing {
 
 }; // namespace simulated_annealing
 
-#endif // __INVERSE_LINEAR_SCHEDULE_HPP__
+#endif // INVERSE_LINEAR_SCHEDULE_HPP

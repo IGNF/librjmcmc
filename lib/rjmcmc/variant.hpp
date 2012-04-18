@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __RJMCMC_VARIANT_HPP__
-#define __RJMCMC_VARIANT_HPP__
+#ifndef RJMCMC_VARIANT_HPP
+#define RJMCMC_VARIANT_HPP
 
 #include <boost/mpl/size.hpp>
 #include <boost/variant.hpp>
@@ -121,4 +121,4 @@ namespace rjmcmc {
 
 }; // namespace rjmcmc
 
-#endif // __RJMCMC_VARIANT_HPP__
+#endif // RJMCMC_VARIANT_HPP

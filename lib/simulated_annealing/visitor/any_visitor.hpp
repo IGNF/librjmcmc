@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __ANY_VISITOR_HPP__
-#define __ANY_VISITOR_HPP__
+#ifndef ANY_VISITOR_HPP
+#define ANY_VISITOR_HPP
 
 namespace simulated_annealing {
 
@@ -123,4 +123,4 @@ namespace simulated_annealing {
 
 } // namespace simulated_annealing
 
-#endif // __ANY_VISITOR_HPP__
+#endif // ANY_VISITOR_HPP

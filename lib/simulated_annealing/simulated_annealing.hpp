@@ -72,4 +72,4 @@ namespace simulated_annealing
 
 }
 
-#endif
+#endif // SIMULATED_ANNEALING_HPP

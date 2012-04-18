@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef DIRECT_SAMPLER_HPP_
-#define DIRECT_SAMPLER_HPP_
+#ifndef DIRECT_SAMPLER_HPP
+#define DIRECT_SAMPLER_HPP
 
 #include "rjmcmc/random_variant_init.hpp"
 
@@ -94,4 +94,4 @@ namespace marked_point_process {
     };
 }
 
-#endif // DIRECT_SAMPLER_HPP_
+#endif // DIRECT_SAMPLER_HPP

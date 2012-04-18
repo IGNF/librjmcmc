@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __ALL_WX_VISITORS_HPP__
-#define __ALL_WX_VISITORS_HPP__
+#ifndef ALL_WX_VISITORS_HPP
+#define ALL_WX_VISITORS_HPP
 
 #include "chart_visitor.hpp"
 #include "configuration_visitor.hpp"
@@ -43,4 +43,4 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "log_visitor.hpp"
 #include "controler_visitor.hpp"
 
-#endif // __ALL_WX_VISITORS_HPP__
+#endif // ALL_WX_VISITORS_HPP

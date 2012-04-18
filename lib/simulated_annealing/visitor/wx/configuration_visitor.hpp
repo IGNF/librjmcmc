@@ -34,13 +34,13 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __WX_CCONFIGURATION_VISITOR_HPP__
-#define __WX_CCONFIGURATION_VISITOR_HPP__
+#ifndef WX_CCONFIGURATION_VISITOR_HPP
+#define WX_CCONFIGURATION_VISITOR_HPP
 
 #include <wx/wx.h>
 #include <wx/aboutdlg.h>
 #include "rjmcmc/variant.hpp"
-#include "configuration_visitor/paint.h"
+#include "paint/all.hpp"
 #include <GilViewer/gui/panel_viewer.hpp>
 
 struct layer_painter {
@@ -147,4 +147,4 @@ namespace simulated_annealing {
     } // namespace wx
 } // namespace simulated_annealing
 
-#endif // __WX_CCONFIGURATION_VISITOR_HPP__
+#endif // WX_CCONFIGURATION_VISITOR_HPP

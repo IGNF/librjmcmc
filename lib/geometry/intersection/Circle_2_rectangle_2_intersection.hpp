@@ -34,11 +34,11 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef GEOMETRY_CIRCLE_2_RECTANGLE_2_INTERSECTION_H
-#define GEOMETRY_CIRCLE_2_RECTANGLE_2_INTERSECTION_H
+#ifndef GEOMETRY_CIRCLE_2_RECTANGLE_2_INTERSECTION_HPP
+#define GEOMETRY_CIRCLE_2_RECTANGLE_2_INTERSECTION_HPP
 
-#include "Rectangle_2.h"
-#include "Circle_2.h"
+#include "geometry/Rectangle_2.hpp"
+#include "geometry/Circle_2.hpp"
 
 
 namespace geometry {
@@ -179,4 +179,4 @@ template<class K> inline bool do_intersect(const geometry::Circle_2<K> &c, const
 
 }; // namespace geometry
 
-#endif // GEOMETRY_CIRCLE_2_RECTANGLE_2_INTERSECTION_H
+#endif // GEOMETRY_CIRCLE_2_RECTANGLE_2_INTERSECTION_HPP

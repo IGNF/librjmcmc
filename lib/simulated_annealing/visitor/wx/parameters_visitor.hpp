@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __WX_PARAMETERS_VISITOR_HPP__
-#define __WX_PARAMETERS_VISITOR_HPP__
+#ifndef WX_PARAMETERS_VISITOR_HPP
+#define WX_PARAMETERS_VISITOR_HPP
 
 #ifdef WIN32
 	#pragma warning(disable : 4251)
@@ -99,4 +99,4 @@ namespace simulated_annealing {
     } // namespace wx
 } // namespace simulated_annealing
 
-#endif // __WX_PARAMETERS_VISITOR_HPP__
+#endif // WX_PARAMETERS_VISITOR_HPP

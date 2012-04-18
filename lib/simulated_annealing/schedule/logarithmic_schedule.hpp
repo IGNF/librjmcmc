@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __LOGARITHMIC_SCHEDULE_HPP__
-#define __LOGARITHMIC_SCHEDULE_HPP__
+#ifndef LOGARITHMIC_SCHEDULE_HPP
+#define LOGARITHMIC_SCHEDULE_HPP
 
 namespace simulated_annealing {
     /**
@@ -74,4 +74,4 @@ namespace simulated_annealing {
 
 }; // namespace simulated_annealing
 
-#endif // __LOGARITHMIC_SCHEDULE_HPP__
+#endif // LOGARITHMIC_SCHEDULE_HPP

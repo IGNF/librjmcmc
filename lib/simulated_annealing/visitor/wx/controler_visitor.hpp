@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __CONTROLER_HPP__
-#define __CONTROLER_HPP__
+#ifndef CONTROLER_HPP
+#define CONTROLER_HPP
 
 #include <wx/window.h>
 #include <boost/shared_ptr.hpp>
@@ -218,4 +218,4 @@ namespace simulated_annealing {
 
     };
 };
-#endif // __CONTROLER_HPP__
+#endif // CONTROLER_HPP

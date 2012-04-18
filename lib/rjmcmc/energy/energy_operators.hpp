@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef ENERGY_OPERATORS_HPP_
-#define ENERGY_OPERATORS_HPP_
+#ifndef ENERGY_OPERATORS_HPP
+#define ENERGY_OPERATORS_HPP
 
 #include "rjmcmc/energy.hpp"
 
@@ -159,4 +159,4 @@ template<typename E> negate_energy<ENERGY(E)> operator-(const E& e) { return neg
 
 */
 
-#endif /*ENERGY_OPERATORS_HPP_*/
+#endif /*ENERGY_OPERATORS_HPP*/

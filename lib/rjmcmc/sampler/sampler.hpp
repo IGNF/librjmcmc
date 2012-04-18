@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __RJMCMC_SAMPLER_HPP__
-#define __RJMCMC_SAMPLER_HPP__
+#ifndef RJMCMC_SAMPLER_HPP
+#define RJMCMC_SAMPLER_HPP
 
 #include "rjmcmc/tuple.hpp"
 #include "rjmcmc/random.hpp"
@@ -193,4 +193,4 @@ namespace rjmcmc {
     */
 }; // namespace rjmcmc
 
-#endif // __RJMCMC_SAMPLER_HPP__
+#endif // RJMCMC_SAMPLER_HPP

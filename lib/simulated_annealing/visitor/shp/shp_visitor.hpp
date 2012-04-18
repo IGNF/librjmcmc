@@ -34,13 +34,13 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __SHP_VISITOR_HPP__
-#define __SHP_VISITOR_HPP__
+#ifndef SHP_VISITOR_HPP
+#define SHP_VISITOR_HPP
 
 #include <string>
 #include <shapefil.h>
 
-#ifdef  GEOMETRY_RECTANGLE_2_H
+#ifdef  GEOMETRY_RECTANGLE_2_HPP
 template<typename K>
 SHPObject* shp_create_object(const geometry::Rectangle_2<K>& r)
 {
@@ -56,9 +56,9 @@ SHPObject* shp_create_object(const geometry::Rectangle_2<K>& r)
 
     return SHPCreateSimpleObject(SHPT_POLYGON, 5, x, y, NULL);
 }
-#endif //  GEOMETRY_RECTANGLE_2_H
+#endif //  GEOMETRY_RECTANGLE_2_HPP
 
-#ifdef  GEOMETRY_CIRCLE_2_H
+#ifdef  GEOMETRY_CIRCLE_2_HPP
 template<typename K>
 SHPObject* shp_create_object(const geometry::Circle_2<K>& c)
 {
@@ -79,7 +79,7 @@ SHPObject* shp_create_object(const geometry::Circle_2<K>& c)
 
     return SHPCreateSimpleObject(SHPT_POLYGON, N+1, x, y, NULL);
 }
-#endif
+#endif // GEOMETRY_CIRCLE_2_HPP
 
 struct shp_writer
 {
@@ -165,5 +165,5 @@ namespace simulated_annealing {
     } // namespace shp
 } // namespace simulated_annealing
 
-#endif // __WX_CHART_VISITOR_HPP__
+#endif // SHP_VISITOR_HPP
 

@@ -2,8 +2,8 @@
 #define GLOBAL_RECONSTRUCTION_UNARY_ENERGY_INC_HPP_
 
 #include "core/global_reconstruction_unary_energy.hpp"
-#include "geometry/integrated_flux.h"
-#include "geometry/image_error.h"
+#include "geometry/integrated_flux/all.hpp"
+#include "geometry/image_error/all.hpp"
 
 template<typename DSM, typename NDVI>
 global_reconstruction_unary_energy<DSM,NDVI>::global_reconstruction_unary_energy(const DSM& dsm, const NDVI& ndvi, double default_energy, double ponderation_dsm, double ponderation_ndvi) :

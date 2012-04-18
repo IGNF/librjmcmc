@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef ENERGY_HPP_
-#define ENERGY_HPP_
+#ifndef ENERGY_HPP
+#define ENERGY_HPP
 
 namespace rjmcmc {
 
@@ -51,5 +51,5 @@ public:
 
 }
 
-#endif // ENERGY_HPP_
+#endif // ENERGY_HPP
 

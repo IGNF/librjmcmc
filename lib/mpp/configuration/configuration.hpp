@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __RJMCMC_CONFIGURATION_HPP__
-#define __RJMCMC_CONFIGURATION_HPP__
+#ifndef RJMCMC_CONFIGURATION_HPP
+#define RJMCMC_CONFIGURATION_HPP
 
 #include "rjmcmc/variant.hpp"
 
@@ -125,4 +125,4 @@ namespace marked_point_process {
 
 }; // namespace marked_point_process
 
-#endif // __RJMCMC_CONFIGURATION_HPP__
+#endif // RJMCMC_CONFIGURATION_HPP

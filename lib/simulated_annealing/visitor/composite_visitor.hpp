@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __COMPOSITE_VISITOR_HPP__
-#define __COMPOSITE_VISITOR_HPP__
+#ifndef COMPOSITE_VISITOR_HPP
+#define COMPOSITE_VISITOR_HPP
 
 #include "rjmcmc/tuple.hpp"
 
@@ -130,4 +130,4 @@ namespace simulated_annealing {
 */
 } // namespace simulated_annealing
 
-#endif // __COMPOSITE_VISITOR_HPP__
+#endif // COMPOSITE_VISITOR_HPP

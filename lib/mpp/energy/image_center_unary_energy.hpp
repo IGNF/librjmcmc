@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef IMAGE_CENTER_UNARY_ENERGY_HPP_
-#define IMAGE_CENTER_UNARY_ENERGY_HPP_
+#ifndef IMAGE_CENTER_UNARY_ENERGY_HPP
+#define IMAGE_CENTER_UNARY_ENERGY_HPP
 
 #include "rjmcmc/energy.hpp"
 
@@ -64,4 +64,4 @@ private:
 };
 
 
-#endif /*IMAGE_CENTER_UNARY_ENERGY_HPP_*/
+#endif /*IMAGE_CENTER_UNARY_ENERGY_HPP*/

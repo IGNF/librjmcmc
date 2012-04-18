@@ -34,53 +34,59 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef GEOMETRY_CIRCLE_2_INTERSECTION_H
-#define GEOMETRY_CIRCLE_2_INTERSECTION_H
+#ifndef RECTANGLE_2_COORDINATES_HPP
+#define RECTANGLE_2_COORDINATES_HPP
 
-#include "Circle_2.h"
+#include "coordinates.hpp"
+#include "geometry/Rectangle_2.hpp"
 
-#if USE_CGAL
 
-#include <CGAL/Circle_2_Circle_2_intersection.h>
+//    void advance(int i) { m_i+=i; }
 
-namespace geometry {
-using namespace CGAL;
-
-#else
-
-namespace geometry {
-
-template<class K> inline bool do_intersect(const Circle_2<K> &c, const Circle_2<K> &d)
+template<typename K>
+struct rectangle_coordinates_iterator
+        : public boost::iterator_facade<rectangle_coordinates_iterator<K>, const typename K::FT, boost::forward_traversal_tag>
 {
-	typename K::Vector_2 v = d.center() - c.center();
-	typename K::FT v2 = v.squared_length();
-	return (v2 < d.squared_radius() + c.squared_radius() + 2 * c.radius()*d.radius());
-}
+    enum { dimension = 5 };
+    rectangle_coordinates_iterator() : m_i(dimension) {}
+    explicit rectangle_coordinates_iterator(const geometry::Rectangle_2<K>& r) : m_i(0)
+    {
+        m_coord[0] = r.center().x();
+        m_coord[1] = r.center().y();
+        m_coord[2] = r.normal().x();
+        m_coord[3] = r.normal().y();
+        m_coord[4] = r.ratio();
+    }
+    typedef typename K::FT FT;
+private:
+    friend class boost::iterator_core_access;
+    void increment() { ++m_i; }
+    const FT& dereference() const {
+        //assert(m_i<dimension);
+        return m_coord[m_i];
+    }
+    FT m_coord[dimension];
+    unsigned int m_i;
+};
 
-#endif
-
-	// Tout vient de :
-	// Weisstein, Eric W. "Circle-Circle Intersection." From MathWorld--A Wolfram Web Resource.
-	// http://mathworld.wolfram.com/Circle-CircleIntersection.html
-template<class K> inline typename K::FT intersection_area(const geometry::Circle_2<K> &c0, const geometry::Circle_2<K> &c1)
+template<typename K>
+struct coordinates_iterator< geometry::Rectangle_2<K> >
 {
-	typename K::Vector_2 diff(c1.center() - c0.center());
-	typename K::FT d2 = diff.squared_length();
-	typename K::FT r0 = radius(c0), r02 = c0.squared_radius(), r1 = radius(c1), r12 = c1.squared_radius();
-	typename K::FT a = d2-r02-r12;
-	typename K::FT b = 2*r0*r1;
-	if(a>b) { // d²>(r0+r1)²
-		return 0.;
-	} else if(-a>b) { // d²<(r0-r1)²
-		return M_PI * std::min(r02,r12);
-	}
-	typename K::FT d = sqrt(to_double(d2));
-	typename K::FT area = r02*acos((d2+r02-r12)/(2.*d*r0)) 
-                + r12*acos((d2+r12-r02)/(2.*d*r1))
-                - 0.5 * ::sqrt((-d+r0+r1)*(d+r0-r1)*(d-r0+r1)*(d+r0+r1));
-	return area;
-}
+    typedef rectangle_coordinates_iterator<K> type;
+    enum { dimension = type::dimension };
+};
 
-}; // namespace geometry;
+template<typename K>
+struct object_from_coordinates< geometry::Rectangle_2<K> > {
+    template<typename Iterator> geometry::Rectangle_2<K> operator()(Iterator it) {
+        typename K::FT x = *it++;
+        typename K::FT y = *it++;
+        typename K::FT u = *it++;
+        typename K::FT v = *it++;
+        typename K::Point_2  p(x,y);
+        typename K::Vector_2 n(u,v);
+        return geometry::Rectangle_2<K>(p,n,*it);
+    }
+};
 
-#endif // GEOMETRY_CIRCLE_2_INTERSECTION_H
+#endif // RECTANGLE_2_COORDINATES_HPP

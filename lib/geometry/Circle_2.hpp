@@ -34,41 +34,97 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef GEOMETRY_ISO_RECTANGLE_2_SEGMENT_2_CLIP_H
-#define GEOMETRY_ISO_RECTANGLE_2_SEGMENT_2_CLIP_H
+#ifndef GEOMETRY_CIRCLE_2_HPP
+#define GEOMETRY_CIRCLE_2_HPP
 
-template<typename IsoRectangle, typename Segment>
-bool clip(const IsoRectangle& r, Segment& s)
-{
-    typedef typename Segment::R R;
-    typedef typename R::FT FT;
-    typedef typename R::Point_2 Point;
-    typedef typename R::Vector_2 Vector;
+#if USE_CGAL
 
-    const Point& p(s.source());
-    const Point& q(s.target());
-    Vector d(q-p);
-    FT a[] = { p.x(), p.y() };
-    FT b[] = { q.x(), q.y() };
-    FT tmin = 0, tmax = 1;
-    for(int i=0; i<2; ++i) {
-      if(d[i]==0 && (p[i]<r.min()[i] || p[i]>r.max()[i])) {
-        return false;
-      } else {
-        int j = 1-i, k = (d[i] > 0);
-        int l = 1-k;
-	FT m[] = {r.min()[i], r.max()[i]}, t;
-        t = (m[l]-p[i])/d[i];
-        if(t>tmin) { tmin=t; a[i]=m[l];  a[j]=p[j]+t*d[j]; } // a=p+td
-        t = (m[k]-p[i])/d[i];
-        if(t<tmax) { tmax=t; b[i]=m[k];  b[j]=p[j]+t*d[j]; } // b=p+td
-        if(tmax <= tmin) return false;
-      }
-    }
-    Point pa(a[0],a[1]);
-    Point pb(b[0],b[1]);
-    s = Segment(pa,pb);
-    return true;
+#include <CGAL/Circle_2.h>
+
+namespace geometry {
+using namespace CGAL;
+
+template<class K>
+inline typename K::FT radius(const Circle_2<K>& c) {
+	return CGAL::sqrt(c.squared_radius());
 }
 
-#endif // GEOMETRY_ISO_RECTANGLE_2_SEGMENT_2_CLIP_H
+#else
+
+namespace geometry {
+/**
+ * \ingroup GroupGeometry
+ */
+template<class K_> class Circle_2
+{
+public:
+	typedef K_ K;
+	typedef typename K::RT RT;
+	typedef typename K::FT FT;
+	typedef typename K::Point_2 Point_2;
+	typedef typename K::Vector_2 Vector_2;
+	typedef typename K::Line_2 Line_2;
+	typedef Circle_2 Self;
+
+	Circle_2()
+	{}
+	Circle_2(const Point_2 &center, double radius) : m_center(center), m_radius(radius), m_squared_radius(radius*radius)
+	{}
+
+        inline const Point_2& center() const
+	{	return m_center;}
+	inline bool is_degenerate() const
+	{	return m_radius==0;}
+        inline const FT& radius() const
+	{	return m_radius;}
+        inline const FT& squared_radius() const
+	{	return m_squared_radius;}
+
+private :
+	Point_2 m_center;
+	FT m_radius, m_squared_radius;
+};
+
+
+template < class K >
+std::ostream &
+operator<<(std::ostream &os, const Circle_2<K> &c)
+{
+        return os << c.center() << ' ' << c.radius();
+}
+
+template < class K >
+std::istream &
+operator>>(std::istream &is, Circle_2<K> &b)
+{
+	typename K::Point_2 p;
+	typename K::FT r;
+
+	is >> p >> r;
+
+	if (is)
+	b = Circle_2<K>(p, r);
+	return is;
+}
+
+template<class K>
+typename K::FT radius(const Circle_2<K>& c) {
+	return c.radius();
+}
+
+#endif // USE_CGAL
+
+template<class K>
+inline typename K::FT perimeter(const Circle_2<K>& c) {
+	return 2*M_PI*radius(c);
+}
+
+
+template<class K>
+inline typename K::FT area(const Circle_2<K>& c) {
+	return M_PI*c.squared_radius();
+}
+
+}; // namespace geometry
+
+#endif // GEOMETRY_CIRCLE_2_HPP

@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef RECTANGLE_ROTATION_SCALED_CORNER_KERNEL_HPP
 #define RECTANGLE_ROTATION_SCALED_CORNER_KERNEL_HPP
 
-#include "geometry/Rectangle_2.h"
+#include "geometry/Rectangle_2.hpp"
 
 namespace geometry {
 

@@ -34,10 +34,10 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef GEOMETRY_CIRCLE_2_INTEGRATED_FLUX_H
-#define GEOMETRY_CIRCLE_2_INTEGRATED_FLUX_H
+#ifndef GEOMETRY_CIRCLE_2_INTEGRATED_FLUX_HPP
+#define GEOMETRY_CIRCLE_2_INTEGRATED_FLUX_HPP
 
-#include "Circle_2.h"
+#include "geometry/Circle_2.hpp"
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
 
@@ -108,4 +108,4 @@ double integrated_flux(const OrientedView& v, const geometry::Circle_2<K> &c)
 	return (res * geometry::perimeter(c)) / w;
 }
 
-#endif // GEOMETRY_CIRCLE_2_INTEGRATED_FLUX_H
+#endif // GEOMETRY_CIRCLE_2_INTEGRATED_FLUX_HPP

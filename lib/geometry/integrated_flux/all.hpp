@@ -34,14 +34,15 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef GEOMETRY_RECTANGLE_2_IMAGE_ERROR_H
-#define GEOMETRY_RECTANGLE_2_IMAGE_ERROR_H
+#ifndef INTEGRATED_FLUX_ALL_HPP
+#define INTEGRATED_FLUX_ALL_HPP
 
-#include "Rectangle_2.h"
+#ifdef GEOMETRY_RECTANGLE_2_HPP
+#include "Rectangle_2_integrated_flux.hpp"
+#endif // GEOMETRY_RECTANGLE_2_HPP
 
-template<typename OrientedView, typename K>
-double image_error(const OrientedView&, const geometry::Rectangle_2<K> &) {
-	return 0;
-}
+#ifdef GEOMETRY_CIRCLE_2_HPP
+#include "Circle_2_integrated_flux.hpp"
+#endif // GEOMETRY_CIRCLE_2_HPP
 
-#endif // GEOMETRY_RECTANGLE_2_IMAGE_ERROR_H
+#endif // INTEGRATED_FLUX_ALL_HPP

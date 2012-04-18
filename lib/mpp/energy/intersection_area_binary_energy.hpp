@@ -34,10 +34,10 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef INTERSECTION_AREA_BINARY_ENERGY_HPP_
-#define INTERSECTION_AREA_BINARY_ENERGY_HPP_
+#ifndef INTERSECTION_AREA_BINARY_ENERGY_HPP
+#define INTERSECTION_AREA_BINARY_ENERGY_HPP
 
-#include "geometry/intersection.h"
+#include "geometry/intersection/all.hpp"
 
 template<typename Value = double>
 class intersection_area_binary_energy
@@ -59,5 +59,5 @@ public:
 
 };
 
-#endif /*INTERSECTION_AREA_BINARY_ENERGY_HPP_*/
+#endif /*INTERSECTION_AREA_BINARY_ENERGY_HPP*/
 

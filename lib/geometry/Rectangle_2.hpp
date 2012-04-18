@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef GEOMETRY_RECTANGLE_2_H
-#define GEOMETRY_RECTANGLE_2_H
+#ifndef GEOMETRY_RECTANGLE_2_HPP
+#define GEOMETRY_RECTANGLE_2_HPP
 #include <utility> // for std::pair
 #include <vector>
 
@@ -420,4 +420,4 @@ operator>>(std::istream &is, Rectangle_2<R> &b)
 
 }; // namespace geometry
 
-#endif // GEOMETRY_RECTANGLE_2_H
+#endif // GEOMETRY_RECTANGLE_2_HPP

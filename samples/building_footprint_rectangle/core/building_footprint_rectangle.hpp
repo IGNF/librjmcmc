@@ -34,15 +34,15 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __BUILDING_FOOTPRINT_RECTANGLE_HPP__
-#define __BUILDING_FOOTPRINT_RECTANGLE_HPP__
+#ifndef BUILDING_FOOTPRINT_RECTANGLE_HPP
+#define BUILDING_FOOTPRINT_RECTANGLE_HPP
 
 //<-
 /************** application-specific types ****************/
 //->
 
 //[building_footprint_rectangle_definition_geometry
-#include "core/geometry.h"
+#include "core/geometry.hpp"
 typedef Rectangle_2 object;
 //]
 
@@ -432,4 +432,4 @@ void init_visitor(const param *p, Visitor& v)
 #include "simulated_annealing/simulated_annealing.hpp"
 //]
 
-#endif // __BUILDING_FOOTPRINT_RECTANGLE_HPP__
+#endif // BUILDING_FOOTPRINT_RECTANGLE_HPP

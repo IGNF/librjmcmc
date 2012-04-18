@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __UNIFORM_DISTRIBUTION_HPP__
-#define __UNIFORM_DISTRIBUTION_HPP__
+#ifndef UNIFORM_DISTRIBUTION_HPP
+#define UNIFORM_DISTRIBUTION_HPP
 
 #include "rjmcmc/random.hpp"
 #include <boost/random/uniform_smallint.hpp>
@@ -77,4 +77,4 @@ namespace rjmcmc {
 
 }; // namespace rjmcmc
 
-#endif // __UNIFORM_DISTRIBUTION_HPP__
+#endif // UNIFORM_DISTRIBUTION_HPP

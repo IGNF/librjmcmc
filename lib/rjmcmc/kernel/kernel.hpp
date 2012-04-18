@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef BINARY_KERNEL_HPP_
-#define BINARY_KERNEL_HPP_
+#ifndef BINARY_KERNEL_HPP
+#define BINARY_KERNEL_HPP
 
 namespace rjmcmc {
 
@@ -143,4 +143,4 @@ namespace rjmcmc {
 
 }; // namespace rjmcmc
 
-#endif // BINARY_KERNEL_HPP_
+#endif // BINARY_KERNEL_HPP

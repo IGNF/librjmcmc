@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __RJMCMC_TUPLE_HPP__
-#define __RJMCMC_TUPLE_HPP__
+#ifndef RJMCMC_TUPLE_HPP
+#define RJMCMC_TUPLE_HPP
 
 #if USE_VARIADIC_TEMPLATES
 
@@ -113,4 +113,4 @@ namespace rjmcmc {
 };
 
 
-#endif // __RJMCMC_TUPLE_HPP__
+#endif // RJMCMC_TUPLE_HPP

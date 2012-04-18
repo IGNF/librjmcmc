@@ -3,7 +3,7 @@
 
 /************** application-specific types ****************/
 
-#include "core/geometry.h"
+#include "core/geometry.hpp"
 #include <boost/variant.hpp>
 typedef boost::variant<Rectangle_2,Circle_2> object;
 //typedef Rectangle_2 object;
@@ -19,7 +19,7 @@ typedef oriented<ndvi_image_t>     oriented_ndvi_view;
 typedef global_reconstruction_unary_energy<oriented_gradient_view,oriented_ndvi_view> unary_energy;
 
 #include "mpp/energy/intersection_area_binary_energy.hpp"
-typedef intersection_area_binary_energy      binary_energy;
+typedef intersection_area_binary_energy<>      binary_energy;
 
 #include "mpp/rectilinear_searchspace.hpp"
 typedef rectilinear_searchspace<object> searchspace;

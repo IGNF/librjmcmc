@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef RANDOM_HPP_
-#define RANDOM_HPP_
+#ifndef RANDOM_HPP
+#define RANDOM_HPP
 
 #include <boost/random.hpp>
 
@@ -70,4 +70,4 @@ namespace rjmcmc {
 
 }; // namespace rjmcmc
 
-#endif /* RANDOM_HPP_ */
+#endif /* RANDOM_HPP */

@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __STEP_SCHEDULE_HPP__
-#define __STEP_SCHEDULE_HPP__
+#ifndef STEP_SCHEDULE_HPP
+#define STEP_SCHEDULE_HPP
 
 namespace simulated_annealing {
     /**
@@ -86,4 +86,4 @@ namespace simulated_annealing {
 
 }; // namespace rjmcmc
 
-#endif // __STEP_SCHEDULE_HPP__
+#endif // STEP_SCHEDULE_HPP

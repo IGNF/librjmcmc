@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef MPP_KERNEL_HPP_
-#define MPP_KERNEL_HPP_
+#ifndef MPP_KERNEL_HPP
+#define MPP_KERNEL_HPP
 
 #include "rjmcmc/random.hpp"
 #include "rjmcmc/kernel/kernel.hpp"
@@ -191,4 +191,4 @@ namespace marked_point_process {
 
 }; // namespace rjmcmc
 
-#endif // MPP_KERNEL_HPP_
+#endif // MPP_KERNEL_HPP

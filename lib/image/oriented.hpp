@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef ORIENTED_HPP_
-#define ORIENTED_HPP_
+#ifndef ORIENTED_HPP
+#define ORIENTED_HPP
 
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/dynamic_image/any_image.hpp>
@@ -87,4 +87,4 @@ template<typename IsoRectangle, typename Image>
 void clip_bbox(IsoRectangle& bbox, const oriented<Image>& img);
 
 
-#endif // ORIENTED_HPP_
+#endif // ORIENTED_HPP

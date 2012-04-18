@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __VECTOR_CONFIGURATION_HPP__
-#define __VECTOR_CONFIGURATION_HPP__
+#ifndef VECTOR_CONFIGURATION_HPP
+#define VECTOR_CONFIGURATION_HPP
 
 #include "configuration.hpp"
 
@@ -182,4 +182,4 @@ namespace marked_point_process {
 
 }; // namespace marked_point_process
 
-#endif // __VECTOR_CONFIGURATION_HPP__
+#endif // VECTOR_CONFIGURATION_HPP

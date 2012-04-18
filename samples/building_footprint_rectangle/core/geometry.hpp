@@ -34,31 +34,21 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef COORDINATES_HPP_
-#define COORDINATES_HPP_
+#ifndef GEOMETRY_HPP
+#define GEOMETRY_HPP
 
-template<typename T> struct coordinates_iterator
-{
-    typedef typename T::iterator type;
-    const static unsigned int dimension = T::dimension;
-};
+//[building_footprint_rectangle_geometry_base
+#include "geometry/geometry.hpp"
+#include "geometry/Rectangle_2.hpp"
 
-template<typename T>
-typename coordinates_iterator<T>::type coordinates_begin(const T& t)
-{
-    return typename coordinates_iterator<T>::type(t);
-}
+typedef geometry::Simple_cartesian<double> K;
+typedef K::Point_2 Point_2;
+typedef K::Vector_2 Vector_2;
+typedef K::Segment_2 Segment_2;
+typedef geometry::Iso_rectangle_2_traits<K>::type Iso_rectangle_2;
+typedef geometry::Rectangle_2<K> Rectangle_2;
 
-template<typename T>
-typename coordinates_iterator<T>::type coordinates_end(const T&)
-{
-    return typename coordinates_iterator<T>::type();
-}
+#include "geometry/coordinates/Rectangle_2_coordinates.hpp"
+//]
 
-template<typename T>
-struct object_from_coordinates {
-    template<typename Iterator> T operator()(Iterator it) { return T(it); }
-};
-
-#endif // COORDINATES_HPP_
-
+#endif // GEOMETRY_HPP

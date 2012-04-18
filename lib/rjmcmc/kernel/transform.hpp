@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __TRANSFORM_HPP__
-#define __TRANSFORM_HPP__
+#ifndef TRANSFORM_HPP
+#define TRANSFORM_HPP
 
 
 namespace rjmcmc {
@@ -237,4 +237,4 @@ namespace rjmcmc {
 }
 
 
-#endif /* __TRANSFORM_HPP__ */
+#endif /* TRANSFORM_HPP */

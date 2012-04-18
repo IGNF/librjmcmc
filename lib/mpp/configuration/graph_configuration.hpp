@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __GRAPH_CONFIGURATION_HPP__
-#define __GRAPH_CONFIGURATION_HPP__
+#ifndef GRAPH_CONFIGURATION_HPP
+#define GRAPH_CONFIGURATION_HPP
 
 #include <boost/graph/adjacency_list.hpp>
 #include "configuration.hpp"
@@ -275,4 +275,4 @@ namespace marked_point_process {
 
 }; // namespace marked_point_process
 
-#endif // __GRAPH_CONFIGURATION_HPP__
+#endif // GRAPH_CONFIGURATION_HPP

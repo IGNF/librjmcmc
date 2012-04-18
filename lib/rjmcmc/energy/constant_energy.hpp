@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef CONSTANT_UNARY_ENERGY_HPP_
-#define CONSTANT_UNARY_ENERGY_HPP_
+#ifndef CONSTANT_UNARY_ENERGY_HPP
+#define CONSTANT_UNARY_ENERGY_HPP
 
 #include "rjmcmc/energy.hpp"
 
@@ -52,4 +52,4 @@ private:
     Value m_energy;
 };
 
-#endif /*CONSTANT_UNARY_ENERGY_HPP_*/
+#endif /*CONSTANT_UNARY_ENERGY_HPP*/

@@ -6,7 +6,7 @@ Historically, __librjmcmc__ was developped for this particular application: dete
 [section Geometry modeling]
 We aim at detect rectangular objects in the input images. Thus, is provided [classref geometry::Rectangle_2] within the __librjmcmc__ library which implements an original parametrization of this simple geometric object, efficient for fast geometric computations (more details can be found in the aforementionned paper). The header [@../../samples/building_footprint_rectangle/core/geometry.h samples/building_footprint_rectangle/core/geometry.h] defines all geometric related stuffs:
 
-[import ../../../samples/building_footprint_rectangle/core/geometry.h]
+[import ../../../samples/building_footprint_rectangle/core/geometry.hpp]
 [building_footprint_rectangle_geometry_base]
 
 Syntax rules and modeling respect [@http://www.cgal.org CGAL] standards. Please refer to its [@http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Kernel_23/Chapter_main.html documentation] if you are interseted in more details.

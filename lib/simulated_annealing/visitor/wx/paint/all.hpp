@@ -34,15 +34,15 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef INTEGRATED_FLUX_H
-#define INTEGRATED_FLUX_H
+#ifndef PAINT_HPP
+#define PAINT_HPP
 
-#ifdef GEOMETRY_RECTANGLE_2_H
-#include "Rectangle_2_integrated_flux.h"
-#endif // GEOMETRY_RECTANGLE_2_H
+#ifdef GEOMETRY_RECTANGLE_2_HPP
+#include "Rectangle_2_paint.hpp"
+#endif // GEOMETRY_RECTANGLE_2_HPP
 
-#ifdef GEOMETRY_CIRCLE_2_H
-#include "Circle_2_integrated_flux.h"
-#endif // GEOMETRY_CIRCLE_2_H
+#ifdef GEOMETRY_CIRCLE_2_HPP
+#include "Circle_2_paint.hpp"
+#endif // GEOMETRY_CIRCLE_2_HPP
 
-#endif // INTEGRATED_FLUX_H
+#endif // PAINT_HPP

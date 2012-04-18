@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef GEOMETRY_SEGMENT_2_ITERATOR_H
-#define GEOMETRY_SEGMENT_2_ITERATOR_H
+#ifndef GEOMETRY_SEGMENT_2_ITERATOR_HPP
+#define GEOMETRY_SEGMENT_2_ITERATOR_HPP
 
 namespace geometry {
 
@@ -91,5 +91,5 @@ private :
 
 }; // namespace geometry
 
-#endif // GEOMETRY_SEGMENT_2_ITERATOR_H
+#endif // GEOMETRY_SEGMENT_2_ITERATOR_HPP
 

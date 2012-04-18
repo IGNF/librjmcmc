@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __RJMCMC_RANDOM_VARIANT_INIT_HPP__
-#define __RJMCMC_RANDOM_VARIANT_INIT_HPP__
+#ifndef RJMCMC_RANDOM_VARIANT_INIT_HPP
+#define RJMCMC_RANDOM_VARIANT_INIT_HPP
 
 #include "rjmcmc/variant.hpp"
 #include "rjmcmc/random.hpp"
@@ -67,4 +67,4 @@ namespace rjmcmc {
 
 }
 
-#endif // __RJMCMC_RANDOM_VARIANT_INIT_HPP__
+#endif // RJMCMC_RANDOM_VARIANT_INIT_HPP

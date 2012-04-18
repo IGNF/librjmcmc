@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef GEOMETRY_RECTANGLE_2_SQUARE_DISTANCE_H
-#define GEOMETRY_RECTANGLE_2_SQUARE_DISTANCE_H
+#ifndef GEOMETRY_RECTANGLE_2_SQUARE_DISTANCE_HPP
+#define GEOMETRY_RECTANGLE_2_SQUARE_DISTANCE_HPP
 
 namespace geometry {
 
@@ -101,4 +101,4 @@ namespace geometry {
 
 }; // namespace geometry
 
-#endif // GEOMETRY_RECTANGLE_2_SQUARE_DISTANCE_H
+#endif // GEOMETRY_RECTANGLE_2_SQUARE_DISTANCE_HPP

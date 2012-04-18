@@ -34,10 +34,10 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef IMAGE_GRADIENT_UNARY_ENERGY_HPP_
-#define IMAGE_GRADIENT_UNARY_ENERGY_HPP_
+#ifndef IMAGE_GRADIENT_UNARY_ENERGY_HPP
+#define IMAGE_GRADIENT_UNARY_ENERGY_HPP
 
-#include "geometry/integrated_flux.h"
+#include "geometry/integrated_flux/all.hpp"
 #include "rjmcmc/energy.hpp"
 
 template<typename Image, typename Value = double>
@@ -58,4 +58,4 @@ private:
 };
 
 
-#endif /*IMAGE_GRADIENT_UNARY_ENERGY_HPP_*/
+#endif /*IMAGE_GRADIENT_UNARY_ENERGY_HPP*/

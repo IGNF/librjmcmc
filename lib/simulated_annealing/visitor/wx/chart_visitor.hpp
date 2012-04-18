@@ -34,8 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef __WX_CHART_VISITOR_HPP__
-#define __WX_CHART_VISITOR_HPP__
+#ifndef WX_CHART_VISITOR_HPP
+#define WX_CHART_VISITOR_HPP
 
 class VectorDataset;
 
@@ -107,4 +107,4 @@ namespace simulated_annealing {
     } // namespace wx
 } // namespace simulated_annealing
 
-#endif // __WX_CHART_VISITOR_HPP__
+#endif // WX_CHART_VISITOR_HPP
