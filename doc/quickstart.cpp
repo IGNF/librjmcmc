@@ -36,9 +36,9 @@ knowledge of the CeCILL license and that you accept its terms.
 
 //[ objects
 #include "geometry/geometry.hpp"
-#include "geometry/Circle_2.h"
-#include "geometry/Circle_2_intersection.h"
-#include "geometry/Circle_2_coordinates.hpp"
+#include "geometry/Circle_2.hpp"
+#include "geometry/intersection/Circle_2_intersection.hpp"
+#include "geometry/coordinates/Circle_2_coordinates.hpp"
 typedef geometry::Simple_cartesian<double> K;
 typedef K::Point_2 Point_2;
 typedef geometry::Circle_2<K> Circle_2;
