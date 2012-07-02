@@ -70,4 +70,63 @@ namespace geometry {
     };
 }
 
+struct rectangle_corner_translation_transform
+{
+    enum { dimension = 7 };
+    typedef Rectangle_2 value_type;
+
+    template<typename Iterator>
+    inline double abs_jacobian(Iterator it) const { return 1.; }
+
+    template<typename IteratorIn,typename IteratorOut>
+    inline double apply  (IteratorIn in, IteratorOut out) const {
+        double res = abs_jacobian(in);
+        typedef typename K::FT FT;
+        FT x = *in++;
+        FT y = *in++;
+        FT u = *in++;
+        FT v = *in++;
+        FT r = *in++;
+        FT s = *in++;
+        FT t = *in;
+        //   res = Rectangle_2(c+v+u, n+v,r);
+        *out++ = x+s-r*t;
+        *out++ = y+t+r*s;
+        *out++ = u+s;
+        *out++ = v+t;
+        *out++ = r;
+        *out++ =-s;
+        *out++ =-t;
+        return res;
+    }
+
+    template<typename IteratorIn,typename IteratorOut>
+    inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
+};
+
+/*
+  generated using boost::lambda ??
+
+ _1+_6-_5*_7,
+ _2+_7-_5*_6,
+ _3+_6,
+ _4+_7,
+ _5,
+-_6,
+-_7
+
+with some aliases :
+
+ _x+_s-_r*_t,
+ _y+_t+_r*_s,
+ _u+_s,
+ _v+_t,
+ _r,
+-_s,
+-_t,
+
+*/
+
+
+
 #endif // RECTANGLE_ROTATION_SCALED_CORNER_KERNEL_HPP

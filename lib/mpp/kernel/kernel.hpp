@@ -159,7 +159,7 @@ namespace marked_point_process {
     };
 
 
-    template <typename T, typename Transform>
+    template <typename Transform, typename T = typename Transform::value_type>
             struct result_of_make_uniform_modification_kernel
     {
         enum { N = Transform::dimension-coordinates_iterator<T>::dimension };
@@ -179,11 +179,11 @@ namespace marked_point_process {
                 pbirth,                pdeath);
     }
 
-    template <typename T, typename Transform>
-            typename result_of_make_uniform_modification_kernel<T,Transform>::type
+    template <typename Transform>
+            typename result_of_make_uniform_modification_kernel<Transform>::type
             make_uniform_modification_kernel(const Transform& t, double p)
     {
-        typedef result_of_make_uniform_modification_kernel<T,Transform> res;
+        typedef result_of_make_uniform_modification_kernel<Transform> res;
         typename res::view_type view;
         typename res::variate_type variate;
         return typename res::type(view,view,variate,variate,t, p*0.5, p*0.5);

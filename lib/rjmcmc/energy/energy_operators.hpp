@@ -121,10 +121,10 @@ struct modulus_energy : public binary_operator_energy<Energy0,Energy1,std::modul
 // operators
 
 #include "constant_energy.hpp"
-/*
+
 // SFINAE utility
 template<typename Test, typename Value> struct enable { typedef Value type; };
-#define ENERGY(E) typename enable<typename E::is_energy,E>::type
+#define ENERGY(E) typename enable<typename E::result_type,E>::type
 
 template<typename E0, typename E1> plus_energy      <ENERGY(E0),ENERGY(E1)> operator+(const E0& e0, const E1& e1) { return plus_energy      <E0,E1>(e0,e1); }
 template<typename E0, typename E1> minus_energy     <ENERGY(E0),ENERGY(E1)> operator-(const E0& e0, const E1& e1) { return minus_energy     <E0,E1>(e0,e1); }
@@ -156,7 +156,5 @@ template<typename E1> modulus_energy   <constant_energy<typename E1::result_type
 operator%(typename E1::result_type e0, const E1& e1) { return modulus_energy   <constant_energy<typename E1::result_type>,E1>(e0,e1); }
 
 template<typename E> negate_energy<ENERGY(E)> operator-(const E& e) { return negate_energy<E>(e); }
-
-*/
 
 #endif /*ENERGY_OPERATORS_HPP*/

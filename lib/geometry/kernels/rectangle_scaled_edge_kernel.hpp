@@ -69,4 +69,40 @@ namespace geometry {
     };
 }
 
+
+struct rectangle_edge_translation_transform
+{
+    enum { dimension = 6 };
+    typedef Rectangle_2 value_type;
+
+    template<typename Iterator>
+    inline double abs_jacobian(Iterator it) const { return 1.; }
+
+    template<typename IteratorIn,typename IteratorOut>
+    inline double apply  (IteratorIn in, IteratorOut out) const {
+        double res = abs_jacobian(in);
+        typedef typename K::FT FT;
+        FT x = *in++;
+        FT y = *in++;
+        FT u = *in++;
+        FT v = *in++;
+        FT r = *in++;
+        FT s = *in++;
+        FT f = exp(4.0*(s-0.5));
+        FT g = 1-f;
+        //   res = Rectangle_2(c+m*(1-f), n,f*r);
+        *out++ = x-g*r*v;
+        *out++ = y+g*r*u;
+        *out++ = u;
+        *out++ = v;
+        *out++ = f*r;
+        *out++ = 1.0-s;
+        return res;
+    }
+
+    template<typename IteratorIn,typename IteratorOut>
+    inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
+};
+
+
 #endif // RECTANGLE_SCALED_EDGE_KERNEL_HPP
