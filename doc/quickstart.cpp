@@ -78,7 +78,7 @@ typedef rjmcmc::sampler<reference_process,acceptance,birth_death_kernel>        
 #include "simulated_annealing/simulated_annealing.hpp"
 #include "simulated_annealing/visitor/ostream_visitor.hpp"
 #include "simulated_annealing/visitor/tex_visitor.hpp"
-#include "simulated_annealing/visitor/ostream_visitor.hpp"
+#include "simulated_annealing/visitor/composite_visitor.hpp"
 #ifdef USE_SHP
 # include "simulated_annealing/visitor/shp/shp_visitor.hpp"
 #endif
