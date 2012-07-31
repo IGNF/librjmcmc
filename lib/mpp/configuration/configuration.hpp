@@ -38,6 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define RJMCMC_CONFIGURATION_HPP
 
 #include "rjmcmc/variant.hpp"
+#include <vector>
 
 namespace marked_point_process {
     //////////////////////////////////////////////////////////

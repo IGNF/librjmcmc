@@ -89,17 +89,17 @@ int main(int argc , char** argv)
 {
     int i=0;
     double energy   = (++i<argc) ? atof(argv[i]) : -1.;
-    double surface  = (++i<argc) ? atof(argv[i]) : 10.;
-    double minradius= (++i<argc) ? atof(argv[i]) : 0.1;
-    double maxradius= (++i<argc) ? atof(argv[i]) : 1;
+    double surface  = (++i<argc) ? atof(argv[i]) : 10000.;
+    double minradius= (++i<argc) ? atof(argv[i]) : 0.02;
+    double maxradius= (++i<argc) ? atof(argv[i]) : 0.1;
     double poisson  = (++i<argc) ? atof(argv[i]) : 200.;
     double pbirth   = (++i<argc) ? atof(argv[i]) : 0.5;
     double pdeath   = (++i<argc) ? atof(argv[i]) : 0.5;
-    int nbiter      = (++i<argc) ? atoi(argv[i]) : 15000000;
-    double temp     = (++i<argc) ? atof(argv[i]) : 150.;
+    int nbiter      = (++i<argc) ? atoi(argv[i]) : 10000001;
+    double temp     = (++i<argc) ? atof(argv[i]) : 200.;
     double deccoef  = (++i<argc) ? atof(argv[i]) : 0.999999;
-    int nbdump      = (++i<argc) ? atoi(argv[i]) : 10000;
-    int nbsave      = (++i<argc) ? atoi(argv[i]) : 10000;
+    int nbdump      = (++i<argc) ? atoi(argv[i]) : 1000000;
+    int nbsave      = (++i<argc) ? atoi(argv[i]) : 1000000;
     //]
 
     //[optimize

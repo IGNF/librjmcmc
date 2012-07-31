@@ -129,9 +129,8 @@ namespace marked_point_process {
                 iterator v = *it;
                 delta -= energy(v);
                 for (const_iterator it2=begin(); it2 != end(); ++it2)
-                    delta -= rjmcmc::apply_visitor(m_binary_energy, value(*it), *it2 );
-                for (dci it2=it+1; it2 != dend; ++it2)
-                    delta -= rjmcmc::apply_visitor(m_binary_energy, value(*it), value(*it2) );
+                    if(std::find(it,dend,it2)==dend)
+                        delta -= rjmcmc::apply_visitor(m_binary_energy, value(*it), *it2 );
             }
             return delta;
 	}

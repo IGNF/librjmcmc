@@ -36,7 +36,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #ifndef SIMULATED_ANNEALING_HPP
 #define SIMULATED_ANNEALING_HPP
-#include "boost/concept/assert.hpp"
+#include "boost/concept_check.hpp"
 
 namespace simulated_annealing
 {
