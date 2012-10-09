@@ -37,6 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GEOMETRY_CIRCLE_2_HPP
 #define GEOMETRY_CIRCLE_2_HPP
 
+#include "geometry.hpp"
+
 #if USE_CGAL
 
 #include <CGAL/Circle_2.h>

@@ -38,6 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define CIRCLE_TRANSLATION_KERNEL_HPP
 
 #include "geometry/Circle_2.hpp"
+#include "rjmcmc/random.hpp"
 
 namespace geometry {
 	

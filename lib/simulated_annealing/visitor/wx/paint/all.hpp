@@ -37,6 +37,14 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef PAINT_HPP
 #define PAINT_HPP
 
+#include <GilViewer/layers/layer.hpp>
+#include <string>
+
+template<typename T> void paint(
+        layer::ptrLayerType& layer,
+        const std::string& label,
+        const T&);
+
 #ifdef GEOMETRY_RECTANGLE_2_HPP
 #include "Rectangle_2_paint.hpp"
 #endif // GEOMETRY_RECTANGLE_2_HPP

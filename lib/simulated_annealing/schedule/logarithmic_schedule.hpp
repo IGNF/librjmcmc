@@ -37,6 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef LOGARITHMIC_SCHEDULE_HPP
 #define LOGARITHMIC_SCHEDULE_HPP
 
+#include <iterator>
+
 namespace simulated_annealing {
     /**
      * \ingroup GroupSchedule

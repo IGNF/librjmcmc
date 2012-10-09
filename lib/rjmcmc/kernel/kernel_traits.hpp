@@ -37,6 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef KERNEL_TRAITS_HPP
 #define KERNEL_TRAITS_HPP
 
+
 namespace rjmcmc {
 
 #if USE_VARIADIC_TEMPLATES
@@ -49,6 +50,8 @@ namespace rjmcmc {
     };
 
 #else // USE_VARIADIC_TEMPLATES
+
+#include <boost/tuple/tuple.hpp>
 
     namespace internal {
 

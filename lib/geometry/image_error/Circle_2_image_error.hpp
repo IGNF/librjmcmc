@@ -38,6 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define GEOMETRY_CIRCLE_2_IMAGE_ERROR_HPP
 
 #include "geometry/Circle_2.hpp"
+#include "image/image_types.hpp"
 
 
 template<typename V, typename F>

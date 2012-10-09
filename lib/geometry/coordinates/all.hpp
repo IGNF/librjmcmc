@@ -37,6 +37,12 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef COORDINATES_ALL_HPP
 #define COORDINATES_ALL_HPP
 
+namespace geometry
+{
+    template<typename T0, typename T1, typename R> R intersection_area(const T0 &, const T1 &);
+    template<typename T0, typename T1> bool do_intersect(const T0 &, const T1 &);
+}
+
 #ifdef GEOMETRY_RECTANGLE_2_HPP
 #include "Rectangle_2_coordinates.hpp"
 #endif // GEOMETRY_RECTANGLE_2_HPP

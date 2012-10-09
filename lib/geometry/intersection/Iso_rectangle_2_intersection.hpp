@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GEOMETRY_ISO_RECTANGLE_2_INTERSECTION_HPP
 #define GEOMETRY_ISO_RECTANGLE_2_INTERSECTION_HPP
 
-#include "geometry.hpp"
+#include "geometry/geometry.hpp"
 
 #if USE_CGAL
 
@@ -50,7 +50,7 @@ using namespace CGAL;
 
 namespace geometry {
 
-template<class K> inline bool do_intersect(const Iso_rectangle_2<K> &r1, const Iso_rectangle_2<K> &r2)
+    template<class IsoRectangle> inline bool do_intersect(const internal::Iso_rectangle_2<K> &r1, const internal::Iso_rectangle_2<K> &r2)
 {
     const typename K::Point_2 &min1 = r1.min();
     const typename K::Point_2 &min2 = r2.min();
@@ -59,16 +59,16 @@ template<class K> inline bool do_intersect(const Iso_rectangle_2<K> &r1, const I
     typename K::FT xmin, ymin, xmax, ymax;
     xmin = (min1.x() >= min2.x()) ? min1.x() : min2.x();
     xmax = (max1.x() <= max2.x()) ? max1.x() : max2.x();
-    if (xmaxx <= xmin) return false;
+    if (xmax <= xmin) return false;
     ymin = (min1.y() >= min2.y()) ? min1.y() : min2.y();
     ymax = (max1.y() <= max2.y()) ? max1.y() : max2.y();
-    return (ymaxy > yminy);
+    return (ymax > ymin);
 }
 
 #endif
 
 
-template<class K> inline typename K::FT intersection_area(const Iso_rectangle_2<K> &r1, const Iso_rectangle_2<K> &r2)
+template<class K> inline typename K::FT intersection_area(const internal::Iso_rectangle_2<K> &r1, const internal::Iso_rectangle_2<K> &r2)
 {
     const typename K::Point_2 &min1 = r1.min();
     const typename K::Point_2 &min2 = r2.min();

@@ -38,6 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define ORIENTED_INC_HPP
 
 #include "image/oriented.hpp"
+#include "image/image_types.hpp"
 
 namespace internal {
 

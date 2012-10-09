@@ -37,6 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GEOMETRY_RECTANGLE_2_POINT_ITERATOR_HPP
 #define GEOMETRY_RECTANGLE_2_POINT_ITERATOR_HPP
 
+#include <cmath>
+
 namespace geometry {
 
 // énumération des points de coordonnées entières contenus dans le rectangle

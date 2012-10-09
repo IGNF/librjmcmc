@@ -40,12 +40,15 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "rjmcmc/random.hpp"
 #include "rjmcmc/kernel/kernel.hpp"
 #include "rjmcmc/kernel/transform.hpp"
+#include "geometry/coordinates/coordinates.hpp"
 #include <boost/random/variate_generator.hpp>
+#include <algorithm> // copy_n
 
 namespace marked_point_process {
     
+
     // single object type configuration for now...
-    template<typename T>
+    template<typename T, unsigned int N=1>
     class uniform_view
     {
         typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > die_type;
@@ -56,36 +59,41 @@ namespace marked_point_process {
         template<typename Configuration, typename Modification, typename OutputIterator>
         inline double operator()(Configuration& c, Modification& modif, OutputIterator out) const
         {
-            //unsigned int n = c.size<T>();
             unsigned int n = c.size();
-            if(!n) return 0.;
-            //typename Configuration::iterator<T> it = c.begin<T>();
-            typename Configuration::iterator it = c.begin();
-            die_type die(rjmcmc::random(), boost::uniform_smallint<>(0,n-1));
-            std::advance(it, die());
-            
-            /*
-            // noop
-            const T *t = rjmcmc::variant_get<T>(&c[it]);
-            if(!t) return 0;
-            */
-            
-            modif.insert_death(it);
-            const T& t = c[it];
-//            iterator coord_it  = coordinates_begin(t.rotate(die()));
-            iterator coord_it  = coordinates_begin(t);
-            for(unsigned int i=0;i<dimension;++i) *out++ = *coord_it++;
-            
-            // return 1./c.size<T>();
-            return 1./c.size();
+            if(n<N) return 0.;
+            unsigned int denom=1;
+            int d[N];
+            const unsigned int dim = dimension;
+            for(unsigned int i=0;i<N;++i)
+            {
+                typename Configuration::iterator it = c.begin();
+                die_type die(rjmcmc::random(), boost::uniform_smallint<>(0,n-1-i));
+                d[i]=die();
+                for(unsigned int j=0;j<i;++j) if(d[j]<=d[i]) ++d[i];
+                std::advance(it, d[i]);
+
+                modif.insert_death(it);
+                const T& t = c[it];
+                //  iterator coord_it  = coordinates_begin(t.rotate(die()));
+                iterator coord_it  = coordinates_begin(t);
+                std::copy_n(coord_it,dim,out);
+                denom *= n-i;
+            }
+            return 1./denom;
         }
         template<typename Configuration, typename Modification, typename InputIterator>
         inline double inverse_pdf(Configuration& c, Modification& modif, InputIterator it) const
         {
+            unsigned int n = c.size()+modif.delta_size();
+            unsigned int denom=1;
             object_from_coordinates<T> creator;
-            modif.insert_birth(creator(it));
-            //            return 1./(c.size<T>()+modif.delta_size<T>());
-            return 1./(c.size()+modif.delta_size());
+            for(unsigned int i=1;i<=N;++i)
+            {
+                modif.insert_birth(creator(it));
+                it+=dimension;
+                denom *= n+i;
+            }
+            return 1./denom;
         }
     };
     
@@ -160,8 +168,8 @@ namespace marked_point_process {
 
 
     template <typename Transform, typename T = typename Transform::value_type>
-            struct result_of_make_uniform_modification_kernel
-    {
+                                               struct result_of_make_uniform_modification_kernel
+                                               {
         enum { N = Transform::dimension-coordinates_iterator<T>::dimension };
         typedef uniform_view<T>    view_type;
         typedef rjmcmc::variate<N> variate_type;

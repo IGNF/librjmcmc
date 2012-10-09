@@ -37,6 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef TRANSFORM_HPP
 #define TRANSFORM_HPP
 
+#include <algorithm>
+#include <cmath>
 
 namespace rjmcmc {
 

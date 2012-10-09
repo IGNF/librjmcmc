@@ -35,7 +35,7 @@ knowledge of the CeCILL license and that you accept its terms.
 ***********************************************************************/
 
 #ifndef __POISSON_DISTRIBUTION_HPP__
-#define __POISSON_DENSITY_HPP__
+#define __POISSON_DISTRIBUTION_HPP__
 
 #include <boost/random/poisson_distribution.hpp>
 #include <boost/math/distributions/poisson.hpp>
@@ -82,4 +82,4 @@ namespace rjmcmc {
 
 }; // namespace rjmcmc
 
-#endif // __POISSON_DENSITY_HPP__
+#endif // __POISSON_DISTRIBUTION_HPP__

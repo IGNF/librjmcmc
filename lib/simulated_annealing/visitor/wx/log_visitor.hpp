@@ -39,6 +39,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include "simulated_annealing/visitor/ostream_visitor.hpp"
 #include <wx/log.h>
+#include <sstream>
+#include <wx/thread.h>
 
 
 namespace simulated_annealing {

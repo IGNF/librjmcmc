@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef OSTREAM_VISITOR_HPP
 #define OSTREAM_VISITOR_HPP
 
-#include <ostream>
+#include <iostream>
 #include <iomanip>
 #include <time.h>
 

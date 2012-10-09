@@ -42,6 +42,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <boost/bind.hpp>
 #include <boost/gil/extension/numeric/kernel.hpp>
 #include <boost/gil/extension/numeric/convolve.hpp>
+#include <boost/gil/extension/io_new/tiff_read.hpp>
 
 namespace internal {
 

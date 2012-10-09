@@ -39,6 +39,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include "coordinates.hpp"
 #include "geometry/Rectangle_2.hpp"
+#include <boost/iterator/iterator_facade.hpp>
 
 
 //    void advance(int i) { m_i+=i; }

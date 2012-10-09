@@ -51,7 +51,7 @@ namespace simulated_annealing
             double m_t;
             bool m_value;
             bool value() const { return m_value; }
-            end_test_predicate(const Configuration& config, const Sampler& sample, double t)
+            end_test_or_predicate(const Configuration& config, const Sampler& sample, double t)
                 : m_config(config), m_sample(sample), m_t(t), m_value(false) {}
             template<typename T> void operator()(const T& t) { m_value |= t(m_config,m_sample,m_t); }
             template<typename T> void operator()(T* t) { operator()(*t); }
@@ -70,10 +70,10 @@ namespace simulated_annealing
     {
     public:
         typedef rjmcmc::tuple<RJMCMC_TUPLE_TYPES> EndTests;
-        composite_visitor(RJMCMC_TUPLE_ARGS) : m_end_tests(RJMCMC_TUPLE_PARAMS) {}
+        composite_end_test(RJMCMC_TUPLE_ARGS) : m_end_tests(RJMCMC_TUPLE_PARAMS) {}
 
         template<typename Configuration, typename Sampler>
-        inline bool operator()(const Configuration&, const Sampler& s, double t)
+        inline bool operator()(const Configuration& config, const Sampler& sample, double t)
         {
             internal::end_test_or_predicate<Configuration,Sampler> pred(config,sample,t);
             rjmcmc::for_each(m_end_tests,pred);

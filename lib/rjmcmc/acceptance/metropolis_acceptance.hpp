@@ -37,6 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef METROPOLIS_ACCEPTANCE_HPP
 #define METROPOLIS_ACCEPTANCE_HPP
 
+#include <cmath>
+
 namespace rjmcmc
 {
     /**

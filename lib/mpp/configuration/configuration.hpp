@@ -39,6 +39,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include "rjmcmc/variant.hpp"
 #include <vector>
+#include <iostream>
 
 namespace marked_point_process {
     //////////////////////////////////////////////////////////

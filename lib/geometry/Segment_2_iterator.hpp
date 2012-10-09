@@ -37,6 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GEOMETRY_SEGMENT_2_ITERATOR_HPP
 #define GEOMETRY_SEGMENT_2_ITERATOR_HPP
 
+#include <cmath>
+
 namespace geometry {
 
 // Découpage d'un segment par une grille

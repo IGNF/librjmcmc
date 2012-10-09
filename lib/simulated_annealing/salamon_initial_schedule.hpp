@@ -37,6 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef SALAMON_INITIAL_SCHEDULE_HPP
 #define SALAMON_INITIAL_SCHEDULE_HPP
 
+#include <cmath>
+
 template<typename DirectSampler, typename Configuration>
 double salamon_initial_schedule(const DirectSampler& sampler, Configuration& c, unsigned int iterations)
 {
@@ -50,7 +52,7 @@ double salamon_initial_schedule(const DirectSampler& sampler, Configuration& c, 
     e1 += inv_e;
     e2 += inv_e*e;
   }
-  double std_dev = sqrt(e2-e1*e1);
+  double std_dev = std::sqrt(e2-e1*e1);
   return 2*std_dev;
 }
 

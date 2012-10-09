@@ -37,6 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef BINARY_KERNEL_HPP
 #define BINARY_KERNEL_HPP
 
+#include "rjmcmc/random.hpp"
+
 namespace rjmcmc {
 
     // a kernel encodes a reversible jump
@@ -68,13 +70,13 @@ namespace rjmcmc {
     public:
         enum { dimension = N };
         template<typename Configuration, typename Modification, typename OutputIterator>
-        inline double operator()(Configuration& c, Modification& modif, OutputIterator it) const {
+        inline double operator()(Configuration&, Modification&, OutputIterator it) const {
             for(unsigned int i=0; i<N; ++i) *it++ = m_die();
             return 1.;
         }
         template<typename Configuration, typename Modification, typename InputIterator>
-        inline double inverse_pdf(Configuration& c, Modification& modif, InputIterator it) const {
-            // check support ?
+        inline double inverse_pdf(Configuration&, Modification&, InputIterator it) const {
+            for(unsigned int i=0; i<N; ++i, ++it) if(*it<0 || *it>1) return 0;
             return 1.;
         }
         template<typename InputIterator>

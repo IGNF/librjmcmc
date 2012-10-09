@@ -38,6 +38,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #define CONTROLER_HPP
 
 #include <wx/window.h>
+#include <wx/bmpbuttn.h>
+
 #include <boost/shared_ptr.hpp>
 class wxAuiManager;
 

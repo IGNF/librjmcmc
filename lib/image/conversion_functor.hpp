@@ -38,6 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define CONVERSION_FUNCTOR_HPP
 
 #include <boost/gil/algorithm.hpp>
+#include <boost/gil/extension/dynamic_image/any_image.hpp>
 
 struct static_cast_color_converter
 {

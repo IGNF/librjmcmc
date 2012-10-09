@@ -37,6 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef ANY_VISITOR_HPP
 #define ANY_VISITOR_HPP
 
+#include <vector>
+
 namespace simulated_annealing {
 
     namespace detail {

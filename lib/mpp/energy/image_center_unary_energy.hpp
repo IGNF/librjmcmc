@@ -38,6 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define IMAGE_CENTER_UNARY_ENERGY_HPP
 
 #include "rjmcmc/energy.hpp"
+#include "geometry/geometry.hpp"
 
 template<typename Image, typename Value = double>
 class image_center_unary_energy : public rjmcmc::energy<Value>

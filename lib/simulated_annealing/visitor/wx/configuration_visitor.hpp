@@ -41,6 +41,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <wx/aboutdlg.h>
 #include "rjmcmc/variant.hpp"
 #include "paint/all.hpp"
+#include "geometry/geometry.hpp"
 #include <GilViewer/gui/panel_viewer.hpp>
 
 struct layer_painter {
