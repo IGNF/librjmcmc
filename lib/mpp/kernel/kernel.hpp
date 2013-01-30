@@ -63,7 +63,6 @@ namespace marked_point_process {
             if(n<N) return 0.;
             unsigned int denom=1;
             int d[N];
-            const unsigned int dim = dimension;
             for(unsigned int i=0;i<N;++i)
             {
                 typename Configuration::iterator it = c.begin();
@@ -74,9 +73,9 @@ namespace marked_point_process {
 
                 modif.insert_death(it);
                 const T& t = c[it];
-                //  iterator coord_it  = coordinates_begin(t.rotate(die()));
-                iterator coord_it  = coordinates_begin(t);
-                std::copy_n(coord_it,dim,out);
+                iterator coord_it  = coordinates_begin(t.rotate(die()));
+                //iterator coord_it  = coordinates_begin(t);
+                for(unsigned int j=0; j<dimension; ++j) *out++ = *coord_it++;
                 denom *= n-i;
             }
             return 1./denom;
@@ -146,8 +145,8 @@ namespace marked_point_process {
         {
             iterator it(coordinates_begin(t));
             double val[dimension];
-            m_transform.inverse(it,val);
-            return m_variate.pdf(val)*m_transform.abs_jacobian(val);
+            double jacob = m_transform.inverse(it,val);
+            return m_variate.pdf(val)*jacob;
         }
     private:
         variate_type m_variate;

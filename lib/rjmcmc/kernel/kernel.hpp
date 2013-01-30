@@ -66,16 +66,18 @@ namespace rjmcmc {
     class variate
     {
         typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_type;
+    protected:
         mutable die_type m_die;
     public:
+        typedef double value_type;
         enum { dimension = N };
-        template<typename Configuration, typename Modification, typename OutputIterator>
-        inline double operator()(Configuration&, Modification&, OutputIterator it) const {
+        template<typename OutputIterator>
+        inline double operator()(OutputIterator it) const {
             for(unsigned int i=0; i<N; ++i) *it++ = m_die();
             return 1.;
         }
-        template<typename Configuration, typename Modification, typename InputIterator>
-        inline double inverse_pdf(Configuration&, Modification&, InputIterator it) const {
+        template<typename InputIterator>
+        inline double inverse_pdf(InputIterator it) const {
             for(unsigned int i=0; i<N; ++i, ++it) if(*it<0 || *it>1) return 0;
             return 1.;
         }
@@ -87,15 +89,46 @@ namespace rjmcmc {
         variate() : m_die(rjmcmc::random(), boost::uniform_real<>(0,1)) {}
     };
 
+    template<typename Transform, typename Variate> // assert(Transform::dimension==Variate::dimension)
+    class transformed_variate
+    {
+        Transform m_transform;
+        Variate m_variate;
+    public:
+        typedef typename Variate::value_type value_type;
+        enum { dimension = Variate::dimension };
+        template<typename OutputIterator>
+        inline double operator()(OutputIterator it) const {
+            value_type val[dimension];
+            double res = m_variate(val);
+            return res*m_transform.apply(val,it);
+        }
+        template<typename InputIterator>
+        inline double inverse_pdf(InputIterator it) const {
+            value_type val[dimension];
+            double res = m_transform.reverse(it,val);
+            return res*m_variate.inverse_pdf(val);
+        }
+        template<typename InputIterator>
+        inline double pdf(InputIterator it) const {
+            value_type val[dimension];
+            double res = m_transform.apply(it,val);
+            return res*m_variate.pdf(val);
+        }
+        transformed_variate(const Transform& transform, const Variate& variate)
+            : m_transform(transform), m_variate(variate) {}
+    };
+
     template<typename View0, typename View1, typename Variate0, typename Variate1, typename Transform> class kernel
     {
-    double m_p, m_p01, m_p10;
     View0 m_view0;
     View1 m_view1;
     Variate0 m_variate0;
     Variate1 m_variate1;
     Transform m_transform;
     mutable unsigned int m_kernel_id;
+    double m_p, m_p01, m_p10;
+
     public:
     enum { size = 2 };
     inline unsigned int kernel_id() const { return m_kernel_id; }
@@ -119,25 +152,25 @@ namespace rjmcmc {
         double val0[Transform::dimension];
         double val1[Transform::dimension];
         if(p<m_p01) { // branch probability : m_p01
-            m_kernel_id = 0;
+            m_kernel_id  = 0;
             double *var0 = val0 + View0::dimension;
             double *var1 = val1 + View1::dimension;
-            double J01  = m_view0   (c,modif,val0);             // returns the discrete probability that samples the portion of the configuration that is being modified (stored in the modif input)
-            double phi01= m_variate0(c,modif,var0);             // returns the continuous probability that samples the completion variates
-            m_transform.apply(val0,val1);                       // computes val1 from val0
-            double phi10= m_variate1.inverse_pdf(c,modif,var1); // returns the continuous probability of the inverse variate sampling, arguments are constant
-            double J10  = m_view1   .inverse_pdf(c,modif,val1); // returns the discrete probability of the inverse view sampling, arguments are constant except val1 that is encoded in modif
-            return m_transform.abs_jacobian(val0)*(m_p10*J10*phi10)/(m_p01*J01*phi01);
+            double J01   = m_view0   (c,modif,val0);             // returns the discrete probability that samples the portion of the configuration that is being modified (stored in the modif input)
+            double phi01 = m_variate0(var0);             // returns the continuous probability that samples the completion variates
+            double jacob = m_transform.apply(val0,val1);                       // computes val1 from val0
+            double phi10 = m_variate1.inverse_pdf(var1); // returns the continuous probability of the inverse variate sampling, arguments are constant
+            double J10   = m_view1   .inverse_pdf(c,modif,val1); // returns the discrete probability of the inverse view sampling, arguments are constant except val1 that is encoded in modif
+            return jacob*(m_p10*J10*phi10)/(m_p01*J01*phi01);
         } else { // branch probability : m_p10
-            m_kernel_id = 1;
+            m_kernel_id  = 1;
             double *var1 = val1 + View1::dimension;
             double *var0 = val0 + View0::dimension;
-            double J10  = m_view1   (c,modif,val1);      // returns the discrete probability that samples the portion of the configuration that is being modified (stored in the modif input)
-            double phi10= m_variate1(c,modif,var1);      // returns the continuous probability that samples the completion variates
-            m_transform.inverse(val1,val0);                       // computes val0 from val1
-            double J01  = m_view0   .inverse_pdf(c,modif,var0);  // returns the continuous probability of the inverse variate sampling, arguments are constant
-            double phi01= m_variate0.inverse_pdf(c,modif,val0);  // returns the discrete probability of the inverse view sampling, arguments are constant except val0 that is encoded in modif
-            return m_transform.abs_jacobian(val1)*(m_p01*J01*phi01)/(m_p10*J10*phi10);
+            double J10   = m_view1   (c,modif,val1);      // returns the discrete probability that samples the portion of the configuration that is being modified (stored in the modif input)
+            double phi10 = m_variate1(var1);      // returns the continuous probability that samples the completion variates
+            double jacob = m_transform.inverse(val1,val0);                       // computes val0 from val1
+            double J01   = m_view0   .inverse_pdf(c,modif,var0);  // returns the continuous probability of the inverse variate sampling, arguments are constant
+            double phi01 = m_variate0.inverse_pdf(val0);  // returns the discrete probability of the inverse view sampling, arguments are constant except val0 that is encoded in modif
+            return jacob*(m_p01*J01*phi01)/(m_p10*J10*phi10);
         }
     }
 };

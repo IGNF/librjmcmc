@@ -243,12 +243,12 @@ namespace marked_point_process {
 	}
 
     private:
+        double m_unary;
+        double m_binary;
 	graph_type m_graph;
 	UnaryEnergy	m_unary_energy;
 	BinaryEnergy	m_binary_energy;
-	Accelerator	m_accelerator;
-	double m_unary;
-	double m_binary;
+        Accelerator	m_accelerator;
     };
 
 
