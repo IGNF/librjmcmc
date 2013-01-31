@@ -45,7 +45,12 @@ knowledge of the CeCILL license and that you accept its terms.
 //
 //	T inverse(const T[N] in, T[N] out) const;
 // applies T^-1 and returns the absolute jacobian of T^-1 evaluated at "in"
-
+//
+//	T abs_jacobian  (const T[N] in) const;
+// evaluates the absolute value of the jacobian of T at "in"
+//
+//	T inverse_abs_jacobian  (const T[N] in) const;
+// evaluates the absolute value of the jacobian of T^-1 at "in"
 
 
 #include <algorithm>
@@ -106,7 +111,7 @@ namespace rjmcmc {
             }
         }
 
-        template<unsigned int N, typename T, unsigned int S=1> void affine_apply(const T m[N*N], const T d[N], const T in[N], T out[N])
+        template<unsigned int N, typename T, unsigned int S> void affine_apply(const T m[N*N], const T d[N], const T in[N], T out[N])
         {
             for(T *oit = out; oit<out+N; ++oit)
             {
@@ -125,6 +130,8 @@ namespace rjmcmc {
     public:
         enum { dimension = N };
 
+        inline T abs_jacobian(const T in[N]) const { return m_abs_jacobian[0]; }
+        inline T inverse_abs_jacobian(const T in[N]) const { return m_abs_jacobian[1]; }
         inline T apply  (const T in[N], T out[N]) const { matrix::linear_apply(m_mat,in,out); return m_abs_jacobian[0]; }
         inline T inverse(const T in[N], T out[N]) const { matrix::linear_apply(m_inv,in,out); return m_abs_jacobian[1]; }
 
@@ -168,6 +175,9 @@ namespace rjmcmc {
     public:
         enum { dimension = N };
 
+        inline T abs_jacobian(const T in[N]) const { return m_abs_jacobian[0]; }
+        inline T inverse_abs_jacobian(const T in[N]) const { return m_abs_jacobian[1]; }
+
         template<typename IteratorIn,typename IteratorOut>
         inline T apply  (IteratorIn in, IteratorOut out) const {
             for(T *m = m_mat;m!=m_mat+N;++m) *out++ = (*in++)*(*m);
@@ -206,6 +216,8 @@ namespace rjmcmc {
     {
     public:
         enum { dimension = N };
+        inline T abs_jacobian(const T in[N]) const { return m_abs_jacobian[0]; }
+        inline T inverse_abs_jacobian(const T in[N]) const { return m_abs_jacobian[1]; }
 
         template<typename IteratorIn,typename IteratorOut>
         inline T apply  (IteratorIn in, IteratorOut out) const {
@@ -249,6 +261,8 @@ namespace rjmcmc {
     {
         enum { dimension = N };
 
+        inline T abs_jacobian(const T in[N]) const { return m_abs_jacobian[0]; }
+        inline T inverse_abs_jacobian(const T in[N]) const { return m_abs_jacobian[1]; }
         inline T apply  (const T in[N], T out[N]) const { matrix::affine_apply<N,T, 1>(m_mat,m_delta,in,out); return m_abs_jacobian[0]; }
         inline T inverse(const T in[N], T out[N]) const { matrix::affine_apply<N,T,-1>(m_inv,m_delta,in,out); return m_abs_jacobian[1]; }
 

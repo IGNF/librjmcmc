@@ -42,6 +42,8 @@ namespace rjmcmc {
 
 #if USE_VARIADIC_TEMPLATES
 
+#include <tuple>
+
     template<typename T> struct kernel_traits {
         enum { size = 0 };
     };

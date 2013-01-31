@@ -48,7 +48,8 @@ typedef Rectangle_2 object;
 
 //[building_footprint_rectangle_definition_kernels
 #include "mpp/kernel/kernel.hpp"
-typedef marked_point_process::result_of_make_uniform_birth_death_kernel<object>::type  birth_death_kernel;
+typedef marked_point_process::uniform_birth<object> uniform_birth;
+typedef marked_point_process::result_of_make_uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
 
 #include "rjmcmc/kernel/transform.hpp"
 #include "geometry/kernels/rectangle_rotation_scaled_corner_kernel.hpp"
@@ -101,8 +102,6 @@ typedef rjmcmc::poisson_distribution                           distribution;
 
 //[building_footprint_rectangle_definition_sampler
 #include "rjmcmc/sampler/sampler.hpp"
-
-typedef marked_point_process::uniform_birth<object> uniform_birth;
 
 #include "mpp/direct_sampler.hpp"
 typedef marked_point_process::direct_sampler<distribution,uniform_birth> d_sampler;

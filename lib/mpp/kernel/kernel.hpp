@@ -97,13 +97,14 @@ namespace marked_point_process {
     };
     
     
-    template<typename T>
+    template<typename T, typename V = typename rjmcmc::variate<coordinates_iterator<T>::dimension> >
     class uniform_birth
     {
     public:
         enum { dimension = coordinates_iterator<T>::dimension };
         typedef typename coordinates_iterator<T>::type iterator;
-        typedef typename rjmcmc::variate<dimension> variate_type;
+        typedef T object_type;
+        typedef V variate_type;
         typedef typename rjmcmc::diagonal_affine_transform<dimension,double> transform_type;
         
         const variate_type& variate() const { return m_variate; }
@@ -119,20 +120,19 @@ namespace marked_point_process {
             for(unsigned int i=0;i<dimension; ++i) *it++ = (*bit++) - (*ait++);
             m_transform = rjmcmc::diagonal_affine_transform<dimension,double>(d,m);
         }
-        
         typedef double result_type;
+
         result_type operator()(T& t) const
         {
-            int dummy_config, dummy_modif;
             double val0[dimension];
             double val1[dimension];
-            double phi01 = m_variate(dummy_config,dummy_modif,val0);
+            double phi = m_variate(val0);
             m_transform.apply(val0,val1);
             object_from_coordinates<T> creator;
             t = creator(val1);
-            return  phi01*pdf(t);
+            return phi*m_transform.inverse_abs_jacobian(val1);
         }
-        
+
         struct pdf_visitor {
             typedef typename uniform_birth<T>::result_type result_type;
             const uniform_birth& m_uniform_birth;
@@ -143,10 +143,10 @@ namespace marked_point_process {
         
         inline result_type pdf(const T &t) const
         {
-            iterator it(coordinates_begin(t));
-            double val[dimension];
-            double jacob = m_transform.inverse(it,val);
-            return m_variate.pdf(val)*jacob;
+            iterator val1(coordinates_begin(t));
+            double val0[dimension];
+            double J10 = m_transform.inverse(val1,val0);
+            return m_variate.pdf(val0)*J10;
         }
     private:
         variate_type m_variate;
@@ -154,17 +154,31 @@ namespace marked_point_process {
     };
 
 
-    template <typename T>
+    template <typename birth_type>
             struct result_of_make_uniform_birth_death_kernel
     {
-        enum { N = coordinates_iterator<T>::dimension };
+        typedef typename birth_type::object_type object_type;
+        typedef typename birth_type::variate_type variate_type;
+        enum { N = coordinates_iterator<object_type>::dimension };
         typedef rjmcmc::kernel<
-                rjmcmc::null_view, marked_point_process::uniform_view<T>,
-                rjmcmc::variate<N>,rjmcmc::variate<0>,
+                rjmcmc::null_view, marked_point_process::uniform_view<object_type>,
+                variate_type, rjmcmc::variate<0>,
                 rjmcmc::diagonal_affine_transform<N,double>
                 > type;
     };
 
+    template <typename birth_type>
+            typename result_of_make_uniform_birth_death_kernel<birth_type>::type
+            make_uniform_birth_death_kernel(const birth_type& b, double pbirth, double pdeath)
+    {
+        typedef result_of_make_uniform_birth_death_kernel<birth_type> result_type;
+        typedef typename result_type::object_type object_type;
+        return typename result_type::type(
+                rjmcmc::null_view(),   uniform_view<object_type>(),
+                b.variate(),           rjmcmc::variate<0>(),
+                b.transform(),
+                pbirth,                pdeath);
+    }
 
     template <typename Transform, typename T = typename Transform::value_type>
                                                struct result_of_make_uniform_modification_kernel
@@ -174,17 +188,6 @@ namespace marked_point_process {
         typedef rjmcmc::variate<N> variate_type;
         typedef rjmcmc::kernel<view_type,view_type,variate_type,variate_type,Transform> type;
     };
-
-    template <typename T>
-            typename result_of_make_uniform_birth_death_kernel<T>::type
-            make_uniform_birth_death_kernel(const uniform_birth<T>& b, double pbirth, double pdeath)
-    {
-        return typename result_of_make_uniform_birth_death_kernel<T>::type(
-                rjmcmc::null_view(),   uniform_view<T>(),
-                b.variate(),           rjmcmc::variate<0>(),
-                b.transform(),
-                pbirth,                pdeath);
-    }
 
     template <typename Transform>
             typename result_of_make_uniform_modification_kernel<Transform>::type

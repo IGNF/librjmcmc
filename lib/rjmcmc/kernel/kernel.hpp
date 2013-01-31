@@ -156,7 +156,9 @@ namespace rjmcmc {
             double *var0 = val0 + View0::dimension;
             double *var1 = val1 + View1::dimension;
             double J01   = m_view0   (c,modif,val0);             // returns the discrete probability that samples the portion of the configuration that is being modified (stored in the modif input)
+            if(J01==0) return 0; // abort : view sampling failed
             double phi01 = m_variate0(var0);             // returns the continuous probability that samples the completion variates
+            if(phi01==0) return 0; // abort : variate sampling failed
             double jacob = m_transform.apply(val0,val1);                       // computes val1 from val0
             double phi10 = m_variate1.inverse_pdf(var1); // returns the continuous probability of the inverse variate sampling, arguments are constant
             double J10   = m_view1   .inverse_pdf(c,modif,val1); // returns the discrete probability of the inverse view sampling, arguments are constant except val1 that is encoded in modif
@@ -166,7 +168,9 @@ namespace rjmcmc {
             double *var1 = val1 + View1::dimension;
             double *var0 = val0 + View0::dimension;
             double J10   = m_view1   (c,modif,val1);      // returns the discrete probability that samples the portion of the configuration that is being modified (stored in the modif input)
+            if(J10==0) return 0; // abort : view sampling failed
             double phi10 = m_variate1(var1);      // returns the continuous probability that samples the completion variates
+            if(phi10==0) return 0; // abort : variate sampling failed
             double jacob = m_transform.inverse(val1,val0);                       // computes val0 from val1
             double J01   = m_view0   .inverse_pdf(c,modif,var0);  // returns the continuous probability of the inverse variate sampling, arguments are constant
             double phi01 = m_variate0.inverse_pdf(val0);  // returns the discrete probability of the inverse view sampling, arguments are constant except val0 that is encoded in modif
