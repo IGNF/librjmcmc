@@ -158,7 +158,7 @@ namespace simulated_annealing {
             P& m_p;
 
             sizer_adder(parameters_frame *frame, layer_control* lc, wxSizer *sizer, wxWindow* wnd, P& p)
-                : m_frame(frame), m_lc(lc), m_sizer(sizer), m_wnd(wnd), m_p(p) {}
+                : m_sizer(sizer), m_wnd(wnd), m_lc(lc), m_frame(frame), m_p(p) {}
 
             void AddText(wxSizer *sizer)
             {

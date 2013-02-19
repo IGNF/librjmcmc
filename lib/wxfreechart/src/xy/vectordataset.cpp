@@ -14,7 +14,7 @@
 WX_DEFINE_EXPORTED_OBJARRAY(wxDoubleArray);
 
 
-VectorDataset::VectorDataset() : m_X0(1.), m_scaleX(1.)
+VectorDataset::VectorDataset() : m_scaleX(1.), m_X0(1.)
 {
 }
 

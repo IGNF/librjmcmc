@@ -226,8 +226,8 @@ public:
     //[building_footprint_rectangle_gui_cons_des
     building_footprint_rectangle_gui() :
             m_config(NULL), m_sampler(NULL), m_schedule(NULL), m_end_test(NULL),
-            m_visitor(NULL), m_thread(NULL),
-            m_confg_visitor(NULL), m_param_visitor(NULL), m_chart_visitor(NULL), m_param(NULL)
+            m_visitor(NULL), m_thread(NULL), m_param(NULL),
+            m_confg_visitor(NULL), m_param_visitor(NULL), m_chart_visitor(NULL)
     {
     }
 

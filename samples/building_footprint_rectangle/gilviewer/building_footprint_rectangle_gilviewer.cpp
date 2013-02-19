@@ -54,7 +54,6 @@ typedef parameters< wx_parameter > param;
 #include <GilViewer/layers/vector_layer_ghost.hpp>
 #include <GilViewer/io/gilviewer_file_io.hpp>
 #include <GilViewer/io/gilviewer_io_factory.hpp>
-#include "gui/resources/IGN.xpm"
 //]
 
 //[building_footprint_rectangle_gilviewer_visitors

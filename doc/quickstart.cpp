@@ -68,7 +68,7 @@ typedef marked_point_process::direct_sampler<distribution,uniform_birth> referen
 #include "rjmcmc/acceptance/metropolis_acceptance.hpp"
 #include "rjmcmc/sampler/sampler.hpp"
 typedef rjmcmc::metropolis_acceptance                                                  acceptance;
-typedef marked_point_process::result_of_make_uniform_birth_death_kernel<object>::type  birth_death_kernel;
+typedef marked_point_process::result_of_make_uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
 typedef rjmcmc::sampler<reference_process,acceptance,birth_death_kernel>                       sampler;
 //]
 
