@@ -54,8 +54,10 @@ typedef marked_point_process::result_of_make_uniform_birth_death_kernel<uniform_
 #include "rjmcmc/kernel/transform.hpp"
 #include "geometry/kernels/rectangle_rotation_scaled_corner_kernel.hpp"
 #include "geometry/kernels/rectangle_scaled_edge_kernel.hpp"
-typedef marked_point_process::result_of_make_uniform_modification_kernel<rectangle_edge_translation_transform  >::type  edge_modification_kernel;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<rectangle_corner_translation_transform>::type  corner_modification_kernel;
+typedef geometry::rectangle_edge_translation_transform<object>    edge_transform;
+typedef geometry::rectangle_corner_translation_transform<object>  corner_transform;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<edge_transform>::type  edge_kernel;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<corner_transform>::type  corner_kernel;
 //]
 
 //[building_footprint_rectangle_definition_energies
@@ -112,8 +114,8 @@ typedef rjmcmc::metropolis_acceptance acceptance;
 //typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel> sampler;
 typedef rjmcmc::sampler<d_sampler,acceptance
         ,birth_death_kernel
-        ,edge_modification_kernel
-        ,corner_modification_kernel
+        ,edge_kernel
+        ,corner_kernel
         > sampler;
 //]
 
@@ -185,12 +187,17 @@ void create_sampler(const param *p, sampler *&s) {
 
     d_sampler ds( cs, birth );
 
+    edge_kernel k_edge   = marked_point_process::make_uniform_modification_kernel(edge_transform(),0.4);
+    corner_kernel k_corner = marked_point_process::make_uniform_modification_kernel(corner_transform(),0.4);
+    k_edge.name(0,"edge0");
+    k_edge.name(1,"edge1");
+    k_corner.name(0,"corner0");
+    k_corner.name(1,"corner1");
+
     s = new sampler( ds, acceptance()
                      , marked_point_process::make_uniform_birth_death_kernel(birth, p->get<double>("pbirth"), p->get<double>("pdeath") )
-                     , marked_point_process::make_uniform_modification_kernel(rectangle_edge_translation_transform(),0.4)
-                     , marked_point_process::make_uniform_modification_kernel(rectangle_corner_translation_transform(),0.4)
-                     //                       , 0.5 * modif2
-
+                     , k_edge
+                     , k_corner
                      );
 }
 //]

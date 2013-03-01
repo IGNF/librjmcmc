@@ -42,68 +42,48 @@ knowledge of the CeCILL license and that you accept its terms.
 
 namespace geometry {
 
-    template<typename K>
-    class rectangle_rotation_scaled_corner_kernel
+
+    template<typename T, typename U = typename T::FT>
+    struct rectangle_corner_translation_transform
     {
-    private:
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > double_die_type;
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > int_die_type;
-        mutable double_die_type m_dief;
-        mutable int_die_type   m_die4;
-        double m_dx, m_dy;
-    public:
+        enum { dimension = 7 };
+        typedef T value_type;
+        typedef U FT;
 
-        rectangle_rotation_scaled_corner_kernel(double dx = 20, double dy = 20) :
-                m_dief(rjmcmc::random(), boost::uniform_real<>(-1,1)),
-                m_die4(rjmcmc::random(), boost::uniform_smallint<>(0,3)),
-		m_dx(dx), m_dy(dy) {}
+        rectangle_corner_translation_transform(FT d=10.) : m_d(d) {}
 
-        typedef double result_type;
-        typedef geometry::Rectangle_2<K> input_type;
-        typedef geometry::Rectangle_2<K> output_type;
+        template<typename Iterator>
+        inline double abs_jacobian(Iterator it) const { return 1.; }
 
-        result_type operator()(const input_type &in, output_type &out) const
-        {
-            typename K::Vector_2 v(m_dief()*m_dx,m_dief()*m_dy);
-            out = in.rotation_scaled_corner(m_die4(),v);
-            return 1.; // TODO
+        template<typename IteratorIn,typename IteratorOut>
+        inline double apply  (IteratorIn in, IteratorOut out) const {
+            double res = abs_jacobian(in);
+            FT x = *in++;
+            FT y = *in++;
+            FT u = *in++;
+            FT v = *in++;
+            FT r = *in++;
+            FT s = *in++;
+            FT t = *in;
+            FT dx = m_d*(s-0.5);
+            FT dy = m_d*(t-0.5);
+            //   v=(dx,dy); v'=r*rot90(v); res = Rectangle_2(c+v+v', n+v,r);
+            *out++ = x+dx-r*dy;
+            *out++ = y+dy+r*dx;
+            *out++ = u+dx;
+            *out++ = v+dy;
+            *out++ = r;
+            *out++ = 1.-s;
+            *out++ = 1.-t;
+            return res;
         }
+
+        template<typename IteratorIn,typename IteratorOut>
+        inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
+    private:
+        FT m_d;
     };
 }
-
-struct rectangle_corner_translation_transform
-{
-    enum { dimension = 7 };
-    typedef Rectangle_2 value_type;
-
-    template<typename Iterator>
-    inline double abs_jacobian(Iterator it) const { return 1.; }
-
-    template<typename IteratorIn,typename IteratorOut>
-    inline double apply  (IteratorIn in, IteratorOut out) const {
-        double res = abs_jacobian(in);
-        typedef typename K::FT FT;
-        FT x = *in++;
-        FT y = *in++;
-        FT u = *in++;
-        FT v = *in++;
-        FT r = *in++;
-        FT s = *in++;
-        FT t = *in;
-        //   res = Rectangle_2(c+v+u, n+v,r);
-        *out++ = x+s-r*t;
-        *out++ = y+t+r*s;
-        *out++ = u+s;
-        *out++ = v+t;
-        *out++ = r;
-        *out++ =-s;
-        *out++ =-t;
-        return res;
-    }
-
-    template<typename IteratorIn,typename IteratorOut>
-    inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
-};
 
 /*
   generated using boost::lambda ??

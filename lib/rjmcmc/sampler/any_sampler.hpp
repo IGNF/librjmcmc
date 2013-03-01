@@ -52,7 +52,7 @@ namespace rjmcmc {
 
             virtual const sampler_base* base() const=0;
             virtual void operator()(Configuration &c, double temp) = 0;
-            virtual const char * kernel_name(unsigned int i) const = 0;
+            virtual const std::string&  kernel_name(unsigned int i) const = 0;
             virtual unsigned int kernel_id  () const = 0;
             virtual unsigned int kernel_size() const = 0;
         };
@@ -66,7 +66,7 @@ namespace rjmcmc {
 
             virtual const sampler_base* base() const { return &held; }
             virtual void operator()(Configuration &c, double temp)  { held(c,temp); }
-            virtual const char * kernel_name(unsigned int i) const  { return held.kernel_name(i); }
+            virtual const std::string& kernel_name(unsigned int i) const  { return held.kernel_name(i); }
             virtual unsigned int kernel_id  () const  { return held.kernel_id(); }
             virtual unsigned int kernel_size() const { return held.kernel_size(); }
 
@@ -105,7 +105,7 @@ namespace rjmcmc {
         // sampling step
         void operator()(Configuration &c, double temp) { (*content)(c,temp); }
         // statistics accessors
-        inline const char * kernel_name(unsigned int i) const { return content->kernel_name(i); }
+        inline const std::string&  kernel_name(unsigned int i) const { return content->kernel_name(i); }
         inline unsigned int kernel_id  () const { return content->kernel_id(); }
         inline unsigned int kernel_size() const { return content->kernel_size(); }
 

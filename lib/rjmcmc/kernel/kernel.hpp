@@ -128,19 +128,23 @@ namespace rjmcmc {
     Transform m_transform;
     mutable unsigned int m_kernel_id;
     double m_p, m_p01, m_p10;
+    std::string m_name[2];
 
     public:
     enum { size = 2 };
     inline unsigned int kernel_id() const { return m_kernel_id; }
-    inline const char* name(unsigned int i) const { return "kernel"; }//(i)?m_kernel1.name():m_kernel0.name(); }
+    inline const std::string& name(unsigned int i) const { return m_name[i]; }
+    inline void name(unsigned int i, const std::string& s) { m_name[i]=s; }
 
     kernel(const View0& v0, const View1& v1, const Variate0& x0, const Variate1& x1, const Transform& t, double p01=0.5, double p10=0.5) :
             m_view0(v0), m_view1(v1), m_variate0(x0), m_variate1(x1), m_transform(t), m_p(p01+p10), m_p01(p01), m_p10(p10)
     {
+        m_name[0]=m_name[1]="kernel";
     }
     kernel(double p01=0.5, double p10=0.5) :
             m_view0(), m_view1(), m_variate0(), m_variate1(), m_transform(), m_p(p01+p10), m_p01(p01), m_p10(p10)
     {
+        m_name[0]=m_name[1]="kernel";
     }
     inline double probability() const { return m_p; }
 

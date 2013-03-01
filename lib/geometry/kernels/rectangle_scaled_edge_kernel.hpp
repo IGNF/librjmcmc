@@ -43,66 +43,41 @@ knowledge of the CeCILL license and that you accept its terms.
 
 namespace geometry {
 
-    template<typename K>
-    class rectangle_scaled_edge_kernel
+    template<typename T, typename U = typename T::FT>
+    struct rectangle_edge_translation_transform
     {
-    private:
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > double_die_type;
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > int_die_type;
-        mutable double_die_type m_dief;
-        mutable int_die_type   m_die4;
-    public:
+        enum { dimension = 6 };
+        typedef T value_type;
+        typedef U FT;
 
-        rectangle_scaled_edge_kernel() :
-                m_dief(rjmcmc::random(), boost::uniform_real<>(0,1)),
-                m_die4(rjmcmc::random(), boost::uniform_smallint<>(0,3)) {}
+        template<typename Iterator>
+        inline double abs_jacobian(Iterator it) const { return exp(4.0*(it[5]-0.5)); }
 
-        typedef double result_type;
-        typedef geometry::Rectangle_2<K> input_type;
-        typedef geometry::Rectangle_2<K> output_type;
-
-        result_type operator()(const input_type &in, output_type &out) const
-        {
-            out = in.scaled_edge(m_die4(),exp(0.5-m_dief()));
-            return 1.; // TODO
+        template<typename IteratorIn,typename IteratorOut>
+        inline double apply  (IteratorIn in, IteratorOut out) const {
+            FT x = *in++;
+            FT y = *in++;
+            FT u = *in++;
+            FT v = *in++;
+            FT r = *in++;
+            FT s = *in++;
+            FT f = exp(4.0*(s-0.5));
+            FT g = 1-f;
+            //   res = Rectangle_2(c+m*(1-f), n,f*r);
+            *out++ = x-g*r*v;
+            *out++ = y+g*r*u;
+            *out++ = u;
+            *out++ = v;
+            *out++ = f*r;
+            *out++ = 1.0-s;
+            return f;
         }
+
+        template<typename IteratorIn,typename IteratorOut>
+        inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
     };
+
 }
-
-
-struct rectangle_edge_translation_transform
-{
-    enum { dimension = 6 };
-    typedef Rectangle_2 value_type;
-
-    template<typename Iterator>
-    inline double abs_jacobian(Iterator it) const { return 1.; }
-
-    template<typename IteratorIn,typename IteratorOut>
-    inline double apply  (IteratorIn in, IteratorOut out) const {
-        double res = abs_jacobian(in);
-        typedef typename K::FT FT;
-        FT x = *in++;
-        FT y = *in++;
-        FT u = *in++;
-        FT v = *in++;
-        FT r = *in++;
-        FT s = *in++;
-        FT f = exp(4.0*(s-0.5));
-        FT g = 1-f;
-        //   res = Rectangle_2(c+m*(1-f), n,f*r);
-        *out++ = x-g*r*v;
-        *out++ = y+g*r*u;
-        *out++ = u;
-        *out++ = v;
-        *out++ = f*r;
-        *out++ = 1.0-s;
-        return res;
-    }
-
-    template<typename IteratorIn,typename IteratorOut>
-    inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
-};
 
 
 #endif // RECTANGLE_SCALED_EDGE_KERNEL_HPP

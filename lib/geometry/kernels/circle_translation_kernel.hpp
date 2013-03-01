@@ -41,34 +41,131 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "rjmcmc/random.hpp"
 
 namespace geometry {
-	
-    template<typename K>
-    class circle_translation_kernel
+
+    template<typename T, typename U = typename T::FT>
+    class circle_center_translation_transform
     {
-    private:
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > die_type;
-        mutable die_type m_die;
-        double m_dx, m_dy;
     public:
+        enum { dimension = 5 };
+        typedef T value_type;
+        typedef U FT;
 
-        circle_translation_kernel(double dx = 20, double dy = 20) :
-                m_die(rjmcmc::random(), boost::uniform_real<>(-1,1)),
-                m_dx(dx), m_dy(dy) {}
+        circle_center_translation_transform(FT d=10.) : m_d(d) {}
+        template<typename Iterator>
+        inline double abs_jacobian(Iterator it) const { return 1.; }
 
-        typedef double result_type;
-        typedef geometry::Circle_2<K> input_type;
-        typedef geometry::Circle_2<K> output_type;
-
-        result_type operator()(const input_type &in, output_type &out) const
-        {
-            typedef typename K::Vector_2 Vector_2;
-            Vector_2 v(m_dx*m_die(),m_dy*m_die());
-            double d2 = v.squared_length();
-            double d = sqrt(d2);
-            if (m_die()>0) d = -d;
-            out = geometry::Circle_2<K>(in.center()+v,geometry::radius(in)+d);
-            return 1.; // TODO
+        template<typename IteratorIn,typename IteratorOut>
+        inline double apply  (IteratorIn in, IteratorOut out) const {
+            double res = abs_jacobian(in);
+            FT x  = *in++;
+            FT y  = *in++;
+            FT r  = *in++;
+            FT u = *in++;
+            FT v = *in++;
+            FT dx = m_d*(u-0.5);
+            FT dy = m_d*(v-0.5);
+            *out++ = x+dx;
+            *out++ = y+dy;
+            *out++ = r;
+            *out++ = 1.-u;
+            *out++ = 1.-v;
+            return res;
         }
+
+        template<typename IteratorIn,typename IteratorOut>
+        inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
+
+    private:
+        FT m_d;
+    };
+
+
+    template<typename T, typename U = typename T::FT>
+    class circle_edge_translation_transform
+    {
+    public:
+        enum { dimension = 5 };
+        typedef T value_type;
+        typedef U FT;
+
+        circle_edge_translation_transform(FT d=10.) : m_d(d) {}
+
+        template<typename Iterator>
+        inline double abs_jacobian(Iterator it) const { return 1.; }
+
+        template<typename IteratorIn,typename IteratorOut>
+        inline double apply  (IteratorIn in, IteratorOut out) const {
+            double res = abs_jacobian(in);
+            FT x = *in++;
+            FT y = *in++;
+            FT r = *in++;
+            FT u = *in++;
+            FT v = *in++;
+            FT dx = m_d*(u-0.5);
+            FT dy = m_d*(v-0.5);
+            *out++ = x+dx;
+            *out++ = y+dy;
+            *out++ = r+sqrt(dx*dx+dy*dy); // forward is increasing the radius
+            *out++ = 1.-u;
+            *out++ = 1.-v;
+            return res;
+        }
+
+        template<typename IteratorIn,typename IteratorOut>
+        inline double inverse(IteratorIn in, IteratorOut out) const {
+            double res = abs_jacobian(in);
+            FT x = *in++;
+            FT y = *in++;
+            FT r = *in++;
+            FT u = *in++;
+            FT v = *in++;
+            FT dx = m_d*(u-0.5);
+            FT dy = m_d*(v-0.5);
+            *out++ = x+dx;
+            *out++ = y+dy;
+            *out++ = r-sqrt(dx*dx+dy*dy); // backward is decreasing the radius
+            *out++ = 1.-u;
+            *out++ = 1.-v;
+            return res;
+        }
+    private:
+        FT m_d;
+    };
+
+    template<typename T, typename U = typename T::FT>
+    class circle_radius_transform
+    {
+    public:
+        enum { dimension = 4 };
+        typedef T value_type;
+        typedef U FT;
+
+        circle_radius_transform(FT d=10.) : m_d(d) {}
+
+        template<typename Iterator>
+        inline double abs_jacobian(Iterator it) const { return 1.; }
+
+        template<typename IteratorIn,typename IteratorOut>
+        inline double apply  (IteratorIn in, IteratorOut out) const {
+            double res = abs_jacobian(in);
+            FT x = *in++;
+            FT y = *in++;
+            FT r = *in++;
+            FT u = *in++;
+            FT dr = m_d*(u-0.5);
+            *out++ = x;
+            *out++ = y;
+            *out++ = r+dr; // forward is increasing the radius
+            *out++ = 1.-u;
+            return res;
+        }
+
+        template<typename IteratorIn,typename IteratorOut>
+        inline double inverse(IteratorIn in, IteratorOut out) const {
+            return apply(in,out);
+        }
+    private:
+        FT m_d;
     };
 }
 

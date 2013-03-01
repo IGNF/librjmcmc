@@ -72,14 +72,16 @@ namespace rjmcmc {
     {
         // statistics accessors
         template<typename K, unsigned int I, unsigned int N> struct get_name {
-            inline const char *operator()(unsigned int i, const K& k) const {
+            inline const std::string& operator()(unsigned int i, const K& k) const {
                 enum { ks = tuple_element<I,K>::type::size };
                 if(i<ks) return get<I>(k).name(i);
                 return get_name<K,I+1,N>()(i-ks,k);
             }
         };
         template<typename K, unsigned int N> struct get_name<K,N,N> {
-            inline const char *operator()(unsigned int i, const K& k) const { return ""; }
+            const std::string error;
+            get_name() : error("ERROR in get_name") {}
+            inline const std::string& operator()(unsigned int i, const K& k) const { return error; }
         };
 
         template<typename K, unsigned int I, unsigned int N> struct get_kernel_id {
@@ -158,7 +160,7 @@ namespace rjmcmc {
         inline const Density& density() const { return m_density; }
 
         ///  statistics accessor : getting the name of the ith kernel
-        inline const char * kernel_name(unsigned int i) const { return detail::get_name<Kernels,0,size>()(i,m_kernel); }
+        inline const std::string& kernel_name(unsigned int i) const { return detail::get_name<Kernels,0,size>()(i,m_kernel); }
 
         ///  statistics accessor : getting the id of the latest proposed kernel
         inline unsigned int kernel_id  () const { return detail::get_kernel_id<Kernels,0,size>()(m_kernel_id,m_kernel); }
