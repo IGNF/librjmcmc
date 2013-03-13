@@ -40,22 +40,34 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <GilViewer/layers/layer.hpp>
 #include "geometry/geometry.hpp"
 #include "geometry/Rectangle_2.hpp"
+#include "geometry/kernels/rectangle_split_merge_kernel.hpp"
+#include "geometry/coordinates/Rectangle_2_coordinates.hpp"
 
 template<typename K> void paint(
-        layer::ptrLayerType& l,
-	const std::string& s,
-	const geometry::Rectangle_2<K>& r)
+layer::ptrLayerType& l,
+const std::string& s,
+const geometry::Rectangle_2<K>& r)
 {
-  std::vector<double> vectx, vecty;
-  for (unsigned int i=0; i<4;++i)
-  {
-    vectx.push_back(geometry::to_double(r[i].x()));
-    vecty.push_back(geometry::to_double(r[i].y()));
-  }
-  double x = geometry::to_double(r.center().x());
-  double y = geometry::to_double(r.center().y());
-  l->add_polygon(vectx, vecty );
-  l->add_text(x, y, s , wxColour(255,0,0) );
+    std::vector<double> vectx, vecty;
+    for (unsigned int i=0; i<4;++i)
+    {
+        vectx.push_back(geometry::to_double(r[2+i].x()));
+        vecty.push_back(geometry::to_double(r[2+i].y()));
+    }
+    double x = geometry::to_double(r.center().x());
+    double y = geometry::to_double(r.center().y());
+
+    {
+        vectx.push_back(x+geometry::to_double(r.normal().x()));
+        vecty.push_back(y+geometry::to_double(r.normal().y()));
+        vectx.push_back(x);
+        vecty.push_back(y);
+        vectx.push_back(x+geometry::to_double(r.normal().x()));
+        vecty.push_back(y+geometry::to_double(r.normal().y()));
+    }
+
+    l->add_polygon(vectx, vecty );
+    l->add_text(x, y, s , wxColour(255,0,0) );
 }
 
 #endif // RECTANGLE_2_PAINT_HPP

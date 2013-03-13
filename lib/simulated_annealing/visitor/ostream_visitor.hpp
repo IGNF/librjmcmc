@@ -124,8 +124,8 @@ namespace simulated_annealing {
                 unsigned int total_accepted =0;
                 for(unsigned int k=0; k<kernel_size; ++k)
                 {
-                    m_out << std::setw(w) << 100.* m_proposed[k] / m_dump;
-                    m_out << std::setw(w) << (m_proposed[k]?(100.* m_accepted[k]) / m_proposed[k]:100.);
+                   // m_out << std::setw(w) << 100.* m_proposed[k] / m_dump;
+                   if(m_proposed[k]) m_out << std::setw(w) << (100.* m_accepted[k]) / m_proposed[k];
                     total_accepted += m_accepted[k];
                     m_accepted[k] = m_proposed[k] = 0;
                 }

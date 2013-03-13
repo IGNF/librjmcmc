@@ -42,22 +42,18 @@ knowledge of the CeCILL license and that you accept its terms.
 
 namespace geometry {
 
-
-    template<typename T, typename U = typename T::FT>
+    template<unsigned int N>
     struct rectangle_corner_translation_transform
     {
         enum { dimension = 7 };
-        typedef T value_type;
-        typedef U FT;
-
-        rectangle_corner_translation_transform(FT d=10.) : m_d(d) {}
+        rectangle_corner_translation_transform(double d=10.) : m_d(d) {}
 
         template<typename Iterator>
         inline double abs_jacobian(Iterator it) const { return 1.; }
 
         template<typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
-            double res = abs_jacobian(in);
+            typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             FT x = *in++;
             FT y = *in++;
             FT u = *in++;
@@ -67,24 +63,31 @@ namespace geometry {
             FT t = *in;
             FT dx = m_d*(s-0.5);
             FT dy = m_d*(t-0.5);
-            //   v=(dx,dy); v'=r*rot90(v); res = Rectangle_2(c+v+v', n+v,r);
-            *out++ = x+dx-r*dy;
-            *out++ = y+dy+r*dx;
+            // maxima
+            // abs(determinant(jacobian([x+e*dx-f*r*dy,y+e*dy+f*r*dx,u+dx,v+dy,r,1-s,1-t],[x,y,u,v,r,s,t]))) = 1;
+            // ratsimp(sublis([x=x+e*d*(s-0.5)-f*r*d*(t-0.5),y=y+e*d*(t-0.5)+f*r*d*(s-0.5),u=u+d*(s-0.5),v=v+d*(t-0.5),r=r,s=1-s,t=1-t],[x+e*d*(s-0.5)-f*r*d*(t-0.5),y+e*d*(t-0.5)+f*r*d*(s-0.5),u+d*(s-0.5),v+d*(t-0.5),r,1-s,1-t])) = [x, y, u, v, r, s, t];
+            switch(N)
+            {
+            case 0 : *out++ = x+dx-r*dy; *out++ = y+dy+r*dx; break;
+            case 1 : *out++ = x+dx+r*dy; *out++ = y+dy-r*dx; break;
+            case 2 : *out++ = x-dx-r*dy; *out++ = y-dy+r*dx; break;
+            case 3 : *out++ = x-dx+r*dy; *out++ = y-dy-r*dx; break;
+            }
             *out++ = u+dx;
             *out++ = v+dy;
             *out++ = r;
             *out++ = 1.-s;
             *out++ = 1.-t;
-            return res;
+            return 1.;
         }
 
         template<typename IteratorIn,typename IteratorOut>
         inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
     private:
-        FT m_d;
+        double m_d;
     };
-}
 
+}
 /*
   generated using boost::lambda ??
 

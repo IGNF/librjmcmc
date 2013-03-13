@@ -46,8 +46,8 @@ template<typename T>
 void initialize_parameters(T* params)
 {
     params->caption("Building footprint extraction parameters");
-    params->template insert<double>("temp",'t',150,"Initial Temperature");
-    params->template insert<double>("deccoef",'C',0.999999,"Decrease coefficient");
+    params->template insert<double>("temp",'t',250,"Initial Temperature");
+    params->template insert<double>("deccoef",'C',0.9999995,"Decrease coefficient");
     params->template insert<int>("nbiter",'I',15000000,"Number of iterations");
 //    params->template insert<double>("qtemp",'q',0.5,"Sampler (q) [0;1]");
     params->template insert<int>("nbdump",'d',10000,"Number of iterations between each result display");
@@ -56,8 +56,11 @@ void initialize_parameters(T* params)
     params->template insert<double>("poisson",'p',200, "Poisson processus parameter");
     params->template insert<double>("maxsize",'m',20, "Maximum rectangle size");
     params->template insert<double>("maxratio",'M',5, "Maximum rectangle aspect ratio");
-    params->template insert<double>("pbirth",'B',0.1, "Birth probability");
-    params->template insert<double>("pdeath",'D',0.1, "Death probability");
+    params->template insert<double>("p_birth",'B',1, "Birth Kernel probability");
+    params->template insert<double>("p_death",'D',1, "Death Kernel probability");
+    params->template insert<double>("p_edge",'E',4, "Edge Transform Kernel probability");
+    params->template insert<double>("p_corner",'C',4, "Corner Transform Kernel probability");
+    params->template insert<double>("p_split_merge",'S',1, "Split Merge Kernel probability");
     params->template insert<double>("ponderation_surface",'s',10, "Intersection area weight");
     params->template insert<double>("energy",'e',250, "Cost of an object");
     params->template insert<double>("ponderation_grad",'\0',1, "Image gradient energy weight");

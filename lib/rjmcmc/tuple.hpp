@@ -62,7 +62,7 @@ namespace rjmcmc {
 #include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
 
 #ifndef RJMCMC_TUPLE_LIMIT_TYPES
-#  define RJMCMC_TUPLE_LIMIT_TYPES 5
+#  define RJMCMC_TUPLE_LIMIT_TYPES 10
 #endif // RJMCMC_TUPLE_LIMIT_TYPES
 #define RJMCMC_TUPLE_ENUM_PARAMS(x) \
 BOOST_PP_ENUM_PARAMS(RJMCMC_TUPLE_LIMIT_TYPES,x)

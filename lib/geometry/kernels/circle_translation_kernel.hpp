@@ -42,24 +42,24 @@ knowledge of the CeCILL license and that you accept its terms.
 
 namespace geometry {
 
-    template<typename T, typename U = typename T::FT>
     class circle_center_translation_transform
     {
     public:
         enum { dimension = 5 };
-        typedef T value_type;
-        typedef U FT;
 
-        circle_center_translation_transform(FT d=10.) : m_d(d) {}
+        circle_center_translation_transform(double d=10.) : m_d(d) {}
         template<typename Iterator>
         inline double abs_jacobian(Iterator it) const { return 1.; }
-
+        // maxima :
+        // abs(determinant(jacobian([x+d*(u-0.5), y+d*(v-0.5), r, 1-u, 1-v] , [x,y,r,u,v]))) = 1;
+        // ratsimp(sublis([x=x+d*(u-0.5), y=y+d*(v-0.5), r=r, u=1-u, v=1-v],[x+d*(u-0.5), y+d*(v-0.5), r, 1-u, 1-v])) = [x,y,r,u,v];
         template<typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
+            typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             double res = abs_jacobian(in);
-            FT x  = *in++;
-            FT y  = *in++;
-            FT r  = *in++;
+            FT x = *in++;
+            FT y = *in++;
+            FT r = *in++;
             FT u = *in++;
             FT v = *in++;
             FT dx = m_d*(u-0.5);
@@ -76,25 +76,25 @@ namespace geometry {
         inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
 
     private:
-        FT m_d;
+        double m_d;
     };
 
 
-    template<typename T, typename U = typename T::FT>
     class circle_edge_translation_transform
     {
     public:
         enum { dimension = 5 };
-        typedef T value_type;
-        typedef U FT;
 
-        circle_edge_translation_transform(FT d=10.) : m_d(d) {}
+        circle_edge_translation_transform(double d=10.) : m_d(d) {}
 
         template<typename Iterator>
         inline double abs_jacobian(Iterator it) const { return 1.; }
-
+        // maxima :
+        // abs(determinant(jacobian([x+d*(u-0.5), y+d*(v-0.5), r+e*d*sqrt((u-0.5)*(u-0.5)+(v-0.5)*(v-0.5)),1-u, 1-v] , [x,y,r,u,v]))) = 1;
+        // ratsimp(sublis([x=x+d*(u-0.5), y=y+d*(v-0.5), r=r+e*d*sqrt((u-0.5)*(u-0.5)+(v-0.5)*(v-0.5)),u=1-u, v=1-v],[x+d*(u-0.5), y+d*(v-0.5), r-e*d*sqrt((u-0.5)*(u-0.5)+(v-0.5)*(v-0.5)),1-u, 1-v])) = [x,y,r,u,v];
         template<typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
+            typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             double res = abs_jacobian(in);
             FT x = *in++;
             FT y = *in++;
@@ -113,6 +113,7 @@ namespace geometry {
 
         template<typename IteratorIn,typename IteratorOut>
         inline double inverse(IteratorIn in, IteratorOut out) const {
+            typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             double res = abs_jacobian(in);
             FT x = *in++;
             FT y = *in++;
@@ -129,24 +130,23 @@ namespace geometry {
             return res;
         }
     private:
-        FT m_d;
+        double m_d;
     };
 
-    template<typename T, typename U = typename T::FT>
     class circle_radius_transform
     {
     public:
         enum { dimension = 4 };
-        typedef T value_type;
-        typedef U FT;
-
-        circle_radius_transform(FT d=10.) : m_d(d) {}
+        circle_radius_transform(double d=10.) : m_d(d) {}
 
         template<typename Iterator>
         inline double abs_jacobian(Iterator it) const { return 1.; }
-
+        // maxima :
+        // abs(determinant(jacobian([x, y, r+d*(u-0.5),1-u] , [x,y,r,u])));
+        // ratsimp(sublis([x=x, y=y, r=r+d*(u-0.5),u=1-u],[x, y, r+d*(u-0.5),1-u])) = [x, y, r, u];
         template<typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
+            typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             double res = abs_jacobian(in);
             FT x = *in++;
             FT y = *in++;
@@ -155,7 +155,7 @@ namespace geometry {
             FT dr = m_d*(u-0.5);
             *out++ = x;
             *out++ = y;
-            *out++ = r+dr; // forward is increasing the radius
+            *out++ = r+dr;
             *out++ = 1.-u;
             return res;
         }
@@ -165,7 +165,7 @@ namespace geometry {
             return apply(in,out);
         }
     private:
-        FT m_d;
+        double m_d;
     };
 }
 

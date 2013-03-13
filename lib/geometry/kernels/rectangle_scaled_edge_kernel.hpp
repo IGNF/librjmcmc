@@ -38,39 +38,63 @@ knowledge of the CeCILL license and that you accept its terms.
 #define RECTANGLE_SCALED_EDGE_KERNEL_HPP
 
 #include "geometry/Rectangle_2.hpp"
-#include "rjmcmc/random.hpp"
-#include <boost/random/variate_generator.hpp>
 
 namespace geometry {
 
-    template<typename T, typename U = typename T::FT>
+    template<unsigned int N>
     struct rectangle_edge_translation_transform
     {
         enum { dimension = 6 };
-        typedef T value_type;
-        typedef U FT;
 
         template<typename Iterator>
-        inline double abs_jacobian(Iterator it) const { return exp(4.0*(it[5]-0.5)); }
+        inline double abs_jacobian(Iterator it) const { return 1.; }
 
         template<typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
+            typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             FT x = *in++;
             FT y = *in++;
             FT u = *in++;
             FT v = *in++;
             FT r = *in++;
-            FT s = *in++;
-            FT f = exp(4.0*(s-0.5));
-            FT g = 1-f;
-            //   res = Rectangle_2(c+m*(1-f), n,f*r);
-            *out++ = x-g*r*v;
-            *out++ = y+g*r*u;
-            *out++ = u;
-            *out++ = v;
-            *out++ = f*r;
-            *out++ = 1.0-s;
-            return f;
+            FT p = *in++;
+
+            if(N<2) {
+                // maxima
+                // abs(determinant(jacobian([x-v*(r-p)*e,y+u*(r-p)*e,u,v,p,r],[x,y,u,v,r,p]))) = 1;
+                // ratsimp(sublis([x=x-v*(r-p)*e,y=y+u*(r-p)*e,u=u,v=v,p=r,r=p],[x-v*(r-p)*e,y+u*(r-p)*e,u,v,p,r])) = [x, y, u, v, r, p];
+                FT d = r-p;
+                switch(N)
+                {
+                case 0 : *out++ = x-v*d; *out++ = y+u*d; break;
+                case 1 : *out++ = x+v*d; *out++ = y-u*d; break;
+                }
+                *out++ = u;
+                *out++ = v;
+                *out++ = p;
+                *out++ = r;
+            } else {
+                // maxima
+                // abs(determinant(jacobian([x-(u-p*r*u)*e,y-(v-p*r*v)*e,p*r*u,p*r*v,1/p,1/r],[x,y,u,v,r,p]))) = 1;
+                // ratsimp(sublis([x=x-(u-p*r*u)*e,y=y-(v-p*r*v)*e,u=p*r*u,v=p*r*v,r=1/p,p=1/r],[x-(u-p*r*u)*e,y-(v-p*r*v)*e,p*r*u,p*r*v,1/p,1/r])) = [x, y, u, v, r, p];
+
+                FT pr  = p*r;
+                FT pru = pr*u;
+                FT prv = pr*v;
+                FT dx  = u-pru;
+                FT dy  = v-prv;
+                switch(N)
+                {
+                case 2 : *out++ = x+dx; *out++ = y+dy; break;
+                case 3 : *out++ = x-dx; *out++ = y-dy; break;
+                }
+                *out++ = pru;
+                *out++ = prv;
+                *out++ = 1./p;
+                *out++ = 1./r;
+            }
+            // maxima rot90: abs(determinant(jacobian([x,y,-r*v,r*u,p,1/r],[x,y,u,v,r,p]))) = 1;
+            return 1;
         }
 
         template<typename IteratorIn,typename IteratorOut>

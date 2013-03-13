@@ -38,123 +38,106 @@ knowledge of the CeCILL license and that you accept its terms.
 #define RECTANGLE_SPLIT_MERGE_KERNEL_HPP
 
 #include "geometry/Rectangle_2.hpp"
-#include "rjmcmc/random.hpp"
-
 namespace geometry {
-
-
-    // size = 10
-
-    template<typename K>
-    class rectangle_split_kernel
+    struct rectangle_split_merge_transform
     {
-    private:
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > double_die_type;
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > int_die_type;
-        mutable double_die_type m_dief;
-        mutable int_die_type   m_die4;
-    public:
+        enum { dimension = 10 };
+        rectangle_split_merge_transform(double d=5.) : m_d(d) {}
 
-        rectangle_split_kernel() :
-                m_dief(rjmcmc::random(), boost::uniform_real<>(0,1)),
-                m_die4(rjmcmc::random(), boost::uniform_smallint<>(0,3)) {}
+        template<typename IteratorIn,typename IteratorOut>
+        inline double apply  (IteratorIn in, IteratorOut out) const {
+            typedef typename std::iterator_traits<IteratorIn>::value_type FT;
+            FT x = *in++;
+            FT y = *in++;
+            FT u = *in++;
+            FT v = *in++;
+            FT r = *in++;
+            FT p = *in++;
+            FT q = *in++;
+            FT s = *in++;
+            FT t = *in++;
+            FT l = *in++;
 
-        typedef double result_type;
-        typedef geometry::Rectangle_2<K> input_type;
-        typedef std::pair<geometry::Rectangle_2<K>,geometry::Rectangle_2<K> > output_type;
+            FT du = m_d*(s-0.5);
+            FT dv = m_d*(t-0.5);
+            FT dl = l-0.5;
 
-        result_type operator()(const input_type &in, output_type &out) const
-        {
-            int i = m_die4();
-            double f = m_dief();
-            double g = m_dief()*(1-f);
-            out.first  = in.scaled_edge(i  ,f);
-            out.second = in.scaled_edge(i+2,g);
-            return 1.; // TODO
+            FT r_p = r-p;
+            FT r_q = r-q;
+
+            *out++ = x-r_p*v;
+            *out++ = y+r_p*u;
+            *out++ = u;
+            *out++ = v;
+            *out++ = p;
+
+            *out++ = x+r_q*v+du-q*dv+dl*u;
+            *out++ = y-r_q*u+dv+q*du+dl*v;
+            *out++ = u+du;
+            *out++ = v+dv;
+            *out++ = q;
+            /* maxima : factor(determinant(jacobian(
+            [x-(r-p)*v, y+(r-p)*u, u, v, p, x+(r-q)*v+du-q*dv+dl*u, y-(r-q)*u+dv+q*du+dl*v, u+du, v+dv, q ] ,
+            [x,y,u,v,r,p,q,du,dv,dl] ))) = 2*(u*u+v*v); */
+            return 2.*m_d*m_d*(u*u+v*v);
         }
-    };
 
-    template<typename K>
-    class rectangle_merge_kernel
-    {
-    private:
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > int_die_type;
-        mutable int_die_type   m_die4;
-    public:
+        template<typename IteratorIn,typename IteratorOut>
+        inline double inverse(IteratorIn in, IteratorOut out) const {
+            typedef typename std::iterator_traits<IteratorIn>::value_type FT;
+            FT x0 = *in++; // x -(r-p)*v
+            FT y0 = *in++; // y +(r-p)*u
+            FT u  = *in++;
+            FT v  = *in++;
+            FT p  = *in++;
+            FT x1 = *in++; // x+(r-q)*v+du-q*dv+dl*u
+            FT y1 = *in++; // y-(r-q)*u+dv+q*du+dl*v
+            FT u1 = *in++;
+            FT v1 = *in++;
+            FT q  = *in++;
 
-        rectangle_merge_kernel() :
-                m_die4(rjmcmc::random(), boost::uniform_smallint<>(0,3)) {}
+            FT du = u1 - u;
+            FT dv = v1 - v;
+            FT n2 = u*u+v*v;
+            if(n2==0) return 0;
+            FT dx = (x1-du+q*dv-x0); // == (2*r-p-q)*v+dl*u
+            FT dy = (y1-dv-q*du-y0); // ==-(2*r-p-q)*u+dl*v
+            FT dl = (dx*u+dy*v)/n2;
+            FT sr = (dx*v-dy*u)/n2; // 2*r-p-q;
+            FT  r = (sr + p + q)*0.5;
+            FT r_p = r-p;
+            FT  x = x0+r_p*v;
+            FT  y = y0-r_p*u;
 
-        typedef double result_type;
-        typedef std::pair<geometry::Rectangle_2<K>,geometry::Rectangle_2<K> > input_type;
-        typedef geometry::Rectangle_2<K> output_type;
+            *out++ = x;
+            *out++ = y;
+            *out++ = u;
+            *out++ = v;
+            *out++ = r;
+            *out++ = p;
+            *out++ = q;
+            *out++ = 0.5+du/m_d;
+            *out++ = 0.5+dv/m_d;
+            *out++ = 0.5+dl;
+            return 0.5/(m_d*m_d*(u*u+v*v));
 
-        result_type operator()(const input_type &in, output_type &out) const
-        {
-            out = in.first.rotate(m_die4()).merge(in.second.rotate(m_die4()));
-            return 1.; // TODO
+            /*
+            maxima:
+    r(x0,y0,u0,v0,r0,x1,y1,u1,v1,r1):=((r0+r1+((x1-(u1-u0)+r1*(v1-v0)-x0)*v0-(y1-(v1-v0)-r1*(u1-u0)-y0)*u0)/(u0*u0+v0*v0))/2);
+    factor(determinant(jacobian([
+        x0-(r(x0,y0,u,v,p,x1,y1,u1,v1,q)-p)*v,
+        y0+(r(x0,y0,u,v,p,x1,y1,u1,v1,q)-p)*u, u, v,
+        r(x0,y0,u,v,p,x1,y1,u1,v1,q),
+        p, q, u1-u, v1-v, ((x1-(u1-u)+q*(v1-v)-x0)*u+(y1-(v1-v)-q*(u1-u)-y0)*v)/(u*u+v*v)] ,
+        [x0,y0,u,v,p,x1,y1,u1,v1,q]))) = 1/(2*(u*u+v*v)) ;
+
+        ratsimp(sublis([x0=x-(r-p)*v, y0=y+(r-p)*u, u0=u, v0=v, r0=p, x1=x+(r-q)*v+d*(s-0.5)-q*d*(t-0.5)+(l-0.5)*u, y1=y-(r-q)*u+d*(t-0.5)+q*d*(s-0.5)+(l-0.5)*v, u1=u+d*(s-0.5), v1=v+d*(t-0.5), r1=q ], [x0+(r(x0,y0,u0,v0,r0,x1,y1,u1,v1,r1)-r0)*v0,y0-(r(x0,y0,u0,v0,r0,x1,y1,u1,v1,r1)-r0)*u0, u0, v0, r(x0,y0,u0,v0,r0,x1,y1,u1,v1,r1),r0, r1, 0.5+(u1-u0)/d, 0.5+(v1-v0)/d, 0.5+((x1-(u1-u0)+r1*(v1-v0)-x0)*u0+(y1-(v1-v0)-r1*(u1-u0)-y0)*v0)/(u0*u0+v0*v0)]));
+        */
+
         }
+    private:
+        double m_d;
     };
 }
-
-
-
-/*
-struct rectangle_split_transform
-{
-    enum { dimension = 10 };
-
-    template<typename Iterator>
-    inline double abs_jacobian(Iterator it) const { return 1.; }
-
-    template<typename IteratorIn,typename IteratorOut>
-    inline double apply  (IteratorIn in, IteratorOut out) const {
-        double res = abs_jacobian(in);
-        typedef typename K::FT FT;
-        FT x0 = *in++;
-        FT y0 = *in++;
-        FT u0 = *in++;
-        FT v0 = *in++;
-        FT r0 = *in++;
-        FT x1 = *in++;
-        FT y1 = *in++;
-        FT u1 = *in++;
-        FT v1 = *in++;
-        FT r1 = *in++;
-        //   res = Rectangle_2(c+v+u, n+v,r);
-        *out++ = x+s-r*t;
-        *out++ = y+t+r*s;
-        *out++ = u+s;
-        *out++ = v+t;
-        *out++ = r;
-        *out++ =-s;
-        *out++ =-t;
-        return res;
-    }
-
-    template<typename IteratorIn,typename IteratorOut>
-    inline double inverse(IteratorIn in, IteratorOut out) const {
-        typedef typename K::FT FT;
-        FT x = *in++;
-        FT y = *in++;
-        FT u = *in++;
-        FT v = *in++;
-        FT r = *in++;
-        FT s = *in++;
-        FT c0 = *in++;
-        FT c1 = *in++;
-        FT s = *in++;
-        FT s = *in++;
-        //   res = Rectangle_2(c+m*(1-f), n,f*r);
-        *out++ = x-g*r*v;
-        *out++ = y+g*r*u;
-        *out++ = u;
-        *out++ = v;
-        *out++ = f*r;
-
-        return res;
-    }
-};
-*/
 
 #endif // RECTANGLE_SPLIT_MERGE_KERNEL_HPP

@@ -54,10 +54,25 @@ typedef marked_point_process::result_of_make_uniform_birth_death_kernel<uniform_
 #include "rjmcmc/kernel/transform.hpp"
 #include "geometry/kernels/rectangle_rotation_scaled_corner_kernel.hpp"
 #include "geometry/kernels/rectangle_scaled_edge_kernel.hpp"
-typedef geometry::rectangle_edge_translation_transform<object>    edge_transform;
-typedef geometry::rectangle_corner_translation_transform<object>  corner_transform;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<edge_transform>::type  edge_kernel;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<corner_transform>::type  corner_kernel;
+#include "geometry/kernels/rectangle_split_merge_kernel.hpp"
+typedef geometry::rectangle_edge_translation_transform<0>    edge_transform0;
+typedef geometry::rectangle_edge_translation_transform<1>    edge_transform1;
+typedef geometry::rectangle_edge_translation_transform<2>    edge_transform2;
+typedef geometry::rectangle_edge_translation_transform<3>    edge_transform3;
+typedef geometry::rectangle_corner_translation_transform<0>  corner_transform0;
+typedef geometry::rectangle_corner_translation_transform<1>  corner_transform1;
+typedef geometry::rectangle_corner_translation_transform<2>  corner_transform2;
+typedef geometry::rectangle_corner_translation_transform<3>  corner_transform3;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<object,edge_transform0>::type  edge_kernel0;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<object,edge_transform1>::type  edge_kernel1;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<object,edge_transform2>::type  edge_kernel2;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<object,edge_transform3>::type  edge_kernel3;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<object,corner_transform0>::type  corner_kernel0;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<object,corner_transform1>::type  corner_kernel1;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<object,corner_transform2>::type  corner_kernel2;
+typedef marked_point_process::result_of_make_uniform_modification_kernel<object,corner_transform3>::type  corner_kernel3;
+typedef geometry::rectangle_split_merge_transform split_merge_transform;
+typedef marked_point_process::result_of_make_uniform_split_merge_kernel<object,split_merge_transform>::type  split_merge_kernel;
 //]
 
 //[building_footprint_rectangle_definition_energies
@@ -114,8 +129,15 @@ typedef rjmcmc::metropolis_acceptance acceptance;
 //typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel> sampler;
 typedef rjmcmc::sampler<d_sampler,acceptance
         ,birth_death_kernel
-        ,edge_kernel
-        ,corner_kernel
+        ,split_merge_kernel
+        ,edge_kernel0
+        ,edge_kernel1
+        ,edge_kernel2
+        ,edge_kernel3
+        ,corner_kernel0
+        ,corner_kernel1
+        ,corner_kernel2
+        ,corner_kernel3
         > sampler;
 //]
 
@@ -187,17 +209,53 @@ void create_sampler(const param *p, sampler *&s) {
 
     d_sampler ds( cs, birth );
 
-    edge_kernel k_edge   = marked_point_process::make_uniform_modification_kernel(edge_transform(),0.4);
-    corner_kernel k_corner = marked_point_process::make_uniform_modification_kernel(corner_transform(),0.4);
-    k_edge.name(0,"edge0");
-    k_edge.name(1,"edge1");
-    k_corner.name(0,"corner0");
-    k_corner.name(1,"corner1");
+    double p_birth = p->get<double>("p_birth");
+    double p_death = p->get<double>("p_death");
+    double p_edge = p->get<double>("p_edge");
+    double p_corner = p->get<double>("p_corner");
+    double p_split_merge = p->get<double>("p_split_merge");
+    birth_death_kernel k_birth_death = marked_point_process::make_uniform_birth_death_kernel(birth, p_birth, p_death );
+    edge_kernel0 k_edge0 = marked_point_process::make_uniform_modification_kernel<object>(edge_transform0(),0.25*p_edge);
+    edge_kernel1 k_edge1 = marked_point_process::make_uniform_modification_kernel<object>(edge_transform1(),0.25*p_edge);
+    edge_kernel2 k_edge2 = marked_point_process::make_uniform_modification_kernel<object>(edge_transform2(),0.25*p_edge);
+    edge_kernel3 k_edge3 = marked_point_process::make_uniform_modification_kernel<object>(edge_transform3(),0.25*p_edge);
+    corner_kernel0 k_corner0 = marked_point_process::make_uniform_modification_kernel<object>(corner_transform0(),0.25*p_corner);
+    corner_kernel1 k_corner1 = marked_point_process::make_uniform_modification_kernel<object>(corner_transform1(),0.25*p_corner);
+    corner_kernel2 k_corner2 = marked_point_process::make_uniform_modification_kernel<object>(corner_transform2(),0.25*p_corner);
+    corner_kernel3 k_corner3 = marked_point_process::make_uniform_modification_kernel<object>(corner_transform3(),0.25*p_corner);
+    k_edge0.name(0,"edge00");
+    k_edge0.name(1,"edge01");
+    k_edge1.name(0,"edge10");
+    k_edge1.name(1,"edge11");
+    k_edge2.name(0,"edge20");
+    k_edge2.name(1,"edge21");
+    k_edge3.name(0,"edge30");
+    k_edge3.name(1,"edge31");
+    k_corner0.name(0,"corner00");
+    k_corner0.name(1,"corner01");
+    k_corner1.name(0,"corner10");
+    k_corner1.name(1,"corner11");
+    k_corner2.name(0,"corner20");
+    k_corner2.name(1,"corner21");
+    k_corner3.name(0,"corner30");
+    k_corner3.name(1,"corner31");
+
+
+    split_merge_kernel k_split_merge = marked_point_process::make_uniform_split_merge_kernel<object>(split_merge_transform(),p_split_merge);
+    k_split_merge.name(0,"split");
+    k_split_merge.name(1,"merge");
 
     s = new sampler( ds, acceptance()
-                     , marked_point_process::make_uniform_birth_death_kernel(birth, p->get<double>("pbirth"), p->get<double>("pdeath") )
-                     , k_edge
-                     , k_corner
+                     , k_birth_death
+                     , k_split_merge
+                     , k_edge0
+                     , k_edge1
+                     , k_edge2
+                     , k_edge3
+                     , k_corner0
+                     , k_corner1
+                     , k_corner2
+                     , k_corner3
                      );
 }
 //]

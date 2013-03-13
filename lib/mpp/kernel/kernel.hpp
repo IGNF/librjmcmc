@@ -24,7 +24,7 @@ software by the user in light of its specific status of free software,
 that may mean that it is complicated to manipulate, and that also
 therefore means that it is reserved for developers and experienced
 professionals having in-depth computer knowledge. Users are therefore
-encouraged to load and test the software's suitability as regards their
+encouraged to load and test thesoftware's suitability as regards their
 requirements in conditions enabling the security of their systems and/or
 data to be ensured and, more generally, to use and operate it in the
 same conditions as regards security.
@@ -73,8 +73,8 @@ namespace marked_point_process {
 
                 modif.insert_death(it);
                 const T& t = c[it];
-                iterator coord_it  = coordinates_begin(t.rotate(die())); //TODO!!!
-                //iterator coord_it  = coordinates_begin(t);
+                //iterator coord_it  = coordinates_begin(t.rotate(die())); //TODO!!!
+                iterator coord_it  = coordinates_begin(t);
                 for(unsigned int j=0; j<dimension; ++j) *out++ = *coord_it++;
                 denom *= n-i;
             }
@@ -180,23 +180,52 @@ namespace marked_point_process {
                 pbirth,                pdeath);
     }
 
-    template <typename Transform, typename T = typename Transform::value_type>
-                                               struct result_of_make_uniform_modification_kernel
-                                               {
+    template <typename T, typename Transform>
+            struct result_of_make_uniform_modification_kernel
+    {
         enum { N = Transform::dimension-coordinates_iterator<T>::dimension };
+        typedef T                  value_type;
         typedef uniform_view<T>    view_type;
         typedef rjmcmc::variate<N> variate_type;
         typedef rjmcmc::kernel<view_type,view_type,variate_type,variate_type,Transform> type;
     };
 
-    template <typename Transform>
-            typename result_of_make_uniform_modification_kernel<Transform>::type
+    template <typename T, typename Transform>
+            typename result_of_make_uniform_modification_kernel<T,Transform>::type
             make_uniform_modification_kernel(const Transform& t, double p)
     {
-        typedef result_of_make_uniform_modification_kernel<Transform> res;
+        typedef result_of_make_uniform_modification_kernel<T,Transform> res;
         typename res::view_type view;
         typename res::variate_type variate;
         return typename res::type(view,view,variate,variate,t, p*0.5, p*0.5);
+    }
+
+
+    template <typename T, typename Transform>
+            struct result_of_make_uniform_split_merge_kernel
+    {
+        enum {
+            N0 = Transform::dimension-  coordinates_iterator<T>::dimension,
+            N1 = Transform::dimension-2*coordinates_iterator<T>::dimension,
+        };
+        typedef T                   value_type;
+        typedef uniform_view<T>     view0_type;
+        typedef uniform_view<T,2>   view1_type;
+        typedef rjmcmc::variate<N0> variate0_type;
+        typedef rjmcmc::variate<N1> variate1_type;
+        typedef rjmcmc::kernel<view0_type,view1_type,variate0_type,variate1_type,Transform> type;
+    };
+
+    template <typename T, typename Transform>
+            typename result_of_make_uniform_split_merge_kernel<T,Transform>::type
+            make_uniform_split_merge_kernel(const Transform& t, double p)
+    {
+        typedef result_of_make_uniform_split_merge_kernel<T,Transform> res;
+        typename res::view0_type view0;
+        typename res::view1_type view1;
+        typename res::variate0_type variate0;
+        typename res::variate1_type variate1;
+        return typename res::type(view0,view1,variate0,variate1,t, p*0.5, p*0.5);
     }
 
 }; // namespace rjmcmc
