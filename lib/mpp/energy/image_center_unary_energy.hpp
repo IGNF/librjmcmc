@@ -40,7 +40,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "rjmcmc/energy.hpp"
 #include "geometry/geometry.hpp"
 
-template<typename Image, typename Value = double>
+template<typename OrientedImage, typename Value = double>
 class image_center_unary_energy : public rjmcmc::energy<Value>
 {
 public:
@@ -48,7 +48,7 @@ public:
     template<typename T>
     result_type operator()(const T &t) const
     {
-        typename Image::view_t view = m_image.view();
+        typename OrientedImage::view_t view = m_image.view();
         int x0 = m_image.x0();
         int y0 = m_image.y0();
         int x = int(geometry::to_double(t.center().x())-x0);
@@ -57,10 +57,10 @@ public:
         return view(x,y);
     }
 
-    image_center_unary_energy(const Image& image, Value out = 0) : m_image(image), m_out(out) {}
+    image_center_unary_energy(const OrientedImage& image, Value out = 0) : m_image(image), m_out(out) {}
 
 private:
-    Image m_image;
+    OrientedImage m_image;
     Value m_out;
 };
 

@@ -175,8 +175,8 @@ public:
         clip_bbox(bbox,dsm_file );
 
         gradient_functor gf(m_param->get<double>("sigmaD"));
-        oriented_gradient_view grad_view(dsm_file,  bbox, gf);
-        m_grad = grad_view.img();
+        oriented_gradient_image grad_image(dsm_file,  bbox, gf);
+        m_grad = grad_image.img();
 
         std::string  mask_file = m_param->get<boost::filesystem::path>("mask").string();
 
@@ -189,7 +189,7 @@ public:
         m_confg_visitor->set_bbox(wxRect(p0,p1));
 
         init_visitor        (m_param,*m_visitor);
-        create_configuration(m_param,grad_view,m_config);
+        create_configuration(m_param,grad_image,m_config);
         //<-
         //    estimate_initial_temperature(p,100,*m_config);
         //->
@@ -200,15 +200,19 @@ public:
       //  std::cout << "Salamon initial schedule : " << salamon_initial_schedule(m_sampler->density(),*m_config,1000) << std::endl;
         m_config->clear();
 
-        typedef rjmcmc::any_sampler<configuration> any_sampler;
+        typedef rjmcmc::mt19937_generator Engine;
+        Engine& e = rjmcmc::random();
+        typedef rjmcmc::any_sampler<Engine,configuration> any_sampler;
+
+        typedef rjmcmc::any_sampler<Engine,configuration> any_sampler;
         typedef simulated_annealing::any_visitor<configuration,any_sampler> any_visitor;
 
         any_sampler *sampler = new any_sampler(*m_sampler);
         any_visitor *visitor = new any_visitor(*m_visitor);
 
         m_thread = new boost::thread(
-                simulated_annealing::optimize<configuration,any_sampler,schedule,end_test,any_visitor>,
-                boost::ref(*m_config), boost::ref(*sampler),
+                simulated_annealing::optimize<Engine,configuration,any_sampler,schedule,end_test,any_visitor>,
+                e, boost::ref(*m_config), boost::ref(*sampler),
                 boost::ref(*m_schedule),   boost::ref(*m_end_test),
                 boost::ref(*visitor) );
     }

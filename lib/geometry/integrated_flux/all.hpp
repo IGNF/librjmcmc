@@ -38,8 +38,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #define INTEGRATED_FLUX_ALL_HPP
 
 
-template<typename OrientedView, typename T>
-double integrated_flux(const OrientedView&, const T &);
+template<typename OrientedImage, typename T>
+double integrated_flux(const OrientedImage&, const T &);
 
 #ifdef GEOMETRY_RECTANGLE_2_HPP
 #include "Rectangle_2_integrated_flux.hpp"

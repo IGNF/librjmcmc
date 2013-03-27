@@ -43,11 +43,13 @@ namespace simulated_annealing
 
     //[simulated_annealing_signature
     template<
-            class Configuration, class Sampler,
-            class Schedule, class EndTest,
-            class Visitor
+            typename Engine,
+            typename Configuration, typename Sampler,
+            typename Schedule, typename EndTest,
+            typename Visitor
             >
             void optimize(
+                    Engine& e,
                     Configuration& config, Sampler& sampler,
                     Schedule& schedule, EndTest& end_test,
                     Visitor& visitor )
@@ -63,7 +65,7 @@ namespace simulated_annealing
         visitor.begin(config,sampler,t);
         for(; !end_test(config,sampler,t); t = *(++schedule))
         {
-            sampler(config,t);
+            sampler(e,config,t);
             visitor.visit(config,sampler,t);
         }
         visitor.end(config,sampler,t);

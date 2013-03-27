@@ -37,10 +37,10 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef DIRECT_SAMPLER_HPP
 #define DIRECT_SAMPLER_HPP
 
-#include "rjmcmc/random_variant_init.hpp"
-
 namespace marked_point_process {
 
+    // does not handle configurations with multiple object types yet
+    // this would require some metaprogramming to handle a vector of (Density/ObjectSampler) pairs
     template<typename Density, typename ObjectSampler>
     class direct_sampler
     {
@@ -50,15 +50,14 @@ namespace marked_point_process {
         m_density(density), m_object_sampler(object_sampler)
         {}
 
-        template<typename Configuration> void operator()(Configuration &c, double temperature=0) const
+        template<typename Engine, typename Configuration> void operator()(Engine& e, Configuration &c, double temperature=0) const
         {
             typedef typename Configuration::value_type T;
             T res;
             c.clear();
-            int n = m_density();
+            int n = m_density(e);
             for(int i=0; i<n; ++i) {
-                rjmcmc::random_variant_init(res);
-                rjmcmc::apply_visitor(m_object_sampler,res);
+                m_object_sampler(e,res);
                 c.insert(res);
             }
         }

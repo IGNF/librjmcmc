@@ -68,18 +68,20 @@ int main(int argc , char** argv)
     clip_bbox(bbox, dsm_file);
 
     gradient_functor gf(p->get<double>("sigmaD"));
-    oriented_gradient_view grad_view(dsm_file, bbox, gf);
+    oriented_gradient_image grad_image(dsm_file, bbox, gf);
 
     set_bbox(p,bbox);
 
     /*< Before launching the optimization process, we create all the required stuffs: a configuration, a sampler, a schedule scheme and an end test >*/
-    configuration *conf; create_configuration(p,grad_view,conf);
+    configuration *conf; create_configuration(p,grad_image,conf);
     sampler       *samp; create_sampler      (p,samp);
     schedule      *sch ; create_schedule     (p,sch);
     end_test      *end ; create_end_test     (p,end);
 
     // test avec les any_*
-    typedef rjmcmc::any_sampler<configuration> any_sampler;
+    typedef rjmcmc::mt19937_generator Engine;
+    Engine& e = rjmcmc::random();
+    typedef rjmcmc::any_sampler<Engine,configuration> any_sampler;
     any_sampler sampler(*samp);
 
     /*< Build and initialize simple visitor which prints some data on the standard output >*/
@@ -91,8 +93,8 @@ int main(int argc , char** argv)
 #endif
     init_visitor(p,visitor);
 
-    /*< This is the way to launch the optimization process. Here, the magic happen... >*/
-    simulated_annealing::optimize(*conf,sampler,*sch,*end,visitor);
+    /*< This is the way to launch the optimization process. Here, the magic happens... >*/
+    simulated_annealing::optimize(e,*conf,sampler,*sch,*end,visitor);
 
     /*< Finally release all dynamically allocated resources >*/
     if(conf) {delete conf; conf=NULL;}

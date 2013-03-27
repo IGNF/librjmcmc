@@ -40,8 +40,6 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <GilViewer/layers/layer.hpp>
 #include "geometry/geometry.hpp"
 #include "geometry/Rectangle_2.hpp"
-#include "geometry/kernels/rectangle_split_merge_kernel.hpp"
-#include "geometry/coordinates/Rectangle_2_coordinates.hpp"
 
 template<typename K> void paint(
 layer::ptrLayerType& l,

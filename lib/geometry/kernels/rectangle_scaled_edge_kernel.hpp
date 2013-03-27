@@ -44,6 +44,11 @@ namespace geometry {
     template<unsigned int N>
     struct rectangle_edge_translation_transform
     {
+        double m_rmin, m_rrange;
+
+        rectangle_edge_translation_transform(double minratio, double maxratio)
+            : m_rmin(minratio), m_rrange(maxratio-minratio) {}
+
         enum { dimension = 6 };
 
         template<typename Iterator>
@@ -57,22 +62,24 @@ namespace geometry {
             FT u = *in++;
             FT v = *in++;
             FT r = *in++;
-            FT p = *in++;
+            FT p = m_rmin+m_rrange*(*in++);
 
             if(N<2) {
                 // maxima
                 // abs(determinant(jacobian([x-v*(r-p)*e,y+u*(r-p)*e,u,v,p,r],[x,y,u,v,r,p]))) = 1;
                 // ratsimp(sublis([x=x-v*(r-p)*e,y=y+u*(r-p)*e,u=u,v=v,p=r,r=p],[x-v*(r-p)*e,y+u*(r-p)*e,u,v,p,r])) = [x, y, u, v, r, p];
                 FT d = r-p;
+                FT dx  = -v*d;
+                FT dy  =  u*d;
                 switch(N)
                 {
-                case 0 : *out++ = x-v*d; *out++ = y+u*d; break;
-                case 1 : *out++ = x+v*d; *out++ = y-u*d; break;
+                case 0 : *out++ = x+dx; *out++ = y+dy; break;
+                case 1 : *out++ = x-dx; *out++ = y-dy; break;
                 }
                 *out++ = u;
                 *out++ = v;
                 *out++ = p;
-                *out++ = r;
+                *out++ = (r-m_rmin)/m_rrange;
             } else {
                 // maxima
                 // abs(determinant(jacobian([x-(u-p*r*u)*e,y-(v-p*r*v)*e,p*r*u,p*r*v,1/p,1/r],[x,y,u,v,r,p]))) = 1;
@@ -91,7 +98,7 @@ namespace geometry {
                 *out++ = pru;
                 *out++ = prv;
                 *out++ = 1./p;
-                *out++ = 1./r;
+                *out++ = (1.-r*m_rmin)/(r*m_rrange);
             }
             // maxima rot90: abs(determinant(jacobian([x,y,-r*v,r*u,p,1/r],[x,y,u,v,r,p]))) = 1;
             return 1;

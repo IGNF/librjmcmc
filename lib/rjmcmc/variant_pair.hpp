@@ -33,7 +33,7 @@ The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
-
+/*
 #ifndef VARIANT_PAIR_HPP
 #define VARIANT_PAIR_HPP
 
@@ -67,15 +67,6 @@ namespace rjmcmc {
         typedef S type;
     };
 
-
-    /*  variant_pairs<boost::variant<Rectangle_2,Circle_2> >::type is a variant over
-	Rectangle_2,
-	Circle_2,
-	std::pair<Rectangle_2,Rectangle_2>,
-	std::pair<Circle_2,Rectangle_2>,
-	std::pair<Circle_2,Circle_2>,
-	std::pair<Rectangle_2,Circle_2>
-*/
     template<BOOST_VARIANT_ENUM_PARAMS(typename T)>
     struct variant_pairs<boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> > {
         typedef boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> T;
@@ -97,3 +88,4 @@ namespace rjmcmc {
 }; // namespace rjmcmc
 
 #endif // VARIANT_PAIR_HPP
+*/

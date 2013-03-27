@@ -82,7 +82,8 @@ class building_footprint_rectangle_gilviewer : public wx_plugin_base, public sim
     //]
 
 private:
-    typedef rjmcmc::any_sampler<configuration> any_sampler;
+    typedef rjmcmc::mt19937_generator Engine;
+    typedef rjmcmc::any_sampler<Engine,configuration> any_sampler;
     typedef simulated_annealing::any_composite_visitor<configuration,any_sampler> any_composite_visitor;
 
     //[building_footprint_rectangle_gilviewer_app_oninit
@@ -174,8 +175,8 @@ public:
         clip_bbox(bbox,dsm_file );
 
         gradient_functor gf(m_param->get<double>("sigmaD"));
-        oriented_gradient_view grad_view(dsm_file,  bbox, gf);
-        m_grad = grad_view.img();
+        oriented_gradient_image grad_image(dsm_file,  bbox, gf);
+        m_grad = grad_image.img();
 
         load_image(dsm_file );
         load_image(mask_file);
@@ -186,7 +187,7 @@ public:
         m_confg_visitor->set_bbox(wxRect(p0,p1));
 
         init_visitor        (m_param,m_visitor);
-        create_configuration(m_param,grad_view,m_config);
+        create_configuration(m_param,grad_image,m_config);
         //<-
         //    estimate_initial_temperature(m_param,100,*m_config);
         //->
@@ -198,10 +199,11 @@ public:
         //    m_config->clear();
 
         any_sampler *sampler = new any_sampler(*m_sampler);
+        Engine& e = rjmcmc::random();
 
         m_thread = new boost::thread(
-                simulated_annealing::optimize<configuration,any_sampler,schedule,end_test,any_composite_visitor>,
-                boost::ref(*m_config), boost::ref(*sampler),
+                simulated_annealing::optimize<Engine,configuration,any_sampler,schedule,end_test,any_composite_visitor>,
+                e, boost::ref(*m_config), boost::ref(*sampler),
                 boost::ref(*m_schedule),   boost::ref(*m_end_test),
                 boost::ref(m_visitor) );
     }

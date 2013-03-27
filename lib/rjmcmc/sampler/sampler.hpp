@@ -95,15 +95,16 @@ namespace rjmcmc {
             inline unsigned int operator()(unsigned int i, const K& k) const { return 0; }
         };
 
-        template<typename Configuration, typename Modification>
+        template<typename Engine, typename Configuration, typename Modification>
         struct kernel_functor
         {
+            Engine& m_e;
             Configuration& m_c;
             Modification& m_m;
             typedef double result_type;
-            kernel_functor(Configuration &c, Modification &m) :m_c(c), m_m(m) {}
+            kernel_functor(Engine& e, Configuration &c, Modification &m) : m_e(e), m_c(c), m_m(m) {}
             template<typename T> inline result_type operator()(double x, const T& t) {
-                return t(x,m_c,m_m);
+                return t(m_e,x,m_c,m_m);
             }
         };
     }
@@ -115,7 +116,7 @@ namespace rjmcmc {
     public:
         /// variadic constructor : d is the reference process, a is the acceptance strategy, RJMCMC_TUPLE_ARGS is the comma-separated list of kernels
         sampler(const Density& d, const Acceptance& a, RJMCMC_TUPLE_ARGS) :
-                m_die(random(), boost::uniform_real<>(0,1)),
+                m_rand(0,1),
                 m_density(d),
                 m_acceptance(a),
                 m_kernel(RJMCMC_TUPLE_PARAMS)
@@ -125,17 +126,17 @@ namespace rjmcmc {
         enum { size = tuple_size<Kernels>::value };
         enum { m_kernel_size = kernel_traits<Kernels>::size };
 
-        /// This is the main sampling function, performing an RJMCMC step on the configuration c in place
-        template<typename Configuration>
-        void operator()(Configuration &c, double temp)
+        /// This is the main sampling function, performing an RJMCMC step on the configuration c in place, using the source of entropy e
+        template<typename Engine, typename Configuration>
+        void operator()(Engine& e, Configuration &c, double temp)
         {
             typedef typename Configuration::modification Modification;
 
             //1 & 2
             Modification modif;
             m_temperature = temp;
-            detail::kernel_functor<Configuration,Modification> kf(c,modif);
-            m_kernel_ratio = random_apply(m_kernel_id,m_die(),m_kernel,kf);
+            detail::kernel_functor<Engine,Configuration,Modification> kf(e,c,modif);
+            m_kernel_ratio = random_apply(m_kernel_id,m_rand(e),m_kernel,kf);
 
             //3
             m_ref_pdf_ratio = m_density.pdf_ratio(c,modif);
@@ -151,7 +152,7 @@ namespace rjmcmc {
             m_acceptance_probability  = m_acceptance(m_delta,m_temperature,m_green_ratio);
 
             //5
-            m_accepted    = ( m_die() < m_acceptance_probability );
+            m_accepted    = ( m_rand(e) < m_acceptance_probability );
             if (m_accepted) c.apply(modif);
         }
 
@@ -170,7 +171,7 @@ namespace rjmcmc {
 
     private:
         // data
-        boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_real<> > m_die;
+        boost::uniform_real<> m_rand;
         Density    m_density;
         Acceptance m_acceptance;
         Kernels    m_kernel;

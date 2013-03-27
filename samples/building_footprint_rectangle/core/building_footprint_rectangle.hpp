@@ -49,7 +49,7 @@ typedef Rectangle_2 object;
 //[building_footprint_rectangle_definition_kernels
 #include "mpp/kernel/kernel.hpp"
 typedef marked_point_process::uniform_birth<object> uniform_birth;
-typedef marked_point_process::result_of_make_uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
+typedef marked_point_process::uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
 
 #include "rjmcmc/kernel/transform.hpp"
 #include "geometry/kernels/rectangle_rotation_scaled_corner_kernel.hpp"
@@ -63,16 +63,16 @@ typedef geometry::rectangle_corner_translation_transform<0>  corner_transform0;
 typedef geometry::rectangle_corner_translation_transform<1>  corner_transform1;
 typedef geometry::rectangle_corner_translation_transform<2>  corner_transform2;
 typedef geometry::rectangle_corner_translation_transform<3>  corner_transform3;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<object,edge_transform0>::type  edge_kernel0;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<object,edge_transform1>::type  edge_kernel1;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<object,edge_transform2>::type  edge_kernel2;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<object,edge_transform3>::type  edge_kernel3;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<object,corner_transform0>::type  corner_kernel0;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<object,corner_transform1>::type  corner_kernel1;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<object,corner_transform2>::type  corner_kernel2;
-typedef marked_point_process::result_of_make_uniform_modification_kernel<object,corner_transform3>::type  corner_kernel3;
 typedef geometry::rectangle_split_merge_transform split_merge_transform;
-typedef marked_point_process::result_of_make_uniform_split_merge_kernel<object,split_merge_transform>::type  split_merge_kernel;
+typedef marked_point_process::uniform_kernel<object,1,1,edge_transform0>::type  edge_kernel0;
+typedef marked_point_process::uniform_kernel<object,1,1,edge_transform1>::type  edge_kernel1;
+typedef marked_point_process::uniform_kernel<object,1,1,edge_transform2>::type  edge_kernel2;
+typedef marked_point_process::uniform_kernel<object,1,1,edge_transform3>::type  edge_kernel3;
+typedef marked_point_process::uniform_kernel<object,1,1,corner_transform0>::type  corner_kernel0;
+typedef marked_point_process::uniform_kernel<object,1,1,corner_transform1>::type  corner_kernel1;
+typedef marked_point_process::uniform_kernel<object,1,1,corner_transform2>::type  corner_kernel2;
+typedef marked_point_process::uniform_kernel<object,1,1,corner_transform3>::type  corner_kernel3;
+typedef marked_point_process::uniform_kernel<object,1,2,split_merge_transform>::type  split_merge_kernel;
 //]
 
 //[building_footprint_rectangle_definition_energies
@@ -80,8 +80,8 @@ typedef marked_point_process::result_of_make_uniform_split_merge_kernel<object,s
 #include "mpp/energy/image_gradient_unary_energy.hpp"
 #include "image/gradient_functor.hpp"
 #include "image/oriented.hpp"
-typedef oriented<gradient_image_t>                          oriented_gradient_view;
-typedef image_gradient_unary_energy<oriented_gradient_view> unary_energy;
+typedef oriented<gradient_image_t>                          oriented_gradient_image;
+typedef image_gradient_unary_energy<oriented_gradient_image> unary_energy;
 
 #include "mpp/energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy<>                   binary_energy;
@@ -165,7 +165,7 @@ void set_bbox(param *p, const Iso_rectangle_2& r) {
 #include "image/conversion_functor.hpp"
 #include <boost/gil/extension/io_new/tiff_write.hpp>
 
-void create_configuration(const param *p, const oriented_gradient_view& grad, configuration *&c) {
+void create_configuration(const param *p, const oriented_gradient_image& grad, configuration *&c) {
     std::string mask_file = p->get<boost::filesystem::path>("mask" ).string();
     if(mask_file!="")
     {
@@ -198,31 +198,41 @@ void create_configuration(const param *p, const oriented_gradient_view& grad, co
 //[building_footprint_rectangle_create_sampler
 void create_sampler(const param *p, sampler *&s) {
     Iso_rectangle_2 r = get_bbox(p);
-    K::Vector_2 v(p->get<double>("maxsize"),p->get<double>("maxsize"));
+    double maxsize  = p->get<double>("maxsize");
+    double maxratio = p->get<double>("maxratio");
+    double minratio = 1./maxratio;
 
+    K::Vector_2 v(maxsize,maxsize);
     uniform_birth birth(
-            Rectangle_2(r.min(),-v,1/p->get<double>("maxratio")),
-            Rectangle_2(r.max(), v,  p->get<double>("maxratio"))
+            Rectangle_2(r.min(),-v,minratio),
+            Rectangle_2(r.max(), v,maxratio)
             );
 
     distribution cs(p->get<double>("poisson"));
 
     d_sampler ds( cs, birth );
 
-    double p_birth = p->get<double>("p_birth");
-    double p_death = p->get<double>("p_death");
-    double p_edge = p->get<double>("p_edge");
-    double p_corner = p->get<double>("p_corner");
+    typedef rjmcmc::mt19937_generator Engine;
+    Engine& e = rjmcmc::random();
+    marked_point_process::graph_configuration<object, constant_energy<>, constant_energy<> > c(1,1);
+    ds(e,c);
+    double p_birthdeath  = p->get<double>("p_birthdeath");
+    double p_birth  = p->get<double>("p_birth");
+    double p_edge   = 0.25*p->get<double>("p_edge");
+    double p_corner = 0.25*p->get<double>("p_corner");
     double p_split_merge = p->get<double>("p_split_merge");
-    birth_death_kernel k_birth_death = marked_point_process::make_uniform_birth_death_kernel(birth, p_birth, p_death );
-    edge_kernel0 k_edge0 = marked_point_process::make_uniform_modification_kernel<object>(edge_transform0(),0.25*p_edge);
-    edge_kernel1 k_edge1 = marked_point_process::make_uniform_modification_kernel<object>(edge_transform1(),0.25*p_edge);
-    edge_kernel2 k_edge2 = marked_point_process::make_uniform_modification_kernel<object>(edge_transform2(),0.25*p_edge);
-    edge_kernel3 k_edge3 = marked_point_process::make_uniform_modification_kernel<object>(edge_transform3(),0.25*p_edge);
-    corner_kernel0 k_corner0 = marked_point_process::make_uniform_modification_kernel<object>(corner_transform0(),0.25*p_corner);
-    corner_kernel1 k_corner1 = marked_point_process::make_uniform_modification_kernel<object>(corner_transform1(),0.25*p_corner);
-    corner_kernel2 k_corner2 = marked_point_process::make_uniform_modification_kernel<object>(corner_transform2(),0.25*p_corner);
-    corner_kernel3 k_corner3 = marked_point_process::make_uniform_modification_kernel<object>(corner_transform3(),0.25*p_corner);
+    double p_split       = p->get<double>("p_split");
+    birth_death_kernel k_birth_death = marked_point_process::make_uniform_birth_death_kernel(birth, p_birthdeath, p_birth );
+    edge_kernel0 k_edge0 = marked_point_process::make_uniform_kernel<object,1,1>(edge_transform0(minratio,maxratio),p_edge);
+    edge_kernel1 k_edge1 = marked_point_process::make_uniform_kernel<object,1,1>(edge_transform1(minratio,maxratio),p_edge);
+    edge_kernel2 k_edge2 = marked_point_process::make_uniform_kernel<object,1,1>(edge_transform2(minratio,maxratio),p_edge);
+    edge_kernel3 k_edge3 = marked_point_process::make_uniform_kernel<object,1,1>(edge_transform3(minratio,maxratio),p_edge);
+    corner_kernel0 k_corner0 = marked_point_process::make_uniform_kernel<object,1,1>(corner_transform0(),p_corner);
+    corner_kernel1 k_corner1 = marked_point_process::make_uniform_kernel<object,1,1>(corner_transform1(),p_corner);
+    corner_kernel2 k_corner2 = marked_point_process::make_uniform_kernel<object,1,1>(corner_transform2(),p_corner);
+    corner_kernel3 k_corner3 = marked_point_process::make_uniform_kernel<object,1,1>(corner_transform3(),p_corner);
+    k_birth_death.name(0,"birth");
+    k_birth_death.name(1,"death");
     k_edge0.name(0,"edge00");
     k_edge0.name(1,"edge01");
     k_edge1.name(0,"edge10");
@@ -241,7 +251,7 @@ void create_sampler(const param *p, sampler *&s) {
     k_corner3.name(1,"corner31");
 
 
-    split_merge_kernel k_split_merge = marked_point_process::make_uniform_split_merge_kernel<object>(split_merge_transform(),p_split_merge);
+    split_merge_kernel k_split_merge = marked_point_process::make_uniform_kernel<object,1,2>(split_merge_transform(),p_split_merge, p_split);
     k_split_merge.name(0,"split");
     k_split_merge.name(1,"merge");
 

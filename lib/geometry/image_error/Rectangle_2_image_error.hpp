@@ -39,10 +39,12 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include "geometry/Rectangle_2.hpp"
 
-template<typename OrientedView, typename K>
-double image_error(const OrientedView&, const geometry::Rectangle_2<K> &) {
-    //TODO
+/*
+//TODO
+template<typename OrientedImage, typename K>
+double image_error(const OrientedImage&, const geometry::Rectangle_2<K> &) {
     return 0;
 }
+*/
 
 #endif // GEOMETRY_RECTANGLE_2_IMAGE_ERROR_HPP

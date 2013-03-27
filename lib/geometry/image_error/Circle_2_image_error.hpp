@@ -76,8 +76,7 @@ struct Circle_2_image_error_functor
             for ( int j = j0 ; j<=j1 ; ++j)
             {
                 if ((x-i)*(x-i)+(y-j)*(y-j)>r*r) continue;
-                double ndvi = v(i,j);
-                res +=(140-ndvi) ;
+                res += v(i,j);
             }
         }
 
@@ -85,8 +84,8 @@ struct Circle_2_image_error_functor
     }
 };
 
-template<typename OrientedView, typename K>
-double image_error(const OrientedView& v, const geometry::Circle_2<K> &c) {
+template<typename OrientedImage, typename K>
+double image_error(const OrientedImage& v, const geometry::Circle_2<K> &c) {
     Circle_2_image_error_functor f(c,v.x0(), v.y0());
     return apply_operation(v.view(), f);
 }

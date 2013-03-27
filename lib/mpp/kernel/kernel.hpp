@@ -51,13 +51,12 @@ namespace marked_point_process {
     template<typename T, unsigned int N=1>
     class uniform_view
     {
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&, boost::uniform_smallint<> > die_type;
     public:
         enum { dimension =  coordinates_iterator<T>::dimension };
         typedef typename coordinates_iterator<T>::type iterator;
         
-        template<typename Configuration, typename Modification, typename OutputIterator>
-        inline double operator()(Configuration& c, Modification& modif, OutputIterator out) const
+        template<typename Engine, typename Configuration, typename Modification, typename OutputIterator>
+        inline double operator()(Engine& e, Configuration& c, Modification& modif, OutputIterator out) const
         {
             unsigned int n = c.size();
             if(n<N) return 0.;
@@ -66,8 +65,8 @@ namespace marked_point_process {
             for(unsigned int i=0;i<N;++i)
             {
                 typename Configuration::iterator it = c.begin();
-                die_type die(rjmcmc::random(), boost::uniform_smallint<>(0,n-1-i));
-                d[i]=die();
+                boost::uniform_smallint<> die(0,n-1-i);
+                d[i]=die(e);
                 for(unsigned int j=0;j<i;++j) if(d[j]<=d[i]) ++d[i];
                 std::advance(it, d[i]);
 
@@ -122,11 +121,13 @@ namespace marked_point_process {
         }
         typedef double result_type;
 
-        result_type operator()(T& t) const
+        // used only be direct_sampler
+        template<typename Engine>
+        result_type operator()(Engine& e, T& t) const
         {
             double val0[dimension];
             double val1[dimension];
-            double phi = m_variate(val0);
+            double phi = m_variate(e, val0);
             m_transform.apply(val0,val1);
             object_from_coordinates<T> creator;
             t = creator(val1);
@@ -155,77 +156,62 @@ namespace marked_point_process {
 
 
     template <typename birth_type>
-            struct result_of_make_uniform_birth_death_kernel
+            struct uniform_birth_death_kernel
     {
-        typedef typename birth_type::object_type object_type;
-        typedef typename birth_type::variate_type variate_type;
-        enum { N = coordinates_iterator<object_type>::dimension };
-        typedef rjmcmc::kernel<
-                rjmcmc::null_view, marked_point_process::uniform_view<object_type>,
-                variate_type, rjmcmc::variate<0>,
-                rjmcmc::diagonal_affine_transform<N,double>
-                > type;
+        typedef typename birth_type::object_type value_type;
+        typedef typename birth_type::transform_type transform_type;
+        enum {
+            N0 = 0,
+            N1 = 1,
+            D0 = transform_type::dimension-N0*coordinates_iterator<value_type>::dimension,
+            D1 = transform_type::dimension-N1*coordinates_iterator<value_type>::dimension
+        };
+        typedef rjmcmc::null_view   view0_type;
+       // typedef uniform_view<value_type,N0>  view0_type;
+        typedef uniform_view<value_type,N1>  view1_type;
+       // typedef typename birth_type::variate_type  variate0_type;
+        typedef rjmcmc::variate<D0> variate0_type;
+        typedef rjmcmc::variate<D1> variate1_type;
+        typedef rjmcmc::kernel<view0_type,view1_type,variate0_type,variate1_type,transform_type> type;
     };
 
     template <typename birth_type>
-            typename result_of_make_uniform_birth_death_kernel<birth_type>::type
-            make_uniform_birth_death_kernel(const birth_type& b, double pbirth, double pdeath)
+            typename uniform_birth_death_kernel<birth_type>::type
+            make_uniform_birth_death_kernel(const birth_type& b, double p, double q = 0.5)
     {
-        typedef result_of_make_uniform_birth_death_kernel<birth_type> result_type;
-        typedef typename result_type::object_type object_type;
-        return typename result_type::type(
-                rjmcmc::null_view(),   uniform_view<object_type>(),
-                b.variate(),           rjmcmc::variate<0>(),
-                b.transform(),
-                pbirth,                pdeath);
+        typedef uniform_birth_death_kernel<birth_type> res;
+        typename res::view0_type view0;
+        typename res::view1_type view1;
+        typename res::variate1_type variate1;
+        return typename res::type(view0,view1,b.variate(),variate1,b.transform(), p, q);
     }
 
-    template <typename T, typename Transform>
-            struct result_of_make_uniform_modification_kernel
+    template <typename T, unsigned int N0, unsigned int N1, typename Transform>
+            struct uniform_kernel
     {
-        enum { N = Transform::dimension-coordinates_iterator<T>::dimension };
-        typedef T                  value_type;
-        typedef uniform_view<T>    view_type;
-        typedef rjmcmc::variate<N> variate_type;
-        typedef rjmcmc::kernel<view_type,view_type,variate_type,variate_type,Transform> type;
-    };
-
-    template <typename T, typename Transform>
-            typename result_of_make_uniform_modification_kernel<T,Transform>::type
-            make_uniform_modification_kernel(const Transform& t, double p)
-    {
-        typedef result_of_make_uniform_modification_kernel<T,Transform> res;
-        typename res::view_type view;
-        typename res::variate_type variate;
-        return typename res::type(view,view,variate,variate,t, p*0.5, p*0.5);
-    }
-
-
-    template <typename T, typename Transform>
-            struct result_of_make_uniform_split_merge_kernel
-    {
+        typedef T value_type;
         enum {
-            N0 = Transform::dimension-  coordinates_iterator<T>::dimension,
-            N1 = Transform::dimension-2*coordinates_iterator<T>::dimension,
+            D0 = Transform::dimension-N0*coordinates_iterator<value_type>::dimension,
+            D1 = Transform::dimension-N1*coordinates_iterator<value_type>::dimension
         };
-        typedef T                   value_type;
-        typedef uniform_view<T>     view0_type;
-        typedef uniform_view<T,2>   view1_type;
-        typedef rjmcmc::variate<N0> variate0_type;
-        typedef rjmcmc::variate<N1> variate1_type;
+        typedef uniform_view<value_type,N0>  view0_type;
+        typedef uniform_view<value_type,N1>  view1_type;
+        typedef rjmcmc::variate<D0> variate0_type;
+        typedef rjmcmc::variate<D1> variate1_type;
         typedef rjmcmc::kernel<view0_type,view1_type,variate0_type,variate1_type,Transform> type;
     };
 
-    template <typename T, typename Transform>
-            typename result_of_make_uniform_split_merge_kernel<T,Transform>::type
-            make_uniform_split_merge_kernel(const Transform& t, double p)
+
+    template <typename T, unsigned int N0, unsigned int N1, typename Transform>
+            typename uniform_kernel<T,N0,N1,Transform>::type
+            make_uniform_kernel(const Transform& t, double p, double q = 0.5)
     {
-        typedef result_of_make_uniform_split_merge_kernel<T,Transform> res;
+        typedef uniform_kernel<T,N0,N1,Transform> res;
         typename res::view0_type view0;
         typename res::view1_type view1;
         typename res::variate0_type variate0;
         typename res::variate1_type variate1;
-        return typename res::type(view0,view1,variate0,variate1,t, p*0.5, p*0.5);
+        return typename res::type(view0,view1,variate0,variate1,t, p, q);
     }
 
 }; // namespace rjmcmc

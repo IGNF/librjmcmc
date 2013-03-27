@@ -43,27 +43,25 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
 
-template<typename K, typename OrientedView, typename Segment>
-double integrated_flux(const OrientedView& v, const Segment& s0)
+template<typename K, typename OrientedImage, typename Segment, typename Functor>
+void integrated_flux(const OrientedImage& v, const Segment& s0, Functor& f)
 {
-    typedef typename OrientedView::view_t view_t;
+    typedef typename OrientedImage::view_t view_t;
     typedef typename view_t::xy_locator xy_locator;
 
     view_t view = v.view();
     int x0 = v.x0();
     int y0 = v.y0();
 
-    //    typedef view_t::pixel_t pixel_t;
-    typedef boost::gil::dev2n32F_pixel_t pixel_t;
-
     int x1 = x0+view.width();
     int y1 = y0+view.height();
     Segment s(s0);
     typename K::Iso_rectangle_2 bbox(x0,y0,x1,y1);
-    if(!clip(bbox,s)) return 0;
+    if(!clip(bbox,s)) return;
+
     geometry::Segment_2_iterator<K> it(s);
 
-    xy_locator loc_grad = view.xy_at(
+    xy_locator loc = view.xy_at(
             (typename xy_locator::x_coord_t) (it.x()-x0),
             (typename xy_locator::y_coord_t) (it.y()-y0)
             );
@@ -72,41 +70,46 @@ double integrated_flux(const OrientedView& v, const Segment& s0)
         boost::gil::point2<std::ptrdiff_t> (it.step(0), 0),
         boost::gil::point2<std::ptrdiff_t> (0, it.step(1))
     };
-    typename K::Vector_2 arete(s.target()-s.source());
-    typename K::Vector_2 normale = arete.perpendicular(geometry::NEGATIVE);
-    double res = 0.;
+    typename K::Vector_2 edge(s.target()-s.source());
+    typename K::Vector_2 normal(edge.y(),-edge.x());
     for (; !it.end() ; ++it)
     {
         if(it.x()>=x0 && it.x()<x1 && it.y()>=y0 && it.y()<y1) {
             typename K::RT length = it.length();
-            const pixel_t& grad = *loc_grad;
-            typename K::Vector_2 g(boost::gil::at_c<0> (grad), boost::gil::at_c<1> (grad));
-            // res += std::abs(length * geometry::to_double(normale * g))-2.;
-            res += length * (geometry::to_double(normale * g));
+            f(length,normal,loc);
         }
-        loc_grad += movement[it.axis()];
+        loc += movement[it.axis()];
     }
-
-    return res;
 }
 
-template<typename OrientedView, typename K>
-double integrated_flux(const OrientedView& view, const geometry::Rectangle_2<K>& r)
+
+class Flux_functor
 {
-    return  integrated_flux<K>(view,r.segment(0)) +
-            integrated_flux<K>(view,r.segment(1)) +
-            integrated_flux<K>(view,r.segment(2)) +
-            integrated_flux<K>(view,r.segment(3));
-}
+public:
+    template<typename RT, typename Vector, typename Locator>
+    void operator()(RT length, const Vector& normal, const Locator& loc)
+    {
+        Vector g(boost::gil::at_c<0> (*loc), boost::gil::at_c<1> (*loc));
+        double dot = length*geometry::to_double(normal * g);
+        // res += std::abs(dot)-2.;
+        m_value += std::max(0.,dot);
+    }
+    Flux_functor() : m_value(0) {}
+    double value() const { return m_value; }
+private:
+    double m_value;
+};
 
-/*
-template<typename View, typename K> double inverted_integrated_flux(const View& view, int x0, int y0, const geometry::Rectangle_2<K>& r)
+
+template<typename OrientedImage, typename K>
+double integrated_flux(const OrientedImage& view, const geometry::Rectangle_2<K>& r)
 {
-        return 	  std::max(0.,-integrated_flux(view,x0,y0,r.segment(0)))
-                + std::max(0.,-integrated_flux(view,x0,y0,r.segment(1)))
-                + std::max(0.,-integrated_flux(view,x0,y0,r.segment(2)))
-                + std::max(0.,-integrated_flux(view,x0,y0,r.segment(3)));
+    Flux_functor f;
+    integrated_flux<K>(view,r.segment(0),f);
+    integrated_flux<K>(view,r.segment(1),f);
+    integrated_flux<K>(view,r.segment(2),f);
+    integrated_flux<K>(view,r.segment(3),f);
+    return f.value();
 }
-*/
 
 #endif // GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_HPP

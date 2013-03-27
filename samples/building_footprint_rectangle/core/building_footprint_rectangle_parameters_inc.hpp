@@ -56,11 +56,12 @@ void initialize_parameters(T* params)
     params->template insert<double>("poisson",'p',200, "Poisson processus parameter");
     params->template insert<double>("maxsize",'m',20, "Maximum rectangle size");
     params->template insert<double>("maxratio",'M',5, "Maximum rectangle aspect ratio");
-    params->template insert<double>("p_birth",'B',1, "Birth Kernel probability");
-    params->template insert<double>("p_death",'D',1, "Death Kernel probability");
+    params->template insert<double>("p_birthdeath",'B',1, "Birth Kernel probability");
     params->template insert<double>("p_edge",'E',4, "Edge Transform Kernel probability");
     params->template insert<double>("p_corner",'C',4, "Corner Transform Kernel probability");
-    params->template insert<double>("p_split_merge",'S',1, "Split Merge Kernel probability");
+    params->template insert<double>("p_split_merge",'\0',1, "Split Merge Kernel probability");
+    params->template insert<double>("p_birth",'b',0.5, "Birth probability");
+    params->template insert<double>("p_split",'\0',0.5, "Split probability");
     params->template insert<double>("ponderation_surface",'s',10, "Intersection area weight");
     params->template insert<double>("energy",'e',250, "Cost of an object");
     params->template insert<double>("ponderation_grad",'\0',1, "Image gradient energy weight");

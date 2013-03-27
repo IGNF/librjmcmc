@@ -77,10 +77,10 @@ void Add8CirclePoints(const View& view, double cx, double cy, double dx, double 
 	Add1CirclePoints(view, cx, cy, dy,-dx, d, res, w);
 }
 
-template<typename OrientedView, typename K>
-double integrated_flux(const OrientedView& v, const geometry::Circle_2<K> &c)
+template<typename OrientedImage, typename K>
+double integrated_flux(const OrientedImage& v, const geometry::Circle_2<K> &c)
 {
-	typedef typename OrientedView::view_t view_t;
+        typedef typename OrientedImage::view_t view_t;
     view_t view(v.view());
 	int x0 = v.x0();
 	int y0 = v.y0();

@@ -37,7 +37,6 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef UNIFORM_DISTRIBUTION_HPP
 #define UNIFORM_DISTRIBUTION_HPP
 
-#include "rjmcmc/random.hpp"
 #include <boost/random/uniform_smallint.hpp>
 // boost::math::uniform is not used as it is linked to real values rather than discrete integral values
 
@@ -49,10 +48,9 @@ namespace rjmcmc {
         typedef double real_type;
         typedef int    int_type;
         typedef boost::uniform_smallint<int_type> rand_distribution_type;
-        typedef boost::variate_generator<rjmcmc::mt19937_generator&,rand_distribution_type> variate_generator_type;
 
         uniform_distribution(int_type a, int_type b)
-            : m_variate(rjmcmc::random(),rand_distribution_type(a,b))
+            : m_rand(a,b)
             , m_pdf(real_type(1)/(b-a+1)) {}
 
         // new/old
@@ -67,11 +65,11 @@ namespace rjmcmc {
             return m_pdf * (m_variate.distribution().min() <= n && n <= m_variate.distribution().max() );
         }
 
-        inline int_type operator()() const { return m_variate(); }
+        template<typename Engine>
+        inline int_type operator()(Engine& e) const { return m_rand(e); }
 
     private:
-        mutable // because boost::poisson_distribution::operator()(Engine&) is non-const
-        variate_generator_type m_variate;
+        rand_distribution_type m_rand;
         real_type m_pdf;
     };
 
