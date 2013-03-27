@@ -36,10 +36,14 @@ void Legend::Draw(wxDC &dc, wxRect rc, DatasetArray &datasets)
 	wxCoord x = rc.x + m_margin;
 	wxCoord y = rc.y + m_margin;
 
-	for (size_t n = 0; n < datasets.Count(); n++) {
+
+        wxFont unselected(dc.GetFont());
+        wxFont   selected(*wxITALIC_FONT);
+        for (size_t n = 0; n < datasets.Count(); n++) {
 		Dataset *dataset = datasets[n];
 
 		FOREACH_SERIE(serie, dataset) {
+                        dc.SetFont(selected);
 			wxString serieName = dataset->GetSerieName(serie);
 			wxSize textExtent = dc.GetTextExtent(serieName);
 
@@ -50,7 +54,7 @@ void Legend::Draw(wxDC &dc, wxRect rc, DatasetArray &datasets)
 
 			wxCoord textX = x + rcSymbol.width + m_symbolTextGap;
 
-			dc.DrawText(serieName, textX, y);
+                        dc.DrawText(serieName, textX, y);
 
 			y += textExtent.y + labelsSpacing;
 		}

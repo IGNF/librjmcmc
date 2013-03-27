@@ -14,7 +14,8 @@
 WX_DEFINE_EXPORTED_OBJARRAY(wxDoubleArray);
 
 
-VectorDataset::VectorDataset() : m_scaleX(1.), m_X0(1.)
+VectorDataset::VectorDataset(const wxString& name)
+    : m_scaleX(1.), m_X0(1.), m_name(name)
 {
 }
 
@@ -44,5 +45,5 @@ size_t VectorDataset::GetSerieCount()
 
 wxString VectorDataset::GetSerieName(size_t serie)
 {
-	return wxEmptyString;
+        return m_name;
 }

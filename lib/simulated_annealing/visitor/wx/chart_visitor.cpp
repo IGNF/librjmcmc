@@ -65,83 +65,120 @@ namespace simulated_annealing {
                 END_EVENT_TABLE();
 
         chart_visitor::chart_visitor(wxWindow *parent, wxWindowID id, const wxString& charttitle, const wxPoint& pos, const wxSize& size, long style) :
-                m_frame(new chart_frame(parent, id, charttitle, pos, size, style))
+                m_frame(new chart_frame(parent, id, charttitle, pos, size, style)), m_proposed(NULL), m_accepted(NULL)
         {
             m_frame->SetIcon(wxICON(IGN));
 
             wxBoxSizer *test_sizer = new wxBoxSizer(wxVERTICAL);
             wxBoxSizer* inner_sizer = new wxBoxSizer(wxVERTICAL);
 
-            wxChartPanel* wnd = new wxChartPanel(m_frame.get());
-            XYPlot *plot = new XYPlot();
+            m_panel = new wxChartPanel(m_frame.get());
+            m_panel->SetScrollbars(20, 20, 50, 50);
 
-            wxColour color[] = { wxColour(0,0,255), wxColour(255,0,0) };
-            char * title[] = { (char *)"Energy", (char *)"Temperature" };
-            AXIS_LOCATION location[] = { AXIS_LEFT, AXIS_RIGHT };
+            m_panel->SetSizer(inner_sizer);
+            m_panel->SetAutoLayout(true);
+            m_panel->Layout();
 
-            // add dynamic datasets and axes with line renderers
-
-            // create bottom number axis
-            NumberAxis *iterations_axis = new NumberAxis(AXIS_BOTTOM);
-            iterations_axis->SetTitle(wxT("Iterations"));
-            iterations_axis->IntegerValues();
-            plot->AddAxis(iterations_axis);
-
-            // link axes and datasets
-            for(unsigned int i=0; i<2; ++i) {
-		m_dataset[i] = new VectorDataset;
-		XYLineStepRenderer *renderer = new XYLineStepRenderer();
-		renderer->SetSerieColour(0, &color[i]);
-		m_dataset[i]->SetRenderer(renderer);
-		plot->AddDataset(m_dataset[i]);
-		NumberAxis *axis = new NumberAxis(location[i]);
-                axis->SetTitle(wxString(title[i], *wxConvCurrent));
-		axis->SetLabelTextColour(color[i]);
-		axis->SetTitleColour(color[i]);
-		plot->AddAxis(axis);
-		plot->LinkDataVerticalAxis(i, i);
-		plot->LinkDataHorizontalAxis(i, 0);
-		if(i==1) axis->SetFixedMin(0);
-            }
-
-            // and finally create chart
-            Chart *chart = new Chart(plot);
-
-            wnd->SetChart(chart);
-            wnd->SetScrollbars(20, 20, 50, 50);
-
-            wnd->SetSizer(inner_sizer);
-            wnd->SetAutoLayout(true);
-            wnd->Layout();
-
-            test_sizer->Add(wnd, 1, wxEXPAND | wxALL, 5);
+            test_sizer->Add(m_panel, 1, wxEXPAND | wxALL, 5);
             m_frame->SetSizer(test_sizer);
             m_frame->Show();
         }
 
 
-        void chart_visitor::clear()
+        void chart_visitor::clear(const std::vector<std::string>& kernel_name )
         {
-            wxMutexGuiEnter();
+            unsigned int kernel_size =  kernel_name.size();
+            if(m_accepted) delete m_accepted;
+            if(m_proposed) delete m_proposed;
+            m_accepted = new unsigned int[kernel_size];
+            m_proposed = new unsigned int[kernel_size];
+            for (unsigned int i=0; i<kernel_size; ++i) m_accepted[i] = m_proposed[i] = 0;
+
+
+            // create bottom number axis
+            NumberAxis *iterations_axis = new NumberAxis(AXIS_BOTTOM);
+            iterations_axis->SetTitle(wxT("Iterations"));
+            iterations_axis->IntegerValues();
+
+            m_dataset.resize(kernel_size+2);
+
+            XYPlot *plot = new XYPlot();
+            plot->AddAxis(iterations_axis);
+
+            wxColour color[2] = { wxColour(0,0,255), wxColour(255,0,0) };
+            std::string title[2] = { "Energy", "Temperature" };
+
+            // create axes
             for(unsigned int i=0; i<2; ++i) {
-		m_dataset[i]->SetX0(0.);
-		m_dataset[i]->SetScaleX(m_dump);
-		m_dataset[i]->Clear();
+                wxColour& col =color[i];
+                wxString s(title[i].c_str(), *wxConvCurrent);
+                NumberAxis *axis = new NumberAxis(AXIS_LEFT);
+                //axis->SetTitle(s);
+                axis->SetLabelTextColour(col);
+                axis->SetTitleColour(col);
+                if(i) axis->SetFixedMin(0);
+                plot->AddAxis(axis);
+                m_dataset[i] = new VectorDataset(s);
+                m_dataset[i]->SetX0(0.);
+                m_dataset[i]->SetScaleX(m_dump);
+                m_dataset[i]->Clear();
+                XYLineStepRenderer *renderer = new XYLineStepRenderer();
+                renderer->SetSerieColour(0, color+i);
+                m_dataset[i]->SetRenderer(renderer);
+                plot->AddDataset(m_dataset[i]);
+                plot->LinkDataVerticalAxis(i, i);
+                plot->LinkDataHorizontalAxis(i, 0);
             }
+
+            NumberAxis *acceptance = new NumberAxis(AXIS_RIGHT);
+            //acceptance->SetTitle(wxString("Acceptance", *wxConvCurrent));
+            acceptance->SetFixedMin(0);
+            acceptance->SetFixedMax(100);
+            plot->AddAxis(acceptance);
+
+            // create and link datasets
+            for(unsigned int i=0; i<kernel_size; ++i) {
+                int r = rand()%255;
+                int g = rand()%255;
+                int b = rand()%255;
+                wxColour col(r,g,b);
+                wxString s(kernel_name[i].c_str(), *wxConvCurrent);
+                m_dataset[i+2] = new VectorDataset(s);
+                m_dataset[i+2]->SetX0(0.);
+                m_dataset[i+2]->SetScaleX(m_dump);
+                m_dataset[i+2]->Clear();
+                XYLineStepRenderer *renderer = new XYLineStepRenderer();
+                renderer->SetSerieColour(0, &col);
+                m_dataset[i+2]->SetRenderer(renderer);
+                plot->AddDataset(m_dataset[i+2]);
+                plot->LinkDataVerticalAxis(i+2, 2);
+                plot->LinkDataHorizontalAxis(i+2, 0);
+            }
+
+            plot->SetLegend(new Legend(wxCENTER,wxRIGHT));
+            // and finally create chart
+            Chart *chart = new Chart(plot);
+            m_panel->SetAntialias(true);
+            wxMutexGuiEnter();
+            m_panel->SetChart(chart);
             wxMutexGuiLeave();
         }
 
-        void chart_visitor::add(double e, double t)
+        void chart_visitor::add(int i, double val)
         {
-            wxMutexGuiEnter();
-            m_dataset[0]->Add(e);
-            m_dataset[1]->Add(t);
-            wxMutexGuiLeave();
+            if(m_dataset[i]) m_dataset[i]->Add(val);
         }
 
         void chart_visitor::Show(bool b) { m_frame->Show(b); }
         bool chart_visitor::IsShown() const { return m_frame->IsShown(); }
-
+        void chart_visitor::begin_update() {
+            wxMutexGuiEnter();
+            m_panel->GetChart()->GetPlot()->BeginUpdate();
+        }
+        void chart_visitor::end_update() {
+            m_panel->GetChart()->GetPlot()->EndUpdate();
+            wxMutexGuiLeave();
+        }
     } // namespace wx
 } // namespace simulated_annealing
 

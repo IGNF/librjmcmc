@@ -28,7 +28,7 @@ public:
 	 * @param _name name of dataset
 	 * @param autoUpdate if true any changes in data will fire dataset updated event
 	 */
-	VectorDataset();
+        VectorDataset(const wxString& name = wxEmptyString);
 	virtual ~VectorDataset();
 
 	virtual size_t GetSerieCount();
@@ -95,6 +95,7 @@ public:
 private:
 	wxDoubleArray m_values;
 	double m_scaleX, m_X0;
+        wxString m_name;
 };
 
 #endif /*VECTORDATASET_H_*/

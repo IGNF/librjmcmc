@@ -38,17 +38,19 @@ knowledge of the CeCILL license and that you accept its terms.
 #define WX_CHART_VISITOR_HPP
 
 class VectorDataset;
+class wxChartPanel;
 
 #include <boost/shared_ptr.hpp>
 
 
 #ifdef WIN32
-	#pragma warning(disable : 4251)
-	#pragma warning(disable : 4275)
-    #include <wx/msw/winundef.h>
+#pragma warning(disable : 4251)
+#pragma warning(disable : 4275)
+#include <wx/msw/winundef.h>
 #endif
 #include <wx/window.h>
 #include <wx/toplevel.h>
+#include <vector>
 
 namespace simulated_annealing {
     namespace wx {
@@ -75,33 +77,58 @@ namespace simulated_annealing {
             template<typename Configuration, typename Sampler>
             void begin(const Configuration& config, const Sampler& sampler, double t)
             {
-                clear();
-                add(config.energy(),t);
+                unsigned int kernel_size =  sampler.kernel_size();
+                std::vector<std::string> kernel_name(kernel_size);
+                for (unsigned int i=0; i<kernel_size; ++i) kernel_name[i] = sampler.kernel_name(i);
+                clear(kernel_name);
+                update(config,sampler,t);
             }
             template<typename Configuration, typename Sampler>
             void end(const Configuration& config, const Sampler& sampler, double t)
             {
-                add(config.energy(),t);
+                update(config,sampler,t);
             }
 
             template<typename Configuration, typename Sampler>
             void visit(const Configuration& config, const Sampler& sampler, double t) {
+                m_proposed[sampler.kernel_id()]++;
+                if( sampler.accepted() ) m_accepted[sampler.kernel_id()]++;
                 if(++m_iter==m_dump)
                 {
                     m_iter = 0;
-                    add(config.energy(),t);
+                    update(config,sampler,t);
                 }
+            }
+            template<typename Configuration, typename Sampler>
+            void update(const Configuration& config, const Sampler& sampler, double t) {
+                begin_update();
+                unsigned int kernel_size =  sampler.kernel_size();
+                add(0,config.energy());
+                add(1,t);
+                unsigned int total_accepted =0;
+                for(unsigned int k=0; k<kernel_size; ++k)
+                {
+                    add(k+2,(m_proposed[k])?(100.* m_accepted[k]) / m_proposed[k]:0);
+                    total_accepted += m_accepted[k];
+                    m_accepted[k] = m_proposed[k] = 0;
+                }
+                end_update();
             }
             void Show(bool b = true);
             bool IsShown() const;
 
         private:
             boost::shared_ptr<chart_frame> m_frame;
-            VectorDataset *m_dataset[2];
+            std::vector<VectorDataset *> m_dataset;
+            wxChartPanel* m_panel;
+            unsigned int *m_proposed;
+            unsigned int *m_accepted;
             unsigned int m_dump, m_iter;
 
-            void clear();
-            void add(double e, double t);
+            void clear(const std::vector<std::string> &kernel_name);
+            void add(int i, double val);
+            void begin_update();
+            void end_update();
         };
 
     } // namespace wx

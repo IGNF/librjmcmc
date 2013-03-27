@@ -44,6 +44,20 @@ public:
 	Plot();
 	virtual ~Plot();
 
+        /**
+         * Called to begin dataset update.
+         * Each call must have corresponding EndUpdate call.
+         * Increment dataset update counter.
+         */
+        void BeginUpdate();
+
+        /**
+         * Called to end dataset update.
+         * Decrement dataset update counter, and fires
+         * DatasetChanged event when counter equal zero.
+         */
+        void EndUpdate();
+
 	/**
 	 * Draws plot
 	 * @param dc device context
@@ -95,13 +109,14 @@ protected:
 	 */
 	virtual void DrawData(wxDC &dc, wxRect rc) = 0;
 
-	FIRE_WITH_THIS(PlotNeedRedraw);
+        FIRE_WITH_THIS_UNLESS_UPDATING(PlotNeedRedraw);
 
 private:
 	wxFont m_textNoDataFont;
 	wxString m_textNoData;
 
 	AreaDraw *m_background;
+        bool m_updating;
 };
 
 #endif /*PLOT_H_*/

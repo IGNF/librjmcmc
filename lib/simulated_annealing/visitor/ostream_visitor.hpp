@@ -83,8 +83,9 @@ namespace simulated_annealing {
             for(unsigned int i=0; i<kernel_size; ++i)
             {
                 std::string s = sampler.kernel_name(i);
-                m_out << std::setw(w)<<("P"+s);
-                m_out << std::setw(w)<<("A"+s);
+                   m_out << std::setw(w)<<s;
+             //   m_out << std::setw(w)<<("P"+s);
+             //   m_out << std::setw(w)<<("A"+s);
             }
             m_out << std::setw(w)<<"Accept"<< std::setw(w)<<"Time(ms)";
             m_out << std::setw(w)<<"Temp"<< std::setw(w)<<"U_1";

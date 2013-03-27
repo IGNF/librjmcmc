@@ -25,6 +25,7 @@ Plot::Plot()
 	m_textNoData = wxT("No data");
 
 	m_background = new NoAreaDraw();
+        m_updating = false;
 }
 
 Plot::~Plot()
@@ -32,6 +33,18 @@ Plot::~Plot()
 	wxDELETE(m_background);
 }
 
+void Plot::BeginUpdate()
+{
+        m_updating = true;
+}
+
+void Plot::EndUpdate()
+{
+        if (m_updating) {
+                m_updating = false;
+                FirePlotNeedRedraw();
+        }
+}
 void Plot::Draw(wxDC &dc, wxRect rc)
 {
 	m_background->Draw(dc, rc);

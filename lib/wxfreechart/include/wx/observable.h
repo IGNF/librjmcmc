@@ -90,9 +90,17 @@ protected:
 
 #define FIRE_WITH_THIS(proc) void Fire##proc()						\
 {																	\
-	for (std::vector<Observer*>::iterator it = observers.begin();	\
-	     it < observers.end(); it++)								\
-		(*it)->proc(this);											\
+        for (std::vector<Observer*>::iterator it = observers.begin();	\
+             it < observers.end(); it++)								\
+                (*it)->proc(this);											\
+}
+
+#define FIRE_WITH_THIS_UNLESS_UPDATING(proc) void Fire##proc()						\
+{																	\
+        if (m_updating) return;                                 \
+        for (std::vector<Observer*>::iterator it = observers.begin();	\
+             it < observers.end(); it++)								\
+                (*it)->proc(this);											\
 }
 
 #define FIRE_VOID(proc) void Fire##proc()						\
