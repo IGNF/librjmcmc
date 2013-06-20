@@ -68,7 +68,7 @@ typedef marked_point_process::direct_sampler<distribution,uniform_birth> referen
 #include "rjmcmc/acceptance/metropolis_acceptance.hpp"
 #include "rjmcmc/sampler/sampler.hpp"
 typedef rjmcmc::metropolis_acceptance                                                  acceptance;
-typedef marked_point_process::result_of_make_uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
+typedef marked_point_process::uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
 typedef rjmcmc::sampler<reference_process,acceptance,birth_death_kernel>                       sampler;
 //]
 
@@ -131,8 +131,11 @@ int main(int argc , char** argv)
     simulated_annealing::composite_visitor< simulated_annealing::ostream_visitor,simulated_annealing::tex_visitor> visitor(osvisitor,texvisitor);
 #endif
 
+    typedef rjmcmc::mt19937_generator Engine;
+    Engine& e = rjmcmc::random();
+
     visitor.init(nbdump,nbsave);
-    simulated_annealing::optimize(c,samp,sch,end,visitor);
+    simulated_annealing::optimize(e,c,samp,sch,end,visitor);
 
     return 0;
 }
