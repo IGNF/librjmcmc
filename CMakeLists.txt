@@ -35,7 +35,7 @@ option(BUILD_SHARED_EXE  "Dynamic executables" ON)
 #########################################################
 #            C++0x Variadic template OPTION           ###
 #########################################################
-option(VARIADIC_TEMPLATES "Enable variadic template implementation" OFF)
+option(VARIADIC_TEMPLATES "Enable variadic template implementation" ON)
 if(VARIADIC_TEMPLATES)
   add_definitions("-DUSE_VARIADIC_TEMPLATES=1")
   add_definitions("-std=c++0x")

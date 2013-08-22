@@ -102,8 +102,8 @@ namespace simulated_annealing {
             clock_t clock_end = clock();
             m_out << "Iterations finished" << std::endl;
             m_out << "Total elapsed time (s) :  " << double(clock_end - m_clock_begin) / CLOCKS_PER_SEC << std::endl;
-            m_out << "Graph Data energy integrity : " << config.audit_unary_energy() - config.unary_energy() << std::endl;
-            m_out << "Graph Prior energy integrity: " << config.audit_binary_energy() - config.binary_energy()<< std::endl;
+            m_out << "Graph Data energy integrity : " << config.audit_unary_energy() << "=" << config.unary_energy() << std::endl;
+            m_out << "Graph Prior energy integrity: " << config.audit_binary_energy() << "=" << config.binary_energy()<< std::endl;
             m_out << "Graph Structure integrity : " << config.audit_structure() << std::endl;
           //  m_out << config;
             m_out << std::endl << std::flush;

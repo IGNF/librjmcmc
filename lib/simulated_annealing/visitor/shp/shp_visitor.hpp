@@ -110,6 +110,20 @@ private:
 namespace simulated_annealing {
     namespace shp {
 
+        class shp_visitor_functor
+        {
+            shp_writer& writer_;
+        public:
+            inline operator bool() { return writer_; }
+            shp_visitor_functor(shp_writer& w) : writer_(w)
+            {
+            }
+            template<typename T> void operator()(const T& t) const
+            {
+                rjmcmc::apply_visitor(writer_,t);
+            }
+        };
+
         class shp_visitor
         {
         public:
@@ -154,11 +168,8 @@ namespace simulated_annealing {
                     std::cout << "\tUnable to create SHP " << oss.str() << std::endl;
                     return;
                 }
-                typename Configuration::const_iterator it = config.begin(), end = config.end();
-                for (; it != end; ++it)
-                {
-                    rjmcmc::apply_visitor(writer,config[it]);
-                }
+                shp_visitor_functor f(writer);
+                config.for_each(f);
             }
         };
 

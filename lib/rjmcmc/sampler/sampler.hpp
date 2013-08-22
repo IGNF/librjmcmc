@@ -153,7 +153,7 @@ namespace rjmcmc {
 
             //5
             m_accepted    = ( m_rand(e) < m_acceptance_probability );
-            if (m_accepted) c.apply(modif);
+            if (m_accepted) modif.apply(c);
         }
 
     public:

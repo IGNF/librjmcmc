@@ -50,11 +50,15 @@ namespace marked_point_process {
 	BinaryEnergy	m_binary_energy;
 	Accelerator	m_accelerator;
     public:
-	typedef T					value_type;
+        typedef T					variant_type;
+//	typedef boost::variant<T>       		variant_type;
 	typedef vector_configuration<T,UnaryEnergy, BinaryEnergy, Accelerator> self;
-	typedef internal::modification<self>	        modification;
-	typedef	typename container::const_iterator	const_iterator;
-	typedef	typename container::iterator		iterator;
+        typedef internal::modification<self>	        modification;
+
+
+        template <typename U> struct const_iterator { typedef typename container::const_iterator type; };
+        template <typename U> struct iterator       { typedef typename container::iterator       type; };
+
 
 	vector_configuration(UnaryEnergy unary_energy, BinaryEnergy binary_energy, Accelerator accelerator=Accelerator()) : m_unary_energy(unary_energy), m_binary_energy(binary_energy), m_accelerator(accelerator)
 	{}
@@ -67,7 +71,7 @@ namespace marked_point_process {
 	double unary_energy() const
 	{
             double e = 0.;
-            for (const_iterator it = begin(); it != end(); ++it)
+            for (typename const_iterator<T>::type it = begin<T>(); it != end<T>(); ++it)
                 e += rjmcmc::apply_visitor(m_unary_energy, *it );
             return e;
 	}
@@ -75,22 +79,21 @@ namespace marked_point_process {
 	double binary_energy() const
 	{
             double e = 0.;
-            for (const_iterator i = begin(); i != end(); ++i)
-                for (const_iterator j = i+1; j != end(); ++j)
+            for (typename const_iterator<T>::type i = begin<T>(); i != end<T>(); ++i)
+                for (typename const_iterator<T>::type j = i+1; j != end<T>(); ++j)
                     e += rjmcmc::apply_visitor(m_binary_energy, *i, *j );
             return e;
 	}
 
 	// objects
 	inline size_t size() const { return m_container.size(); }
-	inline bool empty() const {	return m_container.empty(); }
-	inline iterator begin() { return m_container.begin(); }
-	inline iterator end  () { return m_container.end(); }
-	inline const_iterator begin() const { return m_container.begin(); }
-	inline const_iterator end  () const { return m_container.end(); }
-	inline const value_type& operator[]( const_iterator v ) const { return *v; }
-	inline const value_type& value( const_iterator v ) const { return *v; }
-	inline double energy( const_iterator v ) const { return rjmcmc::apply_visitor(m_unary_energy,*v); }
+        inline bool empty() const {	return m_container.empty(); }
+        template<typename U> inline size_t size() const { return m_container.size(); }
+        template<typename U> inline typename iterator<U>::type begin() { return m_container.begin(); }
+        template<typename U> inline typename iterator<U>::type end  () { return m_container.end  (); }
+        template<typename U> inline typename const_iterator<U>::type begin() const { return m_container.begin(); }
+        template<typename U> inline typename const_iterator<U>::type end  () const { return m_container.end  (); }
+        inline const variant_type& value( typename const_iterator<T>::type v ) const { return *v; }
 
 	// evaluators
 
@@ -110,7 +113,7 @@ namespace marked_point_process {
             dci dend = modif.death_end();
             for(bci it=bbeg; it!=bend; ++it) {
                 delta += rjmcmc::apply_visitor(m_unary_energy,*it);
-                for (const_iterator it2=begin(); it2 != end(); ++it2)
+                for (typename const_iterator<T>::type it2=begin<T>(); it2 != end<T>(); ++it2)
                     if (std::find(dbeg,dend,it2)==dend)
                         delta += rjmcmc::apply_visitor(m_binary_energy, *it, value(it2) );
                 for (bci it2=it+1; it2 != bend; ++it2)
@@ -126,9 +129,8 @@ namespace marked_point_process {
             dci dbeg = modif.death_begin();
             dci dend = modif.death_end();
             for(dci it=dbeg; it!=dend; ++it) {
-                iterator v = *it;
-                delta -= energy(v);
-                for (const_iterator it2=begin(); it2 != end(); ++it2)
+                delta -= rjmcmc::apply_visitor(m_unary_energy, value(*it));
+                for (typename const_iterator<T>::type it2=begin<T>(); it2 != end<T>(); ++it2)
                     if(std::find(it,dend,it2)==dend)
                         delta -= rjmcmc::apply_visitor(m_binary_energy, value(*it), *it2 );
             }
@@ -150,13 +152,17 @@ namespace marked_point_process {
 
 	inline void clear() { m_container.clear(); }
 
-	void insert(const value_type &obj) { 
-            m_container.push_back(obj);
+        template<typename U>
+        void insert(const U&u) {
+            m_container.push_back(u);
 	}
-	void remove( iterator v ) {
+        void remove( typename iterator<T>::type  v ) {
             std::swap(*v,m_container.back());
             m_container.pop_back();
 	}
+
+        template<typename F> inline void for_each(F f)       { std::for_each(m_container.begin(),m_container.end(),f); }
+        template<typename F> inline void for_each(F f) const { std::for_each(m_container.begin(),m_container.end(),f); }
 
 	// audit
 	inline double audit_unary_energy () const { return unary_energy();}
@@ -164,20 +170,6 @@ namespace marked_point_process {
 	inline unsigned int audit_structure() const { return 0; }
     };
 
-
-    template<typename T, typename U, typename B, typename A>
-    std::ostream& operator<<(std::ostream& o, const vector_configuration<T,U,B,A>& c) {
-	o << "energy     : " << c.unary_energy() + c.binary_energy();
-	o << " = " << c.unary_energy() << " + " << c.binary_energy() << " (Data+Prior)\n";
-	o << "Nb objects : " << c.size() << "\n";
-	{
-            typename vector_configuration<T,U,B,A>::const_iterator it = c.begin(), end = c.end();
-            for (; it != end; ++it)
-                o << *it <<"\t" << c.energy(it)<<"\t" << c[it] << std::endl;
-	}
-	
-	return o;
-    }
 
 }; // namespace marked_point_process
 

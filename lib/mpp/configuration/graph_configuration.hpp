@@ -251,28 +251,6 @@ namespace marked_point_process {
         Accelerator	m_accelerator;
     };
 
-
-    template<typename T, typename U, typename B, typename A>
-    std::ostream& operator<<(std::ostream& o, const graph_configuration<T,U,B,A>& c) {
-	o << "energy     : " << c.unary_energy() + c.binary_energy();
-	o << " = " << c.unary_energy() << " + " << c.binary_energy() << " (Data+Prior)\n";
-	o << "Nb objects : " << c.size() << "\n";
-	o << "Nb edges   : " << c.size_of_interactions() << std::endl;
-	{
-            typename graph_configuration<T,U,B,A>::const_iterator it = c.begin(), end = c.end();
-            for (; it != end; ++it)
-                o << *it <<"\t" << c.energy(it)<<"\t" << c[it] << std::endl;
-	}
-	
-	{
-            typename graph_configuration<T,U,B,A>::const_edge_iterator it = c.interactions_begin(), end = c.interactions_end();
-            for (; it != end; ++it)
-                o << *it <<"\t:\t" << c.energy(it) << std::endl;
-	}
-	
-	return o;
-    }
-
 }; // namespace marked_point_process
 
 #endif // GRAPH_CONFIGURATION_HPP

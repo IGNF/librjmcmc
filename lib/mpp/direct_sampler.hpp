@@ -66,19 +66,24 @@ namespace marked_point_process {
         template<typename Configuration, typename Modification>
         double pdf_ratio(const Configuration &c, const Modification &m) const
         {
-            double ratio = m_density.pdf_ratio(c.size(),c.size()+m.delta_size());
-            for(typename Modification::birth_const_iterator b = m.birth_begin(); b!=m.birth_end(); ++b)
+            typedef typename ObjectSampler::value_type T;
+            size_t n0 = c.template size<T>();
+            size_t n1 = n0+m.birth().template size<T>()-m.death().template size<T>();
+            double ratio = m_density.pdf_ratio(n0,n1);
+            for(typename Modification::birth_type::template const_iterator<T>::type b = m.birth().template begin<T>(); b!=m.birth().template end<T>(); ++b)
                 ratio*=rjmcmc::apply_visitor(m_object_sampler.pdf(),*b);
-            for(typename Modification::death_const_iterator d = m.death_begin(); d!=m.death_end(); ++d)
-                ratio/=rjmcmc::apply_visitor(m_object_sampler.pdf(),c[*d]);
+            for(typename Modification::death_type::template const_iterator<T>::type d = m.death().template begin<T>(); d!=m.death().template end<T>(); ++d)
+                ratio/=rjmcmc::apply_visitor(m_object_sampler.pdf(),**d);
             return ratio;
         }
 
         template<typename Configuration>
         double pdf(const Configuration &c) const
         {
-            double res = m_density.pdf(c.size());
-            for(typename Configuration::const_iterator it = c.begin(); it!=c.end(); ++it)
+            typedef typename ObjectSampler::value_type T;
+            typedef typename Configuration::template const_iterator<T>::type I;
+            double res = m_density.pdf(c.template size<T>());
+            for(I it = c.template begin<T>(); it!=c.template end<T>(); ++it)
                 res*=rjmcmc::apply_visitor(m_object_sampler.pdf(),c[it]);
             return res;
         }

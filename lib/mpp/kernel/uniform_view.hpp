@@ -1,0 +1,124 @@
+/***********************************************************************
+This file is part of the librjmcmc project source files.
+
+Copyright : Institut Geographique National (2008-2012)
+Contributors : Mathieu Brédif, Olivier Tournaire, Didier Boldo
+email : librjmcmc@ign.fr
+
+This software is a generic C++ library for stochastic optimization.
+
+This software is governed by the CeCILL license under French law and
+abiding by the rules of distribution of free software. You can use,
+modify and/or redistribute the software under the terms of the CeCILL
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info".
+
+As a counterpart to the access to the source code and rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty and the software's author, the holder of the
+economic rights, and the successive licensors have only limited liability.
+
+In this respect, the user's attention is drawn to the risks associated
+with loading, using, modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean that it is complicated to manipulate, and that also
+therefore means that it is reserved for developers and experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test thesoftware's suitability as regards their
+requirements in conditions enabling the security of their systems and/or
+data to be ensured and, more generally, to use and operate it in the
+same conditions as regards security.
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL license and that you accept its terms.
+
+***********************************************************************/
+
+#ifndef MPP_UNIFORM_VIEW_HPP
+#define MPP_UNIFORM_VIEW_HPP
+
+#include "rjmcmc/random.hpp"
+#include "rjmcmc/kernel/kernel.hpp"
+#include "rjmcmc/kernel/transform.hpp"
+#include "geometry/coordinates/coordinates.hpp"
+#include <boost/random/variate_generator.hpp>
+#include <algorithm> // copy_n
+
+namespace marked_point_process {
+    
+
+    // single object type configuration for now...
+    template<typename T, unsigned int N=1>
+    class uniform_view
+    {
+    public:
+        typedef T object_type;
+        enum { dimension =  coordinates_iterator<T>::dimension };
+
+        template<typename Engine, typename Configuration, typename Modification, typename OutputIterator>
+        inline double operator()(Engine& e, Configuration const& c, Modification& m, OutputIterator out) const
+        {
+            m.death().clear();
+            typedef typename coordinates_iterator<T>::type iterator;
+            unsigned int n = c.template size<T>();
+            if(n<N) return 0.;
+            unsigned int denom=1;
+            int d[N];
+            for(unsigned int i=0;i<N;++i)
+            {
+                typename Configuration::template const_iterator<T>::type it = c.template begin<T>();
+                boost::uniform_smallint<> die(0,n-1-i);
+                d[i]=die(e);
+                for(unsigned int j=0;j<i;++j) if(d[j]<=d[i]) ++d[i];
+                std::advance(it, d[i]);
+
+                m.death().template insert<T>(it);
+                const T& t = *it;
+                //iterator coord_it  = coordinates_begin(t.rotate(die())); //TODO!!!
+                iterator coord_it  = coordinates_begin(t);
+                for(unsigned int j=0; j<dimension; ++j) *out++ = *coord_it++;
+                denom *= n-i;
+            }
+            return 1./denom;
+        }
+        template<typename Configuration, typename Modification, typename InputIterator>
+        inline double inverse_pdf(Configuration const& c, Modification& m, InputIterator it) const
+        {
+            m.birth().clear();
+            unsigned int n = c.template size<T>()+m.birth().template size<T>()-m.death().template size<T>();
+            unsigned int denom=1;
+            object_from_coordinates<T> creator;
+            for(unsigned int i=1;i<=N;++i)
+            {
+                m.birth().insert(creator(it));
+                it+=dimension;
+                denom *= n+i;
+            }
+            return 1./denom;
+        }
+    };
+
+/*
+    template<typename T>
+    class uniform_multiview
+    {
+    public:
+        typedef T types; // std::tuple<T0,T1,T2...> or T
+        enum { dimension =  coordinates_iterator<T>::dimension }; // add all dimensions
+
+        template<typename Engine, typename Configuration, typename Modification, typename OutputIterator>
+        inline double operator()(Engine& e, Configuration& c, Modification& modif, OutputIterator out) const
+        {
+            return 1.;
+        }
+        template<typename Configuration, typename Modification, typename InputIterator>
+        inline double inverse_pdf(Configuration& c, Modification& modif, InputIterator it) const
+        {
+            return 1.;
+        }
+    };
+  */
+
+}; // namespace marked_point_process
+
+#endif // UNIFORM_VIEW_HPP
