@@ -73,7 +73,7 @@ layer::ptrLayerType& operator<<(layer::ptrLayerType& layer, const Config& config
     for (; it != end; ++it)
     {
         painter.energy(config.energy(it));
-        rjmcmc::apply_visitor(painter,config[it]);
+        rjmcmc::apply_visitor(painter,config.value(it));
     }
     return layer;
 }

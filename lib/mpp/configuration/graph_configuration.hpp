@@ -47,8 +47,7 @@ namespace marked_point_process {
     {
     public:
 	typedef graph_configuration<T,UnaryEnergy, BinaryEnergy, Accelerator, OutEdgeList, VertexList> self;
-	typedef internal::modification<self>	modification;
-	typedef T	value_type;
+        typedef T	value_type;
     private:
 	class edge {
 	public:
@@ -68,7 +67,7 @@ namespace marked_point_process {
 
 	private:
             value_type	m_value;
-            double		m_energy;
+            double	m_energy;
 	};
 	typedef boost::adjacency_list<OutEdgeList, VertexList, boost::undirectedS, node, edge> graph_type;
 	typedef typename graph_type::out_edge_iterator	out_edge_iterator;
@@ -80,6 +79,7 @@ namespace marked_point_process {
 	typedef	typename graph_type::vertex_iterator	const_iterator;
 	typedef typename graph_type::edge_iterator	edge_iterator;
 	typedef typename graph_type::edge_iterator	const_edge_iterator;
+        typedef internal::modification<self>            modification;
     public:
 
 	// configuration constructors/destructors
@@ -101,8 +101,7 @@ namespace marked_point_process {
 	inline iterator begin() { return vertices(m_graph).first; }
 	inline iterator end  () { return vertices(m_graph).second; }
 	inline const_iterator begin() const { return vertices(m_graph).first; }
-	inline const_iterator end  () const { return vertices(m_graph).second; }
-	inline const value_type& operator[]( const_iterator v ) const { return m_graph[ *v ].value(); }
+        inline const_iterator end  () const { return vertices(m_graph).second; }
 	inline const value_type& value( const_iterator v ) const { return m_graph[ *v ].value(); }
 	inline double energy( const_iterator v ) const { return m_graph[ *v ].energy(); }
 
@@ -124,12 +123,12 @@ namespace marked_point_process {
 	template <typename Modification> double delta_birth(const Modification &modif) const
 	{
             double delta = 0;
-            typedef typename Modification::birth_const_iterator bci;
-            typedef typename Modification::death_const_iterator dci;
-            bci bbeg = modif.birth_begin();
-            bci bend = modif.birth_end();
-            dci dbeg = modif.death_begin();
-            dci dend = modif.death_end();
+            typedef typename Modification::birth_type::const_iterator bci;
+            typedef typename Modification::death_type::const_iterator dci;
+            bci bbeg = modif.birth().begin();
+            bci bend = modif.birth().end();
+            dci dbeg = modif.death().begin();
+            dci dend = modif.death().end();
             for(bci it=bbeg; it!=bend; ++it) {
                 delta += rjmcmc::apply_visitor(m_unary_energy,*it);
                 const_iterator   it2, end2;
@@ -146,9 +145,9 @@ namespace marked_point_process {
 	template <typename Modification> double delta_death(const Modification &modif) const
 	{
             double delta = 0;
-            typedef typename Modification::death_const_iterator dci;
-            dci dbeg = modif.death_begin();
-            dci dend = modif.death_end();
+            typedef typename Modification::death_type::const_iterator dci;
+            dci dbeg = modif.death().begin();
+            dci dend = modif.death().end();
             for(dci it=dbeg; it!=dend; ++it) {
                 iterator v = *it;
                 delta -= energy(v);

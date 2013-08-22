@@ -108,30 +108,22 @@ namespace marked_point_process {
     }; // namespace internal
 */
     namespace internal {
-        template<typename C> struct vector_inserter {
+        template<typename C> struct inserter {
             C& c_;
-            vector_inserter(C& c) : c_(c) {}
-            template<typename T> void operator()(T& t) const
-            {
-                for(typename T::const_iterator it = t.begin(); it!=t.end(); ++it)
-                    c_.insert(*it);
-            }
+            inserter(C& c) : c_(c) {}
+            template<typename T> void operator()(T& t) const { c_.insert(t); }
         };
-        template<typename C> struct vector_remover {
+        template<typename C> struct remover {
             C& c_;
-            vector_remover(C& c) : c_(c) {}
-            template<typename T> void operator()(T& t) const
-            {
-                for(typename T::const_iterator it = t.begin(); it!=t.end(); ++it)
-                    c_.remove(*it);
-            }
+            remover(C& c) : c_(c) {}
+            template<typename T> void operator()(T& t) const { c_.remove(t); }
         };
 
 
     template<
             typename Configuration,
-            typename Birth = std::vector<typename Configuration::variant_type>,
-            typename Death = std::vector<typename Configuration::variant_type>//template const_iterator<typename Configuration::variant_type>::type >
+            typename Birth = std::vector<typename Configuration::value_type>,
+            typename Death = std::vector<typename Configuration::const_iterator >
                              >
                              class modification
                              {
@@ -146,8 +138,8 @@ namespace marked_point_process {
         // manipulators
         inline void apply(Configuration &c) const
         {
-            m_death.for_each(internal::vector_remover <Configuration>(c));
-            m_birth.for_each(internal::vector_inserter<Configuration>(c));
+            std::for_each(m_death.begin(),m_death.end(),internal::remover <Configuration>(c));
+            std::for_each(m_birth.begin(),m_birth.end(),internal::inserter<Configuration>(c));
         }
 
     private:

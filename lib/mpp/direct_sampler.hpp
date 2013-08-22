@@ -66,25 +66,23 @@ namespace marked_point_process {
         template<typename Configuration, typename Modification>
         double pdf_ratio(const Configuration &c, const Modification &m) const
         {
-            typedef typename ObjectSampler::value_type T;
-            size_t n0 = c.template size<T>();
-            size_t n1 = n0+m.birth().template size<T>()-m.death().template size<T>();
+            size_t n0 = c.size();
+            size_t n1 = n0+m.birth().size()-m.death().size();
             double ratio = m_density.pdf_ratio(n0,n1);
-            for(typename Modification::birth_type::template const_iterator<T>::type b = m.birth().template begin<T>(); b!=m.birth().template end<T>(); ++b)
+            for(typename Modification::birth_type::const_iterator b = m.birth().begin(); b!=m.birth().end(); ++b)
                 ratio*=rjmcmc::apply_visitor(m_object_sampler.pdf(),*b);
-            for(typename Modification::death_type::template const_iterator<T>::type d = m.death().template begin<T>(); d!=m.death().template end<T>(); ++d)
-                ratio/=rjmcmc::apply_visitor(m_object_sampler.pdf(),**d);
+            for(typename Modification::death_type::const_iterator d = m.death().begin(); d!=m.death().end(); ++d)
+                ratio/=rjmcmc::apply_visitor(m_object_sampler.pdf(),c.value(*d));
             return ratio;
         }
 
         template<typename Configuration>
         double pdf(const Configuration &c) const
         {
-            typedef typename ObjectSampler::value_type T;
-            typedef typename Configuration::template const_iterator<T>::type I;
-            double res = m_density.pdf(c.template size<T>());
-            for(I it = c.template begin<T>(); it!=c.template end<T>(); ++it)
-                res*=rjmcmc::apply_visitor(m_object_sampler.pdf(),c[it]);
+            typedef typename Configuration::const_iterator I;
+            double res = m_density.pdf(c.size());
+            for(I it = c.begin(); it!=c.end(); ++it)
+                res*=rjmcmc::apply_visitor(m_object_sampler.pdf(),c.value(it));
             return res;
         }
 

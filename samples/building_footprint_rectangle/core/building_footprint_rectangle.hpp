@@ -47,8 +47,9 @@ typedef Rectangle_2 object;
 //]
 
 //[building_footprint_rectangle_definition_kernels
-#include "mpp/kernel/kernel.hpp"
+#include "mpp/kernel/uniform_birth.hpp"
 typedef marked_point_process::uniform_birth<object> uniform_birth;
+#include "mpp/kernel/uniform_birth_death_kernel.hpp"
 typedef marked_point_process::uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
 
 #include "rjmcmc/kernel/transform.hpp"
@@ -64,6 +65,8 @@ typedef geometry::rectangle_corner_translation_transform<1>  corner_transform1;
 typedef geometry::rectangle_corner_translation_transform<2>  corner_transform2;
 typedef geometry::rectangle_corner_translation_transform<3>  corner_transform3;
 typedef geometry::rectangle_split_merge_transform split_merge_transform;
+
+#include "mpp/kernel/uniform_kernel.hpp"
 typedef marked_point_process::uniform_kernel<object,1,1,edge_transform0>::type  edge_kernel0;
 typedef marked_point_process::uniform_kernel<object,1,1,edge_transform1>::type  edge_kernel1;
 typedef marked_point_process::uniform_kernel<object,1,1,edge_transform2>::type  edge_kernel2;

@@ -138,7 +138,7 @@ namespace simulated_annealing {
             typename Configuration::const_iterator it = config.begin(), end = config.end();
             for (; it != end; ++it)
             {
-                rjmcmc::apply_visitor(writer,config[it]);
+                rjmcmc::apply_visitor(writer,config.value(it));
             }
         }
     };

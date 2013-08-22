@@ -9,4 +9,4 @@ file( GLOB ALL_LIBRJMCMC_HEADERS_FILES
 
 add_subdirectory(building_footprint_extraction)
 add_subdirectory(building_footprint_rectangle)
-add_subdirectory(tree_extraction)
+

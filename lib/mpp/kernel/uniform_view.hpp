@@ -60,20 +60,20 @@ namespace marked_point_process {
         {
             m.death().clear();
             typedef typename coordinates_iterator<T>::type iterator;
-            unsigned int n = c.template size<T>();
+            unsigned int n = c.size();
             if(n<N) return 0.;
             unsigned int denom=1;
             int d[N];
             for(unsigned int i=0;i<N;++i)
             {
-                typename Configuration::template const_iterator<T>::type it = c.template begin<T>();
+                typename Configuration::const_iterator it = c.begin();
                 boost::uniform_smallint<> die(0,n-1-i);
                 d[i]=die(e);
                 for(unsigned int j=0;j<i;++j) if(d[j]<=d[i]) ++d[i];
                 std::advance(it, d[i]);
 
-                m.death().template insert<T>(it);
-                const T& t = *it;
+                m.death().push_back(it);
+                const T& t = c.value(it);
                 //iterator coord_it  = coordinates_begin(t.rotate(die())); //TODO!!!
                 iterator coord_it  = coordinates_begin(t);
                 for(unsigned int j=0; j<dimension; ++j) *out++ = *coord_it++;
@@ -85,12 +85,12 @@ namespace marked_point_process {
         inline double inverse_pdf(Configuration const& c, Modification& m, InputIterator it) const
         {
             m.birth().clear();
-            unsigned int n = c.template size<T>()+m.birth().template size<T>()-m.death().template size<T>();
+            unsigned int n = c.size()+m.birth().size()-m.death().size();
             unsigned int denom=1;
             object_from_coordinates<T> creator;
             for(unsigned int i=1;i<=N;++i)
             {
-                m.birth().insert(creator(it));
+                m.birth().push_back(creator(it));
                 it+=dimension;
                 denom *= n+i;
             }
