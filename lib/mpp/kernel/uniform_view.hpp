@@ -37,12 +37,14 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef MPP_UNIFORM_VIEW_HPP
 #define MPP_UNIFORM_VIEW_HPP
 
-#include "rjmcmc/random.hpp"
 #include "rjmcmc/kernel/kernel.hpp"
 #include "rjmcmc/kernel/transform.hpp"
 #include "geometry/coordinates/coordinates.hpp"
 #include <boost/random/variate_generator.hpp>
 #include <algorithm> // copy_n
+
+
+#include "boost/random/uniform_smallint.hpp"
 
 namespace marked_point_process {
     
@@ -85,7 +87,7 @@ namespace marked_point_process {
         inline double inverse_pdf(Configuration const& c, Modification& m, InputIterator it) const
         {
             m.birth().clear();
-            unsigned int n = c.size()+m.birth().size()-m.death().size();
+            unsigned int n = c.size()-m.death().size();
             unsigned int denom=1;
             object_from_coordinates<T> creator;
             for(unsigned int i=1;i<=N;++i)
@@ -97,27 +99,6 @@ namespace marked_point_process {
             return 1./denom;
         }
     };
-
-/*
-    template<typename T>
-    class uniform_multiview
-    {
-    public:
-        typedef T types; // std::tuple<T0,T1,T2...> or T
-        enum { dimension =  coordinates_iterator<T>::dimension }; // add all dimensions
-
-        template<typename Engine, typename Configuration, typename Modification, typename OutputIterator>
-        inline double operator()(Engine& e, Configuration& c, Modification& modif, OutputIterator out) const
-        {
-            return 1.;
-        }
-        template<typename Configuration, typename Modification, typename InputIterator>
-        inline double inverse_pdf(Configuration& c, Modification& modif, InputIterator it) const
-        {
-            return 1.;
-        }
-    };
-  */
 
 }; // namespace marked_point_process
 

@@ -38,7 +38,6 @@ knowledge of the CeCILL license and that you accept its terms.
 #define RJMCMC_SAMPLER_HPP
 
 #include "rjmcmc/tuple.hpp"
-#include "rjmcmc/random.hpp"
 #include "rjmcmc/random_apply.hpp"
 #include "rjmcmc/kernel/kernel_traits.hpp"
 #include "rjmcmc/kernel/kernel.hpp"

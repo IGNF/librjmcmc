@@ -51,18 +51,12 @@ namespace rjmcmc {
         inline double operator()(OutputIterator it) const {
             value_type val[dimension];
             double res = m_variate(val);
-            return res*m_transform.apply(val,it);
-        }
-        template<typename InputIterator>
-        inline double inverse_pdf(InputIterator it) const {
-            value_type val[dimension];
-            double res = m_transform.reverse(it,val);
-            return res*m_variate.inverse_pdf(val);
+            return res*m_transform.template apply<0>(val,it);
         }
         template<typename InputIterator>
         inline double pdf(InputIterator it) const {
             value_type val[dimension];
-            double res = m_transform.apply(it,val);
+            double res = m_transform.template apply<1>(it,val);
             return res*m_variate.pdf(val);
         }
         transformed_variate(const Transform& transform, const Variate& variate)

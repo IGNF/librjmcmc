@@ -47,12 +47,12 @@ namespace geometry {
         enum { dimension = 5 };
 
         circle_center_translation_transform(double d=10.) : m_d(d) {}
-        template<typename Iterator>
+        template<int I, typename Iterator>
         inline double abs_jacobian(Iterator it) const { return 1.; }
         // maxima :
         // abs(determinant(jacobian([x+d*(u-0.5), y+d*(v-0.5), r, 1-u, 1-v] , [x,y,r,u,v]))) = 1;
         // ratsimp(sublis([x=x+d*(u-0.5), y=y+d*(v-0.5), r=r, u=1-u, v=1-v],[x+d*(u-0.5), y+d*(v-0.5), r, 1-u, 1-v])) = [x,y,r,u,v];
-        template<typename IteratorIn,typename IteratorOut>
+        template<int I, typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
             typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             double res = abs_jacobian(in);
@@ -71,9 +71,6 @@ namespace geometry {
             return res;
         }
 
-        template<typename IteratorIn,typename IteratorOut>
-        inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
-
     private:
         double m_d;
     };
@@ -86,13 +83,21 @@ namespace geometry {
 
         circle_edge_translation_transform(double d=10.) : m_d(d) {}
 
-        template<typename Iterator>
+        template<int I, typename Iterator>
         inline double abs_jacobian(Iterator it) const { return 1.; }
         // maxima :
         // abs(determinant(jacobian([x+d*(u-0.5), y+d*(v-0.5), r+e*d*sqrt((u-0.5)*(u-0.5)+(v-0.5)*(v-0.5)),1-u, 1-v] , [x,y,r,u,v]))) = 1;
         // ratsimp(sublis([x=x+d*(u-0.5), y=y+d*(v-0.5), r=r+e*d*sqrt((u-0.5)*(u-0.5)+(v-0.5)*(v-0.5)),u=1-u, v=1-v],[x+d*(u-0.5), y+d*(v-0.5), r-e*d*sqrt((u-0.5)*(u-0.5)+(v-0.5)*(v-0.5)),1-u, 1-v])) = [x,y,r,u,v];
-        template<typename IteratorIn,typename IteratorOut>
+
+
+        template<int I, typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
+            if(I) return forward (in,out);
+            else  return backward(in,out);
+        }
+
+        template<typename IteratorIn,typename IteratorOut>
+        inline double forward(IteratorIn in, IteratorOut out) const {
             typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             double res = abs_jacobian(in);
             FT x = *in++;
@@ -111,7 +116,7 @@ namespace geometry {
         }
 
         template<typename IteratorIn,typename IteratorOut>
-        inline double inverse(IteratorIn in, IteratorOut out) const {
+        inline double backward(IteratorIn in, IteratorOut out) const {
             typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             double res = abs_jacobian(in);
             FT x = *in++;
@@ -138,12 +143,12 @@ namespace geometry {
         enum { dimension = 4 };
         circle_radius_transform(double d=10.) : m_d(d) {}
 
-        template<typename Iterator>
+        template<int I, typename Iterator>
         inline double abs_jacobian(Iterator it) const { return 1.; }
         // maxima :
         // abs(determinant(jacobian([x, y, r+d*(u-0.5),1-u] , [x,y,r,u])));
         // ratsimp(sublis([x=x, y=y, r=r+d*(u-0.5),u=1-u],[x, y, r+d*(u-0.5),1-u])) = [x, y, r, u];
-        template<typename IteratorIn,typename IteratorOut>
+        template<int I, typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
             typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             double res = abs_jacobian(in);
@@ -159,10 +164,6 @@ namespace geometry {
             return res;
         }
 
-        template<typename IteratorIn,typename IteratorOut>
-        inline double inverse(IteratorIn in, IteratorOut out) const {
-            return apply(in,out);
-        }
     private:
         double m_d;
     };

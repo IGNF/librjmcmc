@@ -39,6 +39,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include <boost/graph/adjacency_list.hpp>
 #include "configuration.hpp"
+#include "rjmcmc/variant.hpp" // apply_visitor
+
 
 namespace marked_point_process {
 

@@ -51,10 +51,10 @@ namespace geometry {
 
         enum { dimension = 6 };
 
-        template<typename Iterator>
+        template<int I, typename Iterator>
         inline double abs_jacobian(Iterator it) const { return 1.; }
 
-        template<typename IteratorIn,typename IteratorOut>
+        template<int I, typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
             typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             FT x = *in++;
@@ -103,9 +103,6 @@ namespace geometry {
             // maxima rot90: abs(determinant(jacobian([x,y,-r*v,r*u,p,1/r],[x,y,u,v,r,p]))) = 1;
             return 1;
         }
-
-        template<typename IteratorIn,typename IteratorOut>
-        inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
     };
 
 }

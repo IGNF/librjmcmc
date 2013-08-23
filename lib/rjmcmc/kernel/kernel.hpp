@@ -90,8 +90,8 @@ namespace rjmcmc {
                 if(J01==0)  return 0; // abort : view sampling failed
                 double phi01 = m_variate0(e,var0);             // returns the continuous probability that samples the completion variates
                 if(phi01==0) return 0; // abort : variate sampling failed
-                double jacob = m_transform.apply(val0,val1);                       // computes val1 from val0
-                double phi10 = m_variate1.inverse_pdf(var1); // returns the continuous probability of the inverse variate sampling, arguments are constant
+                double jacob = m_transform.template apply<0>(val0,val1);                       // computes val1 from val0
+                double phi10 = m_variate1.pdf(var1); // returns the continuous probability of the variate sampling, arguments are constant
                 double J10   = m_view1   .inverse_pdf(c,modif,val1); // returns the discrete probability of the inverse view sampling, arguments are constant except val1 that is encoded in modif
                 return jacob*(m_p10*J10*phi10)/(m_p01*J01*phi01);
             } else { // branch probability : m_p10/m_p
@@ -100,9 +100,9 @@ namespace rjmcmc {
                 if(J10==0) return 0; // abort : view sampling failed
                 double phi10 = m_variate1(e,var1);      // returns the continuous probability that samples the completion variates
                 if(phi10==0) return 0; // abort : variate sampling failed
-                double jacob = m_transform.inverse(val1,val0);                       // computes val0 from val1
-                double phi01 = m_variate0.inverse_pdf(var0);  // returns the discrete probability of the inverse view sampling, arguments are constant except val0 that is encoded in modif
-                double J01   = m_view0   .inverse_pdf(c,modif,val0);  // returns the continuous probability of the inverse variate sampling, arguments are constant
+                double jacob = m_transform.template apply<1>(val1,val0);                       // computes val0 from val1
+                double phi01 = m_variate0.pdf(var0);  // returns the continuous probability of the inverse variate sampling, arguments are constant
+                double J01   = m_view0   .inverse_pdf(c,modif,val0);  // returns the discrete probability of the inverse view sampling, arguments are constant except val0 that is encoded in modif
                 return jacob*(m_p01*J01*phi01)/(m_p10*J10*phi10);
             }
         }

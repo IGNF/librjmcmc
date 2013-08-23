@@ -37,76 +37,17 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef RJMCMC_CONFIGURATION_HPP
 #define RJMCMC_CONFIGURATION_HPP
 
-#include "rjmcmc/variant.hpp"
 #include <vector>
-#include <iostream>
 
 namespace marked_point_process {
     //////////////////////////////////////////////////////////
-
+    
     struct trivial_accelerator {
 	template<typename C, typename T> std::pair<typename C::iterator,typename C::iterator> operator()(const C &c, const T &t) const {
             return std::make_pair(c.begin(),c.end());
 	}
     };
-    /*
-    //////////////////////////////////////////////////////////
-    namespace internal {
-
-        template<class Configuration>
-        class modification
-        {
-            typedef typename Configuration::value_type	value_type;
-            typedef typename Configuration::template iterator<value_type>::type	iterator;
-            std::vector<value_type>	m_birth;
-            std::vector<iterator>	m_death;
-        public:
-            typedef typename std::vector<value_type>::const_iterator	birth_const_iterator;
-            typedef typename std::vector<iterator>::const_iterator	death_const_iterator;
-
-            inline birth_const_iterator birth_begin() const { return m_birth.begin(); }
-            inline birth_const_iterator birth_end  () const { return m_birth.end  (); }
-            inline death_const_iterator death_begin() const { return m_death.begin(); }
-            inline death_const_iterator death_end  () const { return m_death.end  (); }
-            template<typename T>
-            inline void insert_birth(const T& b) { m_birth.push_back(value_type(b)); }
-            inline void insert_death(iterator d)  { m_death.push_back(d); }
-            inline unsigned int birth_size() const { return m_birth.size(); }
-            inline unsigned int death_size() const { return m_death.size(); }
-            inline int delta_size() const { return (int) birth_size() - (int) death_size(); }
-            inline void clear() { m_birth.clear(); m_death.clear(); }
-
-
-            template<typename V> class inserter {
-                V& m_v;
-            public:
-		inserter(V& v) : m_v(v) {}
-		typedef void result_type;
-                template<typename T> void operator()(const T& t) { m_v.push_back(value_type(t)); }
-                template<typename T, typename U> void operator()(const std::pair<T,U>& t) {
-                    m_v.push_back(value_type(t.first));
-                    m_v.push_back(value_type(t.second));
-		}
-            };
-
-            inline inserter<std::vector<value_type> > birth_inserter() {
-		return inserter<std::vector<value_type> > (m_birth);
-            }
-            inline inserter<std::vector<iterator> > death_inserter() {
-		return inserter<std::vector<iterator> >(m_death);
-            }
-
-            inline void apply(Configuration &c) const
-            {
-                for(death_const_iterator it = m_death.begin(); it!=m_death.end(); ++it)
-                    c.remove(*it);
-                for(birth_const_iterator it = m_birth.begin(); it!=m_birth.end(); ++it)
-                    c.insert(*it);
-            }
-        };
-
-    }; // namespace internal
-*/
+    
     namespace internal {
         template<typename C> struct inserter {
             C& c_;
@@ -118,36 +59,36 @@ namespace marked_point_process {
             remover(C& c) : c_(c) {}
             template<typename T> void operator()(T& t) const { c_.remove(t); }
         };
-
-
-    template<
-            typename Configuration,
-            typename Birth = std::vector<typename Configuration::value_type>,
-            typename Death = std::vector<typename Configuration::const_iterator >
-                             >
-                             class modification
-                             {
-                             public:
-        typedef	Birth birth_type;
-        typedef Death death_type;
-        const birth_type& birth() const { return m_birth; }
-        const death_type& death() const { return m_death; }
-        birth_type& birth() { return m_birth; }
-        death_type& death() { return m_death; }
-
-        // manipulators
-        inline void apply(Configuration &c) const
+        
+        
+        template<
+                typename Configuration,
+                typename Birth = std::vector<typename Configuration::value_type>,
+                typename Death = std::vector<typename Configuration::const_iterator >
+        >
+        class modification
         {
-            std::for_each(m_death.begin(),m_death.end(),internal::remover <Configuration>(c));
-            std::for_each(m_birth.begin(),m_birth.end(),internal::inserter<Configuration>(c));
-        }
+        public:
+            typedef	Birth birth_type;
+            typedef Death death_type;
+            const birth_type& birth() const { return m_birth; }
+            const death_type& death() const { return m_death; }
+            birth_type& birth() { return m_birth; }
+            death_type& death() { return m_death; }
 
-    private:
-        birth_type	m_birth;
-        death_type	m_death;
-    };
+            // manipulators
+            inline void apply(Configuration &c) const
+            {
+                std::for_each(m_death.begin(),m_death.end(),internal::remover <Configuration>(c));
+                std::for_each(m_birth.begin(),m_birth.end(),internal::inserter<Configuration>(c));
+            }
 
-}; // namespace internal
+        private:
+            birth_type	m_birth;
+            death_type	m_death;
+        };
+
+    }; // namespace internal
 
 }; // namespace marked_point_process
 

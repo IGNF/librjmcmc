@@ -37,7 +37,6 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef MPP_UNIFORM_KERNEL_HPP
 #define MPP_UNIFORM_KERNEL_HPP
 
-#include "rjmcmc/random.hpp"
 #include "rjmcmc/kernel/kernel.hpp"
 #include "rjmcmc/kernel/transform.hpp"
 #include "geometry/coordinates/coordinates.hpp"

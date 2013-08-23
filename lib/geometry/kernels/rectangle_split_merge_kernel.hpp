@@ -44,8 +44,17 @@ namespace geometry {
         enum { dimension = 10 };
         rectangle_split_merge_transform(double d=5.) : m_d(d) {}
 
-        template<typename IteratorIn,typename IteratorOut>
+        template<int I, typename Iterator>
+        inline double abs_jacobian(Iterator it) const { return 1.; }
+
+        template<int I, typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
+            if(I) return forward (in,out);
+            else  return backward(in,out);
+        }
+
+        template<typename IteratorIn,typename IteratorOut>
+        inline double forward  (IteratorIn in, IteratorOut out) const {
             typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             FT x = *in++;
             FT y = *in++;
@@ -83,7 +92,7 @@ namespace geometry {
         }
 
         template<typename IteratorIn,typename IteratorOut>
-        inline double inverse(IteratorIn in, IteratorOut out) const {
+        inline double backward(IteratorIn in, IteratorOut out) const {
             typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             FT x0 = *in++; // x -(r-p)*v
             FT y0 = *in++; // y +(r-p)*u

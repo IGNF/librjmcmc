@@ -56,11 +56,6 @@ namespace rjmcmc {
             return 1.;
         }
         template<typename InputIterator>
-        inline double inverse_pdf(InputIterator it) const {
-            for(unsigned int i=0; i<N; ++i, ++it) if(*it<0 || *it>1) return 0;
-            return 1.;
-        }
-        template<typename InputIterator>
         inline double pdf(InputIterator it) const {
             for(unsigned int i=0; i<N; ++i, ++it) if(*it<0 || *it>1) return 0;
             return 1.;
@@ -77,10 +72,6 @@ namespace rjmcmc {
         enum { dimension = 0 };
         template<typename Engine, typename OutputIterator>
         inline double operator()(Engine& e, OutputIterator it) const {
-            return 1.;
-        }
-        template<typename InputIterator>
-        inline double inverse_pdf(InputIterator it) const {
             return 1.;
         }
         template<typename InputIterator>

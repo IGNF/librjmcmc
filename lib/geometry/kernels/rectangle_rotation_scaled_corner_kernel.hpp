@@ -47,10 +47,10 @@ namespace geometry {
         enum { dimension = 7 };
         rectangle_corner_translation_transform(double d=10.) : m_d(d) {}
 
-        template<typename Iterator>
+        template<int I, typename Iterator>
         inline double abs_jacobian(Iterator it) const { return 1.; }
 
-        template<typename IteratorIn,typename IteratorOut>
+        template<int I, typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
             typedef typename std::iterator_traits<IteratorIn>::value_type FT;
             FT x = *in++;
@@ -80,8 +80,6 @@ namespace geometry {
             return 1.;
         }
 
-        template<typename IteratorIn,typename IteratorOut>
-        inline double inverse(IteratorIn in, IteratorOut out) const { return apply(in,out); }
     private:
         double m_d;
     };

@@ -37,7 +37,6 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef MPP_UNIFORM_BIRTH_HPP
 #define MPP_UNIFORM_BIRTH_HPP
 
-#include "rjmcmc/random.hpp"
 #include "rjmcmc/kernel/kernel.hpp"
 #include "rjmcmc/kernel/transform.hpp"
 #include "geometry/coordinates/coordinates.hpp"
@@ -82,10 +81,10 @@ namespace marked_point_process {
             double val0[dimension];
             double val1[dimension];
             double phi = m_variate(e, val0);
-            m_transform.apply(val0,val1);
+            m_transform.template apply<0>(val0,val1);
             object_from_coordinates<T> creator;
             t = creator(val1);
-            return phi*m_transform.inverse_abs_jacobian(val1);
+            return phi*m_transform.template abs_jacobian<1>(val1);
         }
 
         struct pdf_visitor {
@@ -100,7 +99,7 @@ namespace marked_point_process {
         {
             iterator val1(coordinates_begin(t));
             double val0[dimension];
-            double J10 = m_transform.inverse(val1,val0);
+            double J10 = m_transform.template apply<1>(val1,val0);
             return m_variate.pdf(val0)*J10;
         }
     private:
