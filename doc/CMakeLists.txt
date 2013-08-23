@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
 
-
-
 # Building of Documentation is tested on Linux only
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 

@@ -54,9 +54,9 @@ typedef marked_point_process::uniform_birth<object> uniform_birth;
 typedef marked_point_process::uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
 
 #include "rjmcmc/kernel/transform.hpp"
-#include "geometry/kernels/rectangle_rotation_scaled_corner_kernel.hpp"
-#include "geometry/kernels/rectangle_scaled_edge_kernel.hpp"
-#include "geometry/kernels/rectangle_split_merge_kernel.hpp"
+#include "geometry/transform/rectangle_corner_translation_transform.hpp"
+#include "geometry/transform/rectangle_edge_translation_transform.hpp"
+#include "geometry/transform/rectangle_split_merge_transform.hpp"
 typedef geometry::rectangle_edge_translation_transform<0>    edge_transform0;
 typedef geometry::rectangle_edge_translation_transform<1>    edge_transform1;
 typedef geometry::rectangle_edge_translation_transform<2>    edge_transform2;
