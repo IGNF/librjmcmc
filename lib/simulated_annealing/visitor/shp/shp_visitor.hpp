@@ -154,11 +154,7 @@ namespace simulated_annealing {
                     std::cout << "\tUnable to create SHP " << oss.str() << std::endl;
                     return;
                 }
-                typename Configuration::const_iterator it = config.begin(), end = config.end();
-                for (; it != end; ++it)
-                {
-                    rjmcmc::apply_visitor(writer,config.value(it));
-                }
+                config.for_each(writer);
             }
         };
 

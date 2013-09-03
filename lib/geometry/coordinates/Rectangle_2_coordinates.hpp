@@ -40,6 +40,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "coordinates.hpp"
 #include "geometry/Rectangle_2.hpp"
 #include <boost/iterator/iterator_facade.hpp>
+#include "boost/random/uniform_smallint.hpp"
 
 
 //    void advance(int i) { m_i+=i; }
@@ -48,9 +49,19 @@ template<typename K>
 struct rectangle_coordinates_iterator
         : public boost::iterator_facade<rectangle_coordinates_iterator<K>, const typename K::FT, boost::forward_traversal_tag>
 {
+
     enum { dimension = 5 };
     rectangle_coordinates_iterator() : m_i(dimension) {}
-    explicit rectangle_coordinates_iterator(const geometry::Rectangle_2<K>& r) : m_i(0)
+    template<typename Engine>
+    explicit rectangle_coordinates_iterator(const geometry::Rectangle_2<K>& r, Engine& e) : m_i(0) {
+        boost::uniform_smallint<> die(0,3);
+        init(r.rotate(die(e)));
+    }
+    explicit rectangle_coordinates_iterator(const geometry::Rectangle_2<K>& r           ) : m_i(0) { init(r); }
+    typedef typename K::FT FT;
+
+private:
+    void init(const geometry::Rectangle_2<K>& r)
     {
         m_coord[0] = r.center().x();
         m_coord[1] = r.center().y();
@@ -58,8 +69,7 @@ struct rectangle_coordinates_iterator
         m_coord[3] = r.normal().y();
         m_coord[4] = r.ratio();
     }
-    typedef typename K::FT FT;
-private:
+
     friend class boost::iterator_core_access;
     void increment() { ++m_i; }
     const FT& dereference() const {

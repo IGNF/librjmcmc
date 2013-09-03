@@ -43,6 +43,12 @@ template<typename T> struct coordinates_iterator
     const static unsigned int dimension = T::dimension;
 };
 
+template<typename T, typename Engine>
+typename coordinates_iterator<T>::type coordinates_begin(const T& t, Engine& e)
+{
+    return typename coordinates_iterator<T>::type(t,e);
+}
+
 template<typename T>
 typename coordinates_iterator<T>::type coordinates_begin(const T& t)
 {

@@ -164,19 +164,7 @@ namespace marked_point_process {
                 }
             }
             return delta;
-	}
-
-	template <typename Modification> void apply(const Modification &modif)
-	{
-            typedef typename Modification::birth_const_iterator bci;
-            typedef typename Modification::death_const_iterator dci;
-            dci dbeg = modif.death_begin();
-            dci dend = modif.death_end();
-            for(dci dit=dbeg; dit!=dend; ++dit) remove(*dit);
-            bci bbeg = modif.birth_begin();
-            bci bend = modif.birth_end();
-            for(bci bit=bbeg; bit!=bend; ++bit) insert(*bit);
-	}
+        }
 
 	// manipulators
 	void insert(const value_type& obj)
@@ -195,6 +183,29 @@ namespace marked_point_process {
                 m_binary += e;
             }
 	}
+
+        template<typename F>
+        struct DerefAdapter
+        {
+            graph_type const & g_;
+            F f_;
+            DerefAdapter(graph_type const & g, F f) : g_(g), f_(f) {}
+            template<typename U> typename F::result_type operator()(U u) { return rjmcmc::apply_visitor(f_,g_[u].value()); }
+        };
+
+
+        template<typename F> inline void for_each(F f)       {
+            iterator it, end;
+            boost::tie(it,end) = vertices(m_graph);
+            DerefAdapter<F> da(m_graph,f);
+            std::for_each(it,end,da);
+        }
+        template<typename F> inline void for_each(F f) const {
+            iterator it, end;
+            boost::tie(it,end) = vertices(m_graph);
+            DerefAdapter<F> da(m_graph,f);
+            std::for_each(it,end,da);
+        }
 
 	void remove( iterator v )
 	{

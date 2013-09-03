@@ -76,8 +76,7 @@ namespace marked_point_process {
 
                 m.death().push_back(it);
                 const T& t = c.value(it);
-                //iterator coord_it  = coordinates_begin(t.rotate(die())); //TODO!!!
-                iterator coord_it  = coordinates_begin(t);
+                iterator coord_it  = coordinates_begin(t,e);
                 for(unsigned int j=0; j<dimension; ++j) *out++ = *coord_it++;
                 denom *= n-i;
             }

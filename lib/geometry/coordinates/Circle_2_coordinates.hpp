@@ -48,16 +48,19 @@ struct circle_coordinates_iterator
 {
     enum { dimension = 3 };
     circle_coordinates_iterator() : m_i(dimension) {}
-    explicit circle_coordinates_iterator(const geometry::Circle_2<K>& c) : m_i(0)
+    template<typename Engine>
+    explicit circle_coordinates_iterator(const geometry::Circle_2<K>& c, Engine& e) : m_i(0) { init(c); }
+    explicit circle_coordinates_iterator(const geometry::Circle_2<K>& c           ) : m_i(0) { init(c); }
+
+    typedef typename K::FT FT;
+
+private:
+    void init(const geometry::Circle_2<K>& c)
     {
         m_coord[0] = c.center().x();
         m_coord[1] = c.center().y();
         m_coord[2] = c.radius();
     }
-
-    typedef typename K::FT FT;
-
-private:
     friend class boost::iterator_core_access;
     void increment() { ++m_i; }
     void advance(int i) { m_i+=i; }
