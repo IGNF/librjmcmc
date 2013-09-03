@@ -40,7 +40,6 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "rjmcmc/kernel/kernel.hpp"
 #include "rjmcmc/kernel/transform.hpp"
 #include "geometry/coordinates/coordinates.hpp"
-#include <boost/random/variate_generator.hpp>
 #include <algorithm> // copy_n
 
 
@@ -66,19 +65,19 @@ namespace marked_point_process {
             if(n<N) return 0.;
             unsigned int denom=1;
             int d[N];
-            for(unsigned int i=0;i<N;++i)
+            for(unsigned int i=0 ; i<N ; ++i,--n)
             {
-                typename Configuration::const_iterator it = c.begin();
-                boost::uniform_smallint<> die(0,n-1-i);
+                boost::uniform_smallint<> die(0,n-1);
                 d[i]=die(e);
-                for(unsigned int j=0;j<i;++j) if(d[j]<=d[i]) ++d[i];
-                std::advance(it, d[i]);
+                for(unsigned int j=0;j<i;++j) if(d[j]<=d[i]) ++d[i]; // skip already selected indices
 
+                typename Configuration::const_iterator it = c.begin();
+                std::advance(it, d[i]);
                 m.death().push_back(it);
                 const T& t = c.value(it);
                 iterator coord_it  = coordinates_begin(t,e);
                 for(unsigned int j=0; j<dimension; ++j) *out++ = *coord_it++;
-                denom *= n-i;
+                denom *= n;
             }
             return 1./denom;
         }
@@ -86,14 +85,15 @@ namespace marked_point_process {
         inline double inverse_pdf(Configuration const& c, Modification& m, InputIterator it) const
         {
             m.birth().clear();
-            unsigned int n = c.size()-m.death().size();
-            unsigned int denom=1;
+            unsigned int beg   = c.size()-m.death().size()+1;
+            unsigned int end   = beg+N;
+            unsigned int denom = 1;
             object_from_coordinates<T> creator;
-            for(unsigned int i=1;i<=N;++i)
+            for(unsigned int n=beg ; n<end ; ++n)
             {
                 m.birth().push_back(creator(it));
-                it+=dimension;
-                denom *= n+i;
+                it    += dimension;
+                denom *= n;
             }
             return 1./denom;
         }
