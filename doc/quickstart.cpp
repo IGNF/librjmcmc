@@ -34,6 +34,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
+#include "rjmcmc/random.hpp"
+
 //[ objects
 #include "geometry/geometry.hpp"
 #include "geometry/Circle_2.hpp"
@@ -49,16 +51,22 @@ typedef Circle_2 object;
 #include "rjmcmc/energy/constant_energy.hpp"
 #include "rjmcmc/energy/energy_operators.hpp"
 #include "mpp/energy/intersection_area_binary_energy.hpp"
-#include "mpp/configuration/graph_configuration.hpp"
 typedef constant_energy<>           unary_energy;
 typedef intersection_area_binary_energy<> binary_energy;
-typedef marked_point_process::graph_configuration<object, unary_energy, multiplies_energy<constant_energy<>,binary_energy> > configuration;
+
+//#include "mpp/configuration/fusion_vector_configuration.hpp"
+#include "mpp/configuration/vector_configuration.hpp"
+typedef marked_point_process::vector_configuration<object, unary_energy, multiplies_energy<constant_energy<>,binary_energy> > configuration;
+
+//#include "mpp/configuration/graph_configuration.hpp"
+//typedef marked_point_process::graph_configuration<object, unary_energy, multiplies_energy<constant_energy<>,binary_energy> > configuration;
+
 //]
 
 //[ reference_process
 #include "rjmcmc/distribution/poisson_distribution.hpp"
 typedef rjmcmc::poisson_distribution                   distribution;
-#include "mpp/kernel/kernel.hpp"
+#include "mpp/kernel/uniform_birth.hpp"
 typedef marked_point_process::uniform_birth<object> uniform_birth;
 #include "mpp/direct_sampler.hpp"
 typedef marked_point_process::direct_sampler<distribution,uniform_birth> reference_process;
@@ -67,6 +75,7 @@ typedef marked_point_process::direct_sampler<distribution,uniform_birth> referen
 //[ rjmcmc_sampler
 #include "rjmcmc/acceptance/metropolis_acceptance.hpp"
 #include "rjmcmc/sampler/sampler.hpp"
+#include "mpp/kernel/uniform_birth_death_kernel.hpp"
 typedef rjmcmc::metropolis_acceptance                                                  acceptance;
 typedef marked_point_process::uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
 typedef rjmcmc::sampler<reference_process,acceptance,birth_death_kernel>                       sampler;
