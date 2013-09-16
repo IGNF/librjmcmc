@@ -47,7 +47,7 @@ namespace rjmcmc {
     {
         typedef boost::uniform_real<> rand_type;
     protected:
-        rand_type m_rand;
+        mutable rand_type m_rand; // rand_type::operator()(Engine&) is non-const...
     public:
         typedef double value_type;
         enum { dimension = N };
