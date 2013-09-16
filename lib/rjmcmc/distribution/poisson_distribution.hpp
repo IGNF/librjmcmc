@@ -73,7 +73,7 @@ namespace rjmcmc {
         inline int_type operator()(Engine& e) const { return m_rand(e); }
 
     private:
-        rand_distribution_type m_rand;
+        mutable rand_distribution_type m_rand;
         math_distribution_type m_math;
     };
 

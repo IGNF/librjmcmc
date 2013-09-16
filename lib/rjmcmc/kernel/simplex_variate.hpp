@@ -161,7 +161,7 @@ namespace rjmcmc {
     class simplex_variate
     {
         typedef boost::uniform_real<> rand_type;
-        rand_type m_rand;
+        mutable rand_type m_rand;
         const double m_pdf;
         Policy m_policy;
     public:
