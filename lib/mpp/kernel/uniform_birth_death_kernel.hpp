@@ -39,27 +39,20 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include "uniform_view.hpp"
 #include "rjmcmc/kernel/null_view.hpp"
-#include "rjmcmc/kernel/variate.hpp"
+#include "rjmcmc/kernel/null_variate.hpp"
 #include "rjmcmc/kernel/kernel.hpp"
 
 namespace marked_point_process {
     template <typename birth_type>
             struct uniform_birth_death_kernel
     {
-        typedef typename birth_type::value_type value_type;
+        typedef typename birth_type::value_type     value_type;
         typedef typename birth_type::transform_type transform_type;
-        enum {
-            N0 = 0,
-            N1 = 1,
-            D0 = transform_type::dimension-N0*coordinates_iterator<value_type>::dimension,
-            D1 = transform_type::dimension-N1*coordinates_iterator<value_type>::dimension
-        };
-        typedef rjmcmc::null_view   view0_type;
-       // typedef uniform_view<value_type,N0>  view0_type;
-        typedef uniform_view<value_type,N1>  view1_type;
-       // typedef typename birth_type::variate_type  variate0_type;
-        typedef rjmcmc::variate<D0> variate0_type;
-        typedef rjmcmc::variate<D1> variate1_type;
+        typedef typename birth_type::variate_type   variate_type;
+        typedef rjmcmc::null_view                   view0_type;
+        typedef uniform_view<value_type,1>          view1_type;
+        typedef typename birth_type::variate_type   variate0_type;
+        typedef rjmcmc::null_variate                variate1_type;
         typedef rjmcmc::kernel<view0_type,view1_type,variate0_type,variate1_type,transform_type> type;
     };
 

@@ -34,39 +34,27 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#ifndef RJMCMC_VARIATE_HPP
-#define RJMCMC_VARIATE_HPP
-
-#include <boost/random/uniform_real.hpp>
-#include "rjmcmc/kernel/null_variate.hpp"
+#ifndef RJMCMC_NULL_VARIATE_HPP
+#define RJMCMC_NULL_VARIATE_HPP
 
 namespace rjmcmc {
 
-    template<int N>
-    class variate
+    class null_variate
     {
-        typedef boost::uniform_real<> rand_type;
-    protected:
-        rand_type m_rand;
     public:
         typedef double value_type;
-        enum { dimension = N };
+        enum { dimension = 0 };
         template<typename Engine, typename OutputIterator>
         inline double operator()(Engine& e, OutputIterator it) const {
-            for(unsigned int i=0; i<N; ++i) *it++ = m_rand(e);
             return 1.;
         }
         template<typename InputIterator>
         inline double pdf(InputIterator it) const {
-            for(unsigned int i=0; i<N; ++i, ++it) if(*it<0 || *it>1) return 0;
             return 1.;
         }
-        variate() : m_rand(0,1) {}
+        null_variate() {}
     };
-
-
-    template<> class variate<0> : public null_variate {};
 
 }; // namespace rjmcmc
 
-#endif // RJMCMC_VARIATE_HPP
+#endif // RJMCMC_NULL_VARIATE_HPP

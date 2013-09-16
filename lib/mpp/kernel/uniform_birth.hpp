@@ -37,12 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef MPP_UNIFORM_BIRTH_HPP
 #define MPP_UNIFORM_BIRTH_HPP
 
-#include "rjmcmc/kernel/kernel.hpp"
 #include "rjmcmc/kernel/transform.hpp"
 #include "geometry/coordinates/coordinates.hpp"
-#include <boost/random/variate_generator.hpp>
-#include <algorithm> // copy_n
-
 
 #include "rjmcmc/kernel/variate.hpp"
 

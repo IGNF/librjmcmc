@@ -100,6 +100,16 @@ public:
 
 private:
     SHPHandle m_file;
+    shp_writer(shp_writer const&) {} // forbid copy
+};
+
+// force copy semantics
+struct shp_writer_wrapper
+{
+    typedef void result_type;
+    shp_writer& w_;
+    shp_writer_wrapper(shp_writer& w) : w_(w) {}
+    template<typename T> void operator()(const T& t) const { w_(t); }
 };
 
 #include <iostream>
@@ -154,7 +164,7 @@ namespace simulated_annealing {
                     std::cout << "\tUnable to create SHP " << oss.str() << std::endl;
                     return;
                 }
-                config.for_each(writer);
+                config.for_each(shp_writer_wrapper(writer));
             }
         };
 
