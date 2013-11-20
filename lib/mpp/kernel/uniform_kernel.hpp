@@ -39,9 +39,9 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include "rjmcmc/kernel/kernel.hpp"
 #include "rjmcmc/kernel/transform.hpp"
+#include "rjmcmc/kernel/variate.hpp"
+#include "mpp/kernel/uniform_view.hpp"
 #include "geometry/coordinates/coordinates.hpp"
-#include <boost/random/variate_generator.hpp>
-#include <algorithm> // copy_n
 
 namespace marked_point_process {
 

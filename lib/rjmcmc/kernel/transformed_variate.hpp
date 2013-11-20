@@ -47,10 +47,10 @@ namespace rjmcmc {
     public:
         typedef typename Variate::value_type value_type;
         enum { dimension = Variate::dimension };
-        template<typename OutputIterator>
-        inline double operator()(OutputIterator it) const {
+        template<typename Engine, typename OutputIterator>
+        inline double operator()(Engine& e, OutputIterator it) const {
             value_type val[dimension];
-            double res = m_variate(val);
+            double res = m_variate(e,val);
             return res*m_transform.template apply<0>(val,it);
         }
         template<typename InputIterator>
