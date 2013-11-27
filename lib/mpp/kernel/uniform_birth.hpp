@@ -77,10 +77,10 @@ namespace marked_point_process {
             double val0[dimension];
             double val1[dimension];
             double phi = m_variate(e, val0);
-            m_transform.template apply<0>(val0,val1);
+            double J01 = m_transform.template apply<0>(val0,val1);
             object_from_coordinates<T> creator;
             t = creator(val1);
-            return phi*m_transform.template abs_jacobian<1>(val1);
+            return phi/J01;
         }
 
         struct pdf_visitor {
