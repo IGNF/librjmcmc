@@ -46,14 +46,14 @@ template<typename T>
 void initialize_parameters(T* params)
 {
     params->caption("Building footprint extraction parameters");
-    params->template insert<double>("temp",'t',250,"Initial Temperature");
-    params->template insert<double>("deccoef",'C',0.9999995,"Decrease coefficient");
+    params->template insert<double>("temp",'t',300,"Initial Temperature");
+    params->template insert<double>("deccoef",'C',0.9999999,"Decrease coefficient");
     params->template insert<int>("nbiter",'I',15000000,"Number of iterations");
 //    params->template insert<double>("qtemp",'q',0.5,"Sampler (q) [0;1]");
     params->template insert<int>("nbdump",'d',10000,"Number of iterations between each result display");
 //    params->template insert<bool>("dosave",'b',false, "Save intermediate results");
     params->template insert<int>("nbsave",'S',100000,"Number of iterations between each save");
-    params->template insert<double>("poisson",'p',200, "Poisson processus parameter");
+    params->template insert<double>("poisson",'p',100, "Poisson processus parameter");
     params->template insert<double>("maxsize",'m',20, "Maximum rectangle size");
     params->template insert<double>("maxratio",'M',5, "Maximum rectangle aspect ratio");
     params->template insert<double>("p_birthdeath",'B',1, "Birth Kernel probability");

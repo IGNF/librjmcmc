@@ -68,11 +68,7 @@ namespace simulated_annealing {
                     const wxSize& size = wxDefaultSize,
                     long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
 
-            void init(int dump, int)
-            {
-                m_dump = dump;
-                m_iter = 0;
-            }
+            void init(int dump, int);
 
             template<typename Configuration, typename Sampler>
             void begin(const Configuration& config, const Sampler& sampler, double t)
@@ -91,8 +87,9 @@ namespace simulated_annealing {
 
             template<typename Configuration, typename Sampler>
             void visit(const Configuration& config, const Sampler& sampler, double t) {
-                m_proposed[sampler.kernel_id()]++;
-                if( sampler.accepted() ) m_accepted[sampler.kernel_id()]++;
+                unsigned int k = sampler.kernel_id(); // 0
+                m_proposed[k]++;
+                if( sampler.accepted() ) m_accepted[k]++;
                 if(++m_iter==m_dump)
                 {
                     m_iter = 0;
@@ -102,7 +99,7 @@ namespace simulated_annealing {
             template<typename Configuration, typename Sampler>
             void update(const Configuration& config, const Sampler& sampler, double t) {
                 begin_update();
-                unsigned int kernel_size =  sampler.kernel_size();
+                unsigned int kernel_size = sampler.kernel_size(); // 1
                 add(0,config.energy());
                 add(1,t);
                 unsigned int total_accepted =0;

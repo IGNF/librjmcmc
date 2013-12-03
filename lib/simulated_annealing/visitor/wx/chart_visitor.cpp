@@ -85,9 +85,14 @@ namespace simulated_annealing {
         }
 
 
+        void chart_visitor::init(int dump, int)
+        {
+            m_dump = 10*dump;
+            m_iter = 0;
+        }
         void chart_visitor::clear(const std::vector<std::string>& kernel_name )
         {
-            unsigned int kernel_size =  kernel_name.size();
+            unsigned int kernel_size = kernel_name.size(); // 1
             if(m_accepted) delete m_accepted;
             if(m_proposed) delete m_proposed;
             m_accepted = new unsigned int[kernel_size];
@@ -142,7 +147,8 @@ namespace simulated_annealing {
                 int g = rand()%255;
                 int b = rand()%255;
                 wxColour col(r,g,b);
-                wxString s(kernel_name[i].c_str(), *wxConvCurrent);
+                wxString s(kernel_name[i].c_str()
+                           , *wxConvCurrent);
                 m_dataset[i+2] = new VectorDataset(s);
                 m_dataset[i+2]->SetX0(0.);
                 m_dataset[i+2]->SetScaleX(m_dump);

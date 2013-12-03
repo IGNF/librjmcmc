@@ -65,7 +65,7 @@ typedef geometry::rectangle_corner_translation_transform<0>  corner_transform0;
 typedef geometry::rectangle_corner_translation_transform<1>  corner_transform1;
 typedef geometry::rectangle_corner_translation_transform<2>  corner_transform2;
 typedef geometry::rectangle_corner_translation_transform<3>  corner_transform3;
-typedef geometry::rectangle_split_merge_transform split_merge_transform;
+typedef geometry::rectangle_split_merge_transform_v2 split_merge_transform;
 
 #include "mpp/kernel/uniform_kernel.hpp"
 typedef marked_point_process::uniform_kernel<object,1,1,edge_transform0>::type  edge_kernel0;

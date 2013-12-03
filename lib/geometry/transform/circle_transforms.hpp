@@ -92,8 +92,8 @@ namespace geometry {
 
         template<int I, typename IteratorIn,typename IteratorOut>
         inline double apply  (IteratorIn in, IteratorOut out) const {
-            if(I) return forward (in,out);
-            else  return backward(in,out);
+            if(I) return backward(in,out);
+            else  return forward (in,out);
         }
 
         template<typename IteratorIn,typename IteratorOut>
