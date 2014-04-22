@@ -48,7 +48,6 @@ namespace marked_point_process {
     {
         typedef typename birth_type::value_type     value_type;
         typedef typename birth_type::transform_type transform_type;
-        typedef typename birth_type::variate_type   variate_type;
         typedef rjmcmc::null_view                   view0_type;
         typedef uniform_view<value_type,1>          view1_type;
         typedef typename birth_type::variate_type   variate0_type;

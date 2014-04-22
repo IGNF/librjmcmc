@@ -157,7 +157,7 @@ namespace geometry {
     struct rectangle_split_merge_transform_v2
     {
         enum { dimension = 10 };
-        rectangle_split_merge_transform_v2(double d=50.) : m_d(d), m_d4(d*d*d*d) {}
+        rectangle_split_merge_transform_v2(double d=400.) : m_d(d), m_d4(d*d*d*d) {}
 
         template<int I, typename Iterator>
         inline double abs_jacobian(Iterator in) const {

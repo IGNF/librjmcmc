@@ -46,62 +46,97 @@ namespace marked_point_process {
     
 
     template<typename T, typename V = typename rjmcmc::variate<coordinates_iterator<T>::dimension> >
-    class uniform_birth
+    class object_birth
     {
     public:
         enum { dimension = coordinates_iterator<T>::dimension };
         typedef typename coordinates_iterator<T>::type iterator;
         typedef T value_type;
         typedef V variate_type;
-        typedef typename rjmcmc::diagonal_affine_transform<dimension,double> transform_type;
 
         const variate_type& variate() const { return m_variate; }
-        const transform_type& transform() const { return m_transform; }
 
 
-        uniform_birth(const T& a, const T& b)
-        {
-            iterator ait  = coordinates_begin(a) , m = ait;
-            iterator bit  = coordinates_begin(b);
-            double d[dimension];
-            double *it = d;
-            for(unsigned int i=0;i<dimension; ++i) *it++ = (*bit++) - (*ait++);
-            m_transform = rjmcmc::diagonal_affine_transform<dimension,double>(d,m);
-        }
+        object_birth(const V& v) : m_variate(v) {}
+
         typedef double result_type;
 
         // used only be direct_sampler
         template<typename Engine>
         result_type operator()(Engine& e, T& t) const
         {
-            double val0[dimension];
-            double val1[dimension];
-            double phi = m_variate(e, val0);
-            double J01 = m_transform.template apply<0>(val0,val1);
+            double val[dimension];
+            double phi = m_variate(e, val);
             object_from_coordinates<T> creator;
-            t = creator(val1);
-            return phi/J01;
+            t = creator(val);
+            return phi;
         }
 
         struct pdf_visitor {
-            typedef typename uniform_birth<T>::result_type result_type;
-            const uniform_birth& m_uniform_birth;
-            inline result_type operator()(const T &t) const { return m_uniform_birth.pdf(t); }
-            pdf_visitor(const uniform_birth& g) : m_uniform_birth(g) {}
+            typedef typename object_birth<T>::result_type result_type;
+            const object_birth& m_object_birth;
+            inline result_type operator()(const T &t) const { return m_object_birth.pdf(t); }
+            pdf_visitor(const object_birth& g) : m_object_birth(g) {}
         };
         inline pdf_visitor pdf() const { return pdf_visitor(*this); }
 
         inline result_type pdf(const T &t) const
         {
-            iterator val1(coordinates_begin(t));
-            double val0[dimension];
-            double J10 = m_transform.template apply<1>(val1,val0);
-            return m_variate.pdf(val0)*J10;
+            iterator val(coordinates_begin(t));
+            return m_variate.pdf(val);
         }
     private:
         variate_type m_variate;
-        transform_type m_transform;
     };
+
+
+}
+
+
+#include "rjmcmc/kernel/transformed_variate.hpp"
+
+namespace marked_point_process {
+    template<typename T, typename V = typename rjmcmc::variate<coordinates_iterator<T>::dimension> >
+    class uniform_birth : public object_birth<
+            T,
+            rjmcmc::transformed_variate<
+                rjmcmc::diagonal_affine_transform<coordinates_iterator<T>::dimension,double>,
+                V
+            >
+          >
+
+    {
+    public:
+        enum { dimension = coordinates_iterator<T>::dimension };
+        typedef typename coordinates_iterator<T>::type iterator;
+        typedef T value_type;
+        typedef double result_type;
+        typedef typename rjmcmc::identity_transform<dimension,double> transform_type;
+        typedef typename rjmcmc::diagonal_affine_transform<dimension,double> variate_transform_type;
+        typedef typename rjmcmc::transformed_variate<variate_transform_type,V> variate_type;
+        typedef object_birth<T,variate_type> base_type;
+        
+        transform_type transform() const { return transform_type(); }
+
+    private:
+        static variate_type get_variate(const T& a, const T& b, V v)
+        {
+            iterator ait  = coordinates_begin(a) , m = ait;
+            iterator bit  = coordinates_begin(b);
+            double d[dimension];
+            double *it = d;
+            for(unsigned int i=0;i<dimension; ++i) *it++ = (*bit++) - (*ait++);
+            variate_transform_type trans(d,m);
+            return variate_type(trans,v);
+        }
+
+    public:
+        uniform_birth(const T& a, const T& b, V v = V()) : base_type(get_variate(a,b,v)) {}
+
+    };
+
+
+
 
 }; // namespace marked_point_process
 

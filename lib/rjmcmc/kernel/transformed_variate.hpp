@@ -39,7 +39,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 namespace rjmcmc {
 
-    template<typename Transform, typename Variate> // assert(Transform::dimension==Variate::dimension)
+    template<typename Transform, typename Variate = typename rjmcmc::variate<Transform::dimension> > // assert(Transform::dimension==Variate::dimension)
     class transformed_variate
     {
         Transform m_transform;
@@ -51,7 +51,8 @@ namespace rjmcmc {
         inline double operator()(Engine& e, OutputIterator it) const {
             value_type val[dimension];
             double res = m_variate(e,val);
-            return res*m_transform.template apply<0>(val,it);
+            double pdf = m_transform.template apply<0>(val,it);
+            return res/pdf; // TODO : check why this is not a multiplication...
         }
         template<typename InputIterator>
         inline double pdf(InputIterator it) const {

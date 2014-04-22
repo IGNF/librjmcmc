@@ -157,7 +157,7 @@ namespace rjmcmc {
     public:
         enum { dimension = N };
 
-        template<int I> T abs_jacobian(const T in[N]) const { return 1; }
+        template<int I, typename Iterator> T abs_jacobian(Iterator in) const { return 1; }
 
         template<int I, typename IteratorIn,typename IteratorOut>
         inline T apply  (IteratorIn in, IteratorOut out) const
