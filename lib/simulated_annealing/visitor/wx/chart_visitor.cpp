@@ -87,12 +87,16 @@ namespace simulated_annealing {
 
         void chart_visitor::init(int dump, int)
         {
-            m_dump = 10*dump;
+            m_dump = 20*dump;
             m_iter = 0;
         }
         void chart_visitor::clear(const std::vector<std::string>& kernel_name )
         {
-            unsigned int kernel_size = kernel_name.size(); // 1
+#ifdef OVERALL_ACCEPTANCE
+                unsigned int kernel_size = 1;
+#else
+                unsigned int kernel_size = kernel_name.size();
+#endif
             if(m_accepted) delete m_accepted;
             if(m_proposed) delete m_proposed;
             m_accepted = new unsigned int[kernel_size];
@@ -136,7 +140,7 @@ namespace simulated_annealing {
             }
 
             NumberAxis *acceptance = new NumberAxis(AXIS_RIGHT);
-            //acceptance->SetTitle(wxString("Acceptance", *wxConvCurrent));
+            acceptance->SetTitle(wxString("Acceptance", *wxConvCurrent));
             acceptance->SetFixedMin(0);
             acceptance->SetFixedMax(100);
             plot->AddAxis(acceptance);
@@ -147,8 +151,11 @@ namespace simulated_annealing {
                 int g = rand()%255;
                 int b = rand()%255;
                 wxColour col(r,g,b);
-                wxString s(kernel_name[i].c_str()
-                           , *wxConvCurrent);
+#ifdef OVERALL_ACCEPTANCE
+                wxString s("Overall", *wxConvCurrent);
+#else
+                wxString s(kernel_name[i].c_str(), *wxConvCurrent);
+#endif
                 m_dataset[i+2] = new VectorDataset(s);
                 m_dataset[i+2]->SetX0(0.);
                 m_dataset[i+2]->SetScaleX(m_dump);

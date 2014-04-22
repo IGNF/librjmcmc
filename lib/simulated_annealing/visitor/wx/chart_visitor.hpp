@@ -52,6 +52,8 @@ class wxChartPanel;
 #include <wx/toplevel.h>
 #include <vector>
 
+#define OVERALL_ACCEPTANCE
+
 namespace simulated_annealing {
     namespace wx {
 
@@ -87,7 +89,11 @@ namespace simulated_annealing {
 
             template<typename Configuration, typename Sampler>
             void visit(const Configuration& config, const Sampler& sampler, double t) {
-                unsigned int k = sampler.kernel_id(); // 0
+#ifdef OVERALL_ACCEPTANCE
+                unsigned int k = 0;
+#else
+                unsigned int k = sampler.kernel_id();
+#endif
                 m_proposed[k]++;
                 if( sampler.accepted() ) m_accepted[k]++;
                 if(++m_iter==m_dump)
@@ -99,7 +105,11 @@ namespace simulated_annealing {
             template<typename Configuration, typename Sampler>
             void update(const Configuration& config, const Sampler& sampler, double t) {
                 begin_update();
-                unsigned int kernel_size = sampler.kernel_size(); // 1
+#ifdef OVERALL_ACCEPTANCE
+                unsigned int kernel_size = 1;
+#else
+                unsigned int kernel_size = sampler.kernel_size();
+#endif
                 add(0,config.energy());
                 add(1,t);
                 unsigned int total_accepted =0;
