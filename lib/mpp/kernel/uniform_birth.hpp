@@ -53,9 +53,10 @@ namespace marked_point_process {
         typedef typename coordinates_iterator<T>::type iterator;
         typedef T value_type;
         typedef V variate_type;
+        typedef typename rjmcmc::identity_transform<dimension,double> transform_type;
+        transform_type transform() const { return transform_type(); }
 
         const variate_type& variate() const { return m_variate; }
-
 
         object_birth(const V& v) : m_variate(v) {}
 

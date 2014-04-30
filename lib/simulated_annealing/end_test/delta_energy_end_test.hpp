@@ -53,7 +53,7 @@ namespace simulated_annealing
         template<typename Configuration, typename Sampler>
         inline bool operator()(const Configuration&, const Sampler& s, double) {
             m_i = (s.delta()==0)? (m_i+1) : 0;
-            return m_i<m_n;
+            return m_i>=m_n;
         }
         void stop () { m_n=0; }
     private:

@@ -39,18 +39,22 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include <iostream>
 #include <iomanip>
-#include <time.h>
+//#include <time.h>
+#include <chrono>
 
 namespace simulated_annealing {
+  	using namespace std::chrono;
 
     class ostream_visitor {
     private:
         unsigned int *m_proposed;
         unsigned int *m_accepted;
-        clock_t m_clock_begin, m_clock;
+        //clock_t m_clock_begin, m_clock;
+	high_resolution_clock::time_point m_clock_begin, m_clock;
         unsigned int m_dump;
         unsigned int m_iter;
         int w;
+	int p;
         std::ostream& m_out;
         bool m_add_endline; // todo: compile time with mpl::true_/false_
 
@@ -67,7 +71,7 @@ namespace simulated_annealing {
         }
 
         template<typename Configuration, typename Sampler>
-        void begin(const Configuration& config, const Sampler& sampler, double t)
+        void begin(const Configuration& config, const Sampler& sampler, double)
         {
             unsigned int kernel_size =  sampler.kernel_size();
 
@@ -78,34 +82,45 @@ namespace simulated_annealing {
             for (unsigned int i=0; i<kernel_size; ++i) m_accepted[i] = m_proposed[i] = 0;
 
             m_out.fill(' ');
-            w = 15;
-            m_out << std::setw(w)<<"Iteration"<< std::setw(w)<< "Objects";
+            w = 20; // TODO make that configurable?
+            p = 4; // TODO make that configurable?
+            m_out << std::setw(w) << "Iteration" << std::setw(w)<< "Objects";
             for(unsigned int i=0; i<kernel_size; ++i)
             {
                 std::string s = sampler.kernel_name(i);
-                   m_out << std::setw(w)<<s;
+                m_out << std::setw(w)<<s;
              //   m_out << std::setw(w)<<("P"+s);
              //   m_out << std::setw(w)<<("A"+s);
             }
-            m_out << std::setw(w)<<"Accept"<< std::setw(w)<<"Time(ms)";
+            m_out << std::setw(w)<<"Accept"<< std::setw(w)<<"Time(microseconds)";
             m_out << std::setw(w)<<"Temp"<< std::setw(w)<<"U_1";
             m_out << std::setw(w)<<"U_2"<< std::setw(w)<<"U";
+            m_out << std::setw(w) << "Accept_prob";
+            m_out << std::setw(w) << "Delta";
+            m_out << std::setw(w) << "Green_ratio";
+            m_out << std::setw(w) << "Accepted";
+            m_out << std::setw(w) << "Kernel_ratio";
+            m_out << std::setw(w) << "Ref_pdf_ratio";
+
             if(m_add_endline)
                 m_out << std::endl;
             m_out << std::flush;
 
-            m_clock_begin = m_clock = clock();
+            //m_clock_begin = m_clock = clock();
+	    m_clock_begin = m_clock = std::chrono::high_resolution_clock::now();
         }
         template<typename Configuration, typename Sampler>
         void end(const Configuration& config, const Sampler&, double)
         {
-            clock_t clock_end = clock();
+            //clock_t clock_end = clock();
+            high_resolution_clock::time_point clock_end = std::chrono::high_resolution_clock::now();
             m_out << "Iterations finished" << std::endl;
-            m_out << "Total elapsed time (s) :  " << double(clock_end - m_clock_begin) / CLOCKS_PER_SEC << std::endl;
+            //m_out << "Total elapsed time (s) :  " << double(clock_end - m_clock_begin) / CLOCKS_PER_SEC << std::endl;
+            m_out << "Total elapsed time (s) :  " << duration_cast<duration<double>>(clock_end - m_clock_begin).count() << std::endl;
             m_out << "Graph Data energy integrity : " << config.audit_unary_energy() << "=" << config.unary_energy() << std::endl;
             m_out << "Graph Prior energy integrity: " << config.audit_binary_energy() << "=" << config.binary_energy()<< std::endl;
             m_out << "Graph Structure integrity : " << config.audit_structure() << std::endl;
-          //  m_out << config;
+            //  m_out << config;
             m_out << std::endl << std::flush;
         }
 
@@ -126,25 +141,28 @@ namespace simulated_annealing {
                 for(unsigned int k=0; k<kernel_size; ++k)
                 {
                    // m_out << std::setw(w) << 100.* m_proposed[k] / m_dump;
-                   if(m_proposed[k]) m_out << std::setw(w) << (100.* m_accepted[k]) / m_proposed[k];
-                    total_accepted += m_accepted[k];
-                    m_accepted[k] = m_proposed[k] = 0;
+                   // if(m_proposed[k]) m_out << std::setw(w) << (100.* m_accepted[k]) / m_proposed[k];
+		   m_out << std::setw(w) << std::setprecision(p) << (m_proposed[k] ? (100.* double(m_accepted[k])) / double(m_proposed[k]) : 100.);
+                   total_accepted += m_accepted[k];
+                   m_accepted[k] = m_proposed[k] = 0;
                 }
-                m_out << std::setw(w) << (100.*total_accepted) / m_dump;
-                clock_t clock_temp = clock();
-                m_out << std::setw(w) << ((clock_temp - m_clock)*1000.)/ m_dump;
+                m_out << std::setw(w) << std::setprecision(p) << (100.*total_accepted) / m_dump;
+                //clock_t clock_temp = clock();
+                high_resolution_clock::time_point clock_temp = high_resolution_clock::now();
+                //m_out << std::setw(w) << std::setprecision(p) << ((clock_temp - m_clock)*1000.)/ m_dump;
+                m_out << std::setw(w) << std::setprecision(p) << double(std::chrono::duration_cast<std::chrono::microseconds>(clock_temp - m_clock).count())/ m_dump;
                 m_clock = clock_temp;
-                m_out << std::setw(w) << t;
-                m_out << std::setw(w) << config.unary_energy();
-                m_out << std::setw(w) << config.binary_energy();
-                m_out << std::setw(w) << config.energy();
-                m_out << std::setw(w) << sampler.acceptance_probability();
-                m_out << std::setw(w) << sampler.temperature();
-                m_out << std::setw(w) << sampler.delta();
-                m_out << std::setw(w) << sampler.green_ratio();
-                m_out << std::setw(w) << sampler.accepted();
-                m_out << std::setw(w) << sampler.kernel_ratio();
-                m_out << std::setw(w) << sampler.ref_pdf_ratio();
+                m_out << std::setw(w) << std::setprecision(p) << t;
+                m_out << std::setw(w) << std::setprecision(p) << config.unary_energy();
+                m_out << std::setw(w) << std::setprecision(p) << config.binary_energy();
+                m_out << std::setw(w) << std::setprecision(p) << config.energy();
+                m_out << std::setw(w) << std::setprecision(p) << sampler.acceptance_probability();
+                //m_out << std::setw(w) << std::setprecision(p) << sampler.temperature();
+                m_out << std::setw(w) << std::setprecision(p) << sampler.delta();
+                m_out << std::setw(w) << std::setprecision(p) << sampler.green_ratio();
+                m_out << std::setw(w) << std::setprecision(p) << sampler.accepted();
+                m_out << std::setw(w) << std::setprecision(p) << sampler.kernel_ratio();
+                m_out << std::setw(w) << std::setprecision(p) << sampler.ref_pdf_ratio();
 
                 if(m_add_endline)
                     m_out << std::endl;

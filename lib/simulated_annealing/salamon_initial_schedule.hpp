@@ -39,14 +39,14 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include <cmath>
 
-template<typename DirectSampler, typename Configuration>
-double salamon_initial_schedule(const DirectSampler& sampler, Configuration& c, unsigned int iterations)
+template<typename DirectSampler, typename Engine, typename Configuration>
+double salamon_initial_schedule(const DirectSampler& sampler, Engine& e, Configuration& c, unsigned int iterations)
 {
   double e1 = 0;
   double e2 = 0;
   double inv = 1./iterations;
   for(unsigned int i=0; i<iterations; ++i) {
-    sampler(c);
+    sampler(e, c);
     double e = c.energy();
     double inv_e = inv*e;
     e1 += inv_e;
