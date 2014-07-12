@@ -16,7 +16,7 @@
 
 bool IsNormalValue(double v)
 {
-	switch (_fpclass(v)) {
+	switch (std::fpclass(v)) {
 		case _FPCLASS_SNAN:
 		case _FPCLASS_QNAN:
 		case _FPCLASS_NINF:
@@ -31,7 +31,7 @@ bool IsNormalValue(double v)
 
 bool IsNormalValue(double v)
 {
-	switch (fpclassify(v)) {
+	switch (std::fpclassify(v)) {
 		case FP_NAN:
 		case FP_INFINITE:
 		case FP_SUBNORMAL:

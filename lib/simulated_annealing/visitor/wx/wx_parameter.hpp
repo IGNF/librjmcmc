@@ -59,7 +59,11 @@ struct wx_parameter : public parameter {
 
         template<typename T> void operator()(T& t, const wxTextCtrl *ctrl) const {
             if(ctrl==NULL) return;
+#if (wxMAJOR_VERSION<3)
             wxString ws(ctrl->GetLineText(0), *wxConvCurrent);
+#else
+            wxString ws(ctrl->GetLineText(0));
+#endif
             std::string s(ws.mb_str());
             std::istringstream iss(s.c_str());
             iss >> t;

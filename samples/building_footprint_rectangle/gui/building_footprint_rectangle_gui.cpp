@@ -71,6 +71,11 @@ typedef parameters< wx_parameter > param;
 #include "gui/resources/IGN.xpm"
 //]
 
+#define NEEDS_XINITTHREADS (wxMAJOR_VERSION>=3 && !defined(__WINDOWS__) && !defined(__WXOS2__))
+#if NEEDS_XINITTHREADS
+#include <X11/Xlib.h>
+#endif
+
 //[building_footprint_rectangle_gui_app_declaration
 class building_footprint_rectangle_gui : public wxApp, public simulated_annealing::Controler
 {
@@ -233,6 +238,9 @@ public:
             m_visitor(NULL), m_thread(NULL), m_param(NULL),
             m_confg_visitor(NULL), m_param_visitor(NULL), m_chart_visitor(NULL)
     {
+#ifdef NEEDS_XINITTHREADS
+	XInitThreads ();
+#endif
     }
 
     virtual ~building_footprint_rectangle_gui() {
