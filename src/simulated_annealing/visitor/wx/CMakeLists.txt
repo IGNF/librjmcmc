@@ -14,7 +14,7 @@ if(wxWidgets_FOUND)
     
     file( GLOB WX_VISITORS_HEADER_FILES *.h *.hpp )
     file( GLOB VISITORS_HEADER_FILES ../*.h ../*.hpp )
-    include_directories(${CMAKE_SOURCE_DIR}/lib/wxfreechart/include)
+    include_directories(${CMAKE_SOURCE_DIR}/src/wxfreechart/include)
     aux_source_directory( . WX_VISITORS_SRC )
     add_library(wx_visitors STATIC ${WX_VISITORS_HEADER_FILES} ${VISITORS_HEADER_FILES} ${WX_VISITORS_SRC})
     target_link_libraries(wx_visitors wxfreechart)

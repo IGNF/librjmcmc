@@ -9,7 +9,7 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_BUILD_TYPE "Release")
 set(ROOT_DIR ${PROJECT_SOURCE_DIR})
 
-include_directories( lib )
+include_directories( src )
 
 #########################################################
 #            platform-specific setup                  ###
@@ -33,13 +33,13 @@ option(BUILD_SHARED_LIBS "Dynamic libraries" ON)
 option(BUILD_SHARED_EXE  "Dynamic executables" ON)
 
 #########################################################
-#            C++0x Variadic template OPTION           ###
+#            C++11 support OPTION                     ###
 #########################################################
-option(VARIADIC_TEMPLATES "Enable variadic template implementation" ON)
-if(VARIADIC_TEMPLATES)
-  add_definitions("-DUSE_VARIADIC_TEMPLATES=1")
+option(USE_CPP11 "Enable C++11 compilation" ON)
+if(USE_CPP11)
+  add_definitions("-DUSE_CPP11=1")
   add_definitions("-std=c++0x")
-endif(VARIADIC_TEMPLATES)
+endif(USE_CPP11)
 
 #########################################################
 # INSTALL DEFAULT CONFIGURATION and CMAKE_PREFIX_PATH ###
@@ -121,6 +121,6 @@ endif(USE_SHP)
 #########################################################
 #            Recursion to subdirs                     ###
 #########################################################
-add_subdirectory(lib)
+add_subdirectory(src)
 add_subdirectory(samples)
 add_subdirectory(doc)
