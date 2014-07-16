@@ -27,7 +27,7 @@ bool IsNormalValue(double v)
 	}
 }
 #else
-#include <math.h>
+#include <cmath>
 
 bool IsNormalValue(double v)
 {

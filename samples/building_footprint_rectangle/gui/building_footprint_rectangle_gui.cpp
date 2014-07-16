@@ -238,7 +238,7 @@ public:
             m_visitor(NULL), m_thread(NULL), m_param(NULL),
             m_confg_visitor(NULL), m_param_visitor(NULL), m_chart_visitor(NULL)
     {
-#ifdef NEEDS_XINITTHREADS
+#if NEEDS_XINITTHREADS
 	XInitThreads ();
 #endif
     }
