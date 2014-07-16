@@ -37,11 +37,12 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef MPP_UNIFORM_KERNEL_HPP
 #define MPP_UNIFORM_KERNEL_HPP
 
-#include "rjmcmc/kernel/kernel.hpp"
-#include "rjmcmc/kernel/transform.hpp"
-#include "rjmcmc/kernel/variate.hpp"
-#include "mpp/kernel/uniform_view.hpp"
-#include "geometry/coordinates/coordinates.hpp"
+#include "rjmcmc/rjmcmc/kernel/kernel.hpp"
+#include "rjmcmc/rjmcmc/kernel/transform.hpp"
+#include "rjmcmc/rjmcmc/kernel/variate.hpp"
+#include "rjmcmc/geometry/coordinates/coordinates.hpp"
+
+#include "uniform_view.hpp"
 
 namespace marked_point_process {
 

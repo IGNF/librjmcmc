@@ -49,11 +49,11 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <wx/icon.h>
 #include <wx/frame.h>
 
-#include "param/parameters_inc.hpp"
-#include "wx_parameter.hpp"
-#include "parameters_visitor.hpp"
+#include "rjmcmc/param/parameters_inc.hpp"
+#include "rjmcmc-wx/wx_parameter.hpp"
+#include "rjmcmc-wx/parameters_visitor.hpp"
+#include "rjmcmc-wx/gui/resources/IGN.xpm"
 
-#include "gui/resources/IGN.xpm"
 #include <map>
 #include <string>
 

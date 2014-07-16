@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GRADIENT_FUNCTOR_INC_HPP
 #define GRADIENT_FUNCTOR_INC_HPP
 
-#include "image/gradient_functor.hpp"
+#include "gradient_functor.hpp"
 
 #include <boost/bind.hpp>
 #include <boost/gil/extension/numeric/kernel.hpp>

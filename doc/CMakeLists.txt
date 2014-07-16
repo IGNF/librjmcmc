@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.6)
 
 option(BUILD_QUICKSTART "build quickstart" ON)
 if(BUILD_QUICKSTART)
-  file( GLOB_RECURSE LIB_HEADER_FILES    ../lib/*.hpp ../lib/*.h)
-  add_executable( quickstart quickstart.cpp ${LIB_HEADER_FILES})
+  include_directories(../include)
+  add_executable( quickstart quickstart.cpp )
   target_link_libraries( quickstart ${Boost_LIBRARIES} ${GEOMETRY_LIBRARIES} ${shapelib_LIBRARIES})
 endif(BUILD_QUICKSTART)
 

@@ -37,9 +37,9 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_HPP
 #define GEOMETRY_RECTANGLE_2_INTEGRATED_FLUX_HPP
 
-#include "geometry/Rectangle_2.hpp"
-#include "geometry/Segment_2_iterator.hpp"
-#include "geometry/Iso_rectangle_2_Segment_2_clip.hpp"
+#include "rjmcmc/geometry/Rectangle_2.hpp"
+#include "rjmcmc/geometry/Segment_2_iterator.hpp"
+#include "rjmcmc/geometry/Iso_rectangle_2_Segment_2_clip.hpp"
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
 

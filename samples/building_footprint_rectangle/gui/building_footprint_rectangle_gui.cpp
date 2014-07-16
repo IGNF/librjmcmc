@@ -35,7 +35,7 @@ knowledge of the CeCILL license and that you accept its terms.
 ***********************************************************************/
 
 //[building_footprint_rectangle_gui_parameters
-#include "simulated_annealing/visitor/wx/wx_parameter.hpp"
+#include "rjmcmc-wx/wx_parameter.hpp"
 typedef parameters< wx_parameter > param;
 #include "core/building_footprint_rectangle_parameters_inc.hpp"
 //]
@@ -45,13 +45,13 @@ typedef parameters< wx_parameter > param;
 //]
 
 //[building_footprint_rectangle_gui_visitors
-#include "simulated_annealing/visitor/composite_visitor.hpp"
-#include "simulated_annealing/visitor/wx/all.hpp"
-#include "simulated_annealing/visitor/any_visitor.hpp"
-#include "rjmcmc/sampler/any_sampler.hpp"
+#include "rjmcmc/simulated_annealing/visitor/composite_visitor.hpp"
+#include "rjmcmc-wx/all.hpp"
+#include "rjmcmc/simulated_annealing/visitor/any_visitor.hpp"
+#include "rjmcmc/rjmcmc/sampler/any_sampler.hpp"
 //]
 
-#include "simulated_annealing/salamon_initial_schedule.hpp"
+#include "rjmcmc/simulated_annealing/salamon_initial_schedule.hpp"
 
 //[building_footprint_rectangle_gui_specific
 #include <boost/thread.hpp>
@@ -68,7 +68,7 @@ typedef parameters< wx_parameter > param;
 #include <GilViewer/gui/layer_control.hpp>
 #include <GilViewer/io/gilviewer_io_factory.hpp>
 #include <GilViewer/io/gilviewer_io_factory.hpp>
-#include "gui/resources/IGN.xpm"
+#include "rjmcmc-wx/gui/resources/IGN.xpm"
 //]
 
 #define NEEDS_XINITTHREADS (wxMAJOR_VERSION>=3 && !defined(__WINDOWS__) && !defined(__WXOS2__))

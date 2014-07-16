@@ -38,9 +38,9 @@ knowledge of the CeCILL license and that you accept its terms.
 #define MPP_UNIFORM_BIRTH_DEATH_KERNEL_HPP
 
 #include "uniform_view.hpp"
-#include "rjmcmc/kernel/null_view.hpp"
-#include "rjmcmc/kernel/null_variate.hpp"
-#include "rjmcmc/kernel/kernel.hpp"
+#include "rjmcmc/rjmcmc/kernel/null_view.hpp"
+#include "rjmcmc/rjmcmc/kernel/null_variate.hpp"
+#include "rjmcmc/rjmcmc/kernel/kernel.hpp"
 
 namespace marked_point_process {
     template <typename birth_type>

@@ -44,7 +44,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <GilViewer/gui/panel_viewer.hpp>
 #include <GilViewer/gui/panel_manager.hpp>
 
-#include "configuration_visitor.hpp"
+#include "rjmcmc-wx/configuration_visitor.hpp"
 using namespace std;
 
 namespace simulated_annealing {

@@ -38,7 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define RJMCMC_VARIATE_HPP
 
 #include <boost/random/uniform_real.hpp>
-#include "rjmcmc/kernel/null_variate.hpp"
+#include "null_variate.hpp"
 
 namespace rjmcmc {
 

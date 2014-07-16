@@ -37,8 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GEOMETRY_CIRCLE_2_RECTANGLE_2_INTERSECTION_HPP
 #define GEOMETRY_CIRCLE_2_RECTANGLE_2_INTERSECTION_HPP
 
-#include "geometry/Rectangle_2.hpp"
-#include "geometry/Circle_2.hpp"
+#include "rjmcmc/geometry/Rectangle_2.hpp"
+#include "rjmcmc/geometry/Circle_2.hpp"
 
 
 namespace geometry {

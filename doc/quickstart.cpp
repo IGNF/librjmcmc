@@ -34,13 +34,13 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#include "rjmcmc/random.hpp"
+#include "rjmcmc/rjmcmc/random.hpp"
 
 //[ objects
-#include "geometry/geometry.hpp"
-#include "geometry/Circle_2.hpp"
-#include "geometry/intersection/Circle_2_intersection.hpp"
-#include "geometry/coordinates/Circle_2_coordinates.hpp"
+#include "rjmcmc/geometry/geometry.hpp"
+#include "rjmcmc/geometry/Circle_2.hpp"
+#include "rjmcmc/geometry/intersection/Circle_2_intersection.hpp"
+#include "rjmcmc/geometry/coordinates/Circle_2_coordinates.hpp"
 typedef geometry::Simple_cartesian<double> K;
 typedef K::Point_2 Point_2;
 typedef geometry::Circle_2<K> Circle_2;
@@ -48,48 +48,48 @@ typedef Circle_2 object;
 //]
 
 //[ objective_function
-#include "rjmcmc/energy/constant_energy.hpp"
-#include "rjmcmc/energy/energy_operators.hpp"
-#include "mpp/energy/intersection_area_binary_energy.hpp"
+#include "rjmcmc/rjmcmc/energy/constant_energy.hpp"
+#include "rjmcmc/rjmcmc/energy/energy_operators.hpp"
+#include "rjmcmc/mpp/energy/intersection_area_binary_energy.hpp"
 typedef constant_energy<>           unary_energy;
 typedef intersection_area_binary_energy<> binary_energy;
 
-//#include "mpp/configuration/fusion_vector_configuration.hpp"
-#include "mpp/configuration/vector_configuration.hpp"
+//#include "rjmcmc/mpp/configuration/fusion_vector_configuration.hpp"
+#include "rjmcmc/mpp/configuration/vector_configuration.hpp"
 typedef marked_point_process::vector_configuration<object, unary_energy, multiplies_energy<constant_energy<>,binary_energy> > configuration;
 
-//#include "mpp/configuration/graph_configuration.hpp"
+//#include "rjmcmc/mpp/configuration/graph_configuration.hpp"
 //typedef marked_point_process::graph_configuration<object, unary_energy, multiplies_energy<constant_energy<>,binary_energy> > configuration;
 
 //]
 
 //[ reference_process
-#include "rjmcmc/distribution/poisson_distribution.hpp"
+#include "rjmcmc/rjmcmc/distribution/poisson_distribution.hpp"
 typedef rjmcmc::poisson_distribution                   distribution;
-#include "mpp/kernel/uniform_birth.hpp"
+#include "rjmcmc/mpp/kernel/uniform_birth.hpp"
 typedef marked_point_process::uniform_birth<object> uniform_birth;
-#include "mpp/direct_sampler.hpp"
+#include "rjmcmc/mpp/direct_sampler.hpp"
 typedef marked_point_process::direct_sampler<distribution,uniform_birth> reference_process;
 //]
 
 //[ rjmcmc_sampler
-#include "rjmcmc/acceptance/metropolis_acceptance.hpp"
-#include "rjmcmc/sampler/sampler.hpp"
-#include "mpp/kernel/uniform_birth_death_kernel.hpp"
+#include "rjmcmc/rjmcmc/acceptance/metropolis_acceptance.hpp"
+#include "rjmcmc/rjmcmc/sampler/sampler.hpp"
+#include "rjmcmc/mpp/kernel/uniform_birth_death_kernel.hpp"
 typedef rjmcmc::metropolis_acceptance                                                  acceptance;
 typedef marked_point_process::uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
 typedef rjmcmc::sampler<reference_process,acceptance,birth_death_kernel>                       sampler;
 //]
 
 //[ simulated_annealing
-#include "simulated_annealing/schedule/geometric_schedule.hpp"
-#include "simulated_annealing/end_test/max_iteration_end_test.hpp"
-#include "simulated_annealing/simulated_annealing.hpp"
-#include "simulated_annealing/visitor/ostream_visitor.hpp"
-#include "simulated_annealing/visitor/tex_visitor.hpp"
-#include "simulated_annealing/visitor/composite_visitor.hpp"
+#include "rjmcmc/simulated_annealing/schedule/geometric_schedule.hpp"
+#include "rjmcmc/simulated_annealing/end_test/max_iteration_end_test.hpp"
+#include "rjmcmc/simulated_annealing/simulated_annealing.hpp"
+#include "rjmcmc/simulated_annealing/visitor/ostream_visitor.hpp"
+#include "rjmcmc/simulated_annealing/visitor/tex_visitor.hpp"
+#include "rjmcmc/simulated_annealing/visitor/composite_visitor.hpp"
 #ifdef USE_SHP
-# include "simulated_annealing/visitor/shp/shp_visitor.hpp"
+# include "rjmcmc/simulated_annealing/visitor/shp/shp_visitor.hpp"
 #endif
 //]
 

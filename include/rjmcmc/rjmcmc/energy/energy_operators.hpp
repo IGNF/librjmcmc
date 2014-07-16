@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef ENERGY_OPERATORS_HPP
 #define ENERGY_OPERATORS_HPP
 
-#include "rjmcmc/energy.hpp"
+#include "rjmcmc/rjmcmc/energy.hpp"
 
 template<typename Energy, typename Operator>
 class unary_operator_energy : public rjmcmc::energy<typename Operator::result_type>

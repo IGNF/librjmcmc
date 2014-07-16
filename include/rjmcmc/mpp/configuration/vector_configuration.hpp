@@ -38,7 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define VECTOR_CONFIGURATION_HPP
 
 #include "configuration.hpp"
-#include "rjmcmc/variant.hpp"
+#include "rjmcmc/rjmcmc/variant.hpp"
 
 namespace marked_point_process {
 

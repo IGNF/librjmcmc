@@ -37,8 +37,9 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef KERNEL_TRAITS_HPP
 #define KERNEL_TRAITS_HPP
 
+#include "rjmcmc/rjmcmc/tuple.hpp"
 
-#include "rjmcmc/tuple.hpp"
+#if USE_CPP11
 
 namespace rjmcmc {
     template<typename T> struct kernel_traits {
@@ -49,5 +50,29 @@ namespace rjmcmc {
     };
 
 }; //namespace rjmcmc
+
+#else
+
+namespace rjmcmc {
+    namespace internal { 
+        template<typename T>
+        struct kernel_traits_impl {
+            enum { size = 0 };
+        };
+
+        template <class H, class T>
+                struct kernel_traits_impl < boost::tuples::cons<H, T> > {
+            enum { size = H::size + kernel_traits_impl<T>::size };
+        };
+
+    } //  namespace internal
+
+    template<typename T> struct kernel_traits {
+        enum { size = internal::kernel_traits_impl<typename T::inherited>::size };
+    };
+
+}; //namespace rjmcmc
+
+#endif // USE_CPP11
 
 #endif // KERNEL_TRAITS_HPP

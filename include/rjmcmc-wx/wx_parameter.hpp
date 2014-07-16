@@ -48,7 +48,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <wx/checkbox.h>
 #include <wx/choice.h>
 
-#include "param/parameter.hpp"
+#include "rjmcmc/param/parameter.hpp"
 
 struct wx_parameter : public parameter {
 

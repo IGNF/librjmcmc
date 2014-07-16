@@ -38,8 +38,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #define GEOMETRY_HPP
 
 //[building_footprint_rectangle_geometry_base
-#include "geometry/geometry.hpp"
-#include "geometry/Rectangle_2.hpp"
+#include "rjmcmc/geometry/geometry.hpp"
+#include "rjmcmc/geometry/Rectangle_2.hpp"
 
 typedef geometry::Simple_cartesian<double> K;
 typedef K::Point_2 Point_2;
@@ -48,7 +48,7 @@ typedef K::Segment_2 Segment_2;
 typedef geometry::Iso_rectangle_2_traits<K>::type Iso_rectangle_2;
 typedef geometry::Rectangle_2<K> Rectangle_2;
 
-#include "geometry/coordinates/Rectangle_2_coordinates.hpp"
+#include "rjmcmc/geometry/coordinates/Rectangle_2_coordinates.hpp"
 //]
 
 #endif // GEOMETRY_HPP

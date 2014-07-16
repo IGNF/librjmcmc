@@ -37,10 +37,10 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef RJMCMC_SAMPLER_HPP
 #define RJMCMC_SAMPLER_HPP
 
-#include "rjmcmc/tuple.hpp"
-#include "rjmcmc/random_apply.hpp"
-#include "rjmcmc/kernel/kernel_traits.hpp"
-#include "rjmcmc/kernel/kernel.hpp"
+#include "rjmcmc/rjmcmc/tuple.hpp"
+#include "rjmcmc/rjmcmc/random_apply.hpp"
+#include "rjmcmc/rjmcmc/kernel/kernel_traits.hpp"
+#include "rjmcmc/rjmcmc/kernel/kernel.hpp"
 #include <iomanip>
 
 namespace rjmcmc {

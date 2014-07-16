@@ -35,7 +35,7 @@ knowledge of the CeCILL license and that you accept its terms.
 ***********************************************************************/
 
 //[building_footprint_rectangle_cli_parameters
-#include "param/parameter.hpp"
+#include "rjmcmc/param/parameter.hpp"
 typedef parameters< parameter > param;
 #include "core/building_footprint_rectangle_parameters_inc.hpp"
 //]
@@ -45,11 +45,11 @@ typedef parameters< parameter > param;
 //]
 
 //[building_footprint_rectangle_cli_visitors
-#include "rjmcmc/sampler/any_sampler.hpp"
-#include "simulated_annealing/visitor/any_visitor.hpp"
-#include "simulated_annealing/visitor/ostream_visitor.hpp"
+#include "rjmcmc/rjmcmc/sampler/any_sampler.hpp"
+#include "rjmcmc/simulated_annealing/visitor/any_visitor.hpp"
+#include "rjmcmc/simulated_annealing/visitor/ostream_visitor.hpp"
 #ifdef USE_SHP
-# include "simulated_annealing/visitor/shp/shp_visitor.hpp"
+# include "rjmcmc/simulated_annealing/visitor/shp/shp_visitor.hpp"
 #endif
 //]
 

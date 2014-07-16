@@ -37,7 +37,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef RECTANGLE_SPLIT_MERGE_KERNEL_HPP
 #define RECTANGLE_SPLIT_MERGE_KERNEL_HPP
 
-#include "geometry/Rectangle_2.hpp"
+#include "rjmcmc/geometry/Rectangle_2.hpp"
+
 namespace geometry {
     struct rectangle_split_merge_transform
     {

@@ -39,18 +39,30 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include <iostream>
 #include <iomanip>
-//#include <time.h>
+
+#if USE_CPP11
 #include <chrono>
+#else
+#include <time.h>
+#endif
 
 namespace simulated_annealing {
+
+#if USE_CPP11
   	using namespace std::chrono;
+#endif
 
     class ostream_visitor {
     private:
         unsigned int *m_proposed;
         unsigned int *m_accepted;
-        //clock_t m_clock_begin, m_clock;
+
+#if USE_CPP11
 	high_resolution_clock::time_point m_clock_begin, m_clock;
+#else
+        clock_t m_clock_begin, m_clock;
+#endif
+
         unsigned int m_dump;
         unsigned int m_iter;
         int w;
@@ -106,17 +118,25 @@ namespace simulated_annealing {
                 m_out << std::endl;
             m_out << std::flush;
 
-            //m_clock_begin = m_clock = clock();
-	    m_clock_begin = m_clock = std::chrono::high_resolution_clock::now();
+#if USE_CPP11
+	m_clock_begin = m_clock = std::chrono::high_resolution_clock::now();
+#else
+        m_clock_begin = m_clock = clock();
+#endif
+	    
         }
         template<typename Configuration, typename Sampler>
         void end(const Configuration& config, const Sampler&, double)
         {
-            //clock_t clock_end = clock();
-            high_resolution_clock::time_point clock_end = std::chrono::high_resolution_clock::now();
             m_out << "Iterations finished" << std::endl;
-            //m_out << "Total elapsed time (s) :  " << double(clock_end - m_clock_begin) / CLOCKS_PER_SEC << std::endl;
+#if USE_CPP11
+	    high_resolution_clock::time_point clock_end = std::chrono::high_resolution_clock::now();
             m_out << "Total elapsed time (s) :  " << duration_cast<duration<double>>(clock_end - m_clock_begin).count() << std::endl;
+#else
+            clock_t clock_end = clock();
+            m_out << "Total elapsed time (s) :  " << double(clock_end - m_clock_begin) / CLOCKS_PER_SEC << std::endl;
+#endif
+            
             m_out << "Graph Data energy integrity : " << config.audit_unary_energy() << "=" << config.unary_energy() << std::endl;
             m_out << "Graph Prior energy integrity: " << config.audit_binary_energy() << "=" << config.binary_energy()<< std::endl;
             m_out << "Graph Structure integrity : " << config.audit_structure() << std::endl;
@@ -147,10 +167,13 @@ namespace simulated_annealing {
                    m_accepted[k] = m_proposed[k] = 0;
                 }
                 m_out << std::setw(w) << std::setprecision(p) << (100.*total_accepted) / m_dump;
-                //clock_t clock_temp = clock();
-                high_resolution_clock::time_point clock_temp = high_resolution_clock::now();
-                //m_out << std::setw(w) << std::setprecision(p) << ((clock_temp - m_clock)*1000.)/ m_dump;
-                m_out << std::setw(w) << std::setprecision(p) << double(std::chrono::duration_cast<std::chrono::microseconds>(clock_temp - m_clock).count())/ m_dump;
+#if USE_CPP11
+	        high_resolution_clock::time_point clock_temp = high_resolution_clock::now();
+		m_out << std::setw(w) << std::setprecision(p) << double(std::chrono::duration_cast<std::chrono::microseconds>(clock_temp - m_clock).count())/ m_dump;
+#else
+            	clock_t clock_temp = clock();
+		m_out << std::setw(w) << std::setprecision(p) << ((clock_temp - m_clock)*1000.)/ m_dump;
+#endif                
                 m_clock = clock_temp;
                 m_out << std::setw(w) << std::setprecision(p) << t;
                 m_out << std::setw(w) << std::setprecision(p) << config.unary_energy();

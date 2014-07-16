@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GEOMETRY_CIRCLE_2_INTERSECTION_HPP
 #define GEOMETRY_CIRCLE_2_INTERSECTION_HPP
 
-#include "geometry/Circle_2.hpp"
+#include "rjmcmc/geometry/Circle_2.hpp"
 
 #if USE_CGAL
 

@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef WX_LOG_VISITOR_HPP
 #define WX_LOG_VISITOR_HPP
 
-#include "simulated_annealing/visitor/ostream_visitor.hpp"
+#include "rjmcmc/simulated_annealing/visitor/ostream_visitor.hpp"
 #include <wx/log.h>
 #include <sstream>
 #include <wx/thread.h>

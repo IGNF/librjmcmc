@@ -38,8 +38,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #define CIRCLE_2_PAINT_HPP
 
 #include <GilViewer/layers/layer.hpp>
-#include "geometry/geometry.hpp"
-#include "geometry/Circle_2.hpp"
+#include "rjmcmc/geometry/geometry.hpp"
+#include "rjmcmc/geometry/Circle_2.hpp"
 
 template<typename K> void paint(
         layer::ptrLayerType& l,

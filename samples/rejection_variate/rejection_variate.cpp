@@ -1,6 +1,6 @@
-#include "rjmcmc/random.hpp"
-#include "rjmcmc/kernel/variate.hpp"
-#include "rjmcmc/kernel/rejection_variate.hpp"
+#include "rjmcmc/rjmcmc/random.hpp"
+#include "rjmcmc/rjmcmc/kernel/variate.hpp"
+#include "rjmcmc/rjmcmc/kernel/rejection_variate.hpp"
 
 
 // simple predicate : is a 2D point within in the x+y<1 halfspace

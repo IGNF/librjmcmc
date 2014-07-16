@@ -37,10 +37,9 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef MPP_UNIFORM_BIRTH_HPP
 #define MPP_UNIFORM_BIRTH_HPP
 
-#include "rjmcmc/kernel/transform.hpp"
-#include "geometry/coordinates/coordinates.hpp"
-
-#include "rjmcmc/kernel/variate.hpp"
+#include "rjmcmc/rjmcmc/kernel/transform.hpp"
+#include "rjmcmc/rjmcmc/kernel/variate.hpp"
+#include "rjmcmc/geometry/coordinates/coordinates.hpp"
 
 namespace marked_point_process {
     
@@ -94,7 +93,7 @@ namespace marked_point_process {
 }
 
 
-#include "rjmcmc/kernel/transformed_variate.hpp"
+#include "rjmcmc/rjmcmc/kernel/transformed_variate.hpp"
 
 namespace marked_point_process {
     template<typename T, typename V = typename rjmcmc::variate<coordinates_iterator<T>::dimension> >

@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GEOMETRY_CIRCLE_2_INTEGRATED_FLUX_HPP
 #define GEOMETRY_CIRCLE_2_INTEGRATED_FLUX_HPP
 
-#include "geometry/Circle_2.hpp"
+#include "rjmcmc/geometry/Circle_2.hpp"
 #include <boost/gil/image.hpp>
 #include <boost/gil/extension/matis/float_images.hpp>
 

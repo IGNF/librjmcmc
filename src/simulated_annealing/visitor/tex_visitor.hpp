@@ -87,7 +87,7 @@ private:
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include "rjmcmc/variant.hpp"
+#include "rjmcmc/rjmcmc/variant.hpp"
 
 namespace simulated_annealing {
 

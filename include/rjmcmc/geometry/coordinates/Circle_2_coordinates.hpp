@@ -38,7 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define CIRCLE_2_COORDINATES_HPP
 
 #include "coordinates.hpp"
-#include "geometry/Circle_2.hpp"
+#include "rjmcmc/geometry/Circle_2.hpp"
 #include <boost/iterator/iterator_facade.hpp>
 
 

@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef RANDOM_APPLY_HPP
 #define RANDOM_APPLY_HPP
 
-#include "rjmcmc/tuple.hpp"
+#include "tuple.hpp"
 
 namespace rjmcmc {
 

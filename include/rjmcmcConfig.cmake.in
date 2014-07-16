@@ -1,0 +1,29 @@
+# @PROJECT_NAME@Config.cmake: Configuration file to use @PROJECT_NAME@
+# Authors: Nicolas David and Bruno Vallet
+# Usage: in your CMake file:
+#include(MatisMacros)
+#__default_install_configuration()
+#find_package(@PROJECT_NAME@) # if this does not work, try FIND_PACKAGE(@PROJECT_NAME@ NO_MODULE)
+#if(@PROJECT_NAME@_FOUND)
+#	include_directories(${@PROJECT_NAME@_INCLUDE_DIRS})
+#	add_definitions(${@PROJECT_NAME@_DEFINITIONS})
+#else(@PROJECT_NAME@_FOUND)
+#	message(FATAL_ERROR "@PROJECT_NAME@ NOT found ! This library can be found at @_URL@")
+#endif(@PROJECT_NAME@_FOUND)
+# and after you added your_target depending on @PROJECT_NAME@:
+#target_link_libraries(your_target ${@PROJECT_NAME@_LIBRARIES})
+
+get_filename_component(@PROJECT_NAME@_SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include(${@PROJECT_NAME@_SELF_DIR}/@PROJECT_NAME@-targets.cmake OPTIONAL)
+
+set(@PROJECT_NAME@_DEFINITIONS @@PROJECT_NAME@_DEFINITIONS@)
+set(@PROJECT_NAME@_INCLUDE_DIR "@@PROJECT_NAME@_INCLUDE_DIRS@")
+set(@PROJECT_NAME@_INCLUDE_DIRS "@@PROJECT_NAME@_INCLUDE_DIRS@")
+set(@PROJECT_NAME@_LIBRARY "@@PROJECT_NAME@_LIBRARIES@")
+set(@PROJECT_NAME@_LIBRARIES "@@PROJECT_NAME@_LIBRARIES@")
+
+include_directories("@CMAKE_INSTALL_PREFIX@/include")
+link_directories(${@PROJECT_NAME@_SELF_DIR}/../lib)
+
+message(STATUS "@PROJECT_NAME@ configured using ${@PROJECT_NAME@_SELF_DIR}/@PROJECT_NAME@Config.cmake")
+

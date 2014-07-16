@@ -34,7 +34,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#include "chart_visitor.hpp"
+#include "rjmcmc-wx/chart_visitor.hpp"
 
 #include <wx/sizer.h>
 #include "wx/chartpanel.h"
@@ -42,7 +42,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "wx/xy/xylinerenderer.h"
 #include "wx/xy/xyplot.h"
 
-#include "gui/resources/IGN.xpm"
+#include "rjmcmc-wx/gui/resources/IGN.xpm"
 
 namespace simulated_annealing {
     namespace wx {

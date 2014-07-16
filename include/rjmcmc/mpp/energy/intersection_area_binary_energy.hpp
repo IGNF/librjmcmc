@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef INTERSECTION_AREA_BINARY_ENERGY_HPP
 #define INTERSECTION_AREA_BINARY_ENERGY_HPP
 
-#include "geometry/intersection/all.hpp"
+#include "rjmcmc/geometry/intersection/all.hpp"
 #include <cmath>
 
 template<typename Value = double>

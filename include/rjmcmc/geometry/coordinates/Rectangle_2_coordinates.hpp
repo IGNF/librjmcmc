@@ -38,9 +38,9 @@ knowledge of the CeCILL license and that you accept its terms.
 #define RECTANGLE_2_COORDINATES_HPP
 
 #include "coordinates.hpp"
-#include "geometry/Rectangle_2.hpp"
+#include "rjmcmc/geometry/Rectangle_2.hpp"
 #include <boost/iterator/iterator_facade.hpp>
-#include "boost/random/uniform_smallint.hpp"
+#include <boost/random/uniform_smallint.hpp>
 
 
 //    void advance(int i) { m_i+=i; }

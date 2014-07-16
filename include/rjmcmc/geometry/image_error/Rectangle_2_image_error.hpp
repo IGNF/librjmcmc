@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GEOMETRY_RECTANGLE_2_IMAGE_ERROR_HPP
 #define GEOMETRY_RECTANGLE_2_IMAGE_ERROR_HPP
 
-#include "geometry/Rectangle_2.hpp"
+#include "rjmcmc/geometry/Rectangle_2.hpp"
 
 /*
 //TODO

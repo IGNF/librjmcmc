@@ -2,28 +2,27 @@
 #                 general setup                       ###
 #########################################################
 cmake_minimum_required(VERSION 2.6)
-project( librjmcmc CXX)
+project(rjmcmc CXX)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_BUILD_TYPE "Release")
 set(ROOT_DIR ${PROJECT_SOURCE_DIR})
 
-include_directories( lib )
 
 #########################################################
 #            platform-specific setup                  ###
 #########################################################
+set(rjmcmc_DEFINITIONS "")
 if(UNIX)
-        add_definitions(-fPIC)
-        add_definitions(-Wno-deprecated) # hide BGL hash_set deprecation warning
-        set(wxWidgets_REQUIRED_COMPONENTS adv base core xml aui xrc html ) # png expat)
+        set(rjmcmc_DEFINITIONS "${rjmcmc_DEFINITIONS} -fPIC")
+        set(rjmcmc_DEFINITIONS "${rjmcmc_DEFINITIONS} -Wno-deprecated") # hide BGL hash_set deprecation warning
 endif(UNIX)
 
 if(WIN32)
-        add_definitions(/MP) # multiprocess compilation
-        set(wxWidgets_REQUIRED_COMPONENTS adv base core xml aui xrc html expat) #  zlib png
+        set(rjmcmc_DEFINITIONS "${rjmcmc_DEFINITIONS} /MP")
 endif(WIN32)
+
 
 #########################################################
 #            Compilation OPTION                       ###
@@ -33,13 +32,12 @@ option(BUILD_SHARED_LIBS "Dynamic libraries" ON)
 option(BUILD_SHARED_EXE  "Dynamic executables" ON)
 
 #########################################################
-#            C++0x Variadic template OPTION           ###
+#            C++11 support OPTION                     ###
 #########################################################
-option(VARIADIC_TEMPLATES "Enable variadic template implementation" ON)
-if(VARIADIC_TEMPLATES)
-  add_definitions("-DUSE_VARIADIC_TEMPLATES=1")
-  add_definitions("-std=c++0x")
-endif(VARIADIC_TEMPLATES)
+option(USE_CPP11 "Enable C++11 compilation" ON)
+if(USE_CPP11)
+    set(rjmcmc_DEFINITIONS "${rjmcmc_DEFINITIONS} -DUSE_CPP11=1 -std=c++0x")
+endif(USE_CPP11)
 
 #########################################################
 # INSTALL DEFAULT CONFIGURATION and CMAKE_PREFIX_PATH ###
@@ -54,7 +52,6 @@ if(WIN32)
        set(CMAKE_PREFIX_PATH ${INSTALL_PREFIX} ${CMAKE_INSTALL_PREFIX} )
 endif(WIN32)
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL  " real install path" FORCE)
-
 
 #########################################################
 #            Finding REQUIRED package Boost           ###
@@ -78,9 +75,9 @@ link_directories( ${Boost_LIBRARY_DIRS} )
 
 if(WIN32)
     message(STATUS "Boost_LIB_DIAGNOSTIC_DEFINITIONS ${Boost_LIB_DIAGNOSTIC_DEFINITIONS} ")
-	add_definitions( ${Boost_LIB_DIAGNOSTIC_DEFINITIONS} )
+    set(rjmcmc_DEFINITIONS "${rjmcmc_DEFINITIONS} ${Boost_LIB_DIAGNOSTIC_DEFINITIONS}" )
     if(NOT Boost_USE_STATIC_LIBS)
-		add_definitions("/DBOOST_ALL_DYN_LINK" )
+        set(rjmcmc_DEFINITIONS "${rjmcmc_DEFINITIONS} /DBOOST_ALL_DYN_LINK" )
     endif(NOT Boost_USE_STATIC_LIBS)
 endif(WIN32)
 
@@ -95,7 +92,7 @@ endif(USE_CGAL)
 
 if(USE_CGAL)
   include(${CGAL_USE_FILE})
-  add_definitions("-DUSE_CGAL=1")
+  set(rjmcmc_DEFINITIONS "${rjmcmc_DEFINITIONS} -DUSE_CGAL=1")
   set(GEOMETRY_LIBRARIES ${CGAL_LIBRARIES})
 else(USE_CGAL)
   set(GEOMETRY_LIBRARIES )
@@ -103,24 +100,16 @@ endif(USE_CGAL)
 
 
 #########################################################
-#            Finding OPTIONAL package shapelib        ###
-#########################################################
-option(USE_SHP "Use SHP library" ON)
-
-if(USE_SHP)
-    find_package(shapelib QUIET)
-    if(NOT shapelib_FOUND)
-		set(shapelib_LIBRARIES "shp" CACHE PATH "SHP library" FORCE  )
-		set(shapelib_INCLUDE_DIRS "" CACHE PATH "SHP include directories" FORCE)
-	endif(NOT shapelib_FOUND)
-    add_definitions("-DUSE_SHP=1")
-    add_definitions(${shapelib_DEFINITIONS})
-    include_directories(${shapelib_INCLUDE_DIRS})
-endif(USE_SHP)
-
-#########################################################
 #            Recursion to subdirs                     ###
 #########################################################
-add_subdirectory(lib)
+
+set(rjmcmc_INCLUDE_DIRS "${Boost_INCLUDE_DIRS}")
+set(rjmcmc_LIBRARIES "${GEOMETRY_LIBRARIES}")
+
+add_definitions(${rjmcmc_DEFINITIONS})
+
+add_subdirectory(extern)
+add_subdirectory(include)
+add_subdirectory(src)
 add_subdirectory(samples)
 add_subdirectory(doc)

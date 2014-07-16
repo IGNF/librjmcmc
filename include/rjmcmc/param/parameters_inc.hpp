@@ -41,7 +41,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
-#include "param/parameter.hpp"
+#include "parameter.hpp"
 
 template<typename T>
 struct option_adder {

@@ -2,6 +2,7 @@
 project( building_footprint_rectangle )
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
+include_directories( ${CMAKE_SOURCE_DIR}/include )
 
 option(BUILD_BUILDING_FOOTPRINT_RECTANGLE_CLI "build building_footprint_rectangle CLI sample" ON)
 option(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GUI "build building_footprint_rectangle GUI sample" ON)

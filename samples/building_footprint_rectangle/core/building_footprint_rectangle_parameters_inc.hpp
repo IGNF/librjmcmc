@@ -38,7 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define BUILDING_FOOTPRINT_RECTANGLE_PARAMETERS_INC_HPP
 
 //[building_footprint_rectangle_parameters_lib_include
-#include "param/parameters_inc.hpp"
+#include "rjmcmc/param/parameters_inc.hpp"
 //]
 
 //[building_footprint_rectangle_initialize_parameters

@@ -37,8 +37,9 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef MPP_UNIFORM_VIEW_HPP
 #define MPP_UNIFORM_VIEW_HPP
 
-#include "geometry/coordinates/coordinates.hpp"
-#include "boost/random/uniform_smallint.hpp"
+#include <boost/random/uniform_smallint.hpp>
+
+#include "rjmcmc/geometry/coordinates/coordinates.hpp"
 
 namespace marked_point_process {
     

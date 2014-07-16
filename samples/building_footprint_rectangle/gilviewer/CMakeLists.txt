@@ -21,7 +21,7 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/wxfreechart/include)
 file( GLOB SRCS *.c *.cpp *.cxx *.h *.hpp *.hxx)
 add_library(GilViewer-building_footprint_rectangle SHARED ${SRCS})
 
-target_link_libraries(GilViewer-building_footprint_rectangle ${BUILDING_FOOTPRINT_RECTANGLE_LIBRARIES} ${Boost_LIBRARIES} ${wxWidgets_LIBRARIES} GilViewer tinyxml wxfreechart wx_visitors boost_program_options)
+target_link_libraries(GilViewer-building_footprint_rectangle ${BUILDING_FOOTPRINT_RECTANGLE_LIBRARIES} ${Boost_LIBRARIES} ${wxWidgets_LIBRARIES} GilViewer tinyxml wxfreechart rjmcmc-wx boost_program_options)
 
 install(TARGETS GilViewer-building_footprint_rectangle
     EXPORT GilViewer-targets

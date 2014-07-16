@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef BUILDING_FOOTPRINT_RECTANGLE_HPP
 #define BUILDING_FOOTPRINT_RECTANGLE_HPP
 
-#include "rjmcmc/random.hpp"
+#include "rjmcmc/rjmcmc/random.hpp"
 //<-
 /************** application-specific types ****************/
 //->
@@ -48,15 +48,15 @@ typedef Rectangle_2 object;
 //]
 
 //[building_footprint_rectangle_definition_kernels
-#include "mpp/kernel/uniform_birth.hpp"
+#include "rjmcmc/mpp/kernel/uniform_birth.hpp"
 typedef marked_point_process::uniform_birth<object> uniform_birth;
-#include "mpp/kernel/uniform_birth_death_kernel.hpp"
+#include "rjmcmc/mpp/kernel/uniform_birth_death_kernel.hpp"
 typedef marked_point_process::uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
 
-#include "rjmcmc/kernel/transform.hpp"
-#include "geometry/transform/rectangle_corner_translation_transform.hpp"
-#include "geometry/transform/rectangle_edge_translation_transform.hpp"
-#include "geometry/transform/rectangle_split_merge_transform.hpp"
+#include "rjmcmc/rjmcmc/kernel/transform.hpp"
+#include "rjmcmc/geometry/transform/rectangle_corner_translation_transform.hpp"
+#include "rjmcmc/geometry/transform/rectangle_edge_translation_transform.hpp"
+#include "rjmcmc/geometry/transform/rectangle_split_merge_transform.hpp"
 typedef geometry::rectangle_edge_translation_transform<0>    edge_transform0;
 typedef geometry::rectangle_edge_translation_transform<1>    edge_transform1;
 typedef geometry::rectangle_edge_translation_transform<2>    edge_transform2;
@@ -67,7 +67,7 @@ typedef geometry::rectangle_corner_translation_transform<2>  corner_transform2;
 typedef geometry::rectangle_corner_translation_transform<3>  corner_transform3;
 typedef geometry::rectangle_split_merge_transform_v2 split_merge_transform;
 
-#include "mpp/kernel/uniform_kernel.hpp"
+#include "rjmcmc/mpp/kernel/uniform_kernel.hpp"
 typedef marked_point_process::uniform_kernel<object,1,1,edge_transform0>::type  edge_kernel0;
 typedef marked_point_process::uniform_kernel<object,1,1,edge_transform1>::type  edge_kernel1;
 typedef marked_point_process::uniform_kernel<object,1,1,edge_transform2>::type  edge_kernel2;
@@ -80,14 +80,14 @@ typedef marked_point_process::uniform_kernel<object,1,2,split_merge_transform>::
 //]
 
 //[building_footprint_rectangle_definition_energies
-#include "rjmcmc/energy/energy_operators.hpp"
-#include "mpp/energy/image_gradient_unary_energy.hpp"
-#include "image/gradient_functor.hpp"
-#include "image/oriented.hpp"
+#include "rjmcmc/rjmcmc/energy/energy_operators.hpp"
+#include "rjmcmc/mpp/energy/image_gradient_unary_energy.hpp"
+#include "rjmcmc/image/gradient_functor.hpp"
+#include "rjmcmc/image/oriented.hpp"
 typedef oriented<gradient_image_t>                          oriented_gradient_image;
 typedef image_gradient_unary_energy<oriented_gradient_image> unary_energy;
 
-#include "mpp/energy/intersection_area_binary_energy.hpp"
+#include "rjmcmc/mpp/energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy<>                   binary_energy;
 //]
 
@@ -97,18 +97,18 @@ typedef intersection_area_binary_energy<>                   binary_energy;
 
 //[building_footprint_rectangle_definition_simulated_annealing
 /*< Choice of the schedule (/include/ and /typedef/) >*/
-#include "simulated_annealing/schedule/geometric_schedule.hpp"
+#include "rjmcmc/simulated_annealing/schedule/geometric_schedule.hpp"
 typedef simulated_annealing::geometric_schedule<double> schedule;
 /*< Choice of the end_test (/include/ and /typedef/) >*/
-#include "simulated_annealing/end_test/max_iteration_end_test.hpp"
+#include "rjmcmc/simulated_annealing/end_test/max_iteration_end_test.hpp"
 typedef simulated_annealing::max_iteration_end_test     end_test;
 //]
 
 //[building_footprint_rectangle_definition_configuration
 
-#include "mpp/energy/image_center_unary_energy.hpp"
+#include "rjmcmc/mpp/energy/image_center_unary_energy.hpp"
 typedef oriented<boost::gil::gray16_image_t> mask_type;
-#include "mpp/configuration/graph_configuration.hpp"
+#include "rjmcmc/mpp/configuration/graph_configuration.hpp"
 typedef marked_point_process::graph_configuration<
         object,
         minus_energy<constant_energy<>,multiplies_energy<constant_energy<>,unary_energy> >,
@@ -117,17 +117,17 @@ typedef marked_point_process::graph_configuration<
 //]
 
 //[building_footprint_rectangle_definition_distribution
-#include "rjmcmc/distribution/poisson_distribution.hpp"
+#include "rjmcmc/rjmcmc/distribution/poisson_distribution.hpp"
 typedef rjmcmc::poisson_distribution                           distribution;
 //]
 
 //[building_footprint_rectangle_definition_sampler
-#include "rjmcmc/sampler/sampler.hpp"
+#include "rjmcmc/rjmcmc/sampler/sampler.hpp"
 
-#include "mpp/direct_sampler.hpp"
+#include "rjmcmc/mpp/direct_sampler.hpp"
 typedef marked_point_process::direct_sampler<distribution,uniform_birth> d_sampler;
 
-#include "rjmcmc/acceptance/metropolis_acceptance.hpp"
+#include "rjmcmc/rjmcmc/acceptance/metropolis_acceptance.hpp"
 typedef rjmcmc::metropolis_acceptance acceptance;
 
 //typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel> sampler;
@@ -166,7 +166,7 @@ void set_bbox(param *p, const Iso_rectangle_2& r) {
 //]
 
 //[building_footprint_rectangle_create_configuration
-#include "image/conversion_functor.hpp"
+#include "rjmcmc/image/conversion_functor.hpp"
 #include <boost/gil/extension/io_new/tiff_write.hpp>
 
 void create_configuration(const param *p, const oriented_gradient_image& grad, configuration *&c) {
@@ -305,13 +305,13 @@ void init_visitor(const param *p, Visitor& v)
 //]
 
 //[building_footprint_rectangle_image_include_tpl_instanciations
-#include "image/image_types.hpp"
-#include "image/oriented_inc.hpp"
-#include "image/gradient_functor_inc.hpp"
+#include "rjmcmc/image/image_types.hpp"
+#include "rjmcmc/image/oriented_inc.hpp"
+#include "rjmcmc/image/gradient_functor_inc.hpp"
 //]
 
 //[building_footprint_rectangle_optimization
-#include "simulated_annealing/simulated_annealing.hpp"
+#include "rjmcmc/simulated_annealing/simulated_annealing.hpp"
 //]
 
 #endif // BUILDING_FOOTPRINT_RECTANGLE_HPP

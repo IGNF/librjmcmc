@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GEOMETRY_ISO_RECTANGLE_2_INTERSECTION_HPP
 #define GEOMETRY_ISO_RECTANGLE_2_INTERSECTION_HPP
 
-#include "geometry/geometry.hpp"
+#include "rjmcmc/geometry/geometry.hpp"
 
 #if USE_CGAL
 

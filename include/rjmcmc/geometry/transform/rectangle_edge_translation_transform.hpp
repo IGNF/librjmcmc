@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef RECTANGLE_SCALED_EDGE_KERNEL_HPP
 #define RECTANGLE_SCALED_EDGE_KERNEL_HPP
 
-#include "geometry/Rectangle_2.hpp"
+#include "rjmcmc/geometry/Rectangle_2.hpp"
 
 namespace geometry {
 

@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef GEOMETRY_RECTANGLE_2_INTERSECTION_HPP
 #define GEOMETRY_RECTANGLE_2_INTERSECTION_HPP
 
-#include "geometry/Rectangle_2.hpp"
+#include "rjmcmc/geometry/Rectangle_2.hpp"
 
 #ifdef CGAL_RECTANGLE_2_COMPILE_BOOLEAN_INTERSECTION
 #include <CGAL/Polygon_2_algorithms.h>
