@@ -10,8 +10,8 @@ option(BUILD_BUILDING_FOOTPRINT_EXTRACTION_GUI "build building_footprint_extract
 #copy the data image
 add_custom_target(building_footprint_extraction_data
   "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/data"
-  COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_SOURCE_DIR}/data/test.tif"      "${CMAKE_BINARY_DIR}/data"
-  COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_SOURCE_DIR}/data/test_ndvi.tif" "${CMAKE_BINARY_DIR}/data"
+  COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_SOURCE_DIR}/samples/data/test.tif"      "${CMAKE_BINARY_DIR}/data"
+  COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_SOURCE_DIR}/samples/data/test_ndvi.tif" "${CMAKE_BINARY_DIR}/data"
 )
 
 if(BUILD_BUILDING_FOOTPRINT_EXTRACTION_CLI OR BUILD_BUILDING_FOOTPRINT_EXTRACTION_GUI)

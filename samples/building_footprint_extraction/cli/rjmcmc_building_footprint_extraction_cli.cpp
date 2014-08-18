@@ -1,21 +1,21 @@
 // parameters
-#include "param/parameter.hpp"
+#include "rjmcmc/param/parameter.hpp"
 typedef parameters< parameter > param;
 #include "core/building_footprint_extraction_parameters_inc.hpp"
 
 // images
-#include "image/image_types.hpp"
+#include "rjmcmc/image/image_types.hpp"
 
 // optimization
 #include "core/building_footprint_extraction.hpp"
-#include "simulated_annealing/simulated_annealing.hpp"
+#include "rjmcmc/simulated_annealing/simulated_annealing.hpp"
 
 // visitors
-#include "simulated_annealing/visitor/ostream_visitor.hpp"
+#include "rjmcmc/simulated_annealing/visitor/ostream_visitor.hpp"
 
 // template instanciations
-#include "image/oriented_inc.hpp"
-#include "image/gradient_functor_inc.hpp"
+#include "rjmcmc/image/oriented_inc.hpp"
+#include "rjmcmc/image/gradient_functor_inc.hpp"
 #include "core/global_reconstruction_unary_energy_inc.hpp"
 
 int main(int argc , char** argv)

@@ -1,7 +1,7 @@
 #ifndef BUILDING_FOOTPRINT_EXTRACTION_PARAMETERS_INC_HPP
 #define BUILDING_FOOTPRINT_EXTRACTION_PARAMETERS_INC_HPP
 
-#include "param/parameters_inc.hpp"
+#include "rjmcmc/param/parameters_inc.hpp"
 
 template<typename T>
 void initialize_parameters(T* params)

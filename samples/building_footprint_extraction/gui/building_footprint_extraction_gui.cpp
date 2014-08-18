@@ -1,28 +1,28 @@
 // parameters
-#include "param/wx_parameter.hpp"
+#include "rjmcmc-wx/wx_parameter.hpp"
 typedef parameters< wx_parameter > param;
 #include "core/building_footprint_extraction_parameters_inc.hpp"
 
 // images
-#include "image/image_types.hpp"
+#include "rjmcmc/image/image_types.hpp"
 
 // optimization
 #include "core/building_footprint_extraction.hpp"
-#include "simulated_annealing/simulated_annealing.hpp"
+#include "rjmcmc/simulated_annealing/simulated_annealing.hpp"
 
 // visitors
-#include "simulated_annealing/visitor/all.hpp"
-#include "simulated_annealing/visitor/wx/all.hpp"
+#include "rjmcmc/simulated_annealing/visitor/all.hpp"
+#include "rjmcmc/simulated_annealing/visitor/wx/all.hpp"
 
 // template instanciations
 #include "core/global_reconstruction_unary_energy_inc.hpp"
-#include "image/oriented_inc.hpp"
-#include "image/gradient_functor_inc.hpp"
+#include "rjmcmc/image/oriented_inc.hpp"
+#include "rjmcmc/image/gradient_functor_inc.hpp"
 
 // threading and wx
 #include <boost/thread.hpp>
 #include <wx/app.h>
-#include "gui/resources/IGN.xpm"
+#include "rjmcmc/gui/resources/IGN.xpm"
 
 class building_footprint_rectangle_gui : public wxApp, public Controler
 { 

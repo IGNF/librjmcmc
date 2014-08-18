@@ -9,8 +9,8 @@ typedef boost::variant<Rectangle_2,Circle_2> object;
 //typedef Rectangle_2 object;
 
 #include "core/global_reconstruction_unary_energy.hpp"
-#include "image/gradient_functor.hpp"
-#include "image/oriented.hpp"
+#include "rjmcmc/image/gradient_functor.hpp"
+#include "rjmcmc/image/oriented.hpp"
 typedef oriented<gradient_image_t> oriented_gradient_view;
 
 //typedef boost::gil::gray16s_image_t ndvi_image_t;
@@ -18,18 +18,18 @@ typedef rjmcmc::any_image_t ndvi_image_t;
 typedef oriented<ndvi_image_t>     oriented_ndvi_view;
 typedef global_reconstruction_unary_energy<oriented_gradient_view,oriented_ndvi_view> unary_energy;
 
-#include "mpp/energy/intersection_area_binary_energy.hpp"
+#include "rjmcmc/mpp/energy/intersection_area_binary_energy.hpp"
 typedef intersection_area_binary_energy<>      binary_energy;
 
-#include "mpp/rectilinear_searchspace.hpp"
+#include "rjmcmc/mpp/rectilinear_searchspace.hpp"
 typedef rectilinear_searchspace<object> searchspace;
 
-#include "rjmcmc/kernel/transform_kernels.hpp"
+#include "rjmcmc/rjmcmc/kernel/transform_kernels.hpp"
 typedef rjmcmc::generator<searchspace>          generator_kernel;
 
-#include "geometry/kernels/rectangle_scaled_edge_kernel.hpp"
-#include "geometry/kernels/rectangle_rotation_scaled_corner_kernel.hpp"
-#include "geometry/kernels/circle_translation_kernel.hpp"
+#include "rjmcmc/geometry/kernels/rectangle_scaled_edge_kernel.hpp"
+#include "rjmcmc/geometry/kernels/rectangle_rotation_scaled_corner_kernel.hpp"
+#include "rjmcmc/geometry/kernels/circle_translation_kernel.hpp"
 typedef geometry::rectangle_scaled_edge_kernel<K> modifier_kernel1;
 typedef geometry::rectangle_rotation_scaled_corner_kernel<K> modifier_kernel2;
 typedef geometry::circle_translation_kernel<K> modifier_kernel3;
@@ -40,24 +40,24 @@ typedef geometry::circle_translation_kernel<K> modifier_kernel3;
 //#include "simulated_annealing/schedule/logarithmic_schedule.hpp"
 //#include "simulated_annealing/schedule/step_schedule.hpp"
 //typedef simulated_annealing::step_schedule<rjmcmc::logarithmic_schedule<double> > schedule;
-#include "simulated_annealing/schedule/geometric_schedule.hpp"
+#include "rjmcmc/simulated_annealing/schedule/geometric_schedule.hpp"
 typedef simulated_annealing::geometric_schedule<double> schedule;
 
-#include "simulated_annealing/end_test/max_iteration_end_test.hpp"
+#include "rjmcmc/simulated_annealing/end_test/max_iteration_end_test.hpp"
 typedef simulated_annealing::max_iteration_end_test                           end_test;
 
 //#include "mpp/configuration/vector_configuration.hpp"
 //typedef marked_point_process::vector_configuration<object, unary_energy, binary_energy> configuration;
-#include "mpp/configuration/graph_configuration.hpp"
+#include "rjmcmc/mpp/configuration/graph_configuration.hpp"
 typedef marked_point_process::graph_configuration<object, unary_energy, binary_energy> configuration;
 
-#include "rjmcmc/distribution/poisson_distribution.hpp"
+#include "rjmcmc/rjmcmc/distribution/poisson_distribution.hpp"
 typedef rjmcmc::poisson_distribution                           distribution;
 //#include "mpp/distribution/uniform_distribution.hpp"
 //typedef marked_point_process::uniform_distribution                           distribution;
 
-#include "rjmcmc/sampler/sampler.hpp"
-#include "mpp/kernel/kernel.hpp"
+#include "rjmcmc/rjmcmc/sampler/sampler.hpp"
+#include "rjmcmc/mpp/kernel/kernel.hpp"
 typedef mpp::uniform_birth_kernel<generator_kernel>           birth_kernel;
 typedef mpp::uniform_death_kernel                             death_kernel;
 typedef rjmcmc::binary_kernel<birth_kernel,death_kernel>      birth_death_kernel;
@@ -70,10 +70,10 @@ typedef mpp::modification_kernel<modifier_kernel3>            modification_kerne
 //typedef rjmcmc::dueck_scheuer_acceptance acceptance;
 //#include "rjmcmc/sampler/franz_hoffmann_sampler.hpp"
 //typedef rjmcmc::franz_hoffmann_acceptance acceptance;
-#include "rjmcmc/acceptance/metropolis_acceptance.hpp"
+#include "rjmcmc/rjmcmc/acceptance/metropolis_acceptance.hpp"
 typedef rjmcmc::metropolis_acceptance acceptance;
 
-#include "mpp/direct_sampler.hpp"
+#include "rjmcmc/mpp/direct_sampler.hpp"
 typedef marked_point_process::direct_sampler<distribution,generator_kernel> d_sampler;
 
 typedef rjmcmc::sampler<d_sampler,acceptance,birth_death_kernel
