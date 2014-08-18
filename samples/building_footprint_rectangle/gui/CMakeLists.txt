@@ -1,49 +1,15 @@
+find_package(rjmcmc REQUIRED COMPONENTS wx)
+include_directories(${rjmcmc_INCLUDE_DIRS})
+add_definitions(${rjmcmc_DEFINITIONS})
+include_directories(../core)
+
+message(STATUS "${rjmcmc_INCLUDE_DIRS}")
+
 if(WIN32)
-    if(MSVC)
-		add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
-		add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-	endif() # MSVC
-endif() # WIN32
-
-find_package( TIFF REQUIRED )
-if(TIFF_FOUND)
-	include_directories(${TIFF_INCLUDE_DIR})
-else()
-	message(FATAL_ERROR "TIFF not found ! Please set TIFF path ...")
+  set(exe_FLAG "WIN32")
 endif()
 
-#Find wxWidgets
-set(wxWidgets_EXCLUDE_COMMON_LIBRARIES TRUE)
-find_package(wxWidgets REQUIRED ${wxWidgets_REQUIRED_COMPONENTS})
-if(WIN32)
-    message(STATUS "wxWidgets_DEFINITIONS ${wxWidgets_DEFINITIONS} ")
-    add_definitions("/D${wxWidgets_DEFINITIONS}")
-endif()
-include(${wxWidgets_USE_FILE})
+file( GLOB SRCS *.c *.cpp *.cxx *.h *.hpp *.hxx)
+add_executable( building_footprint_rectangle_gui ${exe_FLAG} ${SRCS} )
+target_link_libraries( building_footprint_rectangle_gui ${rjmcmc_LIBRARIES})
 
-
-find_package( GilViewer )
-if(GilViewer_FOUND)
-	include_directories(${GilViewer_INCLUDE_DIRS})
-	link_directories(${GilViewer_INCLUDE_DIRS}/../lib)
-else()
-	message(FATAL_ERROR "GilViewer NOT found!")
-endif()
-if(wxWidgets_FOUND AND GilViewer_FOUND )
-    file( GLOB ALL_GUI_HEADER_FILES *.h *.hpp )
-    file( GLOB ALL_CORE_HEADER_FILES ../core/*.h ../core/*.hpp )
-    aux_source_directory( ${CMAKE_CURRENT_SOURCE_DIR} ALL_GUI_SRC )
-    set( GUI_SRC ${ALL_LIBRJMCMC_HEADERS_FILES} ${ALL_GUI_HEADER_FILES} ${ALL_CORE_HEADER_FILES} ${ALL_GUI_SRC} )
-
-    include_directories(${CMAKE_SOURCE_DIR}/lib/wxfreechart/include)
-    include(${wxWidgets_USE_FILE})
-    if(UNIX)
-		add_executable( building_footprint_rectangle_gui ${GUI_SRC} )
-                target_link_libraries( building_footprint_rectangle_gui ${BUILDING_FOOTPRINT_RECTANGLE_LIBRARIES} ${Boost_LIBRARIES} ${wxWidgets_LIBRARIES} GilViewer tinyxml wxfreechart rjmcmc-wx X11 )
-	else()
-		add_executable( building_footprint_rectangle_gui WIN32 ${GUI_SRC} )
-		target_link_libraries( building_footprint_rectangle_gui ${BUILDING_FOOTPRINT_RECTANGLE_LIBRARIES} ${Boost_LIBRARIES} ${wxWidgets_LIBRARIES} GilViewer tinyxml wxfreechart rjmcmc-wx  )
-	endif()
-	message(STATUS "BUILDING_FOOTPRINT_RECTANGLE_LIBRARIES ${BUILDING_FOOTPRINT_RECTANGLE_LIBRARIES} ")
-
-endif()

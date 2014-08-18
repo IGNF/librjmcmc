@@ -1,21 +1,15 @@
 # Project name
 project( building_footprint_rectangle )
 
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
-include_directories( ${CMAKE_SOURCE_DIR}/include )
-
 option(BUILD_BUILDING_FOOTPRINT_RECTANGLE_CLI "build building_footprint_rectangle CLI sample" ON)
 option(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GUI "build building_footprint_rectangle GUI sample" ON)
 option(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GILVIEWER "build building_footprint_rectangle GILVIEWER plugin" ON)
 
-
 #copy the data image
 add_custom_target(building_footprint_rectangle_data
   "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/data"
-  COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_SOURCE_DIR}/data/ZTerrain_c3.tif" "${CMAKE_BINARY_DIR}/data"
+  COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_SOURCE_DIR}/samples/data/ZTerrain_c3.tif" "${CMAKE_BINARY_DIR}/data"
 )
-
-add_subdirectory(core)
 
 if(BUILD_BUILDING_FOOTPRINT_RECTANGLE_CLI)
   add_subdirectory(cli)

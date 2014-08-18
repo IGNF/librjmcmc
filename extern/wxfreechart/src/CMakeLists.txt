@@ -1,41 +1,50 @@
-cmake_minimum_required(VERSION 2.6)
+
+find_package(wxWidgets REQUIRED ${wxWidgets_REQUIRED_COMPONENTS})
+INCLUDE(${wxWidgets_USE_FILE})
+
+include_directories( ../include )
+file( GLOB wxfreechart_HEADERS ../include/wx/*.h ../include/wx/*/*.h )
 
 aux_source_directory( . MAIN_SRC )
-set(WXFREECHART_SRC ${MAIN_SRC})
+set(wxfreechart_SRC ${MAIN_SRC})
 
 macro(wxfreechart_add_module src  module MODULE default)
-  option(WXFREECHART_${MODULE} "Building wxfreechart module ${module}" ${default})
-  if(WXFREECHART_${MODULE})
+  option(wxfreechart_${MODULE} "Building wxfreechart module ${module}" ${default})
+  if(wxfreechart_${MODULE})
     aux_source_directory( ${module} ${MODULE}_SRC )
     set(${src} ${${src}} ${${MODULE}_SRC})
   endif()
-  mark_as_advanced(WXFREECHART_${MODULE})
+  mark_as_advanced(wxfreechart_${MODULE})
 endmacro(wxfreechart_add_module)
 
-wxfreechart_add_module(WXFREECHART_SRC axis         AXIS         1)
-wxfreechart_add_module(WXFREECHART_SRC category     CATEGORY     1)
-wxfreechart_add_module(WXFREECHART_SRC bars         BARS         1)
-wxfreechart_add_module(WXFREECHART_SRC xy           XY           1)
-wxfreechart_add_module(WXFREECHART_SRC xy/functions XY_FUNCTIONS 0)
-wxfreechart_add_module(WXFREECHART_SRC xyz          XYZ          0)
-wxfreechart_add_module(WXFREECHART_SRC gantt        GANTT        0)
-wxfreechart_add_module(WXFREECHART_SRC ohlc         OHLC         0)
-wxfreechart_add_module(WXFREECHART_SRC pie          PIE          0)
+wxfreechart_add_module(wxfreechart_SRC axis         AXIS         1)
+wxfreechart_add_module(wxfreechart_SRC category     CATEGORY     1)
+wxfreechart_add_module(wxfreechart_SRC bars         BARS         1)
+wxfreechart_add_module(wxfreechart_SRC xy           XY           1)
+wxfreechart_add_module(wxfreechart_SRC xy/functions XY_FUNCTIONS 0)
+wxfreechart_add_module(wxfreechart_SRC xyz          XYZ          0)
+wxfreechart_add_module(wxfreechart_SRC gantt        GANTT        0)
+wxfreechart_add_module(wxfreechart_SRC ohlc         OHLC         0)
+wxfreechart_add_module(wxfreechart_SRC pie          PIE          0)
 
 add_definitions("-D_LOCAL_")
 
+
 if(UNIX)
-    add_library(wxfreechart ${WXFREECHART_HEADERS} ${WXFREECHART_SRC})
+  set(wxfreechart_LINK SHARED)
 else()
-    add_library(wxfreechart STATIC ${WXFREECHART_HEADERS} ${WXFREECHART_SRC})
+  set(wxfreechart_LINK STATIC)
 endif()
 
-message(STATUS ${wxWidgets_LIBRARIES})
+add_library(wxfreechart ${wxfreechart_LINK} ${wxfreechart_SRC} ${wxfreechart_HEADERS})
+
+set_target_properties(wxfreechart PROPERTIES PUBLIC_HEADER "${wxfreechart_HEADERS}")
 
 target_link_libraries(wxfreechart ${wxWidgets_LIBRARIES})
 
-install(TARGETS wxfreechart
-    EXPORT wxfreechart-targets
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-)
+install(TARGETS wxfreechart EXPORT wxfreechart-targets
+  RUNTIME DESTINATION ${wxfreechart_INSTALL_BIN_DIR} COMPONENT bin
+  LIBRARY DESTINATION ${wxfreechart_INSTALL_LIB_DIR} COMPONENT lib
+  PUBLIC_HEADER DESTINATION "${wxfreechart_INSTALL_INCLUDE_DIR}/wxfreechart" COMPONENT dev)
+
 

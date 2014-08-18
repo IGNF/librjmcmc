@@ -43,7 +43,7 @@ knowledge of the CeCILL license and that you accept its terms.
 //->
 
 //[building_footprint_rectangle_definition_geometry
-#include "core/geometry.hpp"
+#include "geometry.hpp"
 typedef Rectangle_2 object;
 //]
 

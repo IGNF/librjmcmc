@@ -37,11 +37,11 @@ knowledge of the CeCILL license and that you accept its terms.
 //[building_footprint_rectangle_gilviewer_parameters
 #include "rjmcmc-wx/wx_parameter.hpp"
 typedef parameters< wx_parameter > param;
-#include "core/building_footprint_rectangle_parameters_inc.hpp"
+#include "building_footprint_rectangle_parameters_inc.hpp"
 //]
 
 //[building_footprint_rectangle_gilviewer_core_include
-#include "core/building_footprint_rectangle.hpp"
+#include "building_footprint_rectangle.hpp"
 //]
 
 
