@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef IMAGE_CENTER_UNARY_ENERGY_HPP
 #define IMAGE_CENTER_UNARY_ENERGY_HPP
 
-#include "rjmcmc/rjmcmc/energy.hpp"
+#include "rjmcmc/rjmcmc/energy/energy.hpp"
 #include "rjmcmc/geometry/geometry.hpp"
 
 template<typename OrientedImage, typename Value = double>

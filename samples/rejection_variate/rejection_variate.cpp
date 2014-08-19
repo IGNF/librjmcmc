@@ -1,4 +1,4 @@
-#include "rjmcmc/rjmcmc/random.hpp"
+#include "rjmcmc/util/random.hpp"
 #include "rjmcmc/rjmcmc/kernel/variate.hpp"
 #include "rjmcmc/rjmcmc/kernel/rejection_variate.hpp"
 

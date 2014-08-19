@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef KERNEL_TRAITS_HPP
 #define KERNEL_TRAITS_HPP
 
-#include "rjmcmc/rjmcmc/tuple.hpp"
+#include "rjmcmc/util/tuple.hpp"
 
 #if USE_CPP11
 

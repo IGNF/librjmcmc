@@ -34,7 +34,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 ***********************************************************************/
 
-#include "rjmcmc/rjmcmc/random.hpp"
+#include "rjmcmc/util/random.hpp"
 
 //[ objects
 #include "rjmcmc/geometry/geometry.hpp"

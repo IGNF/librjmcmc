@@ -38,7 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define IMAGE_GRADIENT_UNARY_ENERGY_HPP
 
 #include "rjmcmc/geometry/integrated_flux/all.hpp"
-#include "rjmcmc/rjmcmc/energy.hpp"
+#include "rjmcmc/rjmcmc/energy/energy.hpp"
 
 template<typename Image, typename Value = double>
 class image_gradient_unary_energy : public rjmcmc::energy<Value>

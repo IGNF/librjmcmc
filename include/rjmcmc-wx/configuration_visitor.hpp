@@ -39,7 +39,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include <wx/wx.h>
 #include <wx/aboutdlg.h>
-#include "rjmcmc/rjmcmc/variant.hpp"
+#include "rjmcmc/util/variant.hpp"
 #include "paint/all.hpp"
 #include "rjmcmc/geometry/geometry.hpp"
 #include <GilViewer/gui/panel_viewer.hpp>

@@ -37,7 +37,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef BUILDING_FOOTPRINT_RECTANGLE_HPP
 #define BUILDING_FOOTPRINT_RECTANGLE_HPP
 
-#include "rjmcmc/rjmcmc/random.hpp"
+#include "rjmcmc/util/random.hpp"
 //<-
 /************** application-specific types ****************/
 //->

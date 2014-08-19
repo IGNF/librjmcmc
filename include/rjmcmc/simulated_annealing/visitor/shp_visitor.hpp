@@ -115,7 +115,7 @@ struct shp_writer_wrapper
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include "rjmcmc/rjmcmc/variant.hpp"
+#include "rjmcmc/util/variant.hpp"
 
 namespace simulated_annealing {
     namespace shp {
