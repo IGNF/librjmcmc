@@ -55,5 +55,5 @@ install(DIRECTORY ../../include/rjmcmc-wx
 )
 
 # export the rjmcmc-wx target
-install(TARGETS rjmcmc-wx EXPORT rjmcmc-targets  DESTINATION "${rjmcmc_INSTALL_CMAKE_DIR}" COMPONENT wx)
+install(TARGETS rjmcmc-wx EXPORT rjmcmc-targets  DESTINATION "${rjmcmc_INSTALL_LIB_DIR}" COMPONENT wx)
 

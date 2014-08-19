@@ -6,19 +6,12 @@ set(rjmcmc_PATCH_VERSION 0)
 set(rjmcmc_VERSION
   ${rjmcmc_MAJOR_VERSION}.${rjmcmc_MINOR_VERSION}.${rjmcmc_PATCH_VERSION})
 
-if(WIN32 AND NOT CYGWIN)
-  set(rjmcmc_DEF_INSTALL_CMAKE_DIR cmake)
-else()
-  set(rjmcmc_DEF_INSTALL_CMAKE_DIR lib/cmake/rjmcmc)
-endif()
-
 # Offer the user the choice of overriding the installation directories
 set(rjmcmc_DIR                 "${PROJECT_BINARY_DIR}" CACHE PATH "rjmcmc build directory")
 set(rjmcmc_INSTALL_LIB_DIR     lib     CACHE PATH "Installation directory for libraries"   )
 set(rjmcmc_INSTALL_BIN_DIR     bin     CACHE PATH "Installation directory for executables" )
 set(rjmcmc_INSTALL_INCLUDE_DIR include CACHE PATH "Installation directory for header files")
-set(rjmcmc_INSTALL_CMAKE_DIR ${rjmcmc_DEF_INSTALL_CMAKE_DIR} CACHE PATH
-  "Installation directory for CMake files")
+set(rjmcmc_INSTALL_CMAKE_DIR   cmake   CACHE PATH "Installation directory for CMake files")
 
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE)

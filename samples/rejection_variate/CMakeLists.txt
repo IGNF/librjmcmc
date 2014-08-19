@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+
 file( GLOB HPP *.h *.hpp )
 aux_source_directory( ${CMAKE_CURRENT_SOURCE_DIR} CPP )
 

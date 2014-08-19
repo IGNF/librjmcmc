@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 2.8)
 # Project name
 project( building_footprint_rectangle )
 
@@ -8,7 +9,7 @@ option(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GILVIEWER "build building_footprint_re
 #copy the data image
 add_custom_target(building_footprint_rectangle_data
   "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/data"
-  COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_SOURCE_DIR}/samples/data/ZTerrain_c3.tif" "${CMAKE_BINARY_DIR}/data"
+  COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../data/ZTerrain_c3.tif" "${CMAKE_BINARY_DIR}/data"
 )
 
 if(BUILD_BUILDING_FOOTPRINT_RECTANGLE_CLI)
