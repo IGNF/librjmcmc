@@ -8,7 +8,7 @@ Coupled with the rjmcmc framework, it enables the global optimization of an extr
 Thus the final pdf reduces to a simple Dirac at the global minimum if it is unique.
 To interpolate the pdf between the initial reference pdf and the final pdf a boltzmann distribution is usually used, parameterized by a temperature which decreases from +[infin] to zero.
 
-[import ../../lib/simulated_annealing/simulated_annealing.hpp]
+[import ../../include/rjmcmc/simulated_annealing/simulated_annealing.hpp]
 
 
 The main function of this simulated annealing `namespace` is `simulated_annealing::optimize`:

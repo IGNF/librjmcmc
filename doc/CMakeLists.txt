@@ -1,12 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
 
-option(BUILD_QUICKSTART "build quickstart" ON)
-if(BUILD_QUICKSTART)
-  include_directories(../include)
-  add_executable( quickstart quickstart.cpp )
-  target_link_libraries( quickstart ${Boost_LIBRARIES} ${GEOMETRY_LIBRARIES} ${shapelib_LIBRARIES})
-endif(BUILD_QUICKSTART)
-
 # Building of Documentation is tested on Linux only
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 
@@ -16,12 +9,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
   find_package(Reference)
   find_package(Documentation)
 
-  file( GLOB_RECURSE MPP_HEADERS    ../lib/mpp/*.hpp)
-  file( GLOB_RECURSE RJMCMC_HEADERS ../lib/rjmcmc/*.hpp)
-  file( GLOB_RECURSE SA_HEADERS     ../lib/simulated_annealing/*.hpp)
-  file( GLOB_RECURSE GEOM_HEADERS   ../lib/geometry/*.hpp ../lib/geometry/*.h )
-  file( GLOB_RECURSE IMAGE_HEADERS  ../lib/image/*.hpp)
-  file( GLOB_RECURSE PARAM_HEADERS  ../lib/param/*.hpp)
+  file( GLOB_RECURSE MPP_HEADERS    ../include/rjmcmc/mpp/*.hpp)
+  file( GLOB_RECURSE RJMCMC_HEADERS ../include/rjmcmc/rjmcmc/*.hpp)
+  file( GLOB_RECURSE SA_HEADERS     ../include/rjmcmc/simulated_annealing/*.hpp)
+  file( GLOB_RECURSE GEOM_HEADERS   ../include/rjmcmc/geometry/*.hpp ../lib/geometry/*.h )
+  file( GLOB_RECURSE IMAGE_HEADERS  ../include/rjmcmc/image/*.hpp)
+  file( GLOB_RECURSE PARAM_HEADERS  ../include/rjmcmc/param/*.hpp)
 
   add_reference(librjmcmc-mpp-ref.xml    ${MPP_HEADERS}    BOOSTBOOK boost.doxygen.reftitle="Marked Point Process")
   add_reference(librjmcmc-rjmcmc-ref.xml ${RJMCMC_HEADERS} BOOSTBOOK boost.doxygen.reftitle="Reversible-Jump Markov Chain Monte Carlo")

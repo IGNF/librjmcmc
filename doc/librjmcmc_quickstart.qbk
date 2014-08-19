@@ -5,7 +5,7 @@ that minimizes a simple objective function. Each circle center lie in the  unit 
 in a `[rmin, rmax]` interval. Notice that the cardinality of set itself is unknown.
 The minimized function awards a negative constant value for each circle and penalizes every pair of overlaping circles by
 its intersection area. Basically, it tries to pack as much circles as possible in the unit square while minimizing their overlap.
-[import quickstart.cpp]
+[import ../../samples/quickstart/quickstart.cpp]
 First, one needs to define the object type of the __MPP__, with all its geometric methods
 [objects]
 Then, the object container is defined as well as an objective function as the sum of a unary term for each object and a binary term
