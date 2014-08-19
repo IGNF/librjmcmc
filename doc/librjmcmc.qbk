@@ -1,7 +1,8 @@
 [library librjmcmc
     [quickbook 1.5]
     [version 0.1]
-    [authors [Brédif, Mathieu], [Tournaire, Olivier]]
+    [authors [Brédif, Mathieu], [Perret, Julien]]
+    [copyright 2014 Mathieu Brédif, Julien Perret]
     [copyright 2010 Mathieu Brédif, Olivier Tournaire]
     [purpose A generic library for rjmcmc and simulated annealing]
     [license
@@ -30,6 +31,10 @@
 [template cmake[] [@http://www.cmake.org CMake]]
 [template hg[] [@http://mercurial.selenic.com/ mercurial]]
 [template cgal[] [@http://www.cgal.org/ CGAL]]
+[template github[] [@https://github.com/IGNF/librjmcmc GitHub]]
+[template github_librjmcmc[] [@https://github.com/IGNF/librjmcmc librjmcmc]]
+[template github_wxfreechart[] [@https://github.com/IGNF/wxfreechart wxfreechart]]
+
 
 [template biblioref[name] '''<biblioref linkend="'''[name]'''"/>''']
 

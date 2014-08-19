@@ -1,9 +1,6 @@
-find_package(rjmcmc REQUIRED COMPONENTS wx)
 include_directories(${rjmcmc_INCLUDE_DIRS})
 add_definitions(${rjmcmc_DEFINITIONS})
 include_directories(../core)
-
-message(STATUS "${rjmcmc_INCLUDE_DIRS}")
 
 if(WIN32)
   set(exe_FLAG "WIN32")

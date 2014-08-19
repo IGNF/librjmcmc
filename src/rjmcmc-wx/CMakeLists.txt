@@ -9,9 +9,24 @@ if(WIN32)
 endif()
 
 # find dependent packages
-find_package(wxWidgets REQUIRED COMPONENTS ${wxWidgets_REQUIRED_COMPONENTS})
-find_package(wxfreechart REQUIRED)
-find_package(GilViewer REQUIRED)
+find_package(wxWidgets QUIET COMPONENTS ${wxWidgets_REQUIRED_COMPONENTS})
+find_package(wxfreechart QUIET)
+find_package(GilViewer QUIET)
+
+if(NOT wxWidgets_FOUND)
+  message(WARNING "Could not find wxWidgets, disabling librjmcmc-wx support.")
+  set(rjmcmc_BUILD_wx   OFF   CACHE BOOL "build the rjmcmc-wx support library" FORCE)
+endif()
+if(NOT wxfreechart_FOUND)
+  message(WARNING "Could not find wxfreechart, disabling librjmcmc-wx support.")
+  set(rjmcmc_BUILD_wx   OFF   CACHE BOOL "build the rjmcmc-wx support library" FORCE)
+endif()
+if(NOT GilViewer_FOUND)
+  message(WARNING "Could not find GilViewer, disabling librjmcmc-wx support.")
+  set(rjmcmc_BUILD_wx   OFF   CACHE BOOL "build the rjmcmc-wx support library" FORCE)
+endif()
+
+if(rjmcmc_BUILD_wx)
 
 # prepend "-D" to the wxWidgets definitions
 set(wxWidgets_DEFINITIONS0 ${wxWidgets_DEFINITIONS})
@@ -57,3 +72,4 @@ install(DIRECTORY ../../include/rjmcmc-wx
 # export the rjmcmc-wx target
 install(TARGETS rjmcmc-wx EXPORT rjmcmc-targets  DESTINATION "${rjmcmc_INSTALL_LIB_DIR}" COMPONENT wx)
 
+endif()

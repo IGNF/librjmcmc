@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
-# Project name
 project( building_footprint_rectangle )
 
+find_package(rjmcmc QUIET COMPONENTS wx)
+
 option(BUILD_BUILDING_FOOTPRINT_RECTANGLE_CLI "build building_footprint_rectangle CLI sample" ON)
-option(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GUI "build building_footprint_rectangle GUI sample" ON)
-option(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GILVIEWER "build building_footprint_rectangle GILVIEWER plugin" ON)
+option(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GUI "build building_footprint_rectangle GUI sample" ${rjmcmc-wx_FOUND})
+option(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GILVIEWER "build building_footprint_rectangle GILVIEWER plugin" ${rjmcmc-wx_FOUND})
+
 
 #copy the data image
 add_custom_target(building_footprint_rectangle_data
@@ -15,15 +17,15 @@ add_custom_target(building_footprint_rectangle_data
 if(BUILD_BUILDING_FOOTPRINT_RECTANGLE_CLI)
   add_subdirectory(cli)
   add_dependencies(building_footprint_rectangle_cli building_footprint_rectangle_data)
-endif(BUILD_BUILDING_FOOTPRINT_RECTANGLE_CLI)
+endif()
 
-if(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GUI)
+if(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GUI AND rjmcmc-wx_FOUND)
   add_subdirectory(gui)
   add_dependencies(building_footprint_rectangle_gui building_footprint_rectangle_data)
-endif(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GUI)
+endif()
 
 
-if(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GILVIEWER)
+if(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GILVIEWER AND rjmcmc-wx_FOUND)
   add_subdirectory(gilviewer)
   add_dependencies(GilViewer-building_footprint_rectangle building_footprint_rectangle_data)
-endif(BUILD_BUILDING_FOOTPRINT_RECTANGLE_GILVIEWER)
+endif()

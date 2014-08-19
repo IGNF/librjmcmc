@@ -1,6 +1,5 @@
 list(APPEND CMAKE_MODULE_PATH ${INSTALL_CMAKE_DIR})
 
-find_package( rjmcmc REQUIRED )
 find_package( TIFF   REQUIRED )
 
 include_directories(../core)

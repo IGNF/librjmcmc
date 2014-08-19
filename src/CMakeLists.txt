@@ -13,6 +13,9 @@ set(rjmcmc_INSTALL_BIN_DIR     bin     CACHE PATH "Installation directory for ex
 set(rjmcmc_INSTALL_INCLUDE_DIR include CACHE PATH "Installation directory for header files")
 set(rjmcmc_INSTALL_CMAKE_DIR   cmake   CACHE PATH "Installation directory for CMake files")
 
+
+set(rjmcmc_BUILD_wx   ON   CACHE BOOL "build the rjmcmc-wx support library")
+
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE)
   set(var rjmcmc_INSTALL_${p}_DIR)
@@ -25,7 +28,9 @@ endforeach()
 include_directories(../include)
 
 add_subdirectory(rjmcmc)
-add_subdirectory(rjmcmc-wx)
+if(rjmcmc_BUILD_wx)
+  add_subdirectory(rjmcmc-wx)
+endif()
 
 # Add all targets to the build-tree export set
 #export(TARGETS rjmcmc-wx FILE "${PROJECT_BINARY_DIR}/rjmcmc-targets.cmake")
@@ -55,4 +60,7 @@ install(FILES
   DESTINATION "${rjmcmc_INSTALL_CMAKE_DIR}" COMPONENT dev)
  
 # Install the export set for use with the install-tree
-install(EXPORT rjmcmc-targets DESTINATION "${rjmcmc_INSTALL_CMAKE_DIR}" COMPONENT dev)
+if(${rjmcmc_BUILD_wx})
+  install(EXPORT rjmcmc-targets DESTINATION "${rjmcmc_INSTALL_CMAKE_DIR}" COMPONENT dev)
+endif()
+

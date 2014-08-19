@@ -3,21 +3,13 @@
 [section:compilation_introduction Introduction]
 This section explains how to build the __librjmcmc__. The instructions are clear enough to be directly used on a `Linux` platform. For other platforms (although some tests have been on `Windows` with `Visual Studio Express - 2009`), you should use a ['trial and error] approach...
 
-For all platforms, the __librjmcmc__ depends on the following libraries, which should be installed on your system:
+For all platforms, the __librjmcmc__ depends on the following libraries, which should be installed on your system  [general_boost] libraries: [*[^[boost program_options]]], [*[^[boost thread]]], [*[^[boost system]]], [*[^[boost filesystem]]].
 
-* [general_boost] libraries: [*[^[boost program_options]]], [*[^[boost thread]]], [*[^[boost system]]], [*[^[boost filesystem]]]
+The image-based energies of the samples require [*[^[boost_gil]]], [*[^libtiff]], [*[^libjpeg]], [*[^libpng]].
 
-The image-based energies of the samples require :
+The GUI-based samples that provide 2D visualizations are built over [*[^[wx]]], [*[^[github_wxfreechart]]] and [*[^[gilviewer]]]
 
-* [*[^[boost_gil]]], [*[^libtiff]], [*[^libjpeg]], [*[^libpng]]
-
-The GUI-based samples that provide 2D visualizations are built over :
-
-* [*[^[wx]]], [*[^[gilviewer]]]
-
-Finally to help debugging the geometric aspects of the library (at the cost of computing time...) :
-
-* [*[^[cgal]]]
+Finally to help debugging the geometric aspects of the library (at the cost of computing time...) some test may require the [*[^[cgal]]] library, but this dependency is not intended for regular use.
 
 To build this documentation, either as =html= or =pdf=, the following utilities are required:
 
@@ -25,35 +17,8 @@ To build this documentation, either as =html= or =pdf=, the following utilities 
 * [*[^doxygen]], [*[^xsltproc]], [*[^docbook xsl]], [*[^docbook dtd]], [*[^fop]] (available in your package manager)
 
 You also need to download and install the cross-platform build system [cmake].
-Access to the ['source control management tool] is performed using [hg].
-[endsect]
 
-[section:compilation_download Downloading __librjmcmc__]
-[important Still waiting for a license and an external [hg] repository...]
-
-[h3 First time download]
-__librjmcmc__ is available as a (local) [hg] repository. For a ['read-only] access, you simply have to ['clone] the repository:
-
-``
-	cd wherever_you_like
-	hg clone http://mac0801w055.ign.fr/code/librjmcmc/
-``
-
-This commands will download __librjmcmc__ in =wherever_you_like/librjmcmc=. If you prefer another folder name, just add it at the end of the =hg clone= command:
-
-``
-	hg clone http://mac0801w055.ign.fr/code/librjmcmc/ another_librjmcmc_folder_name
-``
-
-[h3 Updating]
-To update __librjmcmc__, you simply have to run the adequate [hg] commands:
-
-``
-	hg pull
-	hg up
-``
-
-This will update the library with the latest version available in the repository.
+The librjmcmc open source repository is currently hosted on [*[github]] as [*[github_librjmcmc]] along with  [*[github_wxfreechart]].
 [endsect]
 
 [section:compilation_building Building and installing __librjmcmc__]
