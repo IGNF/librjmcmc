@@ -48,8 +48,9 @@ typedef Rectangle_2 object;
 //]
 
 //[building_footprint_rectangle_definition_kernels
+#include "rjmcmc/rjmcmc/kernel/raster_variate.hpp"
 #include "rjmcmc/mpp/kernel/uniform_birth.hpp"
-typedef marked_point_process::uniform_birth<object> uniform_birth;
+typedef marked_point_process::uniform_birth<object,rjmcmc::raster_variate<5> > uniform_birth;
 #include "rjmcmc/mpp/kernel/uniform_birth_death_kernel.hpp"
 typedef marked_point_process::uniform_birth_death_kernel<uniform_birth>::type  birth_death_kernel;
 
@@ -207,9 +208,12 @@ void create_sampler(const param *p, sampler *&s) {
     double minratio = 1./maxratio;
 
     K::Vector_2 v(maxsize,maxsize);
+    int size[] = {3,2,1,1,1};
+    int prob[] = {1,6,0,10,5,2};
     uniform_birth birth(
             Rectangle_2(r.min(),-v,minratio),
-            Rectangle_2(r.max(), v,maxratio)
+            Rectangle_2(r.max(), v,maxratio),
+            rjmcmc::raster_variate<5>(prob,size)
             );
 
     distribution cs(p->get<double>("poisson"));

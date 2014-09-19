@@ -2,7 +2,7 @@ include_directories(${rjmcmc_INCLUDE_DIRS})
 add_definitions(${rjmcmc_DEFINITIONS})
 include_directories(../core)
 
-file( GLOB SRCS *.c *.cpp *.cxx *.h *.hpp *.hxx)
+file( GLOB SRCS *.c *.cpp *.cxx *.h *.hpp *.hxx ../core/*.hpp ../core/*.cpp)
 add_library(GilViewer-building_footprint_rectangle SHARED ${SRCS})
 target_link_libraries(GilViewer-building_footprint_rectangle ${rjmcmc_LIBRARIES})
 
