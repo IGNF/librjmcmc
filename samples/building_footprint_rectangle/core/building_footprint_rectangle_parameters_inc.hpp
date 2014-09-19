@@ -68,6 +68,8 @@ void initialize_parameters(T* params)
     params->template insert<double>("ponderation_mask",'\0',0, "Image mask energy weight");
     params->template insert<boost::filesystem::path>("dsm",'i',"../data/ZTerrain_c3.tif", "DSM image path");
     params->template insert<boost::filesystem::path>("mask",'\0',"", "mask image path");
+    params->template insert<boost::filesystem::path>("birth_prob",'\0',"", "birth probability image path");
+    params->template insert<double>("birth_prob_offset",'\0',-150, "additive constant to the probability map");
     params->template insert<int>("xmin",'x',0, "Xmin");
     params->template insert<int>("ymin",'y',0, "Ymin");
     params->template insert<int>("xmax",'X',1000000, "Xmax");

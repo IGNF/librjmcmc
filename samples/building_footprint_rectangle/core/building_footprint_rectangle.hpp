@@ -207,9 +207,23 @@ void create_sampler(const param *p, sampler *&s) {
     double maxratio = p->get<double>("maxratio");
     double minratio = 1./maxratio;
 
+    int size[] = {1,1,1,1,1};
+    short unsigned prob0[] = {1};
+    short unsigned *prob = prob0;
+    std::string birth_prob_file = p->get<boost::filesystem::path>("birth_prob" ).string();
+    if(birth_prob_file!="")
+    {
+        unsigned short birth_prob_offset = (unsigned short) (p->get<double>("birth_prob_offset" ));
+        clip_bbox(r,birth_prob_file);
+        mask_type birth_prob(birth_prob_file , r, conversion_functor() );
+        mask_type::view_t view = birth_prob.view();
+        size[0] = view.width ();
+        size[1] = view.height();
+        prob = boost::gil::interleaved_view_get_raw_data(view); // should work in general on single channel images
+        for(int i=0; i< size[0]*size[1]; ++i) prob[i] = std::max(prob[i],birth_prob_offset)-birth_prob_offset;
+    }
+
     K::Vector_2 v(maxsize,maxsize);
-    int size[] = {3,2,1,1,1};
-    int prob[] = {1,6,0,10,5,2};
     uniform_birth birth(
             Rectangle_2(r.min(),-v,minratio),
             Rectangle_2(r.max(), v,maxratio),

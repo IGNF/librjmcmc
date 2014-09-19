@@ -69,7 +69,7 @@ namespace marked_point_process {
         class modification
         {
         public:
-            typedef	Birth birth_type;
+            typedef Birth birth_type;
             typedef Death death_type;
             const birth_type& birth() const { return m_birth; }
             const death_type& death() const { return m_death; }
