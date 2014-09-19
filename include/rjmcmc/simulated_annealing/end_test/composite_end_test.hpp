@@ -53,7 +53,7 @@ namespace simulated_annealing
             bool value() const { return m_value; }
             end_test_or_predicate(const Configuration& config, const Sampler& sample, double t)
                 : m_config(config), m_sample(sample), m_t(t), m_value(false) {}
-            template<typename T> void operator()(const T& t) { m_value |= t(m_config,m_sample,m_t); }
+            template<typename T> void operator()(T& t) { m_value |= t(m_config,m_sample,m_t); }
             template<typename T> void operator()(T* t) { operator()(*t); }
         };
     }

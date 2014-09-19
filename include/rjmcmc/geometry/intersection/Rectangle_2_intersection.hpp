@@ -573,7 +573,7 @@ template <class K> inline bool do_intersect(const Rectangle_2<K> &a, const Recta
     typedef typename K::FT FT;
     Vector_2 an(a.normal());
     Vector_2 bn(b.normal());
-    Vector_2 v(a.center(),b.center());
+    Vector_2 v(a.center()-b.center());
 
     FT det = abs(an.x()*bn.y()-an.y()*bn.x());
     FT dot = abs(an*bn);
