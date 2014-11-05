@@ -72,6 +72,33 @@ namespace simulated_annealing
         //]
     }
 
+    template<
+            typename Engine,
+            typename Configuration, typename Sampler,
+            typename Schedule, typename EndTest
+            >
+            int optimize(
+                    Engine& e,
+                    Configuration& config, Sampler& sampler,
+                    Schedule& schedule, EndTest& end_test)
+            //]
+    {
+
+        //[simulated_annealing_concept_assertions
+        BOOST_CONCEPT_ASSERT((boost::InputIterator<Schedule>));
+        //]
+
+        //[simulated_annealing_loop
+        double t = *schedule;
+        int iter = 0;
+        for(; !end_test(config,sampler,t); t = *(++schedule))
+        {
+            sampler(e,config,t);
+            iter++;
+        }
+        //]
+        return iter;
+    }
 }
 
 #endif // SIMULATED_ANNEALING_HPP
