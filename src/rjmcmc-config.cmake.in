@@ -16,7 +16,7 @@ list(APPEND rjmcmc_INCLUDE_DIRS  "${rjmcmc_CMAKE_DIR}/../include")
 
 
 # Our library dependencies (contains definitions for IMPORTED targets)
-if(NOT TARGET rjmcmc AND NOT rjmcmc_BINARY_DIR)
+if(NOT TARGET rjmcmc AND NOT rjmcmc_BINARY_DIR AND "@rjmcmc_BUILD_wx@")
   include("${rjmcmc_CMAKE_DIR}/rjmcmc-targets.cmake")
 endif()
 
