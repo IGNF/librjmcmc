@@ -81,14 +81,10 @@ namespace simulated_annealing
                     Engine& e,
                     Configuration& config, Sampler& sampler,
                     Schedule& schedule, EndTest& end_test)
-            //]
     {
 
-        //[simulated_annealing_concept_assertions
         BOOST_CONCEPT_ASSERT((boost::InputIterator<Schedule>));
-        //]
 
-        //[simulated_annealing_loop
         double t = *schedule;
         int iter = 0;
         for(; !end_test(config,sampler,t); t = *(++schedule))
@@ -96,7 +92,6 @@ namespace simulated_annealing
             sampler(e,config,t);
             iter++;
         }
-        //]
         return iter;
     }
 }
