@@ -52,7 +52,10 @@ namespace rjmcmc {
             value_type val[dimension];
             double res = m_variate(e,val);
             double pdf = m_transform.template apply<0>(val,it);
-            return res/pdf; // TODO : check why this is not a multiplication...
+            // this is a variable substitution (https://en.wikipedia.org/wiki/Probability_density_function#Multiple_variables)
+            // q(it) = q(t(val)), t being the transform
+            // q(it) = q(val) * |J_(t^-1)(t(val))| = q(val) / |J_t(val)|
+            return res/pdf;
         }
         template<typename InputIterator>
         inline double pdf(InputIterator it) const {
