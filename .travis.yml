@@ -9,6 +9,7 @@ addons:
     packages:
     - xsltproc
     - libxerces-c-dev
+    - doxygen
     - xsdcxx
     - libjpeg-dev
     - zlib1g-dev
