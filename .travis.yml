@@ -26,9 +26,9 @@ install:
   - wget https://github.com/IGNF/gilviewer/archive/master.zip
   - unzip master
   - rm master.zip
-  - cd gilviewer-master
   - mkdir gilviewer
-  - mkdir build && cd build && cmake .. && make && make DESTDIR=../../gilviewer install
+  - cd gilviewer-master
+  - mkdir build && cd build && cmake .. && make && make DESTDIR=../../gilviewer install && cd ../..
 
 script:
   - mkdir build && cd build && cmake .. && make
