@@ -77,7 +77,7 @@ namespace rjmcmc {
             for(int i=0; i<N; ++i)
             {
                 double x = *it++;
-                if(x<0. || x>1.) return 0.;
+                if(x<0. || x>=1.) return 0.;
                 int ix = int(x*m_size[i]);
                 offset += stride*ix;
                 stride *= m_size[i];
