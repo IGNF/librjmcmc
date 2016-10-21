@@ -9,7 +9,7 @@ RUN apt-get -y -qq update && apt-get -y --fix-missing install $BUILD_PACKAGES \
 && cd build \
 && cmake -DCMAKE_BUILD_TYPE=Release .. \
 && make install \
-&& cp -R librjmcmc/build/data  /usr/local/share/librjmcmc \
+&& cp -R librjmcmc/samples/data  /usr/local/share/librjmcmc \
 && cp librjmcmc/build/samples/quickstart/quickstart /usr/local/bin \
 && cp librjmcmc/build/samples/building_footprint_rectangle/cli/building_footprint_rectangle_cli /usr/local/bin
 
