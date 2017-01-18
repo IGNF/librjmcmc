@@ -41,10 +41,11 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "rjmcmc/geometry/geometry.hpp"
 #include "rjmcmc/geometry/Rectangle_2.hpp"
 
-template<typename K> void paint(
+template<typename K, typename LayerPainter> void paint(
 layer::ptrLayerType& l,
 const std::string& s,
-const geometry::Rectangle_2<K>& r)
+const geometry::Rectangle_2<K>& r,
+LayerPainter * const)
 {
     std::vector<double> vectx, vecty;
     for (unsigned int i=0; i<4;++i)

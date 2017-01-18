@@ -83,7 +83,7 @@ struct coordinates_iterator< geometry::Circle_2<K> >
 
 template<typename K>
 struct object_from_coordinates< geometry::Circle_2<K> > {
-    template<typename Iterator> geometry::Circle_2<K> operator()(Iterator it) {
+    template<typename Iterator> geometry::Circle_2<K> operator()(Iterator it) const {
         typename K::FT x = *it++;
         typename K::FT y = *it++;
         typename K::Point_2 p(x,y);

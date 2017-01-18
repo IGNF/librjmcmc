@@ -44,108 +44,99 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "rjmcmc/geometry/geometry.hpp"
 #include <GilViewer/gui/panel_viewer.hpp>
 
-struct layer_painter {
-public:
-    layer_painter( layer::ptrLayerType& layer) : m_layer(layer) {}
+namespace simulated_annealing {
+namespace wx {
 
-    void energy(double e) { m_energy=e; }
+class layer_painter {
+public:
+    virtual ~layer_painter() {}
 
     typedef void result_type;
 
-    template<typename T> void operator()(const T& t) const {
-        std::ostringstream oss;
-        oss.precision(std::numeric_limits<double>::digits10+1);
-        oss << m_energy;
-        paint(m_layer,oss.str(),t);
+    template<typename Config>
+    void paint_layer(layer::ptrLayerType& layer, const Config& config)
+    {
+        typename Config::const_iterator it = config.begin(), end = config.end();
+        for (; it != end; ++it)
+        {
+            std::ostringstream oss;
+            oss.precision(std::numeric_limits<double>::digits10+1);
+            oss << config.energy(it);
+            paint(layer,oss.str(),config.value(it),this);
+        }
     }
-
-private:
-    layer::ptrLayerType& m_layer;
-    double m_energy;
 };
 
 
-template<typename Config>
-layer::ptrLayerType& operator<<(layer::ptrLayerType& layer, const Config& config)
+
+
+class configuration_visitor
 {
-    typename Config::const_iterator it = config.begin(), end = config.end();
-    layer_painter painter(layer);
-    for (; it != end; ++it)
+public:
+    configuration_visitor(panel_viewer *panel);
+    configuration_visitor(panel_viewer *panel, layer_painter *painter);
+
+    void init(int dump, int save);
+
+    template<typename Configuration, typename Sampler>
+    void begin(const Configuration& config, const Sampler&, double)
     {
-        painter.energy(config.energy(it));
-        rjmcmc::apply_visitor(painter,config.value(it));
+        paint(config);
     }
-    return layer;
-}
 
-namespace simulated_annealing {
-    namespace wx {
+    template<typename Configuration, typename Sampler>
+    void end(const Configuration& config, const Sampler&, double)
+    {
+        paint(config);
+    }
 
-        class configuration_visitor
+    template<typename Configuration, typename Sampler>
+    void visit(const Configuration& config, const Sampler&, double)
+    {
+        ++m_iter;
+        if ( m_save && (m_iter % m_save == 0) )
         {
-        public:
-            configuration_visitor(panel_viewer *panel);
+            std::ostringstream out;
+            out.width(8);
+            out.fill('0');
+            out << m_iter;
+            m_vlayer->save( out.str() + ".shp" );
+        }
+        if ( m_dump && (m_iter % m_dump == 0) )
+        {
+            paint(config);
+        }
+    }
 
-            void init(int dump, int save);
+    virtual wxAboutDialogInfo about_info() const;
 
-            template<typename Configuration, typename Sampler>
-            void begin(const Configuration& config, const Sampler&, double)
-            {
-                paint(config);
-            }
+    panel_viewer* panelviewer() const;
 
-            template<typename Configuration, typename Sampler>
-            void end(const Configuration& config, const Sampler&, double)
-            {
-                paint(config);
-            }
+    wxRect get_bbox() const;
+    void set_bbox(const wxRect& r);
 
-            template<typename Configuration, typename Sampler>
-            void visit(const Configuration& config, const Sampler&, double)
-            {
-                ++m_iter;
-                if ( m_save && (m_iter % m_save == 0) )
-                {
-                    std::ostringstream out;
-                    out.width(8);
-                    out.fill('0');
-                    out << m_iter;
-                    m_vlayer->save( out.str() + ".shp" );
-                }
-                if ( m_dump && (m_iter % m_dump == 0) )
-                {
-                    paint(config);
-                }
-            }
+private:
+    panel_viewer *m_panel;
 
-            virtual wxAboutDialogInfo about_info() const;
-
-            panel_viewer* panelviewer() const;
-
-            wxRect get_bbox() const;
-            void set_bbox(const wxRect& r);
-
-        private:
-            panel_viewer *m_panel;
-
-            int m_dump;
-            int m_save;
-            int m_iter;
-            layer::ptrLayerType m_vlayer;
+    int m_dump;
+    int m_save;
+    int m_iter;
+    layer::ptrLayerType m_vlayer;
+    layer_painter *m_painter;
 
 
-            template<typename Configuration>
-            void paint(const Configuration& config)
-            {
-                wxMutexGuiEnter();
-                m_vlayer->clear();
-                m_vlayer << config;
-                wxMutexGuiLeave();
-                m_panel->Refresh();
-            }
-        };
+    template<typename Configuration>
+    void paint(const Configuration& config)
+    {
+        wxMutexGuiEnter();
+        m_vlayer->clear();
+        m_painter->paint_layer(m_vlayer,config);
+        wxMutexGuiLeave();
+        m_panel->Refresh();
+    }
+};
 
-    } // namespace wx
+} // namespace wx
 } // namespace simulated_annealing
 
 #endif // WX_CCONFIGURATION_VISITOR_HPP

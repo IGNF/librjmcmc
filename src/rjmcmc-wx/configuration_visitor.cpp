@@ -50,10 +50,15 @@ using namespace std;
 namespace simulated_annealing {
     namespace wx {
 
-        configuration_visitor::configuration_visitor(panel_viewer *panel)
-            : m_panel(panel)
-        {
-        }
+    configuration_visitor::configuration_visitor(panel_viewer *panel, layer_painter *painter)
+        : m_panel(panel), m_painter(painter)
+    {
+    }
+
+    configuration_visitor::configuration_visitor(panel_viewer *panel)
+        : m_panel(panel)
+    {
+    }
         wxAboutDialogInfo configuration_visitor::about_info() const
         {
             wxAboutDialogInfo info;

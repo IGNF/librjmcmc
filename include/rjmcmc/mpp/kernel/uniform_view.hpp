@@ -48,6 +48,7 @@ namespace marked_point_process {
     template<typename T, unsigned int N=1>
     class uniform_view
     {
+        object_from_coordinates<T> creator;
     public:
         typedef T object_type;
         enum { dimension =  coordinates_iterator<T>::dimension };
@@ -84,7 +85,6 @@ namespace marked_point_process {
             unsigned int beg   = c.size()-m.death().size()+1;
             unsigned int end   = beg+N;
             unsigned int denom = 1;
-            object_from_coordinates<T> creator;
             for(unsigned int n=beg ; n<end ; ++n)
             {
                 m.birth().push_back(creator(it));

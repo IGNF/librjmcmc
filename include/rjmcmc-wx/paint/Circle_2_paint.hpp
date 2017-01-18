@@ -41,10 +41,11 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "rjmcmc/geometry/geometry.hpp"
 #include "rjmcmc/geometry/Circle_2.hpp"
 
-template<typename K> void paint(
+template<typename K, typename LayerPainter> void paint(
         layer::ptrLayerType& l,
 	const std::string& s,
-	const geometry::Circle_2<K>& c)
+    const geometry::Circle_2<K>& c,
+    LayerPainter * const)
 {
   double x = geometry::to_double(c.center().x());
   double y = geometry::to_double(c.center().y());

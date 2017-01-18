@@ -89,7 +89,7 @@ struct coordinates_iterator< geometry::Rectangle_2<K> >
 
 template<typename K>
 struct object_from_coordinates< geometry::Rectangle_2<K> > {
-    template<typename Iterator> geometry::Rectangle_2<K> operator()(Iterator it) {
+    template<typename Iterator> geometry::Rectangle_2<K> operator()(Iterator it) const {
         typename K::FT x = *it++;
         typename K::FT y = *it++;
         typename K::FT u = *it++;

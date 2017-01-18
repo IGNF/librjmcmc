@@ -63,7 +63,7 @@ typename coordinates_iterator<T>::type coordinates_end(const T&)
 
 template<typename T>
 struct object_from_coordinates {
-    template<typename Iterator> T operator()(Iterator it) { return T(it); }
+    template<typename Iterator> T operator()(Iterator it) const { return T(it); }
 };
 
 #endif // COORDINATES_HPP

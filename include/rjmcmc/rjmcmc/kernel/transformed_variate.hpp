@@ -61,7 +61,8 @@ namespace rjmcmc {
         inline double pdf(InputIterator it) const {
             value_type val[dimension];
             double res = m_transform.template apply<1>(it,val);
-            return res*m_variate.pdf(val);
+            double pdf = m_variate.pdf(val);
+            return res*pdf;
         }
         transformed_variate(const Transform& transform, const Variate& variate)
             : m_transform(transform), m_variate(variate) {}
